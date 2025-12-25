@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Guide Mate</string>
+    <string name="onboarding_title_1">Şehri Özgürce Keşfet</string>
+    <string name="onboarding_description_1">Sıkıcı turlardan sıkıldın mı? GuideMate ile şehrin gizli hazinelerini, en iyi bilen yerel rehberlerle özgürce keşfet.</string>
+    <string name="onboarding_title_2">Şehrini Tanıt,Kazan</string>
+    <string name="onboarding_description2">Bildiğin sokakları ve favori mekanlarını dünyayla paylaş. Kendi rotanı oluştur, turistlere rehberlik et ve güvenle kazan.</string>
+    <string name="onboarding_title_3">Güvenli Buluşma</string>
+    <string name="onboarding_description_3">Sana en uygun rehberi veya gezgini bul. Ödemeden tura kadar her adımda GuideMate güvencesi seninle. Hadi başlayalım!</string>
+    <string name="get_started">Başlayalım</string>
+    <string name="next">İleri</string>
+
+
+
+
 </resources>

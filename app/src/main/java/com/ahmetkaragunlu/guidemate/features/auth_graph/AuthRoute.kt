@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.features.routes
+package com.ahmetkaragunlu.guidemate.features.auth_graph
 
 enum class AuthRoute(val route: String) {
     OnboardingScreen(route = "OnboardingScreen"),
@@ -7,14 +7,3 @@ enum class AuthRoute(val route: String) {
     SignUpScreen(route = "SignUpScreen"),
     ForgotPassWord(route = "ForgotPasswordScreen")
 }
-
-
-
-
-
-
-
-
-
-
-
