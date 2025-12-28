@@ -3,7 +3,6 @@ package com.ahmetkaragunlu.guidemate.components
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -25,7 +24,7 @@ fun EditButton(
 
     Button(
         onClick = { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
         modifier = modifier.widthIn(max = 380.dp).fillMaxWidth().padding(horizontal = 48.dp)
     ) {

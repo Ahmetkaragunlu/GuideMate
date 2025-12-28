@@ -8,6 +8,12 @@
     <string name="onboarding_description_3">Sana en uygun rehberi veya gezgini bul. Ödemeden tura kadar her adımda GuideMate güvencesi seninle. Hadi başlayalım!</string>
     <string name="get_started">Başlayalım</string>
     <string name="next">İleri</string>
+    <string name="traveler">Gezgin</string>
+    <string name="traveler_description">Yeni yerler keşfetmek istiyorum.</string>
+    <string name="local_guide">Yerel Rehber</string>
+    <string name="local_guide_description">Turlar düzenlemek istiyorum.</string>
+    <string name="choose_user_type_title">Uygulamayı nasıl kullanmak istersin?</string>
+
 
 
 
