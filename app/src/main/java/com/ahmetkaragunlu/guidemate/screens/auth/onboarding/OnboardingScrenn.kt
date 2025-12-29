@@ -77,7 +77,7 @@ fun OnboardingScreen(
                         text = stringResource(page.description),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
-                        color = Color.Gray
+                        color = colorResource(R.color.onboarding_body_text_color)
                     )
                 }
 
