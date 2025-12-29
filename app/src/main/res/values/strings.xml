@@ -8,7 +8,20 @@
     <string name="onboarding_description_3">Sana en uygun rehberi veya gezgini bul. Ödemeden tura kadar her adımda GuideMate güvencesi seninle. Hadi başlayalım!</string>
     <string name="get_started">Başlayalım</string>
     <string name="next">İleri</string>
+    <string name="already_have_an_account">Zaten bir hesabın var mı? Giriş yap</string>
+    <string name="sign_up">Kayıt ol</string>
+    <string name="name">İsim</string>
+    <string name="last_name">Soy İsim</string>
+    <string name="email">E-posta</string>
+    <string name="agree_terms_conditions">
+    Şartları ve koşulları kabul ediyorum</string>
+
+
+    <string name="password">Şifre</string>
+    <string name="confirm_password">Şifreni Onayla</string>
     <string name="traveler">Gezgin</string>
+    <string name="sign_up_title">Hesabını Oluştur</string>
+    <string name="sign_up_subtitle">Yeni yerler keşfetmek ve paylaşmak için hemen kayıt ol!</string>
     <string name="traveler_description">Yeni yerler keşfetmek istiyorum.</string>
     <string name="local_guide">Yerel Rehber</string>
     <string name="local_guide_description">Turlar düzenlemek istiyorum.</string>
