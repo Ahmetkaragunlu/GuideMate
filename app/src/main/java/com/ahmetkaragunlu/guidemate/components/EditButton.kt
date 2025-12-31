@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
@@ -24,9 +25,12 @@ fun EditButton(
 
     Button(
         onClick = { onClick() },
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
-        modifier = modifier.widthIn(max = 380.dp).fillMaxWidth().padding(horizontal = 48.dp)
+        modifier = modifier
+            .widthIn(max = 380.dp)
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large))
     ) {
         Text(
             text = stringResource(text),

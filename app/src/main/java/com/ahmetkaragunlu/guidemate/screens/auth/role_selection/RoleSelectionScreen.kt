@@ -1,4 +1,5 @@
-package com.ahmetkaragunlu.guidemate.screens.auth
+package com.ahmetkaragunlu.guidemate.screens.auth.role_selection
+
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,13 +40,15 @@ fun RoleSelectionScreen(
 ) {
 
     Column(
-        modifier = modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.onPrimary),
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.onPrimary),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(R.string.choose_user_type_title),
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_small)),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
         )
@@ -54,19 +58,19 @@ fun RoleSelectionScreen(
             textAlign = TextAlign.Center,
             color = colorResource(R.color.onboarding_body_text_color)
         )
-        Spacer(modifier = Modifier.height(72.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_double_extra_large)))
         RoleSelectionCard(
             icon = R.drawable.traveler_image,
             title = R.string.traveler,
             description = R.string.traveler_description
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
         RoleSelectionCard(
             icon = R.drawable.guide_image,
             title = R.string.local_guide,
             description = R.string.local_guide_description
         )
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
         EditButton(
             text = R.string.next,
             onClick = {}
@@ -85,14 +89,16 @@ fun RoleSelectionCard(
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         border = BorderStroke(width = 1.dp, color = Color(0XFFdfe2e9)),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = dimensionResource(R.dimen.spacing_medium)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -100,21 +106,25 @@ fun RoleSelectionCard(
                 contentDescription = null,
                 tint = Color.Unspecified
             )
-            Column(modifier = Modifier.padding( 16.dp).weight(1f),verticalArrangement = Arrangement.Center) {
+            Column(
+                modifier = Modifier
+                    .padding(all = dimensionResource(R.dimen.spacing_medium))
+                    .weight(1f), verticalArrangement = Arrangement.Center
+            ) {
                 Text(
                     text = stringResource(title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_tiny))
                 )
                 Text(
                     text = stringResource(description),
                     style = MaterialTheme.typography.bodySmall,
                     color = colorResource(R.color.onboarding_body_text_color)
 
-                    )
+                )
             }
-           RadioButton( selected = false, onClick = {})
+            RadioButton(selected = false, onClick = {})
 
         }
     }

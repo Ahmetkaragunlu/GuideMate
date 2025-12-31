@@ -11,9 +11,11 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.ahmetkaragunlu.guidemate.R
 
 
 @Composable
@@ -26,7 +28,7 @@ fun EditTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    shape: Shape = RoundedCornerShape(12.dp),
+    shape: Shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Color.LightGray,
         unfocusedBorderColor = Color.LightGray

@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -61,18 +62,18 @@ fun OnboardingScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentScale = ContentScale.Crop,
                 )
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_medium))
                 ) {
                     Text(
                         text = stringResource(page.title),
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color(0xFF323539)
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                     Text(
                         text = stringResource(page.description),
                         style = MaterialTheme.typography.bodyLarge,
@@ -95,7 +96,7 @@ fun OnboardingScreen(
                 val size = if (pagerState.currentPage == iteration) 12.dp else 8.dp
                 Box(
                     modifier = Modifier
-                        .padding(4.dp)
+                        .padding(all = dimensionResource(R.dimen.spacing_tiny))
                         .size(size)
                         .clip(CircleShape)
                         .background(color)
