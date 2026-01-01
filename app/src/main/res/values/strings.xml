@@ -23,6 +23,9 @@
     <string name="name">İsim</string>
     <string name="last_name">Soy İsim</string>
     <string name="email">E-posta</string>
+    <string name="send_reset_link">Sıfırlama Bağlantısı Gönder</string>
+    <string name="reset_password_title">Şifre Yenileme</string>
+    <string name="reset_password_description">E-posta adresinize bir sıfırlama bağlantısı göndereceğiz. Lütfen bilgilerinizi girin.</string>
     <string name="agree_terms_conditions">Şartları ve koşulları kabul ediyorum</string>
 
 

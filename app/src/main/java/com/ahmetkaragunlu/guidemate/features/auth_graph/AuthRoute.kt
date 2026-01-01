@@ -5,5 +5,5 @@ enum class AuthRoute(val route: String) {
     RoleSelectionScreen(route = "RoleSelectionScreen"),
     SignInScreen(route = "SignInScreen"),
     SignUpScreen(route = "SignUpScreen"),
-    ForgotPassWord(route = "ForgotPasswordScreen")
+    ForgotPassWordScreen(route = "ForgotPasswordScreen")
 }
