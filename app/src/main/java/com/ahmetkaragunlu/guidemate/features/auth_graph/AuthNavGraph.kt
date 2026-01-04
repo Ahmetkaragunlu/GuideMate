@@ -15,7 +15,7 @@ import com.ahmetkaragunlu.guidemate.screens.auth.sign_up.SignUpScreen
 fun NavGraphBuilder.authNavGraph(navController: NavController) {
 
     navigation(
-        startDestination = AuthRoute.ForgotPassWordScreen.route,
+        startDestination = AuthRoute.SignUpScreen.route,
         route = Graph.AuthGraph.route
     ) {
         composable(route = AuthRoute.OnboardingScreen.route) {

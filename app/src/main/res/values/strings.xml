@@ -23,6 +23,13 @@
     <string name="name">İsim</string>
     <string name="last_name">Soy İsim</string>
     <string name="email">E-posta</string>
+    <string name="name_error_message">İsim en az 3 karakter olmalıdır</string>
+    <string name="email_error_message">Geçersiz e-posta adresi</string>
+    <string name="last_name_error_message">Soy isim en az 2 karakter olmalıdır</string>
+    <string name="password_error_message">Şifre en az 6 karakter olmalıdır</string>
+    <string name="confirm_password_error_message">Şifreler eşleşmiyor</string>
+    <string name="error_fix_fields">Lütfen hatalı alanları düzeltiniz.</string>
+    <string name="error_fill_all_fields">Lütfen tüm alanları doldurunuz.</string>
     <string name="send_reset_link">Sıfırlama Bağlantısı Gönder</string>
     <string name="reset_password_title">Şifre Yenileme</string>
     <string name="reset_password_description">E-posta adresinize bir sıfırlama bağlantısı göndereceğiz. Lütfen bilgilerinizi girin.</string>

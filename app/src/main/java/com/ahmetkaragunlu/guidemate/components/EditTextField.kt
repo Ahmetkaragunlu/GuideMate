@@ -21,6 +21,7 @@ import com.ahmetkaragunlu.guidemate.R
 @Composable
 fun EditTextField(
     value: String,
+    isError: Boolean = false,
     onValueChange: (String) -> Unit,
     @StringRes placeholder : Int? = null,
     @StringRes supportingText: Int? = null,
@@ -44,8 +45,9 @@ fun EditTextField(
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         leadingIcon = leadingIcon,
-        colors = colors
-
+        colors = colors,
+        isError = isError,
+        singleLine = true,
     )
 
 
