@@ -57,6 +57,45 @@
     <string name="logout_success">Başarıyla çıkış yapıldı.</string>
     <string name="logout_offline">Çıkış yapıldı (Çevrimdışı mod).</string>
 
+    <string name="error_terms_required">Lütfen Kullanıcı Sözleşmesini okuyup onaylayın.</string>
+    <string name="terms_dialog_title">Kullanıcı Sözleşmesi ve Gizlilik Politikası</string>
+    <string name="close">Kapat</string>
+
+    <string name="ok">Tamam</string>
+    <string name="cancel">İptal</string>
+    <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>
+
+    <string name="terms_read_and_approve">Okudum, Onaylıyorum</string>
+    <string name="terms_continue_reading">Okumaya Devam Edin…</string>
+
+    <string name="verification_required_title">Doğrulama Gerekli</string>
+    <string name="registration_success_message">Kaydınız başarıyla alındı! E-posta adresinize gönderilen doğrulama bağlantısına tıklayın.</string>
+
+
+
+    <string name="terms_and_conditions_full_text">
+        GUIDEMATE KULLANICI SÖZLEŞMESİ, GİZLİLİK POLİTİKASI VE AÇIK RIZA METNİ\n\n
+        1. TARAFLAR VE KONU\n
+        İşbu sözleşme, GuideMate mobil uygulaması (bundan böyle "Platform" olarak anılacaktır) ile uygulamayı kullanan Turist veya Rehber (bundan böyle "Kullanıcı" olarak anılacaktır) arasında akdedilmiştir. Kullanıcı, uygulamayı kullanarak veya ödeme yaparak aşağıdaki şartları peşinen kabul etmiş sayılır.\n\n
+        2. HİZMETİN KAPSAMI\n
+        GuideMate, seyahat etmek isteyen kullanıcılar (Turist) ile profesyonel rehberlik hizmeti verenleri (Rehber) bir araya getiren bir "Aracı Hizmet Sağlayıcı"dır. GuideMate, turların doğrudan düzenleyicisi değil, güvenli buluşma ve ödeme platformudur.\n\n
+        3. ÖDEME VE GÜVENLİK (ALTIN KURAL)\n
+        3.1. Tüm ödemeler, Platform üzerinden Kredi/Banka Kartı ile 256-bit SSL sertifikalı güvenli ödeme altyapısı kullanılarak yapılır.\n
+        3.2. Kullanıcı kart bilgileri GuideMate sunucularında ASLA SAKLANMAZ. İşlemler, uluslararası güvenlik standartlarına (PCI-DSS) sahip ödeme kuruluşları aracılığıyla gerçekleştirilir.\n
+        3.3. Platform Dışı Ödeme Yasağı: Güvenlik gereği, Turist ve Rehber arasındaki tüm para transferi uygulama üzerinden yapılmalıdır. Elden nakit ödeme veya harici IBAN transferlerinde yaşanan mağduriyetlerde GuideMate hiçbir hukuki sorumluluk kabul etmez.\n\n
+        4. KİŞİSEL VERİLERİN KORUNMASI (KVKK AYDINLATMA METNİ)\n
+        4.1. Paylaştığınız Ad, Soyad, E-posta, Konum ve İletişim bilgileri; hizmetin ifası, fatura düzenlenmesi ve güvenliğin sağlanması amacıyla 6698 sayılı KVKK kapsamında işlenmektedir.\n
+        4.2. Kişisel verileriniz, yasal zorunluluklar haricinde üçüncü şahıslarla paylaşılmaz. Rehberler, sadece turun gerçekleşmesi için gerekli olan sınırlı bilgileri görebilir.\n\n
+        5. İPTAL VE İADE KOŞULLARI\n
+        5.1. Turist, satın aldığı turu, tur başlangıç saatinden 24 saat öncesine kadar iptal etmesi durumunda %100 ücret iadesi alır.\n
+        5.2. Son 24 saat içinde yapılan iptallerde hizmet bedeli kesintisi uygulanabilir.\n
+        5.3. Rehber tarafından kaynaklanan iptallerde, ödemenin tamamı Turist’e kesintisiz iade edilir.\n\n
+        6. KULLANIM KURALLARI VE YASAKLAR\n
+        Platform üzerinde genel ahlaka aykırı, tehditkar, yanıltıcı veya taciz edici mesajlaşmalar yasaktır. Rehberlerin "Profesyonel Turist Rehberi" kokartına sahip olması zorunludur.\n\n
+        7. YÜRÜRLÜK\n
+        Kullanıcı, "Okudum ve Kabul Ediyorum" kutucuğunu işaretleyerek işbu sözleşmenin tüm maddelerini kabul etmiş sayılır.
+    </string>
+
 
 
 

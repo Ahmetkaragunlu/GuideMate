@@ -32,7 +32,9 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
             SignInScreen()
         }
         composable(route = AuthRoute.SignUpScreen.route) {
-            SignUpScreen()
+            SignUpScreen(
+                onNavigateToSignIn = { navController.navigate(AuthRoute.SignInScreen.route) }
+            )
         }
         composable(route = AuthRoute.ForgotPassWordScreen.route) {
             ForgotPasswordScreen()

@@ -1,20 +1,23 @@
 package com.ahmetkaragunlu.guidemate.data.remote.api
 
-
-import com.ahmetkaragunlu.guidemate.data.remote.model.*
+import com.ahmetkaragunlu.guidemate.data.remote.model.AuthResponse
+import com.ahmetkaragunlu.guidemate.data.remote.model.ForgotPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.GoogleLoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.LoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.RefreshTokenRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.RegisterRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.ResetPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.RoleSelectionRequest
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Query
-
 
 interface AuthApi {
-
     @POST("register")
     suspend fun register(
         @Body request: RegisterRequest
-    ): Response<String>
+    ): Response<ResponseBody>
 
     @POST("login")
     suspend fun login(
@@ -34,7 +37,7 @@ interface AuthApi {
     @POST("logout")
     suspend fun logout(
         @Body request: RefreshTokenRequest
-    ): Response<String>
+    ): Response<ResponseBody>
 
     @POST("select-role")
     suspend fun selectRole(
@@ -44,15 +47,11 @@ interface AuthApi {
     @POST("forgot-password")
     suspend fun forgotPassword(
         @Body request: ForgotPasswordRequest
-    ): Response<String>
+    ): Response<ResponseBody>
 
     @POST("reset-password")
     suspend fun resetPassword(
         @Body request: ResetPasswordRequest
-    ): Response<String>
+    ): Response<ResponseBody>
 
-    @GET("confirm")
-    suspend fun confirmAccount(
-        @Query("token") token: String
-    ): Response<Unit>
 }
