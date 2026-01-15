@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -54,6 +55,7 @@ fun SignInScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(
                 top = dimensionResource(R.dimen.spacing_double_extra_large),
@@ -187,7 +189,6 @@ fun SignInScreen(
         Spacer(modifier = Modifier.weight(1f))
         TextButton(
             onClick = { },
-            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_large))
         ) {
             Text(
                 text = buildAnnotatedString {

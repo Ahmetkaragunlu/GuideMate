@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -59,7 +61,7 @@ fun SignUpScreen(
             .verticalScroll(rememberScrollState())
             .navigationBarsPadding()
             .padding(
-                bottom = dimensionResource(R.dimen.spacing_medium),
+                bottom = dimensionResource(R.dimen.spacing_large),
                 top = dimensionResource(R.dimen.spacing_double_extra_large)
             ),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -166,8 +168,9 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
         Row(
             modifier = Modifier
+                .widthIn(max = 400.dp)
                 .fillMaxWidth()
-                .padding(horizontal = 48.dp),
+                .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
             verticalAlignment = Alignment.CenterVertically,
 
             ) {
@@ -188,15 +191,10 @@ fun SignUpScreen(
         EditButton(
             text = R.string.sign_up,
             onClick = {
-                val isFormValid = viewModel.checkSignUpErrors { resId ->
-                    Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT).show()
-                }
-                if (isFormValid) {
-                }
+
             }
         )
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_double_extra_large)))
-
+        Spacer(modifier = Modifier.weight(1f))
         TextButton(
             onClick = { }
         ) {

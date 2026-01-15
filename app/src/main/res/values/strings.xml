@@ -48,6 +48,16 @@
     <string name="choose_user_type_description">Deneyimini buna göre kişiselleştireceğiz.</string>
 
 
+    <string name="error_no_internet">İnternet bağlantınızı kontrol edin.</string>
+    <string name="error_server">Sunucu kaynaklı bir hata oluştu. Kod: %d</string>
+    <string name="error_unknown">Beklenmedik bir hata oluştu.</string>
+    <string name="error_session_expired">Oturum süreniz doldu, lütfen tekrar giriş yapın.</string>
+    <string name="error_generic_failure">İşlem başarısız oldu.</string>
+    <string name="error_json_parse">Veri işlenirken hata oluştu.</string>
+    <string name="logout_success">Başarıyla çıkış yapıldı.</string>
+    <string name="logout_offline">Çıkış yapıldı (Çevrimdışı mod).</string>
+
+
 
 
 
