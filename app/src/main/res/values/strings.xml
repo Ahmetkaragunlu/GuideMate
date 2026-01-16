@@ -72,6 +72,10 @@
     <string name="registration_success_message">Kaydınız başarıyla alındı! E-posta adresinize gönderilen doğrulama bağlantısına tıklayın.</string>
 
 
+    <string name="google_sign_in_failed">Google Sign-In failed</string>
+    <string name="google_sign_in_error">Google Sign-In error: %1$s</string>
+    <string name="default_web_client_id">677861073392-4ni851g7ggkhb8ngk9418u346t4so9rd.apps.googleusercontent.com</string>
+
 
     <string name="terms_and_conditions_full_text">
         GUIDEMATE KULLANICI SÖZLEŞMESİ, GİZLİLİK POLİTİKASI VE AÇIK RIZA METNİ\n\n
@@ -79,7 +83,7 @@
         İşbu sözleşme, GuideMate mobil uygulaması (bundan böyle "Platform" olarak anılacaktır) ile uygulamayı kullanan Turist veya Rehber (bundan böyle "Kullanıcı" olarak anılacaktır) arasında akdedilmiştir. Kullanıcı, uygulamayı kullanarak veya ödeme yaparak aşağıdaki şartları peşinen kabul etmiş sayılır.\n\n
         2. HİZMETİN KAPSAMI\n
         GuideMate, seyahat etmek isteyen kullanıcılar (Turist) ile profesyonel rehberlik hizmeti verenleri (Rehber) bir araya getiren bir "Aracı Hizmet Sağlayıcı"dır. GuideMate, turların doğrudan düzenleyicisi değil, güvenli buluşma ve ödeme platformudur.\n\n
-        3. ÖDEME VE GÜVENLİK (ALTIN KURAL)\n
+        3. ÖDEME VE GÜVENLİK \n
         3.1. Tüm ödemeler, Platform üzerinden Kredi/Banka Kartı ile 256-bit SSL sertifikalı güvenli ödeme altyapısı kullanılarak yapılır.\n
         3.2. Kullanıcı kart bilgileri GuideMate sunucularında ASLA SAKLANMAZ. İşlemler, uluslararası güvenlik standartlarına (PCI-DSS) sahip ödeme kuruluşları aracılığıyla gerçekleştirilir.\n
         3.3. Platform Dışı Ödeme Yasağı: Güvenlik gereği, Turist ve Rehber arasındaki tüm para transferi uygulama üzerinden yapılmalıdır. Elden nakit ödeme veya harici IBAN transferlerinde yaşanan mağduriyetlerde GuideMate hiçbir hukuki sorumluluk kabul etmez.\n\n

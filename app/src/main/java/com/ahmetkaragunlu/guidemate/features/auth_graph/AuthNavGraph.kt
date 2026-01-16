@@ -15,7 +15,7 @@ import com.ahmetkaragunlu.guidemate.screens.auth.sign_up.SignUpScreen
 fun NavGraphBuilder.authNavGraph(navController: NavController) {
 
     navigation(
-        startDestination = AuthRoute.SignUpScreen.route,
+        startDestination = AuthRoute.SignInScreen.route,
         route = Graph.AuthGraph.route
     ) {
         composable(route = AuthRoute.OnboardingScreen.route) {
@@ -29,11 +29,21 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
             RoleSelectionScreen()
         }
         composable(route = AuthRoute.SignInScreen.route) {
-            SignInScreen()
+            SignInScreen(
+                onNavigateToSignUp = {
+                    navController.navigateTo(AuthRoute.SignUpScreen.route)
+                },
+                onNavigateToForgotPassword = {
+                    navController.navigateTo(AuthRoute.ForgotPassWordScreen.route)
+                },
+                onNavigateToRoleSelection = {
+                    navController.navigateTo(AuthRoute.RoleSelectionScreen.route)
+                }
+            )
         }
         composable(route = AuthRoute.SignUpScreen.route) {
             SignUpScreen(
-                onNavigateToSignIn = { navController.navigate(AuthRoute.SignInScreen.route) }
+                onNavigateToSignIn = { navController.navigateTo(AuthRoute.SignInScreen.route) }
             )
         }
         composable(route = AuthRoute.ForgotPassWordScreen.route) {

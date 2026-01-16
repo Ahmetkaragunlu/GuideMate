@@ -92,6 +92,8 @@ dependencies {
     // EncryptedSharedPreferences
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
+     // Google Authentication
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
 
 }
