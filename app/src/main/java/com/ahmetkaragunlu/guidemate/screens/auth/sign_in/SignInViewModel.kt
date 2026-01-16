@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.auth.sign_in
 
-
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,9 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-
-
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
@@ -50,9 +46,10 @@ class SignInViewModel @Inject constructor(
         return Patterns.EMAIL_ADDRESS.matcher(_formState.value.email).matches()
     }
 
+
     fun isValidPassword(): Boolean {
         val password = _formState.value.password
-        return password.length == 6 && password.all { it.isDigit() }
+        return password.length >= 6 && password.all { it.isDigit() }
     }
 
     // --- Login Process ---
@@ -123,7 +120,6 @@ class SignInViewModel @Inject constructor(
             onShowErrorToast(R.string.error_fill_all_fields)
             return false
         }
-
         return true
     }
 }
