@@ -1,50 +1,58 @@
 package com.ahmetkaragunlu.guidemate.data.repository
 
-import android.content.Context
+
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.DataResult
+import com.ahmetkaragunlu.guidemate.common.ResourceProvider
 import com.ahmetkaragunlu.guidemate.data.local.TokenManager
 import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
-import com.ahmetkaragunlu.guidemate.data.remote.model.*
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RefreshTokenRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResetPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RoleSelectionRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
+import com.ahmetkaragunlu.guidemate.data.remote.model.response.ErrorResponse
 import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
 import com.google.gson.Gson
-import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
-import com.ahmetkaragunlu.guidemate.core.result.Result
 
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val tokenManager: TokenManager,
-    @param:ApplicationContext private val context: Context
+    private val resourceProvider: ResourceProvider
 ) : AuthRepository {
 
-    private fun Response<ResponseBody>.toStringResult(): Result<String> {
+    private fun Response<ResponseBody>.toDataResult(): DataResult<String> {
         return if (isSuccessful) {
             val bodyString = body()?.string()
             if (!bodyString.isNullOrBlank()) {
-                Result.Success(bodyString)
+                DataResult.Success(bodyString)
             } else {
-                Result.Error(context.getString(R.string.error_no_response_from_server))
+                DataResult.Error(resourceProvider.getString(R.string.error_no_response_from_server))
             }
         } else {
             val errorMsg = parseError(errorBody()?.string())
-            Result.Error(errorMsg ?: context.getString(R.string.error_generic_failure))
+            DataResult.Error(errorMsg ?: resourceProvider.getString(R.string.error_generic_failure))
         }
     }
 
-    override suspend fun register(request: RegisterRequest): Result<String> {
+    override suspend fun register(request: RegisterRequest): DataResult<String> {
         return try {
             val response = api.register(request)
-            response.toStringResult()
+            response.toDataResult()
         } catch (e: Exception) {
             handleException(e)
         }
     }
 
-    override suspend fun login(request: LoginRequest): Result<AuthResponse> {
+    override suspend fun login(request: LoginRequest): DataResult<AuthResponse> {
         return try {
             val response = api.login(request)
             handleAuthResponse(response)
@@ -53,7 +61,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun googleLogin(request: GoogleLoginRequest): Result<AuthResponse> {
+    override suspend fun googleLogin(request: GoogleLoginRequest): DataResult<AuthResponse> {
         return try {
             val response = api.googleLogin(request)
             handleAuthResponse(response)
@@ -62,26 +70,26 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout(): Result<String> {
+    override suspend fun logout(): DataResult<String> {
         return try {
             val refreshToken = tokenManager.getRefreshToken()
             if (!refreshToken.isNullOrEmpty()) {
                 val response = api.logout(RefreshTokenRequest(refreshToken))
                 tokenManager.clearTokens()
-                return response.toStringResult()
+                return response.toDataResult()
             }
             tokenManager.clearTokens()
-            Result.Success(context.getString(R.string.logout_success))
+            DataResult.Success(resourceProvider.getString(R.string.logout_success))
         } catch (e: Exception) {
             tokenManager.clearTokens()
-            Result.Success(context.getString(R.string.logout_offline))
+            DataResult.Success(resourceProvider.getString(R.string.logout_offline))
         }
     }
 
-    override suspend fun refreshToken(): Result<AuthResponse> {
+    override suspend fun refreshToken(): DataResult<AuthResponse> {
         return try {
             val refreshToken = tokenManager.getRefreshToken()
-                ?: return Result.Error(context.getString(R.string.error_session_expired))
+                ?: return DataResult.Error(resourceProvider.getString(R.string.error_session_expired))
             val response = api.refreshToken(RefreshTokenRequest(refreshToken))
             handleAuthResponse(response)
         } catch (e: Exception) {
@@ -89,58 +97,58 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun selectRole(request: RoleSelectionRequest): Result<AuthResponse> {
+    override suspend fun selectRole(request: RoleSelectionRequest): DataResult<AuthResponse> {
         return try {
             val response = api.selectRole(request)
             if (response.isSuccessful && response.body() != null) {
                 val authResponse = response.body()!!
                 authResponse.role?.let { tokenManager.saveUserRole(it) }
-                Result.Success(authResponse)
+                DataResult.Success(authResponse)
             } else {
                 val errorMsg = parseError(response.errorBody()?.string())
-                Result.Error(errorMsg ?: context.getString(R.string.error_generic_failure))
+                DataResult.Error(errorMsg ?: resourceProvider.getString(R.string.error_generic_failure))
             }
         } catch (e: Exception) {
             handleException(e)
         }
     }
 
-    override suspend fun forgotPassword(request: ForgotPasswordRequest): Result<String> {
+    override suspend fun forgotPassword(request: ForgotPasswordRequest): DataResult<String> {
         return try {
             val response = api.forgotPassword(request)
-            response.toStringResult()
+            response.toDataResult()
         } catch (e: Exception) {
             handleException(e)
         }
     }
 
-    override suspend fun resetPassword(request: ResetPasswordRequest): Result<String> {
+    override suspend fun resetPassword(request: ResetPasswordRequest): DataResult<String> {
         return try {
             val response = api.resetPassword(request)
-            response.toStringResult()
+            response.toDataResult()
         } catch (e: Exception) {
             handleException(e)
         }
     }
 
-    private fun handleAuthResponse(response: Response<AuthResponse>): Result<AuthResponse> {
+    private fun handleAuthResponse(response: Response<AuthResponse>): DataResult<AuthResponse> {
         return if (response.isSuccessful && response.body() != null) {
             val authResponse = response.body()!!
             authResponse.accessToken?.let { tokenManager.saveAccessToken(it) }
             authResponse.refreshToken?.let { tokenManager.saveRefreshToken(it) }
             authResponse.role?.let { tokenManager.saveUserRole(it) }
-            Result.Success(authResponse)
+            DataResult.Success(authResponse)
         } else {
             val errorMsg = parseError(response.errorBody()?.string())
-            Result.Error(errorMsg ?: context.getString(R.string.error_generic_failure))
+            DataResult.Error(errorMsg ?: resourceProvider.getString(R.string.error_generic_failure))
         }
     }
 
-    private fun <T> handleException(e: Exception): Result<T> {
+    private fun <T> handleException(e: Exception): DataResult<T> {
         return when (e) {
-            is IOException -> Result.Error(context.getString(R.string.error_no_internet), e)
-            is HttpException -> Result.Error(context.getString(R.string.error_server, e.code()), e)
-            else -> Result.Error(context.getString(R.string.error_unknown), e)
+            is IOException -> DataResult.Error(resourceProvider.getString(R.string.error_no_internet), e)
+            is HttpException -> DataResult.Error(resourceProvider.getString(R.string.error_server, e.code()), e)
+            else -> DataResult.Error(resourceProvider.getString(R.string.error_unknown), e)
         }
     }
 

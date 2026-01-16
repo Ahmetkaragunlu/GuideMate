@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.data.local
 
-
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -21,12 +20,12 @@ class TokenManager @Inject constructor(
         private const val KEY_USER_ROLE = "user_role"
     }
 
-    // Create MasterKey for hardware-backed encryption
+    private val lock = Any() // Added for thread safety
+
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
 
-    // Initialize EncryptedSharedPreferences for secure storage
     private val sharedPreferences = EncryptedSharedPreferences.create(
         context,
         "guidemate_secure_prefs",
@@ -35,54 +34,41 @@ class TokenManager @Inject constructor(
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    // Token Operations
-
     fun saveAccessToken(token: String) {
         sharedPreferences.edit { putString(KEY_ACCESS_TOKEN, token) }
     }
 
-    fun getAccessToken(): String? {
-        return sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
-    }
+    fun getAccessToken(): String? = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
 
     fun saveRefreshToken(token: String) {
         sharedPreferences.edit { putString(KEY_REFRESH_TOKEN, token) }
     }
 
-    fun getRefreshToken(): String? {
-        return sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
-    }
+    fun getRefreshToken(): String? = sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
 
-    // Device ID Operations
-
+    // --- Updated with Thread Safety ---
     fun getDeviceId(): String {
-        val existingId = sharedPreferences.getString(KEY_DEVICE_ID, null)
-        if (existingId != null) {
-            return existingId
+        synchronized(lock) {
+            val existingId = sharedPreferences.getString(KEY_DEVICE_ID, null)
+            if (existingId != null) return existingId
+
+            val newId = UUID.randomUUID().toString()
+            sharedPreferences.edit { putString(KEY_DEVICE_ID, newId) }
+            return newId
         }
-
-        val newId = UUID.randomUUID().toString()
-        sharedPreferences.edit { putString(KEY_DEVICE_ID, newId) }
-        return newId
     }
-
-    // User Role & Cleanup Operations
 
     fun saveUserRole(role: String) {
         sharedPreferences.edit { putString(KEY_USER_ROLE, role) }
     }
 
-    fun getUserRole(): String? {
-        return sharedPreferences.getString(KEY_USER_ROLE, null)
-    }
-
-    // Clear all sensitive data on logout, keeping the Device ID
+    fun getUserRole(): String? = sharedPreferences.getString(KEY_USER_ROLE, null)
 
     fun clearTokens() {
         sharedPreferences.edit {
             remove(KEY_ACCESS_TOKEN)
-                .remove(KEY_REFRESH_TOKEN)
-                .remove(KEY_USER_ROLE)
+            remove(KEY_REFRESH_TOKEN)
+            remove(KEY_USER_ROLE)
         }
     }
 }

@@ -29,11 +29,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditAlertDialog
 import com.ahmetkaragunlu.guidemate.components.EditButton
 import com.ahmetkaragunlu.guidemate.components.EditTextField
-import com.ahmetkaragunlu.guidemate.screens.auth.viewmodel.SignUpViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,15 +43,18 @@ fun SignUpScreen(
     onNavigateToSignIn: () -> Unit,
 ) {
     val context = LocalContext.current
+    val formState by viewModel.formState.collectAsStateWithLifecycle()
+    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState()
 
-    LaunchedEffect(viewModel.errorMessage) {
-        viewModel.errorMessage?.let { error ->
+    LaunchedEffect(screenState.errorMessage) {
+        screenState.errorMessage?.let { error ->
             Toast.makeText(context, error, Toast.LENGTH_LONG).show()
             viewModel.clearError()
         }
     }
-    if (viewModel.isRegistrationSuccess) {
+
+    if (screenState.isRegistrationSuccess) {
         EditAlertDialog(
             title = R.string.verification_required_title,
             text = R.string.registration_success_message,
@@ -62,16 +65,16 @@ fun SignUpScreen(
                         onNavigateToSignIn()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color))
-
                 ) {
                     Text(stringResource(R.string.ok))
                 }
             }
         )
     }
-    if (viewModel.showTermsSheet) {
+
+    if (screenState.showTermsSheet) {
         ModalBottomSheet(
-            onDismissRequest = { viewModel.showTermsSheet = false },
+            onDismissRequest = { viewModel.toggleTermsSheet(false) },
             sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.surface
         ) {
@@ -82,58 +85,26 @@ fun SignUpScreen(
                 }
             }
             LaunchedEffect(isCurrentlyAtBottom) {
-                if (isCurrentlyAtBottom) {
-                    viewModel.markTermsAsRead()
-                }
+                if (isCurrentlyAtBottom) viewModel.markTermsAsRead()
             }
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(R.string.terms_dialog_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-
+                Text(text = stringResource(R.string.terms_dialog_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color.Black)
                 Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f, fill = false)
-                        .verticalScroll(scrollState)
-                ) {
-                    Text(
-                        text = stringResource(R.string.terms_and_conditions_full_text),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.DarkGray
-                    )
+                Column(modifier = Modifier.weight(1f, fill = false).verticalScroll(scrollState)) {
+                    Text(text = stringResource(R.string.terms_and_conditions_full_text), style = MaterialTheme.typography.bodyMedium, color = Color.DarkGray)
                 }
-
                 Spacer(modifier = Modifier.height(24.dp))
-
                 Button(
                     onClick = { viewModel.acceptTerms() },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = viewModel.hasUserReadTerms,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(R.color.brand_color),
-                        disabledContainerColor = Color.Gray,
-                        contentColor = Color.White,
-                        disabledContentColor = Color.White
-                    )
+                    enabled = screenState.hasUserReadTerms,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color), disabledContainerColor = Color.Gray, contentColor = Color.White, disabledContentColor = Color.White)
                 ) {
-                    Text(
-                        text = stringResource(
-                            if (viewModel.hasUserReadTerms) R.string.terms_read_and_approve
-                            else R.string.terms_continue_reading
-                        ),
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(text = stringResource(if (screenState.hasUserReadTerms) R.string.terms_read_and_approve else R.string.terms_continue_reading), fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -141,131 +112,93 @@ fun SignUpScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .navigationBarsPadding()
-            .padding(
-                bottom = dimensionResource(R.dimen.spacing_large),
-                top = dimensionResource(R.dimen.spacing_double_extra_large)
-            ),
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = dimensionResource(R.dimen.spacing_large), top = dimensionResource(R.dimen.spacing_double_extra_large)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(R.string.sign_up_title),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-        )
+        Text(text = stringResource(R.string.sign_up_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         Spacer(modifier = modifier.height(dimensionResource(R.dimen.spacing_small)))
-        Text(
-            text = stringResource(R.string.sign_up_subtitle),
-            color = colorResource(R.color.onboarding_body_text_color),
-            style = MaterialTheme.typography.bodySmall
-        )
+        Text(text = stringResource(R.string.sign_up_subtitle), color = colorResource(R.color.onboarding_body_text_color), style = MaterialTheme.typography.bodySmall)
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
         ) {
             EditTextField(
-                value = viewModel.inputFirstName,
+                value = formState.firstName,
                 onValueChange = { viewModel.inputFirstNameChange(it) },
                 placeholder = R.string.name,
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                isError = viewModel.shouldShowFirstNameError(),
-                supportingText = if (viewModel.shouldShowFirstNameError()) R.string.name_error_message else null
+                isError = !viewModel.isValidFirstName() && formState.firstName.isNotEmpty(),
+                supportingText = if (!viewModel.isValidFirstName() && formState.firstName.isNotEmpty()) R.string.name_error_message else null
             )
             EditTextField(
-                value = viewModel.inputLastName,
+                value = formState.lastName,
                 onValueChange = { viewModel.onLastNameChange(it) },
                 placeholder = R.string.last_name,
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                isError = viewModel.shouldShowLastNameError(),
-                supportingText = if (viewModel.shouldShowLastNameError()) R.string.last_name_error_message else null
+                isError = !viewModel.isValidLastName() && formState.lastName.isNotEmpty(),
+                supportingText = if (!viewModel.isValidLastName() && formState.lastName.isNotEmpty()) R.string.last_name_error_message else null
             )
             EditTextField(
-                value = viewModel.inputEmail,
+                value = formState.email,
                 onValueChange = { viewModel.onEmailChange(it) },
                 placeholder = R.string.email,
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-                isError = viewModel.shouldShowEmailError(),
-                supportingText = if (viewModel.shouldShowEmailError()) R.string.email_error_message else null
+                isError = !viewModel.isValidEmail() && formState.email.isNotEmpty(),
+                supportingText = if (!viewModel.isValidEmail() && formState.email.isNotEmpty()) R.string.email_error_message else null
             )
             EditTextField(
-                value = viewModel.inputPassword,
+                value = formState.password,
                 onValueChange = { viewModel.onPasswordChange(it) },
                 placeholder = R.string.password,
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Next),
-                visualTransformation = if (viewModel.passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                isError = viewModel.shouldShowPasswordError(),
+                visualTransformation = if (formState.passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                isError = !viewModel.isValidPassWord() && formState.password.isNotEmpty(),
                 trailingIcon = {
                     Icon(
-                        imageVector = if (viewModel.passwordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.clickable { viewModel.passwordVisibility = !viewModel.passwordVisibility }
+                        imageVector = if (formState.passwordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = null, tint = Color.Gray,
+                        modifier = Modifier.clickable { viewModel.togglePasswordVisibility() }
                     )
                 },
-                supportingText = if (viewModel.shouldShowPasswordError()) R.string.password_error_message else null,
+                supportingText = if (!viewModel.isValidPassWord() && formState.password.isNotEmpty()) R.string.password_error_message else null,
             )
             EditTextField(
-                value = viewModel.inputConfirmPassword,
+                value = formState.confirmPassword,
                 onValueChange = { viewModel.onConfirmPasswordChange(it) },
                 placeholder = R.string.confirm_password,
-                visualTransformation = if (viewModel.confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (formState.confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
                 trailingIcon = {
                     Icon(
-                        imageVector = if (viewModel.confirmPasswordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.clickable { viewModel.confirmPasswordVisibility = !viewModel.confirmPasswordVisibility }
+                        imageVector = if (formState.confirmPasswordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = null, tint = Color.Gray,
+                        modifier = Modifier.clickable { viewModel.toggleConfirmPasswordVisibility() }
                     )
                 },
-                isError = viewModel.shouldShowConfirmPasswordError(),
-                supportingText = if (viewModel.shouldShowConfirmPasswordError()) R.string.confirm_password_error_message else null
+                isError = !viewModel.isValidConfirmPassword() && formState.confirmPassword.isNotEmpty(),
+                supportingText = if (!viewModel.isValidConfirmPassword() && formState.confirmPassword.isNotEmpty()) R.string.confirm_password_error_message else null
             )
         }
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
 
         Row(
-            modifier = Modifier
-                .widthIn(max = 400.dp)
-                .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
+            modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
-                checked = viewModel.isTermsAccepted,
-                onCheckedChange = {
-                    if (!viewModel.isTermsAccepted) {
-                        viewModel.showTermsSheet = true
-                    } else {
-                        viewModel.isTermsAccepted = false
-                    }
-                },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = colorResource(R.color.brand_color),
-                    uncheckedColor = colorResource(R.color.brand_color)
-                )
+                checked = screenState.isTermsAccepted,
+                onCheckedChange = { viewModel.onTermsCheckboxClicked() },
+                colors = CheckboxDefaults.colors(checkedColor = colorResource(R.color.brand_color), uncheckedColor = colorResource(R.color.brand_color))
             )
-
             Text(
                 text = stringResource(R.string.agree_terms_conditions),
-                style = MaterialTheme.typography.bodySmall.copy(
-                    textDecoration = TextDecoration.Underline
-                ),
+                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
                 color = colorResource(R.color.onboarding_body_text_color),
-                modifier = Modifier
-                    .padding(top = 2.dp)
-                    .clickable {
-                        viewModel.showTermsSheet = true
-                    }
+                modifier = Modifier.padding(top = 2.dp).clickable { viewModel.toggleTermsSheet(true) }
             )
         }
 
@@ -282,9 +215,7 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        TextButton(
-            onClick = { onNavigateToSignIn() }
-        ) {
+        TextButton(onClick = { onNavigateToSignIn() }) {
             Text(
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(color = colorResource(R.color.onboarding_body_text_color))) {

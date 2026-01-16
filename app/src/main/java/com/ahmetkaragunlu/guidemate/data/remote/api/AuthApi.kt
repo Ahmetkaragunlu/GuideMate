@@ -1,13 +1,15 @@
 package com.ahmetkaragunlu.guidemate.data.remote.api
 
-import com.ahmetkaragunlu.guidemate.data.remote.model.AuthResponse
-import com.ahmetkaragunlu.guidemate.data.remote.model.ForgotPasswordRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.GoogleLoginRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.LoginRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.RefreshTokenRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.RegisterRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.ResetPasswordRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.RoleSelectionRequest
+
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RefreshTokenRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResetPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RoleSelectionRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
+import retrofit2.Call
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -33,6 +35,9 @@ interface AuthApi {
     suspend fun refreshToken(
         @Body request: RefreshTokenRequest
     ): Response<AuthResponse>
+
+    @POST("refresh-token")
+    fun refreshTokenSync(@Body request: RefreshTokenRequest): Call<AuthResponse>
 
     @POST("logout")
     suspend fun logout(

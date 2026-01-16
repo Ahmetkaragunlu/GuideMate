@@ -1,10 +1,8 @@
-package com.ahmetkaragunlu.guidemate.data.remote.model
+package com.ahmetkaragunlu.guidemate.data.remote.model.request
 
-
+import com.ahmetkaragunlu.guidemate.data.remote.model.RoleType
 import com.google.gson.annotations.SerializedName
 
-
-// 1. REQUEST
 data class RegisterRequest(
     @SerializedName("firstName") val firstName: String,
     @SerializedName("lastName") val lastName: String,
@@ -34,29 +32,3 @@ data class ResetPasswordRequest(
     @SerializedName("newPassword") val newPassword: String,
     @SerializedName("confirmPassword") val confirmPassword: String
 )
-
-
-// 2. RESPONSE
-data class AuthResponse(
-    @SerializedName("accessToken") val accessToken: String?,
-    @SerializedName("refreshToken") val refreshToken: String?,
-    @SerializedName("message") val message: String?,
-    @SerializedName("roleSelected") val isRoleSelected: Boolean,
-    @SerializedName("role") val role: String?
-)
-data class ErrorResponse(
-    @SerializedName("code") val code: Int,
-    @SerializedName("message") val message: String,
-    @SerializedName("timestamp") val timestamp: String?
-)
-
-
-// 3. ENUM
-enum class RoleType {
-    @SerializedName("ROLE_TOURIST")
-    ROLE_TOURIST,
-    @SerializedName("ROLE_GUIDE")
-    ROLE_GUIDE,
-    @SerializedName("ROLE_ADMIN")
-    ROLE_ADMIN
-}

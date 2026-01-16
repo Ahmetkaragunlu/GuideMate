@@ -2,18 +2,23 @@ package com.ahmetkaragunlu.guidemate.domain.repository
 
 
 
-import com.ahmetkaragunlu.guidemate.data.remote.model.*
-import com.ahmetkaragunlu.guidemate.core.result.Result
 
+import com.ahmetkaragunlu.guidemate.common.DataResult
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResetPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.RoleSelectionRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
 
 interface AuthRepository {
-
-    suspend fun register(request: RegisterRequest): Result<String>
-    suspend fun login(request: LoginRequest): Result<AuthResponse>
-    suspend fun googleLogin(request: GoogleLoginRequest): Result<AuthResponse>
-    suspend fun logout(): Result<String>
-    suspend fun refreshToken(): Result<AuthResponse>
-    suspend fun selectRole(request: RoleSelectionRequest): Result<AuthResponse>
-    suspend fun forgotPassword(request: ForgotPasswordRequest): Result<String>
-    suspend fun resetPassword(request: ResetPasswordRequest): Result<String>
+    suspend fun register(request: RegisterRequest): DataResult<String>
+    suspend fun login(request: LoginRequest): DataResult<AuthResponse>
+    suspend fun googleLogin(request: GoogleLoginRequest): DataResult<AuthResponse>
+    suspend fun logout(): DataResult<String>
+    suspend fun refreshToken(): DataResult<AuthResponse>
+    suspend fun selectRole(request: RoleSelectionRequest): DataResult<AuthResponse>
+    suspend fun forgotPassword(request: ForgotPasswordRequest): DataResult<String>
+    suspend fun resetPassword(request: ResetPasswordRequest): DataResult<String>
 }
