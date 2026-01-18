@@ -61,6 +61,9 @@
     <string name="terms_dialog_title">Kullanıcı Sözleşmesi ve Gizlilik Politikası</string>
     <string name="close">Kapat</string>
 
+    <string name="success">Başarılı</string>
+    <string name="reset_password_link_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.</string>
+
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
     <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>
