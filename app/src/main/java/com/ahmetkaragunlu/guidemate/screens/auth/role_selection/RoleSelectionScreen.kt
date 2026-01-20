@@ -33,12 +33,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
+import com.ahmetkaragunlu.guidemate.features.graph.Graph
+import com.ahmetkaragunlu.guidemate.features.tourist_graph.TouristRoute
+import com.ahmetkaragunlu.guidemate.navigation.navigateTo
+import com.ahmetkaragunlu.guidemate.navigation.switchRoot
 
 @Composable
 fun RoleSelectionScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToTouristGraph: () -> Unit,
 ) {
 
     Column(
@@ -76,7 +82,7 @@ fun RoleSelectionScreen(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
         EditButton(
             text = R.string.next,
-            onClick = {}
+            onClick = { onNavigateToTouristGraph() }
         )
 
     }

@@ -8,7 +8,8 @@ data class AuthResponse(
     @SerializedName("refreshToken") val refreshToken: String?,
     @SerializedName("message") val message: String?,
     @SerializedName("roleSelected") val isRoleSelected: Boolean,
-    @SerializedName("role") val role: String?
+    @SerializedName("role") val role: String?,
+    @SerializedName("firstName") val firstName: String?,
 )
 data class ErrorResponse(
     @SerializedName("code") val code: Int,

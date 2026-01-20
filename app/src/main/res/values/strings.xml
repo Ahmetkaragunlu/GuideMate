@@ -64,6 +64,13 @@
     <string name="success">Başarılı</string>
     <string name="reset_password_link_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.</string>
 
+    <string name="tourist_home">Anasayfa</string>
+    <string name="welcome_message">Hoş geldin, %1$s 👋</string>
+    <string name="tourist_explore">Keşfet</string>
+    <string name="tourist_trips">Gezilerim</string>
+    <string name="tourist_chat">Sohbet</string>
+    <string name="tourist_profile">Profil</string>
+
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
     <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>

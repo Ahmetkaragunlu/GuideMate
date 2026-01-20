@@ -11,6 +11,7 @@ import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResetPasswordRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.RoleSelectionRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
+import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
     suspend fun register(request: RegisterRequest): DataResult<String>
@@ -21,4 +22,7 @@ interface AuthRepository {
     suspend fun selectRole(request: RoleSelectionRequest): DataResult<AuthResponse>
     suspend fun forgotPassword(request: ForgotPasswordRequest): DataResult<String>
     suspend fun resetPassword(request: ResetPasswordRequest): DataResult<String>
-}
+
+    val getUserName: Flow<String?>
+
+    suspend fun saveUserName(name: String)}

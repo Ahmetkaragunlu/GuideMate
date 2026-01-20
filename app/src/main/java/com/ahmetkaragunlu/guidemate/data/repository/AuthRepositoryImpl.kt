@@ -1,33 +1,33 @@
 package com.ahmetkaragunlu.guidemate.data.repository
 
-
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.common.ResourceProvider
 import com.ahmetkaragunlu.guidemate.data.local.TokenManager
 import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.RefreshTokenRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResetPasswordRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.RoleSelectionRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.*
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.ErrorResponse
 import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
 
+
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val tokenManager: TokenManager,
     private val resourceProvider: ResourceProvider
 ) : AuthRepository {
+
+    private val _userName = MutableStateFlow(tokenManager.getUserName())
+    override val getUserName: Flow<String?> = _userName.asStateFlow()
 
     private fun Response<ResponseBody>.toDataResult(): DataResult<String> {
         return if (isSuccessful) {
@@ -75,15 +75,21 @@ class AuthRepositoryImpl @Inject constructor(
             val refreshToken = tokenManager.getRefreshToken()
             if (!refreshToken.isNullOrEmpty()) {
                 val response = api.logout(RefreshTokenRequest(refreshToken))
-                tokenManager.clearTokens()
+                clearLocalData()
                 return response.toDataResult()
             }
-            tokenManager.clearTokens()
+
+            clearLocalData()
             DataResult.Success(resourceProvider.getString(R.string.logout_success))
         } catch (e: Exception) {
-            tokenManager.clearTokens()
+            clearLocalData()
             DataResult.Success(resourceProvider.getString(R.string.logout_offline))
         }
+    }
+
+    private fun clearLocalData() {
+        tokenManager.clearTokens()
+        _userName.value = null
     }
 
     override suspend fun refreshToken(): DataResult<AuthResponse> {
@@ -131,12 +137,23 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun handleAuthResponse(response: Response<AuthResponse>): DataResult<AuthResponse> {
+    override suspend fun saveUserName(name: String) {
+        tokenManager.saveUserName(name)
+        _userName.value = name
+    }
+
+
+    private suspend fun handleAuthResponse(response: Response<AuthResponse>): DataResult<AuthResponse> {
         return if (response.isSuccessful && response.body() != null) {
             val authResponse = response.body()!!
             authResponse.accessToken?.let { tokenManager.saveAccessToken(it) }
             authResponse.refreshToken?.let { tokenManager.saveRefreshToken(it) }
             authResponse.role?.let { tokenManager.saveUserRole(it) }
+
+            val firstName = authResponse.firstName.orEmpty().trim()
+            if (firstName.isNotEmpty()) {
+                saveUserName(firstName)
+            }
             DataResult.Success(authResponse)
         } else {
             val errorMsg = parseError(response.errorBody()?.string())

@@ -18,6 +18,8 @@ class TokenManager @Inject constructor(
         private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_DEVICE_ID = "device_id"
         private const val KEY_USER_ROLE = "user_role"
+
+        private const val KEY_USER_NAME = "user_name"
     }
 
     private val lock = Any() // Added for thread safety
@@ -40,13 +42,18 @@ class TokenManager @Inject constructor(
 
     fun getAccessToken(): String? = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
 
+    fun saveUserName(name: String) {
+        sharedPreferences.edit { putString(KEY_USER_NAME, name) }
+    }
+
+    fun getUserName(): String? = sharedPreferences.getString(KEY_USER_NAME, null)
+
     fun saveRefreshToken(token: String) {
         sharedPreferences.edit { putString(KEY_REFRESH_TOKEN, token) }
     }
 
     fun getRefreshToken(): String? = sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
 
-    // --- Updated with Thread Safety ---
     fun getDeviceId(): String {
         synchronized(lock) {
             val existingId = sharedPreferences.getString(KEY_DEVICE_ID, null)
@@ -69,6 +76,7 @@ class TokenManager @Inject constructor(
             remove(KEY_ACCESS_TOKEN)
             remove(KEY_REFRESH_TOKEN)
             remove(KEY_USER_ROLE)
+            remove(KEY_USER_NAME)
         }
     }
 }

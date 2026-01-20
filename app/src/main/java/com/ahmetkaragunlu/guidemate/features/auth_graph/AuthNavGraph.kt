@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.ahmetkaragunlu.guidemate.features.graph.Graph
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
+import com.ahmetkaragunlu.guidemate.navigation.switchRoot
 import com.ahmetkaragunlu.guidemate.screens.auth.forgot_password.ForgotPasswordScreen
 import com.ahmetkaragunlu.guidemate.screens.auth.onboarding.OnboardingScreen
 import com.ahmetkaragunlu.guidemate.screens.auth.role_selection.RoleSelectionScreen
@@ -15,7 +16,7 @@ import com.ahmetkaragunlu.guidemate.screens.auth.sign_up.SignUpScreen
 fun NavGraphBuilder.authNavGraph(navController: NavController) {
 
     navigation(
-        startDestination = AuthRoute.ForgotPassWordScreen.route,
+        startDestination = AuthRoute.SignInScreen.route,
         route = Graph.AuthGraph.route
     ) {
         composable(route = AuthRoute.OnboardingScreen.route) {
@@ -26,7 +27,11 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
             )
         }
         composable(route = AuthRoute.RoleSelectionScreen.route) {
-            RoleSelectionScreen()
+            RoleSelectionScreen(
+             onNavigateToTouristGraph = {
+                 navController.switchRoot(Graph.TouristGraph.route)
+             }
+            )
         }
         composable(route = AuthRoute.SignInScreen.route) {
             SignInScreen(
