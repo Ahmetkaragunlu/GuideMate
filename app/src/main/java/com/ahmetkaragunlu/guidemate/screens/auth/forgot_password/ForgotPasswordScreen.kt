@@ -85,7 +85,7 @@ fun ForgotPasswordScreen(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
         Text(
             text = stringResource(R.string.reset_password_description),
-            color = colorResource(R.color.onboarding_body_text_color),
+            color = colorResource(R.color.text_color),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )

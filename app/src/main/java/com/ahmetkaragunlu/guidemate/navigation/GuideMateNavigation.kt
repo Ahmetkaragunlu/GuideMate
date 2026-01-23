@@ -1,3 +1,5 @@
+package com.ahmetkaragunlu.guidemate.navigation
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,12 +14,12 @@ fun GuideMateNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Graph.AuthGraph.route
+        startDestination = Graph.TouristGraph.route
     ) {
         authNavGraph(navController = navController)
 
         composable(route = Graph.TouristGraph.route) {
-            TouristNavGraphScaffold()
+            TouristNavGraphScaffold(routeNavController = navController)
         }
     }
 }

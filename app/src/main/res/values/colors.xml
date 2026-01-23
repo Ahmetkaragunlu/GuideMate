@@ -8,5 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="brand_color">#FF0da6f2</color>
-    <color name="onboarding_body_text_color">#FF60646d</color>
+    <color name="text_color">#FF60646d</color>
 </resources>

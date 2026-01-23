@@ -20,14 +20,24 @@ class AuthInterceptor @Inject constructor(
         val originalRequest = chain.request()
         val requestBuilder = originalRequest.newBuilder()
 
-        // 1. Always add the Device ID (Required by Backend)
         val deviceId = tokenManager.getDeviceId()
         requestBuilder.addHeader("X-Device-Id", deviceId)
 
-        // 2. Add Access Token if it exists (For protected endpoints)
-        val token = tokenManager.getAccessToken()
-        if (!token.isNullOrEmpty()) {
-            requestBuilder.addHeader("Authorization", "Bearer $token")
+        val url = originalRequest.url.encodedPath
+
+        val isPublicEndpoint = url.contains("/auth/login") ||
+                url.contains("/auth/register") ||
+                url.contains("/auth/google") ||
+                url.contains("/auth/forgot-password") ||
+                url.contains("/auth/reset-password") ||
+                url.contains("/auth/confirm") ||
+                url.contains("/auth/refresh-token")
+
+        if (!isPublicEndpoint) {
+            val token = tokenManager.getAccessToken()
+            if (!token.isNullOrEmpty()) {
+                requestBuilder.addHeader("Authorization", "Bearer $token")
+            }
         }
 
         return chain.proceed(requestBuilder.build())

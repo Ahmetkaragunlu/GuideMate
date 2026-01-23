@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate
 
-import GuideMateNavigation
+import com.ahmetkaragunlu.guidemate.navigation.GuideMateNavigation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

@@ -12,6 +12,8 @@
 
     <dimen name="spacing_double_extra_large">72dp</dimen>
 
+    <dimen name="radius_small">8dp</dimen>
+
     <dimen name="radius_medium">12dp</dimen>
 
     <dimen name="radius_large">24dp</dimen>

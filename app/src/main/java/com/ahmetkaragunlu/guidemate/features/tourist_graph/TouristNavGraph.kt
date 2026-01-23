@@ -18,14 +18,15 @@ import com.ahmetkaragunlu.guidemate.components.TouristAppBar
 import com.ahmetkaragunlu.guidemate.navigation.touristNavItems
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristChatScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristExploreScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.TouristHomeScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristMyTripsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristProfileScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeViewModel
 
 
 fun NavGraphBuilder.touristNavGraph(
     touristNavController: NavController,
+    routeNavController: NavController
 ) {
         composable(route = TouristRoute.TouristHomeScreen.route) {
             TouristHomeScreen()
@@ -49,7 +50,8 @@ fun NavGraphBuilder.touristNavGraph(
 
 @Composable
 fun TouristNavGraphScaffold(
-    viewModel: TouristHomeViewModel = hiltViewModel()
+    viewModel: TouristHomeViewModel = hiltViewModel(),
+    routeNavController: NavController
 ) {
     val touristNavController = rememberNavController()
     val navBackStackEntry by touristNavController.currentBackStackEntryAsState()
@@ -79,6 +81,7 @@ fun TouristNavGraphScaffold(
         ) {
             touristNavGraph(
                 touristNavController = touristNavController,
+                routeNavController = routeNavController
             )
         }
     }

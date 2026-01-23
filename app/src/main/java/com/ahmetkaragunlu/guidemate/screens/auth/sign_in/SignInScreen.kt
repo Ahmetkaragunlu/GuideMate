@@ -115,7 +115,7 @@ fun SignInScreen(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
         Text(
             text = stringResource(R.string.sign_in_subtitle),
-            color = colorResource(R.color.onboarding_body_text_color),
+            color = colorResource(R.color.text_color),
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_double_extra_large)))
@@ -189,7 +189,7 @@ fun SignInScreen(
                 text = stringResource(R.string.forgot_password),
                 modifier = Modifier.clickable { onNavigateToForgotPassword() },
                 style = MaterialTheme.typography.bodyMedium,
-                color = colorResource(R.color.onboarding_body_text_color)
+                color = colorResource(R.color.text_color)
             )
         }
 
@@ -223,7 +223,7 @@ fun SignInScreen(
                 text = stringResource(R.string.or_continue_with),
                 modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small)),
                 style = MaterialTheme.typography.bodySmall,
-                color = colorResource(R.color.onboarding_body_text_color)
+                color = colorResource(R.color.text_color)
             )
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
@@ -265,7 +265,7 @@ fun SignInScreen(
             Text(
                 text = stringResource(R.string.google),
                 style = MaterialTheme.typography.labelLarge,
-                color = colorResource(R.color.onboarding_body_text_color).copy(alpha = 0.8f)
+                color = colorResource(R.color.text_color).copy(alpha = 0.8f)
             )
         }
 
@@ -279,7 +279,7 @@ fun SignInScreen(
                 text = buildAnnotatedString {
                     withStyle(
                         style = SpanStyle(
-                            color = colorResource(R.color.onboarding_body_text_color)
+                            color = colorResource(R.color.text_color)
                         )
                     ) {
                         append(stringResource(R.string.dont_have_an_account))

@@ -33,13 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
-import com.ahmetkaragunlu.guidemate.features.graph.Graph
-import com.ahmetkaragunlu.guidemate.features.tourist_graph.TouristRoute
-import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.navigation.switchRoot
 
 @Composable
 fun RoleSelectionScreen(
@@ -65,7 +60,7 @@ fun RoleSelectionScreen(
             text = stringResource(R.string.choose_user_type_description),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = colorResource(R.color.onboarding_body_text_color)
+            color = colorResource(R.color.text_color)
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_double_extra_large)))
         RoleSelectionCard(
@@ -129,7 +124,7 @@ fun RoleSelectionCard(
                 Text(
                     text = stringResource(description),
                     style = MaterialTheme.typography.bodySmall,
-                    color = colorResource(R.color.onboarding_body_text_color)
+                    color = colorResource(R.color.text_color)
 
                 )
             }

@@ -151,7 +151,7 @@ fun SignUpScreen(
         Spacer(modifier = modifier.height(dimensionResource(R.dimen.spacing_small)))
         Text(
             text = stringResource(R.string.sign_up_subtitle),
-            color = colorResource(R.color.onboarding_body_text_color),
+            color = colorResource(R.color.text_color),
             style = MaterialTheme.typography.bodySmall
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
@@ -250,7 +250,7 @@ fun SignUpScreen(
             Text(
                 text = stringResource(R.string.agree_terms_conditions),
                 style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                color = colorResource(R.color.onboarding_body_text_color),
+                color = colorResource(R.color.text_color),
                 modifier = Modifier
                     .padding(top = 2.dp)
                     .clickable { viewModel.toggleTermsSheet(true) }
@@ -274,7 +274,7 @@ fun SignUpScreen(
         TextButton(onClick = { onNavigateToSignIn() }) {
             Text(
                 text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = colorResource(R.color.onboarding_body_text_color))) {
+                    withStyle(style = SpanStyle(color = colorResource(R.color.text_color))) {
                         append(stringResource(R.string.already_have_an_account))
                         append("  ")
                     }

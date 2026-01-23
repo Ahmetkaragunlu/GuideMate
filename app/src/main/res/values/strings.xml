@@ -69,7 +69,21 @@
     <string name="tourist_explore">Keşfet</string>
     <string name="tourist_trips">Gezilerim</string>
     <string name="tourist_chat">Sohbet</string>
-    <string name="tourist_profile">Profil</string>
+    <string name="tourist_profile">Hesabım</string>
+
+
+    <string name="category_culture">Kültür</string>
+    <string name="category_all">Tümü</string>
+    <string name="category_food">Yemek</string>
+    <string name="category_nature">Doğa</string>
+    <string name="category_art">Sanat</string>
+    <string name="category_entertainment">Eğlence</string>
+    <string name="category_adventure">Macera</string>
+
+    <string name="best_guides_in_region">Bu Bölgedeki En İyi Rehberler</string>
+
+    <string name="popular_experiences">Popüler Deneyimler</string>
+    <string name="categories">Kategoriler</string>
 
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
