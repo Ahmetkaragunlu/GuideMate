@@ -15,11 +15,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.components.AppBottomBar
 import com.ahmetkaragunlu.guidemate.components.TouristAppBar
+import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.touristNavItems
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristChatScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.TouristExploreScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.TouristMyTripsScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.TouristTripsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristProfileScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristExploreScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristFilterScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeViewModel
 
@@ -28,22 +30,29 @@ fun NavGraphBuilder.touristNavGraph(
     touristNavController: NavController,
     routeNavController: NavController
 ) {
-        composable(route = TouristRoute.TouristHomeScreen.route) {
-            TouristHomeScreen()
-        }
-        composable(route = TouristRoute.TouristExploreScreen.route) {
-            TouristExploreScreen()
-        }
-        composable(route = TouristRoute.TouristMyTripsScreen.route) {
-            TouristMyTripsScreen()
-        }
-        composable(route = TouristRoute.TouristChatScreen.route) {
-            TouristChatScreen()
-        }
+    composable(route = TouristRoute.TouristHomeScreen.route) {
+        TouristHomeScreen()
+    }
+    composable(route = TouristRoute.TouristExploreScreen.route) {
+        TouristExploreScreen(
+            onNavigateToFilter = {
+                touristNavController.navigateTo(TouristRoute.TouristFilterScreen.route)
+            }
+        )
+    }
+    composable(route = TouristRoute.TouristMyTripsScreen.route) {
+        TouristTripsScreen()
+    }
+    composable(route = TouristRoute.TouristChatScreen.route) {
+        TouristChatScreen()
+    }
 
-        composable(route = TouristRoute.TouristProfileScreen.route) {
-            TouristProfileScreen()
-        }
+    composable(route = TouristRoute.TouristProfileScreen.route) {
+        TouristProfileScreen()
+    }
+    composable(route = TouristRoute.TouristFilterScreen.route) {
+        TouristFilterScreen()
+    }
 }
 
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -16,6 +17,7 @@ import androidx.navigation.NavController
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.features.tourist_graph.TouristRoute
 import compose.icons.TablerIcons
+import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Bell
 
 
@@ -32,12 +34,11 @@ fun TouristAppBar(
         TopAppBar(
             title = {
                 Text(
-                    text = stringResource(id = titleResId, userName?: ""),
+                    text = stringResource(id = titleResId, userName ?: ""),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
             },
-            navigationIcon = { },
             actions = {
                 Icon(
                     imageVector = TablerIcons.Bell,
@@ -56,7 +57,16 @@ fun TouristAppBar(
                 )
             },
             navigationIcon = {
-
+                if (currentRoute == TouristRoute.TouristFilterScreen.route) {
+                    IconButton(
+                        onClick = { navController.navigateUp() }
+                    ) {
+                        Icon(
+                            imageVector = TablerIcons.ArrowLeft,
+                            contentDescription = null
+                        )
+                    }
+                }
             },
             actions = {
 
@@ -72,6 +82,7 @@ fun getTouristScreenTitle(route: String?): Int {
         TouristRoute.TouristMyTripsScreen.route -> R.string.tourist_trips
         TouristRoute.TouristChatScreen.route -> R.string.tourist_chat
         TouristRoute.TouristProfileScreen.route -> R.string.tourist_profile
+        TouristRoute.TouristFilterScreen.route -> R.string.filter
         else -> R.string.app_name
     }
 }

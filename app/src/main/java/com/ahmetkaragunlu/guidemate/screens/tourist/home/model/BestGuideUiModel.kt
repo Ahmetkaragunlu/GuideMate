@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.home
+package com.ahmetkaragunlu.guidemate.screens.tourist.home.model
 
 
 data class BestGuideUiModel(

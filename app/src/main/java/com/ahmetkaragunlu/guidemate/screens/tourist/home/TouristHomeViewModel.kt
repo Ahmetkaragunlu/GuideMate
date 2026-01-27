@@ -1,27 +1,22 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.home
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
-import compose.icons.TablerIcons
-import compose.icons.tablericons.BuildingChurch
-import compose.icons.tablericons.Confetti
-import compose.icons.tablericons.Flame
-import compose.icons.tablericons.LayoutGrid
-import compose.icons.tablericons.Palette
-import compose.icons.tablericons.ToolsKitchen
-import compose.icons.tablericons.Trees
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategoriesData
+import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-
 
 @HiltViewModel
 class TouristHomeViewModel @Inject constructor(
@@ -35,25 +30,22 @@ class TouristHomeViewModel @Inject constructor(
             initialValue = null
         )
 
-    val categories = listOf(
-        CategoryItem(0, R.string.category_all, TablerIcons.LayoutGrid),
-        CategoryItem(0, R.string.category_culture, TablerIcons.BuildingChurch),
-        CategoryItem(1, R.string.category_food, TablerIcons.ToolsKitchen),
-        CategoryItem(2, R.string.category_nature, TablerIcons.Trees),
-        CategoryItem(3, R.string.category_art, TablerIcons.Palette),
-        CategoryItem(4, R.string.category_entertainment, TablerIcons.Confetti),
-        CategoryItem(5, R.string.category_adventure, TablerIcons.Flame)
-    )
+    val categories = TourCategoriesData.categories
+    private val _selectedCategory = MutableStateFlow(TourCategory.ALL)
+    val selectedCategory = _selectedCategory.asStateFlow()
 
-    private val _selectedCategoryIndex = MutableStateFlow(0)
-    val selectedCategoryIndex = _selectedCategoryIndex.asStateFlow()
-
-    fun updateSelectedCategory(index: Int) {
-        _selectedCategoryIndex.value = index
+    fun updateSelectedCategory(category: TourCategory) {
+        _selectedCategory.value = category
     }
 
-    val popularTours: StateFlow<List<PopularToursCardUiModel>> = flow {
-        emit(getDummyTours())
+    val popularTours: StateFlow<List<PopularToursCardUiModel>> = selectedCategory.map { currentCategory ->
+        val allTours = getDummyTours()
+
+        if (currentCategory == TourCategory.ALL) {
+            allTours
+        } else {
+            allTours.filter { it.category == currentCategory }
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -80,7 +72,8 @@ class TouristHomeViewModel @Inject constructor(
                 languagesFlag = "🇹🇷 🇬🇧 🇩🇪",
                 languagesText = "TR, EN, DE",
                 guideName = "Ahmet K.",
-                guideImageUrl = R.drawable.unnamed
+                guideImageUrl = R.drawable.unnamed,
+                category = TourCategory.CULTURE
             ),
             PopularToursCardUiModel(
                 id = "2",
@@ -92,7 +85,8 @@ class TouristHomeViewModel @Inject constructor(
                 languagesFlag = "🇬🇧 🇫🇷",
                 languagesText = "EN, FR",
                 guideName = "Mehmet Y.",
-                guideImageUrl = R.drawable.unnamed
+                guideImageUrl = R.drawable.unnamed,
+                category = TourCategory.ADVENTURE
             ),
             PopularToursCardUiModel(
                 id = "3",
@@ -104,11 +98,12 @@ class TouristHomeViewModel @Inject constructor(
                 languagesFlag = "🇹🇷 🇬🇧",
                 languagesText = "TR, EN",
                 guideName = "Ayşe Z.",
-                guideImageUrl = R.drawable.unnamed
+                guideImageUrl = R.drawable.unnamed,
+                category = TourCategory.CULTURE
             ),
             PopularToursCardUiModel(
                 id = "4",
-                title = "Boğaz Tekne Turu",
+                title = "Boğaz Tekne ve Yemek",
                 imageUrl = R.drawable.aaa,
                 rating = "4.7",
                 reviewCount = "(300)",
@@ -116,7 +111,8 @@ class TouristHomeViewModel @Inject constructor(
                 languagesFlag = "🇬🇧 🇸🇦",
                 languagesText = "EN, AR",
                 guideName = "Caner E.",
-                guideImageUrl = R.drawable.unnamed
+                guideImageUrl = R.drawable.unnamed,
+                category = TourCategory.FOOD
             )
         )
     }

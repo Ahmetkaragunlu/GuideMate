@@ -9,6 +9,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.dimensionResource
@@ -26,6 +27,8 @@ fun EditTextField(
     @StringRes placeholder : Int? = null,
     @StringRes supportingText: Int? = null,
     keyboardOptions: KeyboardOptions,
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -37,6 +40,8 @@ fun EditTextField(
 ) {
     OutlinedTextField(
         value = value,
+        modifier = modifier,
+        readOnly = readOnly,
         onValueChange = onValueChange,
         shape = shape,
         placeholder = placeholder?.let {  { Text(text = stringResource(it), style = MaterialTheme.typography.labelLarge, color = Color.Gray) } },

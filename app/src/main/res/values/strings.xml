@@ -85,9 +85,25 @@
     <string name="popular_experiences">Popüler Deneyimler</string>
     <string name="categories">Kategoriler</string>
 
+    <string name="tab_tours">Turlar</string>
+    <string name="tab_guides">Rehberler</string>
+    <string name="search_tours">Tur Ara</string>
+    <string name="search_guide">Rehber Ara</string>
+    <string name="filter">Filtrele</string>
+    <string name="rating">Puan</string>
+    <string name="select_languages">Dil Seçimi</string>
+    <string name="language">Dil Seç</string>
+    <string name="select_country">Ülke Seç</string>
+    <string name="select_city">Şehir Seç</string>
+    <string name="price_range">Fiyat Aralığı</string>
+
+
+    <string name="clear">Temizle</string>
+    <string name="apply_filter">Filtreleri Uygula</string>
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
     <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>
+    <string name="price_plus">%1$s +</string>
 
     <string name="terms_read_and_approve">Okudum, Onaylıyorum</string>
     <string name="terms_continue_reading">Okumaya Devam Edin…</string>

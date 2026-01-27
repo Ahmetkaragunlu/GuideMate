@@ -1,4 +1,6 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.home
+package com.ahmetkaragunlu.guidemate.screens.tourist.home.components
+
+
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -37,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
 
 @Composable
 fun PopularTourCard(
@@ -98,7 +101,6 @@ fun PopularTourCard(
                     text = tour.price,
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),
-                    fontWeight = FontWeight.Bold
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = tour.languagesFlag)

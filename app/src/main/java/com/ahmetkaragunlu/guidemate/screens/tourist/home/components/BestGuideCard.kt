@@ -1,4 +1,6 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.home
+package com.ahmetkaragunlu.guidemate.screens.tourist.home.components
+
+
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
 
 @Composable
 fun BestGuideCard(
