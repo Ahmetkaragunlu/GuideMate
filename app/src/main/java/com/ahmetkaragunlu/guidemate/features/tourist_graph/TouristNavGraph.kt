@@ -18,12 +18,12 @@ import com.ahmetkaragunlu.guidemate.components.TouristAppBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.touristNavItems
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristChatScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.TouristTripsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.TouristProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristExploreScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristFilterScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeViewModel
+import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TouristTripsScreen
 
 
 fun NavGraphBuilder.touristNavGraph(
