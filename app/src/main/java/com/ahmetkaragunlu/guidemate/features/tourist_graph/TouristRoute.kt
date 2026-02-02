@@ -9,5 +9,7 @@ enum class TouristRoute(val route: String)  {
     TouristChatScreen(route = "TouristChatScreen"),
     TouristExploreScreen(route = "TouristExploreScreen"),
     TouristMyTripsScreen(route = "TouristMyTripsScreen"),
-    TouristFilterScreen(route = "TouristFilterScreen")
+    TouristFilterScreen(route = "TouristFilterScreen"),
+    TouristChatDetailScreen(route = "TouristChatDetailScreen")
+
 }
