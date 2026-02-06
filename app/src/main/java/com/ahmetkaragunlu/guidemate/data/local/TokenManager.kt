@@ -22,7 +22,7 @@ class TokenManager @Inject constructor(
         private const val KEY_USER_NAME = "user_name"
     }
 
-    private val lock = Any() // Added for thread safety
+    private val lock = Any()
 
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)

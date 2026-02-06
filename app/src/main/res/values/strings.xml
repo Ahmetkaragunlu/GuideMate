@@ -104,6 +104,21 @@
     <string name="price_range">Fiyat Aralığı</string>
 
 
+    <string name="profile_current_balance">MEVCUT BAKİYE</string>
+    <string name="profile_add_money">PARA YÜKLE</string>
+    <string name="profile_logout">Çıkış Yap</string>
+    <string name="profile_default_user">Misafir Kullanıcı</string>
+    <string name="profile_brand_name">GuideMate</string>
+
+    <string name="menu_cards">Kayıtlı Kartlarım</string>
+    <string name="menu_password">Şifre Değiştir</string>
+    <string name="menu_notifications">Bildirim Ayarları</string>
+    <string name="menu_language">Dil Seçeneği</string>
+    <string name="menu_legal">Yasal &amp; Sözleşmeler</string>
+    <string name="menu_help">Yardım &amp; Destek</string>
+
+
+
     <string name="clear">Temizle</string>
     <string name="apply_filter">Filtreleri Uygula</string>
     <string name="ok">Tamam</string>

@@ -65,7 +65,7 @@ fun TouristAppBar(
                 if (isChatDetail) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
-                            painter = painterResource(id = R.drawable.aaa),
+                            painter = painterResource(id = R.drawable.example),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier

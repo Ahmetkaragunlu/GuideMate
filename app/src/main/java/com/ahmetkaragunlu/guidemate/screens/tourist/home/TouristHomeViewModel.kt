@@ -9,18 +9,21 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardU
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategoriesData
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
+
 @HiltViewModel
 class TouristHomeViewModel @Inject constructor(
-    authRepository: AuthRepository
+    authRepository: AuthRepository,
+
 ) : ViewModel() {
 
     val userName: StateFlow<String?> = authRepository.getUserName
@@ -38,34 +41,31 @@ class TouristHomeViewModel @Inject constructor(
         _selectedCategory.value = category
     }
 
-    val popularTours: StateFlow<List<PopularToursCardUiModel>> = selectedCategory.map { currentCategory ->
-        val allTours = getDummyTours()
-
-        if (currentCategory == TourCategory.ALL) {
-            allTours
-        } else {
-            allTours.filter { it.category == currentCategory }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val popularTours: StateFlow<List<PopularToursCardUiModel>> = selectedCategory
+        .flatMapLatest { currentCategory ->
+            flow { emit(getDummyTours(currentCategory)) }
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    val bestGuides: StateFlow<List<BestGuideUiModel>> = flow {
-        emit(getDummyGuides())
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
-
-    private fun getDummyTours(): List<PopularToursCardUiModel> {
-        return listOf(
+    val bestGuides: StateFlow<List<BestGuideUiModel>> =
+        flow { emit(getDummyGuides()) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
+            )
+  //Mock Data
+    private fun getDummyTours(category: TourCategory): List<PopularToursCardUiModel> {
+        val allTours = listOf(
             PopularToursCardUiModel(
                 id = "1",
                 title = "Sultanahmet ve Gizli Sokaklar",
-                imageUrl = R.drawable.aaa,
+                imageUrl = R.drawable.example,
                 rating = "4.9",
                 reviewCount = "(120)",
                 price = "750 ₺",
@@ -78,7 +78,7 @@ class TouristHomeViewModel @Inject constructor(
             PopularToursCardUiModel(
                 id = "2",
                 title = "Kapadokya Balon Turu",
-                imageUrl = R.drawable.aaa,
+                imageUrl = R.drawable.example,
                 rating = "5.0",
                 reviewCount = "(85)",
                 price = "2500 ₺",
@@ -91,7 +91,7 @@ class TouristHomeViewModel @Inject constructor(
             PopularToursCardUiModel(
                 id = "3",
                 title = "Efes Antik Kent Gezisi",
-                imageUrl = R.drawable.aaa,
+                imageUrl = R.drawable.example,
                 rating = "4.8",
                 reviewCount = "(210)",
                 price = "600 ₺",
@@ -104,7 +104,7 @@ class TouristHomeViewModel @Inject constructor(
             PopularToursCardUiModel(
                 id = "4",
                 title = "Boğaz Tekne ve Yemek",
-                imageUrl = R.drawable.aaa,
+                imageUrl = R.drawable.example,
                 rating = "4.7",
                 reviewCount = "(300)",
                 price = "1200 ₺",
@@ -115,6 +115,12 @@ class TouristHomeViewModel @Inject constructor(
                 category = TourCategory.FOOD
             )
         )
+
+        return if (category == TourCategory.ALL) {
+            allTours
+        } else {
+            allTours.filter { it.category == category }
+        }
     }
 
     private fun getDummyGuides(): List<BestGuideUiModel> {

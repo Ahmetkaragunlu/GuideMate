@@ -19,10 +19,10 @@ class TouristTripsViewModel @Inject constructor() : ViewModel() {
 
     // 1. Mock Data
     private val allTrips = listOf(
-        TripUiModel("1", "Kapadokya Balon Turu", "24 Mayıs 2026", "Nevşehir, Ürgüp", R.drawable.aaa, false),
-        TripUiModel("2", "Efes Antik Kent", "10 Haziran 2026", "İzmir, Buca", R.drawable.aaa, false),
-        TripUiModel("3", "İstanbul Boğaz Turu", "12 Ocak 2025", "İstanbul", R.drawable.aaa, true),
-        TripUiModel("4", "Pamukkale Gezisi", "05 Kasım 2024", "Denizli", R.drawable.aaa, true)
+        TripUiModel("1", "Kapadokya Balon Turu", "24 Mayıs 2026", "Nevşehir, Ürgüp", R.drawable.example, false),
+        TripUiModel("2", "Efes Antik Kent", "10 Haziran 2026", "İzmir, Buca", R.drawable.example, false),
+        TripUiModel("3", "İstanbul Boğaz Turu", "12 Ocak 2025", "İstanbul", R.drawable.example, true),
+        TripUiModel("4", "Pamukkale Gezisi", "05 Kasım 2024", "Denizli", R.drawable.example, true)
     )
 
     // 2. Tab State

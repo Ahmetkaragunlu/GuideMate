@@ -20,7 +20,7 @@ class TouristChatListViewModel @Inject constructor() : ViewModel() {
                 name = "Ahmet Rehber",
                 lastMessage = "Tur sabah 09:00'da otel önünden kalkacak.",
                 time = "14:30",
-                avatarResId = R.drawable.aaa,
+                avatarResId = R.drawable.example,
                 unreadCount = 2
             ),
             ChatUiModel(
@@ -28,7 +28,7 @@ class TouristChatListViewModel @Inject constructor() : ViewModel() {
                 name = "Mehmet Yılmaz",
                 lastMessage = "Tamamdır, teşekkürler.",
                 time = "Dün",
-                avatarResId = R.drawable.aaa,
+                avatarResId = R.drawable.example,
                 unreadCount = 0
             ),
             ChatUiModel(
@@ -36,7 +36,7 @@ class TouristChatListViewModel @Inject constructor() : ViewModel() {
                 name = "Ayşe Demir",
                 lastMessage = "Konum bilgisini tekrar atabilir misiniz acaba?",
                 time = "Pzt",
-                avatarResId = R.drawable.aaa,
+                avatarResId = R.drawable.example,
                 unreadCount = 5
             ),
             ChatUiModel(
@@ -44,7 +44,7 @@ class TouristChatListViewModel @Inject constructor() : ViewModel() {
                 name = "Fatma Kaya",
                 lastMessage = "Görüşmek üzere.",
                 time = "12.05",
-                avatarResId = R.drawable.aaa,
+                avatarResId = R.drawable.example,
                 unreadCount = 0
             )
         )
