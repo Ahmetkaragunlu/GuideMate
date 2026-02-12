@@ -31,6 +31,7 @@ import com.ahmetkaragunlu.guidemate.features.tourist_graph.TouristRoute
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Bell
+import compose.icons.tablericons.Logout
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,7 +103,16 @@ fun TouristAppBar(
                     }
                 }
             },
-            actions = {}
+            actions = {
+                if (currentRoute == TouristRoute.TouristProfileScreen.route) {
+                    IconButton(onClick = { }) {
+                        Icon(
+                            imageVector = TablerIcons.Logout,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            }
         )
     }
 }

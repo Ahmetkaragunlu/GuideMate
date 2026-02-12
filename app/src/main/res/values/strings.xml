@@ -72,6 +72,25 @@
     <string name="tourist_profile">Hesabım</string>
 
 
+    <string name="guide_home">Anasayfa</string>
+    <string name="guide_tours">Turlarım</string>
+    <string name="guide_chat">Sohbet</string>
+    <string name="guide_profile">Hesabım</string>
+    <string name="guide_wallet">Cüzdan</string>
+
+
+    <string name="completed_tours">Tamamlanan Tur</string>
+    <string name="total_participants">Katılımcı</string>
+    <string name="average_rating">Ortalama Puan</string>
+    <string name="monthly_earnings">Bu ayki kazanç</string>
+    <string name="tour_status">Tur Durumu</string>
+    <string name="active_tours">Yayında</string>
+    <string name="pending_tours">Onay Bekliyor</string>
+    <string name="recent_activities">Son hareketler</string>
+
+
+
+
     <string name="tab_upcoming">Yaklaşan</string>
     <string name="tab_past">Geçmiş</string>
 

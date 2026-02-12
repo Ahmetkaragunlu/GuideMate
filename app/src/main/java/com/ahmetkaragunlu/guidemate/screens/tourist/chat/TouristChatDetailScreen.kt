@@ -137,7 +137,6 @@ fun ChatInputArea(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.onPrimary)
             .padding(dimensionResource(R.dimen.spacing_medium)),
         verticalAlignment = Alignment.CenterVertically
     ) {
