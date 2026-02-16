@@ -6,5 +6,6 @@ enum class GuideRoute(val route: String) {
     GuideProfileScreen(route = "GuideProfileScreen"),
     GuideChatScreen(route = "GuideChatScreen"),
     GuideMyWalletScreen(route = "GuideMyWalletScreen"),
+    GuideChatDetailScreen(route = "GuideChatDetailScreen"),
 
 }

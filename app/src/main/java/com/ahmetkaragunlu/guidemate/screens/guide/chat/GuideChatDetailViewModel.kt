@@ -1,4 +1,5 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.chat
+package com.ahmetkaragunlu.guidemate.screens.guide.chat
+
 
 import androidx.lifecycle.ViewModel
 import com.ahmetkaragunlu.guidemate.screens.common.chat.model.MessageUiModel
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class TouristChatDetailViewModel @Inject constructor() : ViewModel() {
+class GuideChatDetailViewModel @Inject constructor() : ViewModel() {
 
     private val _messages = MutableStateFlow(
         listOf(
@@ -17,31 +18,31 @@ class TouristChatDetailViewModel @Inject constructor() : ViewModel() {
                 id = "1",
                 text = "Merhaba, tur programı belli oldu mu?",
                 time = "14:10",
-                isFromMe = true
+                isFromMe = false
             ),
             MessageUiModel(
                 id = "2",
-                text = "Evet Ahmet Bey, sabah 09:00'da lobide buluşuyoruz.",
+                text = "Evet Hans Bey, sabah 09:00'da lobide buluşuyoruz.",
                 time = "14:12",
-                isFromMe = false
+                isFromMe = true
             ),
             MessageUiModel(
                 id = "3",
                 text = "Harika! Yanıma ne almalıyım?",
                 time = "14:13",
-                isFromMe = true
+                isFromMe = false
             ),
             MessageUiModel(
                 id = "4",
                 text = "Rahat bir ayakkabı ve güneş gözlüğü yeterli olacaktır.",
                 time = "14:15",
-                isFromMe = false
+                isFromMe = true
             ),
             MessageUiModel(
                 id = "5",
                 text = "Tamamdır, teşekkürler.",
                 time = "14:16",
-                isFromMe = true
+                isFromMe = false
             )
         )
     )

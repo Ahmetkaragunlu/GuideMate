@@ -79,7 +79,7 @@ fun TouristTripsScreen(
 }
 
 @Composable
-fun TripCard(trip: TripUiModel) {
+ private fun TripCard(trip: TripUiModel) {
     val alphaValue = if (trip.isPast) 0.9f else 1f
     val colorFilter = if (trip.isPast) {
         ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })

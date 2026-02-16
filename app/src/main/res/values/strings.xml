@@ -111,6 +111,7 @@
     <string name="categories">Kategoriler</string>
 
     <string name="tab_tours">Turlar</string>
+    <string name="tab_active">Yayında</string>
     <string name="tab_guides">Rehberler</string>
     <string name="search_tours">Tur Ara</string>
     <string name="search_guide">Rehber Ara</string>
@@ -136,7 +137,16 @@
     <string name="menu_legal">Yasal &amp; Sözleşmeler</string>
     <string name="menu_help">Yardım &amp; Destek</string>
 
+    <string name="live">Yayında</string>
+    <string name="edit">Düzenle</string>
+    <string name="create_new_tour">Yeni Tur Oluştur</string>
+    <string name="price_format">₺%.0f</string>
+    <string name="earnings_format">Kazanç: ₺%.0f</string>
 
+    <string name="category_label">Kategori: %1$s</string>
+    <string name="participant_count">%1$d Katılımcı</string>
+
+    <string name="hidden">Gizli</string>
 
     <string name="clear">Temizle</string>
     <string name="apply_filter">Filtreleri Uygula</string>

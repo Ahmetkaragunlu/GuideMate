@@ -16,18 +16,19 @@ import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.components.AppBottomBar
 import com.ahmetkaragunlu.guidemate.components.GuideTopBar
 import com.ahmetkaragunlu.guidemate.navigation.guideNavItems
-import com.ahmetkaragunlu.guidemate.screens.guide.GuideChatScreen
-
-import com.ahmetkaragunlu.guidemate.screens.guide.GuideMyToursScreen
+import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.screens.guide.GuideMyWalletScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.GuideProfileScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatDetailScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.GuideMyToursScreen
 
 
 fun NavGraphBuilder.guideNavGraph(
-   guideNavController: NavController,
-   routeNavController: NavController
+    guideNavController: NavController,
+    routeNavController: NavController
 ) {
     composable(route = GuideRoute.GuideHomeScreen.route) {
         GuideHomeScreen()
@@ -39,17 +40,20 @@ fun NavGraphBuilder.guideNavGraph(
         GuideMyWalletScreen()
     }
     composable(route = GuideRoute.GuideChatScreen.route) {
-        GuideChatScreen()
+        GuideChatScreen(
+            onNavigateToDetail = { chatId ->
+                guideNavController.navigateTo(GuideRoute.GuideChatDetailScreen.route)
+            }
+        )
+    }
+
+    composable(route = GuideRoute.GuideChatDetailScreen.route) {
+        GuideChatDetailScreen()
     }
     composable(route = GuideRoute.GuideProfileScreen.route) {
         GuideProfileScreen()
     }
 }
-
-
-
-
-
 
 @Composable
 fun GuideNavGraphScaffold(
@@ -61,12 +65,11 @@ fun GuideNavGraphScaffold(
     val currentRoute = navBackStackEntry?.destination?.route ?: GuideRoute.GuideHomeScreen.route
     val getUserName by viewModel.userName.collectAsStateWithLifecycle()
 
-
-
     Scaffold(
         topBar = {
             GuideTopBar(
                 currentRoute = currentRoute,
+                navController = guideNavController,
                 userName = getUserName
             )
         },

@@ -1,7 +1,8 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.chat.model
+package com.ahmetkaragunlu.guidemate.screens.common.chat.model
 
 data class ChatUiModel(
     val id: String,
+    val remoteUserId: String,
     val name: String,
     val lastMessage: String,
     val time: String,
