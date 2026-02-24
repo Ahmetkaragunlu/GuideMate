@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -173,7 +174,7 @@ fun WalletCard(
                     modifier = Modifier
                         .fillMaxWidth().padding(horizontal = 24.dp),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White.copy(alpha = 0.25f),
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),

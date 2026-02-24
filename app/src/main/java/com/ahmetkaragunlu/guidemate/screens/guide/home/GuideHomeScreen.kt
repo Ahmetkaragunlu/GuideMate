@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -46,7 +45,6 @@ import com.ahmetkaragunlu.guidemate.screens.guide.home.model.dashboardStats
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.recentActivities
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowRight
-import compose.icons.tablericons.Flag
 
 
 @Composable
@@ -166,7 +164,7 @@ private fun MonthlyEarningsCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.monthly_earnings),
+                text = stringResource(R.string.this_month_earnings),
                 color = colorResource(R.color.text_color),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.labelLarge
