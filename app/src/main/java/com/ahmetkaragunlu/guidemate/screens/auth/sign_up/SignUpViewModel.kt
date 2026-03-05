@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
-import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

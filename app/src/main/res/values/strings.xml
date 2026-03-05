@@ -48,6 +48,20 @@
     <string name="choose_user_type_description">Deneyimini buna göre kişiselleştireceğiz.</string>
 
 
+    <string name="menu_bank_accounts">Banka Hesaplarım</string>
+    <string name="menu_about_languages">Hakkımda ve Diller</string>
+    <string name="menu_account_settings">Hesap Ayarları</string>
+    <string name="menu_help_faq">Yardım ve S.S.S.</string>
+
+    <string name="view_as_tourist">Turistin Gözünden Gör</string>
+    <string name="rating_format">%1$s Puan</string>
+    <string name="tour_count_format">%1$s Tur</string>
+
+    <string name="default_first_name">Ahmet</string>
+    <string name="default_last_name">Karagünlü</string>
+    <string name="info">Bilgi</string>
+
+
     <string name="error_no_internet">İnternet bağlantınızı kontrol edin.</string>
     <string name="error_server">Sunucu kaynaklı bir hata oluştu. Kod: %d</string>
     <string name="error_unknown">Beklenmedik bir hata oluştu.</string>

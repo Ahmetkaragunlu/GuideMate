@@ -8,26 +8,22 @@ import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.*
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.ErrorResponse
-import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.UserRepository
+
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
 
-
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val tokenManager: TokenManager,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val userRepository: UserRepository
 ) : AuthRepository {
-
-    private val _userName = MutableStateFlow(tokenManager.getUserName())
-    override val getUserName: Flow<String?> = _userName.asStateFlow()
 
     private fun Response<ResponseBody>.toDataResult(): DataResult<String> {
         return if (isSuccessful) {
@@ -89,7 +85,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     private fun clearLocalData() {
         tokenManager.clearTokens()
-        _userName.value = null
+        userRepository.clearUser()
     }
 
     override suspend fun refreshToken(): DataResult<AuthResponse> {
@@ -137,12 +133,6 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveUserName(name: String) {
-        tokenManager.saveUserName(name)
-        _userName.value = name
-    }
-
-
     private suspend fun handleAuthResponse(response: Response<AuthResponse>): DataResult<AuthResponse> {
         return if (response.isSuccessful && response.body() != null) {
             val authResponse = response.body()!!
@@ -151,9 +141,13 @@ class AuthRepositoryImpl @Inject constructor(
             authResponse.role?.let { tokenManager.saveUserRole(it) }
 
             val firstName = authResponse.firstName.orEmpty().trim()
-            if (firstName.isNotEmpty()) {
-                saveUserName(firstName)
-            }
+            val lastName = authResponse.lastName.orEmpty().trim()
+
+            userRepository.saveUser(
+                firstName = firstName.ifEmpty { null },
+                lastName = lastName.ifEmpty { null }
+            )
+
             DataResult.Success(authResponse)
         } else {
             val errorMsg = parseError(response.errorBody()?.string())

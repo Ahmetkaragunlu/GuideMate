@@ -17,11 +17,11 @@ import com.ahmetkaragunlu.guidemate.components.AppBottomBar
 import com.ahmetkaragunlu.guidemate.components.GuideTopBar
 import com.ahmetkaragunlu.guidemate.navigation.guideNavItems
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.screens.guide.GuideProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatDetailScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.GuideProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.GuideMyToursScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.GuideMyWalletScreen
 

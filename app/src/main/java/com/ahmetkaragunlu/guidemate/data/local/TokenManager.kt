@@ -20,6 +20,7 @@ class TokenManager @Inject constructor(
         private const val KEY_USER_ROLE = "user_role"
 
         private const val KEY_USER_NAME = "user_name"
+        private const val KEY_USER_LAST_NAME = "user_last_name"
     }
 
     private val lock = Any()
@@ -40,6 +41,7 @@ class TokenManager @Inject constructor(
         sharedPreferences.edit { putString(KEY_ACCESS_TOKEN, token) }
     }
 
+
     fun getAccessToken(): String? = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
 
     fun saveUserName(name: String) {
@@ -47,6 +49,11 @@ class TokenManager @Inject constructor(
     }
 
     fun getUserName(): String? = sharedPreferences.getString(KEY_USER_NAME, null)
+
+    fun saveUserLastName(lastName: String) {
+        sharedPreferences.edit { putString(KEY_USER_LAST_NAME, lastName) }
+    }
+    fun getUserLastName(): String? = sharedPreferences.getString(KEY_USER_LAST_NAME, null)
 
     fun saveRefreshToken(token: String) {
         sharedPreferences.edit { putString(KEY_REFRESH_TOKEN, token) }

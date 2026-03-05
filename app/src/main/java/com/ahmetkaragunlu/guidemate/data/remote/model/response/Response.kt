@@ -10,6 +10,7 @@ data class AuthResponse(
     @SerializedName("roleSelected") val isRoleSelected: Boolean,
     @SerializedName("role") val role: String?,
     @SerializedName("firstName") val firstName: String?,
+    @SerializedName("lastName") val lastName: String?,
 )
 data class ErrorResponse(
     @SerializedName("code") val code: Int,

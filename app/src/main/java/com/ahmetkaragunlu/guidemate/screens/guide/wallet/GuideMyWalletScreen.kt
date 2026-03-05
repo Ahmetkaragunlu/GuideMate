@@ -50,7 +50,9 @@ fun GuideMyWalletScreen(
 
             Button(
                 onClick = { showBottomSheet = true },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.spacing_tiny)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_tiny)),
                 shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color))
@@ -70,8 +72,18 @@ fun GuideMyWalletScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
-                Box(modifier = Modifier.fillMaxWidth().height(160.dp).simpleVerticalScrollbar(earningsScrollState)) {
-                    Column(modifier = Modifier.fillMaxSize().verticalScroll(earningsScrollState).padding(end = 12.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .simpleVerticalScrollbar(earningsScrollState)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(earningsScrollState)
+                            .padding(end = 12.dp)
+                    ) {
                         uiState.earningSummaries.forEach { earning ->
                             EarningSummaryItem(earning = earning)
                         }
@@ -87,8 +99,18 @@ fun GuideMyWalletScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
-                Box(modifier = Modifier.fillMaxWidth().height(200.dp).simpleVerticalScrollbar(transactionsScrollState)) {
-                    Column(modifier = Modifier.fillMaxSize().verticalScroll(transactionsScrollState).padding(end = 12.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .simpleVerticalScrollbar(transactionsScrollState)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(transactionsScrollState)
+                            .padding(end = 12.dp)
+                    ) {
                         uiState.recentTransactions.forEach { transaction ->
                             TransactionItem(transaction = transaction)
                         }

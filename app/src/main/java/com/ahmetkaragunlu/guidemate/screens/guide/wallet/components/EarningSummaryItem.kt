@@ -27,14 +27,12 @@ import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary
 
 @Composable
 fun EarningSummaryItem(earning: EarningSummary) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { /* TODO: Detaya git */ }
-            .padding(vertical = 12.dp),
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .clickable { /* TODO: Detaya git */ }
+        .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+        verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = earning.periodName,
             style = MaterialTheme.typography.titleSmall,

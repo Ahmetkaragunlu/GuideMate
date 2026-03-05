@@ -3,7 +3,7 @@ package com.ahmetkaragunlu.guidemate.screens.tourist.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.UserRepository
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategoriesData
@@ -19,14 +19,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-
 @HiltViewModel
 class TouristHomeViewModel @Inject constructor(
-    authRepository: AuthRepository,
-
+    userRepository: UserRepository
 ) : ViewModel() {
 
-    val userName: StateFlow<String?> = authRepository.getUserName
+    val userName: StateFlow<String?> = userRepository.userName
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -59,7 +57,8 @@ class TouristHomeViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = emptyList()
             )
-  //Mock Data
+
+    //Mock Data
     private fun getDummyTours(category: TourCategory): List<PopularToursCardUiModel> {
         val allTours = listOf(
             PopularToursCardUiModel(
