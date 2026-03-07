@@ -53,7 +53,11 @@ fun NavGraphBuilder.touristNavGraph(
     }
 
     composable(route = TouristRoute.TouristProfileScreen.route) {
-        TouristProfileScreen()
+        TouristProfileScreen(
+            onNavigateToAccount = { targetRoute ->
+                routeNavController.navigateTo(targetRoute)
+            }
+        )
     }
     composable(route = TouristRoute.TouristFilterScreen.route) {
         TouristFilterScreen()

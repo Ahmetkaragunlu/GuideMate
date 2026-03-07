@@ -4,4 +4,5 @@ enum class Graph(val route : String) {
     AuthGraph(route = "AuthGraphRoot"),
     GuideGraph(route = "GuideGraphRoot"),
     TouristGraph(route = "TouristGraphRoot"),
+    AccountGraph("AccountGraphRoot")
 }

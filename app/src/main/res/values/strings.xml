@@ -146,12 +146,13 @@
     <string name="profile_default_user">Misafir Kullanıcı</string>
     <string name="profile_brand_name">GuideMate</string>
 
-    <string name="menu_cards">Kayıtlı Kartlarım</string>
-    <string name="menu_password">Şifre Değiştir</string>
-    <string name="menu_notifications">Bildirim Ayarları</string>
-    <string name="menu_language">Dil Seçeneği</string>
-    <string name="menu_legal">Yasal &amp; Sözleşmeler</string>
-    <string name="menu_help">Yardım &amp; Destek</string>
+    <string name="saved_cards">Kayıtlı Kartlarım</string>
+    <string name="change_password">Şifre Değiştir</string>
+    <string name="notification_settings">Bildirim Ayarları</string>
+    <string name="legal_agreements">Yasal &amp; Sözleşmeler</string>
+    <string name="help_support">Yardım &amp; Destek</string>
+    <string name="account_settings">Hesap Ayarları</string>
+
     <string name="total_withdrawable_balance">TOPLAM ÇEKİLEBİLİR BAKİYE</string>
     <string name="recent_transactions">Son Hareketler</string>
     <string name="live">Yayında</string>

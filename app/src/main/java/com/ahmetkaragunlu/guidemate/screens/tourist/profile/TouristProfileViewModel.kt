@@ -4,7 +4,6 @@ package com.ahmetkaragunlu.guidemate.screens.tourist.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.data.local.TokenManager
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.ProfileMenuType
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,14 +35,5 @@ class TouristProfileViewModel @Inject constructor(
         }
     }
 
-    fun onMenuItemClicked(type: ProfileMenuType) {
-        when(type) {
-            ProfileMenuType.CARDS -> {  }
-            ProfileMenuType.PASSWORD -> {  }
-            ProfileMenuType.NOTIFICATIONS -> { /* ... */ }
-            ProfileMenuType.LANGUAGE -> { /* ... */ }
-            ProfileMenuType.LEGAL -> { /* ... */ }
-            ProfileMenuType.HELP -> { /* ... */ }
-        }
-    }
+
 }
