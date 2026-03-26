@@ -22,9 +22,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.wallet.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GuideMyWalletScreen(
-    viewModel: GuideMyWalletViewModel = hiltViewModel()
-) {
+fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val earningsScrollState = rememberScrollState()
     val transactionsScrollState = rememberScrollState()
@@ -33,34 +31,35 @@ fun GuideMyWalletScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
         ) {
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
             WalletCard(
                 formattedBalance = uiState.totalBalance.toLocalCurrency(),
-                maskedIban = uiState.selectedBankAccount?.maskedIban ?: "TR** **** ****"
+                maskedIban = uiState.selectedBankAccount?.maskedIban ?: "TR** **** ****",
             )
 
             Button(
                 onClick = { showBottomSheet = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(R.dimen.spacing_tiny)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_tiny)),
                 shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color))
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
             ) {
                 Text(
                     text = stringResource(R.string.withdraw_money),
                     style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
 
@@ -70,19 +69,21 @@ fun GuideMyWalletScreen(
                     color = colorResource(R.color.brand_color),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 12.dp),
                 )
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp)
-                        .simpleVerticalScrollbar(earningsScrollState)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(160.dp)
+                            .simpleVerticalScrollbar(earningsScrollState),
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(earningsScrollState)
-                            .padding(end = 12.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(earningsScrollState)
+                                .padding(end = 12.dp),
                     ) {
                         uiState.earningSummaries.forEach { earning ->
                             EarningSummaryItem(earning = earning)
@@ -97,19 +98,21 @@ fun GuideMyWalletScreen(
                     color = colorResource(R.color.brand_color),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 12.dp),
                 )
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .simpleVerticalScrollbar(transactionsScrollState)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .simpleVerticalScrollbar(transactionsScrollState),
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(transactionsScrollState)
-                            .padding(end = 12.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .verticalScroll(transactionsScrollState)
+                                .padding(end = 12.dp),
                     ) {
                         uiState.recentTransactions.forEach { transaction ->
                             TransactionItem(transaction = transaction)
@@ -126,7 +129,7 @@ fun GuideMyWalletScreen(
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = sheetState,
                 containerColor = Color.White,
-                dragHandle = { BottomSheetDefaults.DragHandle() }
+                dragHandle = { BottomSheetDefaults.DragHandle() },
             ) {
                 WithdrawBottomSheetContent(
                     availableBalance = uiState.totalBalance,
@@ -134,7 +137,7 @@ fun GuideMyWalletScreen(
                     onConfirm = { amount ->
                         viewModel.withdrawMoney(amount)
                         showBottomSheet = false
-                    }
+                    },
                 )
             }
         }

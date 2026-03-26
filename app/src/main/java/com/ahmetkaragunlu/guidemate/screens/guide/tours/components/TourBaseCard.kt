@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours.components
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,16 +26,17 @@ fun TourBaseCard(
     colorFilter: ColorFilter? = null,
     alpha: Float = 1f,
     elevation: Dp = 4.dp,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
-        modifier = modifier
-            .widthIn(max = 720.dp)
-            .fillMaxWidth()
-            .alpha(alpha),
+        modifier =
+            modifier
+                .widthIn(max = 720.dp)
+                .fillMaxWidth()
+                .alpha(alpha),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -44,9 +44,10 @@ fun TourBaseCard(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 colorFilter = colorFilter,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
             )
             content()
         }
@@ -54,13 +55,16 @@ fun TourBaseCard(
 }
 
 @Composable
-fun InfoRow(icon: ImageVector, text: String) {
+fun InfoRow(
+    icon: ImageVector,
+    text: String,
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = colorResource(R.color.text_color),
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
         )
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
         Text(
@@ -68,7 +72,7 @@ fun InfoRow(icon: ImageVector, text: String) {
             style = MaterialTheme.typography.bodyMedium,
             color = colorResource(R.color.text_color),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

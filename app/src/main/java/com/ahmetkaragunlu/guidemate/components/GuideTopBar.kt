@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.components
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,13 +33,12 @@ import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Bell
 import compose.icons.tablericons.Logout
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuideTopBar(
     currentRoute: String,
     navController: NavController,
-    userName: String?
+    userName: String?,
 ) {
     val isChatDetail = currentRoute == GuideRoute.GuideChatDetailScreen.route
 
@@ -50,16 +48,16 @@ fun GuideTopBar(
                 Text(
                     text = stringResource(id = R.string.welcome_message, userName ?: ""),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             },
             actions = {
                 Icon(
                     imageVector = TablerIcons.Bell,
                     contentDescription = null,
-                    modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small))
+                    modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small)),
                 )
-            }
+            },
         )
     } else {
         CenterAlignedTopAppBar(
@@ -70,9 +68,10 @@ fun GuideTopBar(
                             painter = painterResource(id = R.drawable.example),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
+                            modifier =
+                                Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
@@ -80,7 +79,7 @@ fun GuideTopBar(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 } else {
@@ -88,18 +87,18 @@ fun GuideTopBar(
                     Text(
                         text = stringResource(id = titleResId),
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             },
             navigationIcon = {
                 if (isChatDetail) {
                     IconButton(
-                        onClick = { navController.navigateUp() }
+                        onClick = { navController.navigateUp() },
                     ) {
                         Icon(
                             imageVector = TablerIcons.ArrowLeft,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 }
@@ -113,14 +112,13 @@ fun GuideTopBar(
                         )
                     }
                 }
-            }
+            },
         )
     }
 }
 
-
-fun getGuideScreenTitle(route: String?): Int {
-    return when (route) {
+fun getGuideScreenTitle(route: String?): Int =
+    when (route) {
         GuideRoute.GuideHomeScreen.route -> R.string.welcome_message // String kaynağını kontrol et (guide_home olabilir)
         GuideRoute.GuideMyToursScreen.route -> R.string.guide_tours
         GuideRoute.GuideMyWalletScreen.route -> R.string.guide_wallet
@@ -128,4 +126,3 @@ fun getGuideScreenTitle(route: String?): Int {
         GuideRoute.GuideProfileScreen.route -> R.string.guide_profile
         else -> R.string.app_name
     }
-}

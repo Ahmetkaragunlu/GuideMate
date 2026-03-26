@@ -5,5 +5,5 @@ data class MessageUiModel(
     val text: String,
     val time: String,
     val isFromMe: Boolean,
-    val senderId: String = ""
+    val senderId: String = "",
 )

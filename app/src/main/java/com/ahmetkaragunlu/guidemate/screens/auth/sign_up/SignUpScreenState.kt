@@ -5,5 +5,5 @@ data class SignUpScreenState(
     val isRegistrationSuccess: Boolean = false,
     val isTermsAccepted: Boolean = false,
     val showTermsSheet: Boolean = false,
-    val hasUserReadTerms: Boolean = false
+    val hasUserReadTerms: Boolean = false,
 )

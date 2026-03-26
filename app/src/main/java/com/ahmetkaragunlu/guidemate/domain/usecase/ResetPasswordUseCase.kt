@@ -1,0 +1,15 @@
+package com.ahmetkaragunlu.guidemate.domain.usecase
+
+import com.ahmetkaragunlu.guidemate.common.DataResult
+import com.ahmetkaragunlu.guidemate.domain.AuthRepository
+import javax.inject.Inject
+
+class ResetPasswordUseCase @Inject constructor(
+    private val repository: AuthRepository
+) {
+    suspend operator fun invoke(
+        token: String,
+        newPassword: String,
+        confirmPassword: String
+    ): DataResult<String> = repository.resetPassword(token, newPassword, confirmPassword)
+}

@@ -12,29 +12,34 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class GuideProfileViewModel @Inject constructor(
-    userRepository: UserRepository
-) : ViewModel() {
+class GuideProfileViewModel
+    @Inject
+    constructor(
+        userRepository: UserRepository,
+    ) : ViewModel() {
+        val firstName: StateFlow<String?> =
+            userRepository.userName
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    val firstName: StateFlow<String?> = userRepository.userName
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        val lastName: StateFlow<String?> =
+            userRepository.userLastName
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    val lastName: StateFlow<String?> = userRepository.userLastName
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
-    val profileState: StateFlow<GuideProfileUiState> = flow {
-        // MOCK DATA
-        val mockData = GuideProfileUiState(
-            profileImageUrl = null,
-            title = "Profesyonel Tur Rehberi",
-            guideLevel = "Süper Rehber",
-            rating = 4.9,
-            tourCount = 124
-        )
-        emit(mockData)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = GuideProfileUiState()
-    )
-}
+        val profileState: StateFlow<GuideProfileUiState> =
+            flow {
+                // MOCK DATA
+                val mockData =
+                    GuideProfileUiState(
+                        profileImageUrl = null,
+                        title = "Profesyonel Tur Rehberi",
+                        guideLevel = "Süper Rehber",
+                        rating = 4.9,
+                        tourCount = 124,
+                    )
+                emit(mockData)
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = GuideProfileUiState(),
+            )
+    }

@@ -27,24 +27,27 @@ import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary
 
 @Composable
 fun EarningSummaryItem(earning: EarningSummary) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { /* TODO: Detaya git */ }
-        .padding(vertical = 12.dp),
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { /* TODO: Detaya git */ }
+                .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
             text = earning.periodName,
             style = MaterialTheme.typography.titleSmall,
             color = colorResource(R.color.text_color),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "+${earning.amount.toLocalCurrency()}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF388E3C)
+                color = Color(0xFF388E3C),
             )
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
             Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray)

@@ -29,7 +29,7 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.shared.CategoryCard
 @Composable
 fun TouristHomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: TouristHomeViewModel = hiltViewModel()
+    viewModel: TouristHomeViewModel = hiltViewModel(),
 ) {
     val categories = viewModel.categories
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
@@ -37,30 +37,35 @@ fun TouristHomeScreen(
     val bestGuides by viewModel.bestGuides.collectAsStateWithLifecycle()
 
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.spacing_medium)),
-        contentPadding = PaddingValues(bottom = dimensionResource(R.dimen.spacing_double_extra_large))
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(dimensionResource(R.dimen.spacing_medium)),
+        contentPadding = PaddingValues(bottom = dimensionResource(R.dimen.spacing_double_extra_large)),
     ) {
         item {
             Column(
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
             ) {
                 Text(
                     text = stringResource(id = R.string.categories),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small), bottom = dimensionResource(R.dimen.spacing_tiny))
+                    modifier =
+                        Modifier.padding(
+                            start = dimensionResource(R.dimen.spacing_small),
+                            bottom = dimensionResource(R.dimen.spacing_tiny),
+                        ),
                 )
 
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
                 ) {
                     items(categories) { category ->
                         CategoryCard(
                             category = category,
                             isSelected = (category.type == selectedCategory),
-                            onClick = { viewModel.updateSelectedCategory(category.type) }
+                            onClick = { viewModel.updateSelectedCategory(category.type) },
                         )
                     }
                 }
@@ -71,12 +76,12 @@ fun TouristHomeScreen(
                     text = stringResource(id = R.string.popular_experiences),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small))
+                    modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
                 )
 
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-                    contentPadding = PaddingValues(horizontal = 4.dp)
+                    contentPadding = PaddingValues(horizontal = 4.dp),
                 ) {
                     items(popularTours) { tour ->
                         PopularTourCard(tour = tour)
@@ -94,9 +99,10 @@ fun TouristHomeScreen(
                 text = stringResource(id = R.string.best_guides_in_region),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(
-                    start = dimensionResource(R.dimen.spacing_small)
-                )
+                modifier =
+                    Modifier.padding(
+                        start = dimensionResource(R.dimen.spacing_small),
+                    ),
             )
         }
 
@@ -110,4 +116,3 @@ fun TouristHomeScreen(
         }
     }
 }
-

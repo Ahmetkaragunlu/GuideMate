@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
+import com.ahmetkaragunlu.guidemate.common.ResourceProvider
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
 import com.ahmetkaragunlu.guidemate.domain.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.usecase.ForgotPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ForgotPasswordViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val forgotPasswordUseCase: ForgotPasswordUseCase,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(ForgotPasswordFormState())
@@ -25,7 +28,6 @@ class ForgotPasswordViewModel @Inject constructor(
     private val _screenState = MutableStateFlow(ForgotPasswordScreenState())
     val screenState: StateFlow<ForgotPasswordScreenState> = _screenState.asStateFlow()
 
-    // --- Input Changes ---
     fun onFirstNameChange(value: String) {
         _formState.update { it.copy(firstName = value) }
     }
@@ -38,50 +40,37 @@ class ForgotPasswordViewModel @Inject constructor(
         _formState.update { it.copy(email = value.trim()) }
     }
 
-    // --- Form Submission ---
-    fun onSubmitClick(onShowErrorToast: (Int) -> Unit) {
-        if (checkErrors(onShowErrorToast)) {
+    fun onSubmitClick() {
+        if (checkErrors()) {
             sendResetLink()
         }
     }
 
     private fun sendResetLink() {
         viewModelScope.launch {
-            val request = ForgotPasswordRequest(
-                firstName = _formState.value.firstName,
-                lastName = _formState.value.lastName,
-                email = _formState.value.email
-            )
+            val form = _formState.value
+            when (val result = forgotPasswordUseCase(form.email, form.firstName, form.lastName)) {
+                is DataResult.Success -> _screenState.update {
+                    it.copy(
+                        showSuccessDialog = true,
+                        successMessage = result.data
+                    )
+                }
 
-            when (val result = repository.forgotPassword(request)) {
-                is DataResult.Success -> {
-                    _screenState.update {
-                        it.copy(
-                            showSuccessDialog = true,
-                            successMessage = result.data
-                        )
-                    }
-                }
-                is DataResult.Error -> {
-                    _screenState.update {
-                        it.copy(errorMessage = result.message)
-                    }
-                }
+                is DataResult.Error -> _screenState.update { it.copy(errorMessage = result.message) }
             }
         }
     }
 
-    // --- Validation ---
-    private fun checkErrors(onShowErrorToast: (Int) -> Unit): Boolean {
+    private fun checkErrors(): Boolean {
         val form = _formState.value
         if (form.firstName.isBlank() || form.lastName.isBlank() || form.email.isBlank()) {
-            onShowErrorToast(R.string.error_fill_all_fields)
+            _screenState.update { it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields)) }
             return false
         }
         return true
     }
 
-    // --- State Management ---
     fun clearError() {
         _screenState.update { it.copy(errorMessage = null) }
     }

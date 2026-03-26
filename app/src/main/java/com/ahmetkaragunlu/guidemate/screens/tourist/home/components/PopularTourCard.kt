@@ -1,7 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.home.components
 
-
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -42,32 +40,33 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
 
 @Composable
-fun PopularTourCard(
-    tour: PopularToursCardUiModel
-) {
+fun PopularTourCard(tour: PopularToursCardUiModel) {
     Card(
-        modifier = Modifier
-            .width(200.dp)
-            .height(260.dp),
+        modifier =
+            Modifier
+                .width(200.dp)
+                .height(260.dp),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = tour.imageUrl),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.40f)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(0.40f),
             )
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.6f)
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(0.6f)
+                        .padding(12.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = tour.title,
@@ -81,20 +80,19 @@ fun PopularTourCard(
                         Icons.Default.Star,
                         null,
                         tint = Color(0xFFFFC107),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                     Text(
                         text = tour.rating,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = colorResource(R.color.text_color)
+                        color = colorResource(R.color.text_color),
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                     Text(
                         text = tour.reviewCount,
                         style = MaterialTheme.typography.bodySmall,
-                        color = colorResource(R.color.text_color)
-
+                        color = colorResource(R.color.text_color),
                     )
                 }
                 Text(
@@ -108,7 +106,7 @@ fun PopularTourCard(
                     Text(
                         text = tour.languagesText,
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        color = Color.Gray,
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -116,29 +114,31 @@ fun PopularTourCard(
                         painter = painterResource(id = tour.guideImageUrl),
                         contentDescription = "Rehber",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .border(1.dp, Color.LightGray, CircleShape)
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .border(1.dp, Color.LightGray, CircleShape),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append("Rehber: ") }
-                            withStyle(
-                                style = SpanStyle(
-                                    fontWeight = FontWeight.Normal,
-                                    color = colorResource(R.color.text_color)
-                                )
-                            ) { append(tour.guideName) }
-                        },
+                        text =
+                            buildAnnotatedString {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append("Rehber: ") }
+                                withStyle(
+                                    style =
+                                        SpanStyle(
+                                            fontWeight = FontWeight.Normal,
+                                            color = colorResource(R.color.text_color),
+                                        ),
+                                ) { append(tour.guideName) }
+                            },
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
         }
     }
 }
-

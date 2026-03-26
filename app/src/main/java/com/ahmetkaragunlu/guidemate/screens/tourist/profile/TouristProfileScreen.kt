@@ -39,7 +39,7 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.menuOptions
 fun TouristProfileScreen(
     viewModel: TouristProfileViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
-    onNavigateToAccount: (String) -> Unit = {}
+    onNavigateToAccount: (String) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
@@ -47,20 +47,22 @@ fun TouristProfileScreen(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.spacing_medium))
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(dimensionResource(R.dimen.spacing_medium))
+                .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
         Image(
             painter = painterResource(id = R.drawable.example),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape)
+            modifier =
+                Modifier
+                    .size(80.dp)
+                    .clip(CircleShape),
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
@@ -77,7 +79,7 @@ fun TouristProfileScreen(
 
         WalletCard(
             balance = uiState.balance,
-            onAddMoneyClick = {}
+            onAddMoneyClick = {},
         )
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
@@ -88,7 +90,7 @@ fun TouristProfileScreen(
                     option = option,
                     onClick = {
                         onNavigateToAccount("${Graph.AccountGraph.route}/${option.targetRoute}")
-                    }
+                    },
                 )
                 if (index < menuOptions.lastIndex) {
                     HorizontalDivider(

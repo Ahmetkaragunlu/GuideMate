@@ -15,5 +15,5 @@ data class GuideTourUiModel(
     val reviewCount: Int?,
     val isActive: Boolean = true,
     val isLive: Boolean = false,
-    val earnings: Double? = null
+    val earnings: Double? = null,
 )

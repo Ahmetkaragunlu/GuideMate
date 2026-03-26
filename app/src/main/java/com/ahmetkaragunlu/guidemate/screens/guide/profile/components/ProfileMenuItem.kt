@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile.components
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,32 +26,33 @@ import compose.icons.tablericons.ChevronRight
 fun ProfileMenuItem(
     icon: ImageVector,
     title: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = Color.Gray,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(24.dp),
         )
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
             color = colorResource(R.color.text_color),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         Icon(
             imageVector = TablerIcons.ChevronRight,
             contentDescription = null,
-            tint = Color.Gray
+            tint = Color.Gray,
         )
     }
 }

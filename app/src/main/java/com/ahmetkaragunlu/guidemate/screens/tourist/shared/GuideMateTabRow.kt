@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.shared
 
-
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -20,7 +19,7 @@ import com.ahmetkaragunlu.guidemate.R
 fun <T : GuidemateTab> GuideMateTabRow(
     tabs: List<T>,
     selectedTab: T,
-    onTabSelected: (T) -> Unit
+    onTabSelected: (T) -> Unit,
 ) {
     val selectedIndex = tabs.indexOf(selectedTab)
 
@@ -31,9 +30,9 @@ fun <T : GuidemateTab> GuideMateTabRow(
             TabRowDefaults.SecondaryIndicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
                 height = 2.dp,
-                color = colorResource(R.color.brand_color)
+                color = colorResource(R.color.brand_color),
             )
-        }
+        },
     ) {
         tabs.forEach { tab ->
             val isSelected = (tab == selectedTab)
@@ -45,11 +44,11 @@ fun <T : GuidemateTab> GuideMateTabRow(
                     Text(
                         text = stringResource(id = tab.titleResId),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     )
                 },
                 selectedContentColor = colorResource(R.color.brand_color),
-                unselectedContentColor = colorResource(R.color.text_color)
+                unselectedContentColor = colorResource(R.color.text_color),
             )
         }
     }

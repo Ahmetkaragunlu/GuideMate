@@ -35,26 +35,27 @@ import compose.icons.tablericons.Plus
 @Composable
 fun WalletCard(
     balance: String,
-    onAddMoneyClick: () -> Unit
+    onAddMoneyClick: () -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = colorResource(R.color.brand_color).copy(alpha = 0.8f))
-                .padding(24.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(color = colorResource(R.color.brand_color).copy(alpha = 0.8f))
+                    .padding(24.dp),
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Column {
                         Text(
@@ -62,21 +63,21 @@ fun WalletCard(
                             color = Color.White.copy(alpha = 0.9f),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Medium,
-                            letterSpacing = 0.5.sp
+                            letterSpacing = 0.5.sp,
                         )
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                         Text(
                             text = balance,
                             color = MaterialTheme.colorScheme.onPrimary,
                             style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                     Text(
                         text = stringResource(R.string.profile_brand_name),
                         color = Color.White.copy(alpha = 0.95f),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
 
@@ -84,13 +85,16 @@ fun WalletCard(
 
                 Button(
                     onClick = onAddMoneyClick,
-                    modifier = Modifier
-                        .fillMaxWidth().padding(horizontal = 24.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White.copy(alpha = 0.25f),
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color.White.copy(alpha = 0.25f),
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                 ) {
                     Icon(
                         imageVector = TablerIcons.Plus,
@@ -100,7 +104,7 @@ fun WalletCard(
                     Text(
                         text = stringResource(R.string.profile_add_money),
                         style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }

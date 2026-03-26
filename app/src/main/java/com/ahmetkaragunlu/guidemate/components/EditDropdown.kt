@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.components
 
-
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,21 +14,21 @@ fun EditDropdown(
     value: String,
     @StringRes placeholder: Int,
     modifier: Modifier = Modifier,
-    options: List<String> = emptyList()
+    options: List<String> = emptyList(),
 ) {
-
     val expanded = false
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { },
-        modifier = modifier
+        modifier = modifier,
     ) {
         EditTextField(
             value = value,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFeeedf1),
-                unfocusedBorderColor = Color(0xFFeeedf1),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFeeedf1),
+                    unfocusedBorderColor = Color(0xFFeeedf1),
                 ),
             onValueChange = {},
             readOnly = true,
@@ -38,10 +37,10 @@ fun EditDropdown(
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor()
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
         )
-
     }
 }

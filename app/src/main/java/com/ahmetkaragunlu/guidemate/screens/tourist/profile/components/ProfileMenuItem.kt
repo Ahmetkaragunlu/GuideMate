@@ -24,14 +24,15 @@ import compose.icons.tablericons.ChevronRight
 @Composable
 fun ProfileMenuItem(
     option: ProfileMenuOption,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = dimensionResource(R.dimen.spacing_medium), horizontal = dimensionResource(R.dimen.spacing_small)),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(vertical = dimensionResource(R.dimen.spacing_medium), horizontal = dimensionResource(R.dimen.spacing_small)),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
             imageVector = option.icon,
@@ -44,7 +45,7 @@ fun ProfileMenuItem(
         Text(
             text = stringResource(id = option.titleResId),
             style = MaterialTheme.typography.bodyMedium,
-            color = colorResource(R.color.text_color)
+            color = colorResource(R.color.text_color),
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -53,7 +54,6 @@ fun ProfileMenuItem(
             imageVector = TablerIcons.ChevronRight,
             contentDescription = null,
             tint = Color.LightGray,
-
-            )
+        )
     }
 }

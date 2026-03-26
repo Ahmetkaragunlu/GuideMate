@@ -14,23 +14,22 @@ import com.ahmetkaragunlu.guidemate.screens.auth.sign_in.SignInScreen
 import com.ahmetkaragunlu.guidemate.screens.auth.sign_up.SignUpScreen
 
 fun NavGraphBuilder.authNavGraph(navController: NavController) {
-
     navigation(
         startDestination = AuthRoute.SignInScreen.route,
-        route = Graph.AuthGraph.route
+        route = Graph.AuthGraph.route,
     ) {
         composable(route = AuthRoute.OnboardingScreen.route) {
             OnboardingScreen(
                 onboardingCompleted = {
                     navController.navigateTo(route = AuthRoute.RoleSelectionScreen.route)
-                }
+                },
             )
         }
         composable(route = AuthRoute.RoleSelectionScreen.route) {
             RoleSelectionScreen(
-             onNavigateToTouristGraph = {
-                 navController.switchRoot(Graph.TouristGraph.route)
-             }
+                onNavigateToTouristGraph = {
+                    navController.switchRoot(Graph.TouristGraph.route)
+                },
             )
         }
         composable(route = AuthRoute.SignInScreen.route) {
@@ -43,17 +42,17 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
                 },
                 onNavigateToRoleSelection = {
                     navController.navigateTo(AuthRoute.RoleSelectionScreen.route)
-                }
+                },
             )
         }
         composable(route = AuthRoute.SignUpScreen.route) {
             SignUpScreen(
-                onNavigateToSignIn = { navController.navigateTo(AuthRoute.SignInScreen.route) }
+                onNavigateToSignIn = { navController.navigateTo(AuthRoute.SignInScreen.route) },
             )
         }
         composable(route = AuthRoute.ForgotPassWordScreen.route) {
             ForgotPasswordScreen(
-                onNavigateToSignIn = {navController.navigateTo(AuthRoute.SignInScreen.route)}
+                onNavigateToSignIn = { navController.navigateTo(AuthRoute.SignInScreen.route) },
             )
         }
     }

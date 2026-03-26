@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
+import com.ahmetkaragunlu.guidemate.common.ResourceProvider
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
 import com.ahmetkaragunlu.guidemate.domain.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.usecase.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,11 +17,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val registerUseCase: RegisterUseCase,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val _formState = MutableStateFlow(SignUpFormState())
@@ -28,7 +29,6 @@ class SignUpViewModel @Inject constructor(
     private val _screenState = MutableStateFlow(SignUpScreenState())
     val screenState: StateFlow<SignUpScreenState> = _screenState.asStateFlow()
 
-    // --- Input Changes ---
     fun inputFirstNameChange(name: String) {
         _formState.update { it.copy(firstName = name) }
     }
@@ -59,7 +59,6 @@ class SignUpViewModel @Inject constructor(
         _formState.update { it.copy(confirmPasswordVisibility = !it.confirmPasswordVisibility) }
     }
 
-    // --- Terms & Conditions Logic ---
     fun markTermsAsRead() {
         _screenState.update { it.copy(hasUserReadTerms = true) }
     }
@@ -78,7 +77,6 @@ class SignUpViewModel @Inject constructor(
         else _screenState.update { it.copy(isTermsAccepted = false) }
     }
 
-    // --- Validation Controls ---
     fun isValidFirstName() = _formState.value.firstName.trim().length >= 3 &&
             _formState.value.firstName.matches(Regex("^[a-zA-ZğüşıöçĞÜŞİÖÇ]+(?: [a-zA-ZğüşıöçĞÜŞİÖÇ]+)*$"))
 
@@ -91,34 +89,23 @@ class SignUpViewModel @Inject constructor(
     fun isValidConfirmPassword() = _formState.value.password == _formState.value.confirmPassword
     fun isValidEmail() = Patterns.EMAIL_ADDRESS.matcher(_formState.value.email).matches()
 
-    // --- Registration Process ---
-    fun onSignUpClick(onShowErrorToast: (Int) -> Unit) {
-        if (checkSignUpErrors(onShowErrorToast)) {
+    fun onSignUpClick() {
+        if (checkSignUpErrors()) {
             if (!_screenState.value.isTermsAccepted) {
-                onShowErrorToast(R.string.error_terms_required)
+                _screenState.update { it.copy(errorMessage = resourceProvider.getString(R.string.error_terms_required)) }
                 return
             }
             registerUser()
         }
     }
 
+
     private fun registerUser() {
         viewModelScope.launch {
             val form = _formState.value
-            val request = RegisterRequest(
-                firstName = form.firstName,
-                lastName = form.lastName,
-                email = form.email,
-                password = form.password
-            )
-            when (val result = repository.register(request)) {
-                is DataResult.Success -> {
-                    _screenState.update { it.copy(isRegistrationSuccess = true) }
-                }
-
-                is DataResult.Error -> {
-                    _screenState.update { it.copy(errorMessage = result.message) }
-                }
+            when (val result = registerUseCase(form.firstName, form.lastName, form.email, form.password)) {
+                is DataResult.Success -> _screenState.update { it.copy(isRegistrationSuccess = true) }
+                is DataResult.Error -> _screenState.update { it.copy(errorMessage = result.message) }
             }
         }
     }
@@ -131,7 +118,7 @@ class SignUpViewModel @Inject constructor(
         _screenState.update { it.copy(isRegistrationSuccess = false) }
     }
 
-    private fun checkSignUpErrors(onShowErrorToast: (Int) -> Unit): Boolean {
+    private fun checkSignUpErrors(): Boolean {
         val form = _formState.value
         val hasInputError = (!isValidFirstName() && form.firstName.isNotEmpty()) ||
                 (!isValidLastName() && form.lastName.isNotEmpty()) ||
@@ -140,13 +127,13 @@ class SignUpViewModel @Inject constructor(
                 (!isValidConfirmPassword() && form.confirmPassword.isNotEmpty())
 
         if (hasInputError) {
-            onShowErrorToast(R.string.error_fix_fields)
+            _screenState.update { it.copy(errorMessage = resourceProvider.getString(R.string.error_fix_fields)) }
             return false
         }
         if (form.firstName.isBlank() || form.lastName.isBlank() || form.email.isBlank() ||
             form.password.isBlank() || form.confirmPassword.isBlank()
         ) {
-            onShowErrorToast(R.string.error_fill_all_fields)
+            _screenState.update { it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields)) }
             return false
         }
         return true

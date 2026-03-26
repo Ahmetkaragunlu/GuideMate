@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.common.chat.screens
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,14 +19,13 @@ import com.ahmetkaragunlu.guidemate.screens.common.chat.components.ChatInputArea
 import com.ahmetkaragunlu.guidemate.screens.common.chat.components.MessageBubble
 import com.ahmetkaragunlu.guidemate.screens.common.chat.model.MessageUiModel
 
-
 @Composable
 fun SharedChatDetailContent(
     messages: List<MessageUiModel>,
     inputText: String,
     onTextChanged: (String) -> Unit,
     onSendMessage: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
 
@@ -40,10 +38,11 @@ fun SharedChatDetailContent(
     Column(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         ) {
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
@@ -58,7 +57,7 @@ fun SharedChatDetailContent(
         ChatInputArea(
             inputValue = inputText,
             onValueChange = onTextChanged,
-            onSendClick = onSendMessage
+            onSendClick = onSendMessage,
         )
     }
 }

@@ -31,48 +31,49 @@ import com.ahmetkaragunlu.guidemate.R
 import java.text.NumberFormat
 import java.util.Locale
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriceRangeSelector(
     range: ClosedFloatingPointRange<Float>,
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
     minPrice: Float = 0f,
-    maxPrice: Float = 1000f
+    maxPrice: Float = 1000f,
 ) {
     val currentLocale = Locale.getDefault()
 
-    val currencyFormatter = remember(currentLocale) {
-        NumberFormat.getCurrencyInstance(currentLocale).apply {
-            maximumFractionDigits = 0
+    val currencyFormatter =
+        remember(currentLocale) {
+            NumberFormat.getCurrencyInstance(currentLocale).apply {
+                maximumFractionDigits = 0
+            }
         }
-    }
 
     Column(
-        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small))
+        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small)),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = currencyFormatter.format(range.start),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = colorResource(R.color.brand_color)
+                color = colorResource(R.color.brand_color),
             )
 
-            val endPriceText = if (range.endInclusive >= maxPrice) {
-                stringResource(R.string.price_plus, currencyFormatter.format(maxPrice))
-            } else {
-                currencyFormatter.format(range.endInclusive)
-            }
+            val endPriceText =
+                if (range.endInclusive >= maxPrice) {
+                    stringResource(R.string.price_plus, currencyFormatter.format(maxPrice))
+                } else {
+                    currencyFormatter.format(range.endInclusive)
+                }
 
             Text(
                 text = endPriceText,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = colorResource(R.color.brand_color)
+                color = colorResource(R.color.brand_color),
             )
         }
 
@@ -82,27 +83,28 @@ fun PriceRangeSelector(
             valueRange = minPrice..maxPrice,
             startThumb = {
                 CustomSliderThumb(
-                    thumbColor = colorResource(R.color.brand_color)
+                    thumbColor = colorResource(R.color.brand_color),
                 )
             },
             endThumb = {
                 CustomSliderThumb(
-                    thumbColor = colorResource(R.color.brand_color)
+                    thumbColor = colorResource(R.color.brand_color),
                 )
             },
             track = { rangeSliderState ->
                 SliderDefaults.Track(
                     rangeSliderState = rangeSliderState,
                     modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)),
-                    colors = SliderDefaults.colors(
-                        activeTrackColor = colorResource(R.color.brand_color),
-                        inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f),
-                        activeTickColor = Color.Transparent,
-                        inactiveTickColor = Color.Transparent
-                    ),
-                    drawStopIndicator = null
+                    colors =
+                        SliderDefaults.colors(
+                            activeTrackColor = colorResource(R.color.brand_color),
+                            inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f),
+                            activeTickColor = Color.Transparent,
+                            inactiveTickColor = Color.Transparent,
+                        ),
+                    drawStopIndicator = null,
                 )
-            }
+            },
         )
     }
 }
@@ -110,24 +112,23 @@ fun PriceRangeSelector(
 @Composable
 fun CustomSliderThumb(
     thumbColor: Color,
-    thumbSize: Dp = dimensionResource(R.dimen.spacing_medium)
+    thumbSize: Dp = dimensionResource(R.dimen.spacing_medium),
 ) {
     Box(
-        modifier = Modifier
-            .size(thumbSize)
-            .shadow(
-                elevation = 2.dp,
-                shape = CircleShape,
-                clip = false
-            )
-            .background(
-                color = Color.White,
-                shape = CircleShape
-            )
-            .border(
-                width = 1.dp,
-                color = thumbColor,
-                shape = CircleShape
-            )
+        modifier =
+            Modifier
+                .size(thumbSize)
+                .shadow(
+                    elevation = 2.dp,
+                    shape = CircleShape,
+                    clip = false,
+                ).background(
+                    color = Color.White,
+                    shape = CircleShape,
+                ).border(
+                    width = 1.dp,
+                    color = thumbColor,
+                    shape = CircleShape,
+                ),
     )
 }

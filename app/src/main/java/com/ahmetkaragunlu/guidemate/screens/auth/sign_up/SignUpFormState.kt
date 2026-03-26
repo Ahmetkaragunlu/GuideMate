@@ -7,5 +7,5 @@ data class SignUpFormState(
     val password: String = "",
     val confirmPassword: String = "",
     val passwordVisibility: Boolean = false,
-    val confirmPasswordVisibility: Boolean = false
+    val confirmPasswordVisibility: Boolean = false,
 )

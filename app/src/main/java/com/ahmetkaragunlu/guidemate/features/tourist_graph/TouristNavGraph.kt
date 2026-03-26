@@ -26,10 +26,9 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.TouristProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TouristTripsScreen
 
-
 fun NavGraphBuilder.touristNavGraph(
     touristNavController: NavController,
-    routeNavController: NavController
+    routeNavController: NavController,
 ) {
     composable(route = TouristRoute.TouristHomeScreen.route) {
         TouristHomeScreen()
@@ -38,7 +37,7 @@ fun NavGraphBuilder.touristNavGraph(
         TouristExploreScreen(
             onNavigateToFilter = {
                 touristNavController.navigateTo(TouristRoute.TouristFilterScreen.route)
-            }
+            },
         )
     }
     composable(route = TouristRoute.TouristMyTripsScreen.route) {
@@ -48,7 +47,7 @@ fun NavGraphBuilder.touristNavGraph(
         TouristChatScreen(
             onNavigateToDetail = { chatId ->
                 touristNavController.navigateTo(TouristRoute.TouristChatDetailScreen.route)
-            }
+            },
         )
     }
 
@@ -56,7 +55,7 @@ fun NavGraphBuilder.touristNavGraph(
         TouristProfileScreen(
             onNavigateToAccount = { targetRoute ->
                 routeNavController.navigateTo(targetRoute)
-            }
+            },
         )
     }
     composable(route = TouristRoute.TouristFilterScreen.route) {
@@ -67,12 +66,10 @@ fun NavGraphBuilder.touristNavGraph(
     }
 }
 
-
-
 @Composable
 fun TouristNavGraphScaffold(
     viewModel: TouristHomeViewModel = hiltViewModel(),
-    routeNavController: NavController
+    routeNavController: NavController,
 ) {
     val touristNavController = rememberNavController()
     val navBackStackEntry by touristNavController.currentBackStackEntryAsState()
@@ -84,30 +81,26 @@ fun TouristNavGraphScaffold(
             TouristAppBar(
                 currentRoute = currentRoute,
                 navController = touristNavController,
-                userName = getUserName
+                userName = getUserName,
             )
         },
         bottomBar = {
             AppBottomBar(
                 navController = touristNavController,
                 currentRoute = currentRoute,
-                items = touristNavItems
+                items = touristNavItems,
             )
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = touristNavController,
             startDestination = TouristRoute.TouristHomeScreen.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             touristNavGraph(
                 touristNavController = touristNavController,
-                routeNavController = routeNavController
+                routeNavController = routeNavController,
             )
         }
     }
 }
-
-
-
-

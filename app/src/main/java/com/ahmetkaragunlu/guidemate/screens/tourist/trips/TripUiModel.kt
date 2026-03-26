@@ -6,5 +6,5 @@ data class TripUiModel(
     val date: String,
     val location: String,
     val imageUrl: Int,
-    val isPast: Boolean = false
+    val isPast: Boolean = false,
 )

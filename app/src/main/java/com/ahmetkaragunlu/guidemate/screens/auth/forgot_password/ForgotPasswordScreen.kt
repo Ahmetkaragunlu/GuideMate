@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditAlertDialog
@@ -32,7 +32,7 @@ import com.ahmetkaragunlu.guidemate.components.EditTextField
 fun ForgotPasswordScreen(
     modifier: Modifier = Modifier,
     viewModel: ForgotPasswordViewModel = hiltViewModel(),
-    onNavigateToSignIn: () -> Unit
+    onNavigateToSignIn: () -> Unit,
 ) {
     val context = LocalContext.current
     val formState by viewModel.formState.collectAsStateWithLifecycle()
@@ -58,23 +58,24 @@ fun ForgotPasswordScreen(
                     onClick = {
                         viewModel.dismissSuccessDialog()
                         onNavigateToSignIn()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.ok))
                 }
-            }
+            },
         )
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(
-                top = dimensionResource(R.dimen.spacing_double_extra_large),
-                start = dimensionResource(R.dimen.spacing_medium),
-                end = dimensionResource(R.dimen.spacing_medium)
-            ),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    top = dimensionResource(R.dimen.spacing_double_extra_large),
+                    start = dimensionResource(R.dimen.spacing_medium),
+                    end = dimensionResource(R.dimen.spacing_medium),
+                ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -87,7 +88,7 @@ fun ForgotPasswordScreen(
             text = stringResource(R.string.reset_password_description),
             color = colorResource(R.color.text_color),
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
@@ -95,10 +96,11 @@ fun ForgotPasswordScreen(
             value = formState.firstName,
             onValueChange = { viewModel.onFirstNameChange(it) },
             placeholder = R.string.name,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next,
+                ),
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
@@ -106,10 +108,11 @@ fun ForgotPasswordScreen(
             value = formState.lastName,
             onValueChange = { viewModel.onLastNameChange(it) },
             placeholder = R.string.last_name,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next,
+                ),
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
@@ -117,20 +120,16 @@ fun ForgotPasswordScreen(
             value = formState.email,
             onValueChange = { viewModel.onEmailChange(it) },
             placeholder = R.string.email,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Done
-            ),
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Done,
+                ),
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
         EditButton(
             text = R.string.send_reset_link,
-            onClick = {
-                viewModel.onSubmitClick { errorResId ->
-                    Toast.makeText(context, context.getString(errorResId), Toast.LENGTH_SHORT).show()
-                }
-            }
+            onClick = viewModel::onSubmitClick
         )
     }
 }

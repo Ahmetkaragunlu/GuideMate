@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.wallet.components
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +32,6 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.CreditCard
 import compose.icons.tablericons.Ticket
 
-
 @Composable
 fun TransactionItem(transaction: Transaction) {
     val isIncome = transaction.type == TransactionType.TOUR_INCOME
@@ -42,24 +40,26 @@ fun TransactionItem(transaction: Transaction) {
     val amountPrefix = if (isIncome) "+" else "-"
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .background(Color(0xFFF5F5F5), CircleShape),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(44.dp)
+                        .background(Color(0xFFF5F5F5), CircleShape),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = Color.DarkGray,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
@@ -68,13 +68,13 @@ fun TransactionItem(transaction: Transaction) {
                     text = transaction.title,
                     style = MaterialTheme.typography.titleSmall,
                     color = colorResource(R.color.text_color),
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                 Text(
                     text = transaction.formattedDate,
                     style = MaterialTheme.typography.bodySmall,
-                    color = colorResource(R.color.text_color)
+                    color = colorResource(R.color.text_color),
                 )
             }
         }
@@ -82,7 +82,7 @@ fun TransactionItem(transaction: Transaction) {
             text = "$amountPrefix${transaction.amount.toLocalCurrency()}",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            color = amountColor
+            color = amountColor,
         )
     }
     HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))

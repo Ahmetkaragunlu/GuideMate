@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.chat
 
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -11,7 +10,7 @@ import com.ahmetkaragunlu.guidemate.screens.common.chat.screens.SharedChatDetail
 @Composable
 fun GuideChatDetailScreen(
     viewModel: GuideChatDetailViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val messages by viewModel.messages.collectAsStateWithLifecycle()
     val inputText by viewModel.inputText.collectAsStateWithLifecycle()
@@ -21,6 +20,6 @@ fun GuideChatDetailScreen(
         inputText = inputText,
         onTextChanged = viewModel::onTextChange,
         onSendMessage = viewModel::sendMessage,
-        modifier = modifier
+        modifier = modifier,
     )
 }

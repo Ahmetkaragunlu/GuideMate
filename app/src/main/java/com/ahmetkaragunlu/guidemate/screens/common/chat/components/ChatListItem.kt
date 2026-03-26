@@ -34,36 +34,38 @@ import com.ahmetkaragunlu.guidemate.screens.common.chat.model.ChatUiModel
 @Composable
 fun ChatListItem(
     chatItem: ChatUiModel,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp)
-            .clickable { onClick() }
-            .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .clickable { onClick() }
+                .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(id = chatItem.avatarResId),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
+            modifier =
+                Modifier
+                    .size(56.dp)
+                    .clip(CircleShape),
         )
 
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = chatItem.name,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1
+                maxLines = 1,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -71,7 +73,7 @@ fun ChatListItem(
                 style = MaterialTheme.typography.bodyMedium,
                 color = colorResource(R.color.text_color),
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -80,21 +82,22 @@ fun ChatListItem(
                 text = chatItem.time,
                 style = MaterialTheme.typography.bodySmall,
                 color = if (chatItem.unreadCount > 0) colorResource(R.color.brand_color) else Color.Gray,
-                fontWeight = if (chatItem.unreadCount > 0) FontWeight.Bold else FontWeight.Normal
+                fontWeight = if (chatItem.unreadCount > 0) FontWeight.Bold else FontWeight.Normal,
             )
             Spacer(modifier = Modifier.height(6.dp))
             if (chatItem.unreadCount > 0) {
                 Box(
-                    modifier = Modifier
-                        .size(22.dp)
-                        .background(colorResource(R.color.brand_color), CircleShape),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(22.dp)
+                            .background(colorResource(R.color.brand_color), CircleShape),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = chatItem.unreadCount.toString(),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }

@@ -34,34 +34,38 @@ import compose.icons.tablericons.AdjustmentsHorizontal
 fun TouristExploreScreen(
     modifier: Modifier = Modifier,
     viewModel: TouristExploreViewModel = hiltViewModel(),
-    onNavigateToFilter: () -> Unit
+    onNavigateToFilter: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         GuideMateTabRow(
             tabs = ExploreTab.entries,
             selectedTab = uiState.selectedTab,
             onTabSelected = { newTab ->
                 viewModel.updateSelectedTab(newTab)
-            }
+            },
         )
 
         when (uiState.selectedTab) {
-            ExploreTab.TOURS -> ToursContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(dimensionResource(R.dimen.spacing_medium)),
-                onNavigateToFilter = onNavigateToFilter
-            )
+            ExploreTab.TOURS ->
+                ToursContent(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(dimensionResource(R.dimen.spacing_medium)),
+                    onNavigateToFilter = onNavigateToFilter,
+                )
 
-            ExploreTab.GUIDES -> GuidesContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(dimensionResource(R.dimen.spacing_medium))
-            )
+            ExploreTab.GUIDES ->
+                GuidesContent(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(dimensionResource(R.dimen.spacing_medium)),
+                )
         }
     }
 }
@@ -69,28 +73,29 @@ fun TouristExploreScreen(
 @Composable
 private fun ToursContent(
     modifier: Modifier = Modifier,
-    onNavigateToFilter: () -> Unit
+    onNavigateToFilter: () -> Unit,
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
     Column(
-        modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium))
+        modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium)),
     ) {
         EditTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.brand_color),
-                unfocusedBorderColor = colorResource(R.color.brand_color),
-                cursorColor = colorResource(R.color.brand_color),
-            ),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorResource(R.color.brand_color),
+                    unfocusedBorderColor = colorResource(R.color.brand_color),
+                    cursorColor = colorResource(R.color.brand_color),
+                ),
             placeholder = R.string.search_tours,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = null,
-                    tint = Color.Gray
+                    tint = Color.Gray,
                 )
             },
             trailingIcon = {
@@ -98,42 +103,41 @@ private fun ToursContent(
                     Icon(
                         imageVector = TablerIcons.AdjustmentsHorizontal,
                         contentDescription = null,
-                        tint = colorResource(R.color.brand_color)
+                        tint = colorResource(R.color.brand_color),
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
 @Composable
-private fun GuidesContent(
-    modifier: Modifier = Modifier
-) {
+private fun GuidesContent(modifier: Modifier = Modifier) {
     var searchQuery by remember { mutableStateOf("") }
 
     Column(
-        modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium))
+        modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium)),
     ) {
         EditTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.brand_color),
-                unfocusedBorderColor = colorResource(R.color.brand_color),
-                cursorColor = colorResource(R.color.brand_color),
-            ),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorResource(R.color.brand_color),
+                    unfocusedBorderColor = colorResource(R.color.brand_color),
+                    cursorColor = colorResource(R.color.brand_color),
+                ),
             placeholder = R.string.search_guide,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
                     contentDescription = null,
-                    tint = Color.Gray
+                    tint = Color.Gray,
                 )
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

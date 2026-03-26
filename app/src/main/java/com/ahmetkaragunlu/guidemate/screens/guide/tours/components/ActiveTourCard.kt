@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours.components
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -29,36 +28,37 @@ import compose.icons.tablericons.Users
 fun ActiveTourCard(
     tour: GuideTourUiModel,
     onToggleLive: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
 ) {
     var switchState by remember { mutableStateOf(tour.isLive) }
 
     TourBaseCard(imageUrl = tour.imageUrl) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.spacing_medium)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.spacing_medium)),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Top,
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
                         text = tour.title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     InfoRow(Icons.Default.CalendarMonth, tour.date)
                     InfoRow(TablerIcons.MapPin, tour.location)
                     Text(
                         text = stringResource(R.string.category_label, tour.category),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = colorResource(R.color.text_color)
+                        color = colorResource(R.color.text_color),
                     )
                     if (tour.languagesFlag.isNotEmpty()) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -67,20 +67,20 @@ fun ActiveTourCard(
                             Text(
                                 text = tour.languagesText,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = colorResource(R.color.text_color)
+                                color = colorResource(R.color.text_color),
                             )
                         }
                     }
                     InfoRow(
                         icon = TablerIcons.Users,
-                        text = stringResource(R.string.participant_count, tour.participantCount)
+                        text = stringResource(R.string.participant_count, tour.participantCount),
                     )
                 }
 
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-                    modifier = Modifier.padding(start = 16.dp)
+                    modifier = Modifier.padding(start = 16.dp),
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Switch(
@@ -89,60 +89,69 @@ fun ActiveTourCard(
                                 switchState = it
                                 onToggleLive()
                             },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                                checkedTrackColor = Color.Green,
-                                uncheckedTrackColor = Color.LightGray
-                            ),
-                            modifier = Modifier.scale(0.8f)
+                            colors =
+                                SwitchDefaults.colors(
+                                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                    checkedTrackColor = Color.Green,
+                                    uncheckedTrackColor = Color.LightGray,
+                                ),
+                            modifier = Modifier.scale(0.8f),
                         )
                         Text(
-                            text = if (switchState) stringResource(R.string.live) else stringResource(
-                                R.string.hidden
-                            ),
+                            text =
+                                if (switchState) {
+                                    stringResource(R.string.live)
+                                } else {
+                                    stringResource(
+                                        R.string.hidden,
+                                    )
+                                },
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (switchState) Color.Green else Color.LightGray
+                            color = if (switchState) Color.Green else Color.LightGray,
                         )
                     }
 
                     Row(
-                        modifier = Modifier
-                            .clickable { onEdit() }
-                            .padding(end = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier =
+                            Modifier
+                                .clickable { onEdit() }
+                                .padding(end = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             imageVector = TablerIcons.Edit,
                             contentDescription = null,
                             tint = colorResource(R.color.text_color),
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                         Text(
                             text = stringResource(R.string.edit),
                             style = MaterialTheme.typography.labelMedium,
-                            color = colorResource(R.color.text_color)
+                            color = colorResource(R.color.text_color),
                         )
                     }
                 }
             }
 
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = dimensionResource(R.dimen.spacing_medium))
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(R.string.price_format, tour.price),
                         style = MaterialTheme.typography.titleMedium,
-                        color = colorResource(R.color.brand_color)
+                        color = colorResource(R.color.brand_color),
                     )
 
                     if (tour.rating != null && tour.reviewCount != null) {
@@ -151,13 +160,13 @@ fun ActiveTourCard(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = null,
                                 tint = Color(0xFFFFC107),
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                             Text(
                                 text = "${tour.rating} (${tour.reviewCount})",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = colorResource(R.color.text_color)
+                                color = colorResource(R.color.text_color),
                             )
                         }
                     }

@@ -41,17 +41,18 @@ fun OnboardingScreen(
     modifier: Modifier = Modifier,
     onboardingCompleted: () -> Unit,
 ) {
-
-    val pagerState = rememberPagerState(
-        initialPage = 0,
-        pageCount = { onboardingPages.size }
-    )
+    val pagerState =
+        rememberPagerState(
+            initialPage = 0,
+            pageCount = { onboardingPages.size },
+        )
     val scope = rememberCoroutineScope()
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         HorizontalPager(
@@ -69,22 +70,21 @@ fun OnboardingScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
                 ) {
                     Text(
                         text = stringResource(page.title),
                         style = MaterialTheme.typography.headlineSmall,
-                        color = Color(0xFF323539)
+                        color = Color(0xFF323539),
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                     Text(
                         text = stringResource(page.description),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
-                        color = colorResource(R.color.text_color)
+                        color = colorResource(R.color.text_color),
                     )
                 }
-
             }
         }
         Spacer(modifier = Modifier.height(36.dp))
@@ -98,11 +98,12 @@ fun OnboardingScreen(
                     if (pagerState.currentPage == iteration) colorResource(R.color.brand_color) else Color.Gray
                 val size = if (pagerState.currentPage == iteration) 12.dp else 8.dp
                 Box(
-                    modifier = Modifier
-                        .padding(all = dimensionResource(R.dimen.spacing_tiny))
-                        .size(size)
-                        .clip(CircleShape)
-                        .background(color)
+                    modifier =
+                        Modifier
+                            .padding(all = dimensionResource(R.dimen.spacing_tiny))
+                            .size(size)
+                            .clip(CircleShape)
+                            .background(color),
                 )
             }
         }
@@ -118,7 +119,6 @@ fun OnboardingScreen(
                     }
                 }
             },
-            )
-
+        )
     }
 }

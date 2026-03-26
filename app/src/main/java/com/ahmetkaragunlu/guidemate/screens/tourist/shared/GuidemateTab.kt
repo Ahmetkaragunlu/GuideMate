@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.shared
 
-
 import androidx.annotation.StringRes
 
 interface GuidemateTab {

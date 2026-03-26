@@ -5,5 +5,5 @@ data class GuideProfileUiState(
     val title: String = "",
     val guideLevel: String = "",
     val rating: Double = 0.0,
-    val tourCount: Int = 0
+    val tourCount: Int = 0,
 )

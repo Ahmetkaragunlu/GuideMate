@@ -1,7 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.home.components
 
-
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -41,36 +39,37 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
 
 @Composable
-fun BestGuideCard(
-    guide: BestGuideUiModel
-) {
+fun BestGuideCard(guide: BestGuideUiModel) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(80.dp),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
                 painter = painterResource(id = guide.imageUrl),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .border(1.dp, Color.LightGray, CircleShape)
+                modifier =
+                    Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.LightGray, CircleShape),
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = guide.name,
@@ -84,30 +83,30 @@ fun BestGuideCard(
                     color = Color.Gray,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    lineHeight = 14.sp
+                    lineHeight = 14.sp,
                 )
             }
             Surface(
                 color = Color(0xFFFF9F1C),
                 shape = RoundedCornerShape(dimensionResource(R.dimen.radius_small)),
-                modifier = Modifier.wrapContentSize()
+                modifier = Modifier.wrapContentSize(),
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         Icons.Default.Star,
                         null,
                         tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(12.dp)
+                        modifier = Modifier.size(12.dp),
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                     Text(
                         text = guide.rating,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
                 }
             }

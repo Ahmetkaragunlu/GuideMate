@@ -46,34 +46,36 @@ import com.ahmetkaragunlu.guidemate.screens.guide.home.model.recentActivities
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowRight
 
-
 @Composable
 fun GuideHomeScreen(modifier: Modifier = Modifier) {
-
-
-    //Mock Data
+    // Mock Data
     val monthlyEarnings = "12.500$"
     val pendingCount = "1"
 
     val activeCount = "3"
 
     Column(
-        modifier = modifier
-            .fillMaxSize().verticalScroll(rememberScrollState())
-            .padding(dimensionResource(R.dimen.spacing_medium)),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(dimensionResource(R.dimen.spacing_medium)),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.spacing_medium)),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = dimensionResource(R.dimen.spacing_medium)),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
         ) {
             dashboardStats.forEach { stat ->
                 GuideStatCard(
-                    stat = stat, modifier = Modifier
-                        .weight(1f)
-                        .height(152.dp)
+                    stat = stat,
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(152.dp),
                 )
             }
         }
@@ -83,29 +85,27 @@ fun GuideHomeScreen(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.text_color),
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small))
+            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
         TourStatusCard(
             pendingCount = pendingCount,
-            activeCount = activeCount
+            activeCount = activeCount,
         )
         Text(
             text = stringResource(R.string.recent_activities),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.text_color),
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small))
+            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
         RecentActivities(activities = recentActivities, modifier = Modifier.heightIn(max = 200.dp))
-
     }
 }
-
 
 @Composable
 private fun GuideStatCard(
     stat: GuideStatistic,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val isStarIcon = stat.description == R.string.average_rating
 
@@ -114,19 +114,20 @@ private fun GuideStatCard(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         border = BorderStroke(width = 1.dp, color = Color(0xFFeeedf1)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(all = dimensionResource(R.dimen.spacing_medium)),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(all = dimensionResource(R.dimen.spacing_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
+            verticalArrangement = Arrangement.SpaceAround,
         ) {
             Icon(
                 imageVector = stat.icon,
                 contentDescription = null,
-                tint = if (isStarIcon) Color(0xFFFFC107) else colorResource(R.color.brand_color)
+                tint = if (isStarIcon) Color(0xFFFFC107) else colorResource(R.color.brand_color),
             )
             Text(
                 text = stat.value,
@@ -139,18 +140,16 @@ private fun GuideStatCard(
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                color = colorResource(R.color.text_color)
+                color = colorResource(R.color.text_color),
             )
-
         }
     }
 }
 
-
 @Composable
 private fun MonthlyEarningsCard(
     earnings: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -158,16 +157,17 @@ private fun MonthlyEarningsCard(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium)),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.this_month_earnings),
                 color = colorResource(R.color.text_color),
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -179,36 +179,35 @@ private fun MonthlyEarningsCard(
             Icon(
                 imageVector = TablerIcons.ArrowRight,
                 contentDescription = null,
-                tint = Color(0xFF888ded)
+                tint = Color(0xFF888ded),
             )
         }
     }
 }
 
-
 @Composable
 private fun TourStatusCard(
     modifier: Modifier = Modifier,
     pendingCount: String,
-    activeCount: String
+    activeCount: String,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().height(IntrinsicSize.Max),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
     ) {
-        //Active Tours
+        // Active Tours
         StatusItemCard(
             count = activeCount,
             label = stringResource(R.string.active_tours),
             indicatorColor = Color.Green,
-            modifier = Modifier.weight(1f).fillMaxHeight()
+            modifier = Modifier.weight(1f).fillMaxHeight(),
         )
-        //Pending Tours
+        // Pending Tours
         StatusItemCard(
             count = pendingCount,
             label = stringResource(R.string.pending_tours),
             indicatorColor = Color(0xFFFF9800),
-            modifier = Modifier.weight(1f).fillMaxHeight()
+            modifier = Modifier.weight(1f).fillMaxHeight(),
         )
     }
 }
@@ -218,7 +217,7 @@ private fun StatusItemCard(
     count: String,
     label: String,
     indicatorColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier,
@@ -228,20 +227,22 @@ private fun StatusItemCard(
         border = BorderStroke(width = 1.dp, color = Color(0xFFeeedf1)),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(color = indicatorColor, shape = CircleShape)
+                    modifier =
+                        Modifier
+                            .size(12.dp)
+                            .background(color = indicatorColor, shape = CircleShape),
                 )
                 Text(
                     text = count,
@@ -252,41 +253,43 @@ private fun StatusItemCard(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
                 color = colorResource(R.color.text_color),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
 }
 
-
 @Composable
 private fun RecentActivities(
     activities: List<RecentActivity>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         border = BorderStroke(width = 1.dp, color = Color(0xFFeeedf1)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth().padding(dimensionResource(R.dimen.spacing_medium))
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
         ) {
             itemsIndexed(activities) { index, item ->
                 Column {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.spacing_medium)),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(dimensionResource(R.dimen.spacing_medium)),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             imageVector = item.icon,
                             contentDescription = null,
-                            tint = Color.Gray
+                            tint = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
@@ -295,7 +298,7 @@ private fun RecentActivities(
                             color = colorResource(R.color.text_color),
                             modifier = Modifier.weight(1f),
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             text = item.time,
@@ -308,7 +311,7 @@ private fun RecentActivities(
                         androidx.compose.material3.HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             thickness = 0.5.dp,
-                            color = Color(0xFFeeedf1)
+                            color = Color(0xFFeeedf1),
                         )
                     }
                 }

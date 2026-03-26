@@ -20,17 +20,17 @@ import com.ahmetkaragunlu.guidemate.R
 fun EditButton(
     @StringRes text: Int,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     Button(
         onClick = { onClick() },
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
-        modifier = modifier
-            .widthIn(max = 380.dp)
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large))
+        modifier =
+            modifier
+                .widthIn(max = 380.dp)
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
     ) {
         Text(
             text = stringResource(text),

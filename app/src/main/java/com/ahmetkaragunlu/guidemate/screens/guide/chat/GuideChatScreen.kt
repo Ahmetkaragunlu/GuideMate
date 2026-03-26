@@ -9,12 +9,12 @@ import com.ahmetkaragunlu.guidemate.screens.common.chat.screens.SharedChatListCo
 @Composable
 fun GuideChatScreen(
     viewModel: GuideChatViewModel = hiltViewModel(),
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit,
 ) {
     val chatList by viewModel.chatList.collectAsStateWithLifecycle()
 
     SharedChatListContent(
         chatList = chatList,
-        onChatClick = onNavigateToDetail
+        onChatClick = onNavigateToDetail,
     )
 }

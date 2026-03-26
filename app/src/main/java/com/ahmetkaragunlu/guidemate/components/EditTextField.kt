@@ -15,16 +15,14 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-
 
 @Composable
 fun EditTextField(
     value: String,
     isError: Boolean = false,
     onValueChange: (String) -> Unit,
-    @StringRes placeholder : Int? = null,
+    @StringRes placeholder: Int? = null,
     @StringRes supportingText: Int? = null,
     keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier,
@@ -33,10 +31,11 @@ fun EditTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     shape: Shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = Color.LightGray,
-        unfocusedBorderColor = Color.LightGray
-    )
+    colors: TextFieldColors =
+        OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color.LightGray,
+            unfocusedBorderColor = Color.LightGray,
+        ),
 ) {
     OutlinedTextField(
         value = value,
@@ -44,7 +43,16 @@ fun EditTextField(
         readOnly = readOnly,
         onValueChange = onValueChange,
         shape = shape,
-        placeholder = placeholder?.let {  { Text(text = stringResource(it), style = MaterialTheme.typography.labelLarge, color = Color.Gray) } },
+        placeholder =
+            placeholder?.let {
+                {
+                    Text(
+                        text = stringResource(it),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.Gray,
+                    )
+                }
+            },
         supportingText = supportingText?.let { { Text(text = stringResource(it), color = MaterialTheme.colorScheme.error) } },
         keyboardOptions = keyboardOptions,
         visualTransformation = visualTransformation,
@@ -54,6 +62,4 @@ fun EditTextField(
         isError = isError,
         singleLine = true,
     )
-
-
 }

@@ -17,7 +17,6 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.ActiveTourCard
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.PastTourCard
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
-
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.GuideMateTabRow
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Plus
@@ -25,7 +24,7 @@ import compose.icons.tablericons.Plus
 @Composable
 fun GuideMyToursScreen(
     viewModel: GuideMyToursViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val tours by viewModel.tours.collectAsStateWithLifecycle()
@@ -35,26 +34,28 @@ fun GuideMyToursScreen(
             GuideMateTabRow(
                 tabs = GuideTourTab.entries,
                 selectedTab = selectedTab,
-                onTabSelected = viewModel::changeTab
+                onTabSelected = viewModel::changeTab,
             )
 
             LazyColumn(
                 contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_medium)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 items(tours, key = { it.id }) { tour ->
                     when (selectedTab) {
-                        GuideTourTab.ACTIVE -> ActiveTourCard(
-                            tour = tour,
-                            onToggleLive = { /* ViewModel action */ },
-                            onEdit = { /* Navigate to edit */ }
-                        )
-                        GuideTourTab.PAST -> PastTourCard(
-                            tour = tour,
-                            onDetails = { /* Navigate to details */ }
-                        )
+                        GuideTourTab.ACTIVE ->
+                            ActiveTourCard(
+                                tour = tour,
+                                onToggleLive = { /* ViewModel action */ },
+                                onEdit = { /* Navigate to edit */ },
+                            )
+                        GuideTourTab.PAST ->
+                            PastTourCard(
+                                tour = tour,
+                                onDetails = { /* Navigate to details */ },
+                            )
                     }
                 }
             }
@@ -63,16 +64,17 @@ fun GuideMyToursScreen(
         if (selectedTab == GuideTourTab.ACTIVE) {
             FloatingActionButton(
                 onClick = { /* Navigate to create tour */ },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(dimensionResource(R.dimen.spacing_large)),
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(dimensionResource(R.dimen.spacing_large)),
                 containerColor = colorResource(R.color.brand_color),
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
             ) {
                 Icon(
                     imageVector = TablerIcons.Plus,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
         }

@@ -7,5 +7,5 @@ data class ChatUiModel(
     val lastMessage: String,
     val time: String,
     val avatarResId: Int,
-    val unreadCount: Int = 0
+    val unreadCount: Int = 0,
 )

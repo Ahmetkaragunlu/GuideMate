@@ -48,30 +48,32 @@ import java.util.Locale
 fun WithdrawBottomSheetContent(
     availableBalance: Double,
     selectedBank: BankAccount?,
-    onConfirm: (Double) -> Unit
+    onConfirm: (Double) -> Unit,
 ) {
     var amountText by remember { mutableStateOf("") }
 
-    val currencySymbol = remember {
-        try {
-            Currency.getInstance(Locale.getDefault()).symbol
-        } catch (e: Exception) {
-            "₺"
+    val currencySymbol =
+        remember {
+            try {
+                Currency.getInstance(Locale.getDefault()).symbol
+            } catch (e: Exception) {
+                "₺"
+            }
         }
-    }
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
-            .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+                .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(R.string.withdraw_title),
             color = colorResource(R.color.brand_color),
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -85,93 +87,101 @@ fun WithdrawBottomSheetContent(
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.brand_color),
-                unfocusedBorderColor = Color.LightGray
-            ),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorResource(R.color.brand_color),
+                    unfocusedBorderColor = Color.LightGray,
+                ),
             trailingIcon = {
                 Text(
                     text = currencySymbol,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(end = 16.dp),
-                    color = Color.DarkGray
+                    color = Color.DarkGray,
                 )
-            })
+            },
+        )
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.available_balance_format, availableBalance.toLocalCurrency()),
                 color = colorResource(R.color.text_color),
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
             Text(
                 text = stringResource(R.string.withdraw_all),
                 color = colorResource(R.color.brand_color),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .clickable { amountText = availableBalance.toInt().toString() }
-                    .padding(4.dp))
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { amountText = availableBalance.toInt().toString() }
+                        .padding(4.dp),
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
-                .background(Color(0xFFF0F4F8))
-                .padding(dimensionResource(R.dimen.spacing_medium)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
+                    .background(Color(0xFFF0F4F8))
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     TablerIcons.CreditCard,
                     contentDescription = null,
                     tint = colorResource(R.color.brand_color),
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
                         text = selectedBank?.bankName ?: stringResource(R.string.bank_not_selected),
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color.Black,
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = selectedBank?.maskedIban ?: stringResource(R.string.default_masked_iban),
                         color = colorResource(R.color.text_color),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 }
             }
 
-            Row(modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
-                .clickable {  }
-                .padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { }
+                        .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Icon(
                     TablerIcons.Refresh,
                     contentDescription = null,
                     tint = colorResource(R.color.brand_color),
-                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium))
+                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium)),
                 )
                 Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                 Text(
                     text = stringResource(R.string.change),
                     color = colorResource(R.color.brand_color),
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         }
@@ -181,24 +191,25 @@ fun WithdrawBottomSheetContent(
         Text(
             text = stringResource(R.string.withdraw_info_text),
             color = colorResource(R.color.text_color),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = { onConfirm(amountText.toDoubleOrNull() ?: 0.0) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color))
+            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
         ) {
             Text(
                 text = stringResource(R.string.confirm),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
             )
         }
     }

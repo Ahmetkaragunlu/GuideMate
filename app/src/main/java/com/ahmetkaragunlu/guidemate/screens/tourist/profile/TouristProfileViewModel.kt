@@ -1,9 +1,9 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.profile
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.data.local.TokenManager
+import com.ahmetkaragunlu.guidemate.domain.UserRepository
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,26 +14,25 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TouristProfileViewModel @Inject constructor(
-    private val tokenManager: TokenManager
+class TouristProfileViewModel
+@Inject
+constructor(
+    private val userRepository: UserRepository
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
-
     fun loadProfileData() {
         viewModelScope.launch {
-            val savedName = tokenManager.getUserName() ?: ""
-            _uiState.update {
-                it.copy(
-                    fullName = savedName,
-                    email = "ahmet@gmail.com",
-                    balance = "1500,00 $"
-                )
+            userRepository.userName.collect { name ->
+                _uiState.update {
+                    it.copy(
+                        fullName = name ?: "",
+                        email = "ahmet@gmail.com",
+                        balance = "1500,00 $"
+                    )
+                }
             }
         }
     }
-
-
 }

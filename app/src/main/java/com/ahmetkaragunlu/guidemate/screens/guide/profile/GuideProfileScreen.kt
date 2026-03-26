@@ -26,9 +26,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStat
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.guideProfileMenuItems
 
 @Composable
-fun GuideProfileScreen(
-    viewModel: GuideProfileViewModel = hiltViewModel()
-) {
+fun GuideProfileScreen(viewModel: GuideProfileViewModel = hiltViewModel()) {
     val firstName by viewModel.firstName.collectAsStateWithLifecycle()
     val lastName by viewModel.lastName.collectAsStateWithLifecycle()
     val profileState by viewModel.profileState.collectAsStateWithLifecycle()
@@ -36,46 +34,49 @@ fun GuideProfileScreen(
     val displayName = "${firstName ?: "Ahmet"} ${lastName ?: "Karagünlü"}"
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
         Box(contentAlignment = Alignment.BottomEnd) {
             Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(Color.LightGray),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Rounded.Person,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(48.dp),
                 )
             }
 
             Surface(
                 onClick = { },
-                modifier = Modifier
-                    .size(32.dp)
-                    .offset(x = 4.dp, y = 4.dp),
+                modifier =
+                    Modifier
+                        .size(32.dp)
+                        .offset(x = 4.dp, y = 4.dp),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.onPrimary,
-                shadowElevation = 4.dp
+                shadowElevation = 4.dp,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Rounded.PhotoCamera,
                         contentDescription = null,
                         tint = colorResource(R.color.brand_color),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }
@@ -86,27 +87,28 @@ fun GuideProfileScreen(
                 text = displayName,
                 color = colorResource(R.color.brand_color),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
             Text(
                 text = profileState.title,
                 color = Color.Gray,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
 
         Surface(
             onClick = { },
             shape = CircleShape,
-            color = colorResource(R.color.brand_color).copy(alpha = 0.1f)
+            color = colorResource(R.color.brand_color).copy(alpha = 0.1f),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(R.dimen.spacing_medium),
-                    vertical = dimensionResource(R.dimen.spacing_tiny)
-                )
+                modifier =
+                    Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.spacing_medium),
+                        vertical = dimensionResource(R.dimen.spacing_tiny),
+                    ),
             ) {
                 Text(
                     text = "👀",
@@ -117,7 +119,7 @@ fun GuideProfileScreen(
                     text = stringResource(R.string.view_as_tourist),
                     color = colorResource(R.color.brand_color),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }
@@ -126,7 +128,7 @@ fun GuideProfileScreen(
             guideLevel = profileState.guideLevel,
             rating = profileState.rating,
             tourCount = profileState.tourCount,
-            onGuideLevelInfoClick = { /* TODO: BottomSheet Göster */ }
+            onGuideLevelInfoClick = { /* TODO: BottomSheet Göster */ },
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
@@ -135,7 +137,7 @@ fun GuideProfileScreen(
                 ProfileMenuItem(
                     icon = item.icon,
                     title = stringResource(id = item.titleResId),
-                    onClick = item.onClick
+                    onClick = item.onClick,
                 )
 
                 if (index < guideProfileMenuItems.lastIndex) {

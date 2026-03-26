@@ -27,9 +27,7 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.menuOptions
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 
-fun NavGraphBuilder.accountNavGraph(
-    accountNavController: NavController
-) {
+fun NavGraphBuilder.accountNavGraph(accountNavController: NavController) {
     composable(route = AccountRoute.SavedCards.route) {
         SavedCardsScreen()
     }
@@ -47,16 +45,16 @@ fun NavGraphBuilder.accountNavGraph(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountNavGraphScaffold(
     routeNavController: NavController,
-    startDestination: String = AccountRoute.SavedCards.route
+    startDestination: String = AccountRoute.SavedCards.route,
 ) {
     val accountNavController = rememberNavController()
-    val titleResId = menuOptions.find { it.targetRoute == startDestination }?.titleResId
-        ?: R.string.account_settings
+    val titleResId =
+        menuOptions.find { it.targetRoute == startDestination }?.titleResId
+            ?: R.string.account_settings
 
     Scaffold(
         topBar = {
@@ -65,24 +63,24 @@ fun AccountNavGraphScaffold(
                     Text(
                         text = stringResource(id = titleResId),
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { routeNavController.navigateUp() }) {
                         Icon(
                             imageVector = TablerIcons.ArrowLeft,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = accountNavController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             accountNavGraph(accountNavController = accountNavController)
         }

@@ -20,138 +20,140 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class TouristHomeViewModel @Inject constructor(
-    userRepository: UserRepository
-) : ViewModel() {
+class TouristHomeViewModel
+    @Inject
+    constructor(
+        userRepository: UserRepository,
+    ) : ViewModel() {
+        val userName: StateFlow<String?> =
+            userRepository.userName
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    initialValue = null,
+                )
 
-    val userName: StateFlow<String?> = userRepository.userName
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
+        val categories = TourCategoriesData.categories
+        private val _selectedCategory = MutableStateFlow(TourCategory.ALL)
+        val selectedCategory = _selectedCategory.asStateFlow()
 
-    val categories = TourCategoriesData.categories
-    private val _selectedCategory = MutableStateFlow(TourCategory.ALL)
-    val selectedCategory = _selectedCategory.asStateFlow()
-
-    fun updateSelectedCategory(category: TourCategory) {
-        _selectedCategory.value = category
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val popularTours: StateFlow<List<PopularToursCardUiModel>> = selectedCategory
-        .flatMapLatest { currentCategory ->
-            flow { emit(getDummyTours(currentCategory)) }
+        fun updateSelectedCategory(category: TourCategory) {
+            _selectedCategory.value = category
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
 
-    val bestGuides: StateFlow<List<BestGuideUiModel>> =
-        flow { emit(getDummyGuides()) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList()
-            )
+        @OptIn(ExperimentalCoroutinesApi::class)
+        val popularTours: StateFlow<List<PopularToursCardUiModel>> =
+            selectedCategory
+                .flatMapLatest { currentCategory ->
+                    flow { emit(getDummyTours(currentCategory)) }
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    initialValue = emptyList(),
+                )
 
-    //Mock Data
-    private fun getDummyTours(category: TourCategory): List<PopularToursCardUiModel> {
-        val allTours = listOf(
-            PopularToursCardUiModel(
-                id = "1",
-                title = "Sultanahmet ve Gizli Sokaklar",
-                imageUrl = R.drawable.example,
-                rating = "4.9",
-                reviewCount = "(120)",
-                price = "750 ₺",
-                languagesFlag = "🇹🇷 🇬🇧 🇩🇪",
-                languagesText = "TR, EN, DE",
-                guideName = "Ahmet K.",
-                guideImageUrl = R.drawable.unnamed,
-                category = TourCategory.CULTURE
-            ),
-            PopularToursCardUiModel(
-                id = "2",
-                title = "Kapadokya Balon Turu",
-                imageUrl = R.drawable.example,
-                rating = "5.0",
-                reviewCount = "(85)",
-                price = "2500 ₺",
-                languagesFlag = "🇬🇧 🇫🇷",
-                languagesText = "EN, FR",
-                guideName = "Mehmet Y.",
-                guideImageUrl = R.drawable.unnamed,
-                category = TourCategory.ADVENTURE
-            ),
-            PopularToursCardUiModel(
-                id = "3",
-                title = "Efes Antik Kent Gezisi",
-                imageUrl = R.drawable.example,
-                rating = "4.8",
-                reviewCount = "(210)",
-                price = "600 ₺",
-                languagesFlag = "🇹🇷 🇬🇧",
-                languagesText = "TR, EN",
-                guideName = "Ayşe Z.",
-                guideImageUrl = R.drawable.unnamed,
-                category = TourCategory.CULTURE
-            ),
-            PopularToursCardUiModel(
-                id = "4",
-                title = "Boğaz Tekne ve Yemek",
-                imageUrl = R.drawable.example,
-                rating = "4.7",
-                reviewCount = "(300)",
-                price = "1200 ₺",
-                languagesFlag = "🇬🇧 🇸🇦",
-                languagesText = "EN, AR",
-                guideName = "Caner E.",
-                guideImageUrl = R.drawable.unnamed,
-                category = TourCategory.FOOD
-            )
-        )
+        val bestGuides: StateFlow<List<BestGuideUiModel>> =
+            flow { emit(getDummyGuides()) }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    initialValue = emptyList(),
+                )
 
-        return if (category == TourCategory.ALL) {
-            allTours
-        } else {
-            allTours.filter { it.category == category }
+        // Mock Data
+        private fun getDummyTours(category: TourCategory): List<PopularToursCardUiModel> {
+            val allTours =
+                listOf(
+                    PopularToursCardUiModel(
+                        id = "1",
+                        title = "Sultanahmet ve Gizli Sokaklar",
+                        imageUrl = R.drawable.example,
+                        rating = "4.9",
+                        reviewCount = "(120)",
+                        price = "750 ₺",
+                        languagesFlag = "🇹🇷 🇬🇧 🇩🇪",
+                        languagesText = "TR, EN, DE",
+                        guideName = "Ahmet K.",
+                        guideImageUrl = R.drawable.unnamed,
+                        category = TourCategory.CULTURE,
+                    ),
+                    PopularToursCardUiModel(
+                        id = "2",
+                        title = "Kapadokya Balon Turu",
+                        imageUrl = R.drawable.example,
+                        rating = "5.0",
+                        reviewCount = "(85)",
+                        price = "2500 ₺",
+                        languagesFlag = "🇬🇧 🇫🇷",
+                        languagesText = "EN, FR",
+                        guideName = "Mehmet Y.",
+                        guideImageUrl = R.drawable.unnamed,
+                        category = TourCategory.ADVENTURE,
+                    ),
+                    PopularToursCardUiModel(
+                        id = "3",
+                        title = "Efes Antik Kent Gezisi",
+                        imageUrl = R.drawable.example,
+                        rating = "4.8",
+                        reviewCount = "(210)",
+                        price = "600 ₺",
+                        languagesFlag = "🇹🇷 🇬🇧",
+                        languagesText = "TR, EN",
+                        guideName = "Ayşe Z.",
+                        guideImageUrl = R.drawable.unnamed,
+                        category = TourCategory.CULTURE,
+                    ),
+                    PopularToursCardUiModel(
+                        id = "4",
+                        title = "Boğaz Tekne ve Yemek",
+                        imageUrl = R.drawable.example,
+                        rating = "4.7",
+                        reviewCount = "(300)",
+                        price = "1200 ₺",
+                        languagesFlag = "🇬🇧 🇸🇦",
+                        languagesText = "EN, AR",
+                        guideName = "Caner E.",
+                        guideImageUrl = R.drawable.unnamed,
+                        category = TourCategory.FOOD,
+                    ),
+                )
+
+            return if (category == TourCategory.ALL) {
+                allTours
+            } else {
+                allTours.filter { it.category == category }
+            }
         }
-    }
 
-    private fun getDummyGuides(): List<BestGuideUiModel> {
-        return listOf(
-            BestGuideUiModel(
-                id = "1",
-                name = "Mehmet Yılmaz",
-                imageUrl = R.drawable.unnamed,
-                specialization = "Profesyonel Tarih Rehberi",
-                rating = "5.0"
-            ),
-            BestGuideUiModel(
-                id = "2",
-                name = "Zeynep Kaya",
-                imageUrl = R.drawable.unnamed,
-                specialization = "Boğaz ve Doğa Uzmanı",
-                rating = "4.9"
-            ),
-            BestGuideUiModel(
-                id = "3",
-                name = "Caner Erkin",
-                imageUrl = R.drawable.unnamed,
-                specialization = "Sanat Tarihçisi",
-                rating = "4.8"
-            ),
-            BestGuideUiModel(
-                id = "4",
-                name = "Elif Demir",
-                imageUrl = R.drawable.unnamed,
-                specialization = "Gurme ve Yemek Rehberi",
-                rating = "4.9"
+        private fun getDummyGuides(): List<BestGuideUiModel> =
+            listOf(
+                BestGuideUiModel(
+                    id = "1",
+                    name = "Mehmet Yılmaz",
+                    imageUrl = R.drawable.unnamed,
+                    specialization = "Profesyonel Tarih Rehberi",
+                    rating = "5.0",
+                ),
+                BestGuideUiModel(
+                    id = "2",
+                    name = "Zeynep Kaya",
+                    imageUrl = R.drawable.unnamed,
+                    specialization = "Boğaz ve Doğa Uzmanı",
+                    rating = "4.9",
+                ),
+                BestGuideUiModel(
+                    id = "3",
+                    name = "Caner Erkin",
+                    imageUrl = R.drawable.unnamed,
+                    specialization = "Sanat Tarihçisi",
+                    rating = "4.8",
+                ),
+                BestGuideUiModel(
+                    id = "4",
+                    name = "Elif Demir",
+                    imageUrl = R.drawable.unnamed,
+                    specialization = "Gurme ve Yemek Rehberi",
+                    rating = "4.9",
+                ),
             )
-        )
     }
-}

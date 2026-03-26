@@ -11,18 +11,17 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.screens.common.chat.components.ChatListItem
 import com.ahmetkaragunlu.guidemate.screens.common.chat.model.ChatUiModel
 
-
 @Composable
 fun SharedChatListContent(
     chatList: List<ChatUiModel>,
     onChatClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(chatList) { chatItem ->
             ChatListItem(
                 chatItem = chatItem,
-                onClick = { onChatClick(chatItem.id) }
+                onClick = { onChatClick(chatItem.id) },
             )
             HorizontalDivider(
                 thickness = 0.5.dp,

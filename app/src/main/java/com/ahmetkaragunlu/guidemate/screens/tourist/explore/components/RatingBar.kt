@@ -20,11 +20,11 @@ fun RatingBar(
     rating: Int,
     onRatingChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    maxStars: Int = 5
+    maxStars: Int = 5,
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny))
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
     ) {
         repeat(maxStars) { index ->
             val starIndex = index + 1
@@ -32,9 +32,10 @@ fun RatingBar(
                 imageVector = if (starIndex <= rating) Icons.Filled.Star else Icons.Filled.StarBorder,
                 contentDescription = null,
                 tint = Color(0xFFFF9F1C),
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { onRatingChanged(starIndex) }
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .clickable { onRatingChanged(starIndex) },
             )
         }
     }

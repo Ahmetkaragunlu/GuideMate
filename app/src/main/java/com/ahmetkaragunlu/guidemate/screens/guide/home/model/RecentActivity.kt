@@ -11,16 +11,14 @@ data class RecentActivity(
     val icon: ImageVector,
     val description: String,
     val time: String,
-    )
-
-
-
-val recentActivities = listOf(
-    RecentActivity(TablerIcons.Ticket, "Ahmet tur satın aldı.", "10 dk önce"),
-    RecentActivity(TablerIcons.Star, "Ayşe 5 yıldız verdi.", "1 saat önce" ),
-    RecentActivity(TablerIcons.CreditCard, "Paran hesabına aktarıldı.", "Dün"),
-    RecentActivity(TablerIcons.Message, "Mehmet yorum yaptı", "Dün"),
-    RecentActivity(TablerIcons.Message, "Mehmet yorum yaptı", "Dün"),
-    RecentActivity(TablerIcons.Message, "Mehmet yorum yaptı", "Dün"),
-
 )
+
+val recentActivities =
+    listOf(
+        RecentActivity(TablerIcons.Ticket, "Ahmet tur satın aldı.", "10 dk önce"),
+        RecentActivity(TablerIcons.Star, "Ayşe 5 yıldız verdi.", "1 saat önce"),
+        RecentActivity(TablerIcons.CreditCard, "Paran hesabına aktarıldı.", "Dün"),
+        RecentActivity(TablerIcons.Message, "Mehmet yorum yaptı", "Dün"),
+        RecentActivity(TablerIcons.Message, "Mehmet yorum yaptı", "Dün"),
+        RecentActivity(TablerIcons.Message, "Mehmet yorum yaptı", "Dün"),
+    )

@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
-import com.ahmetkaragunlu.guidemate.domain.AuthRepository
+import com.ahmetkaragunlu.guidemate.common.ResourceProvider
+import com.ahmetkaragunlu.guidemate.domain.usecase.GoogleLoginUseCase
+import com.ahmetkaragunlu.guidemate.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +18,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val loginUseCase: LoginUseCase,
+    private val googleLoginUseCase: GoogleLoginUseCase,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
+
+    val webClientId: String
+        get() = resourceProvider.getString(R.string.default_web_client_id)
 
     private val _formState = MutableStateFlow(SignInFormState())
     val formState: StateFlow<SignInFormState> = _formState.asStateFlow()
@@ -27,46 +32,32 @@ class SignInViewModel @Inject constructor(
     private val _screenState = MutableStateFlow(SignInScreenState())
     val screenState: StateFlow<SignInScreenState> = _screenState.asStateFlow()
 
-    // --- Input Changes ---
     fun onEmailChange(email: String) {
         _formState.update { it.copy(email = email.trim()) }
     }
 
     fun onPasswordChange(password: String) {
-        val clean = password.filter { !it.isWhitespace() }
-        _formState.update { it.copy(password = clean) }
+        _formState.update { it.copy(password = password.filter { !it.isWhitespace() }) }
     }
 
     fun togglePasswordVisibility() {
         _formState.update { it.copy(passwordVisibility = !it.passwordVisibility) }
     }
 
-    // --- Validation ---
-    fun isValidEmail(): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(_formState.value.email).matches()
-    }
-
+    fun isValidEmail() = Patterns.EMAIL_ADDRESS.matcher(_formState.value.email).matches()
 
     fun isValidPassword(): Boolean {
         val password = _formState.value.password
         return password.length >= 6 && password.all { it.isDigit() }
     }
 
-    // --- Login Process ---
     fun onSignInClick(onShowErrorToast: (Int) -> Unit) {
-        if (checkSignInErrors(onShowErrorToast)) {
-            loginUser()
-        }
+        if (checkSignInErrors(onShowErrorToast)) loginUser()
     }
 
     private fun loginUser() {
         viewModelScope.launch {
-            val request = LoginRequest(
-                email = _formState.value.email,
-                password = _formState.value.password
-            )
-
-            when (val result = repository.login(request)) {
+            when (val result = loginUseCase(_formState.value.email, _formState.value.password)) {
                 is DataResult.Success -> {
                     _screenState.update { it.copy(navigateToRoleSelection = true) }
                 }
@@ -78,12 +69,9 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    // --- Google Login ---
     fun onGoogleSignInSuccess(idToken: String) {
         viewModelScope.launch {
-            val request = GoogleLoginRequest(idToken = idToken)
-
-            when (val result = repository.googleLogin(request)) {
+            when (val result = googleLoginUseCase(idToken)) {
                 is DataResult.Success -> {
                     _screenState.update { it.copy(navigateToRoleSelection = true) }
                 }
@@ -95,27 +83,16 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    // --- Error & Navigation Management ---
-    fun clearError() {
-        _screenState.update { it.copy(errorMessage = null) }
-    }
+    fun clearError() = _screenState.update { it.copy(errorMessage = null) }
 
-    fun resetNavigationState() {
-        _screenState.update { it.copy(navigateToRoleSelection = false) }
-    }
+    fun resetNavigationState() = _screenState.update { it.copy(navigateToRoleSelection = false) }
 
-    // --- Validation Check ---
     private fun checkSignInErrors(onShowErrorToast: (Int) -> Unit): Boolean {
         val form = _formState.value
-
-        val hasInputError = (!isValidEmail() && form.email.isNotEmpty()) ||
-                (!isValidPassword() && form.password.isNotEmpty())
-
-        if (hasInputError) {
+        if ((!isValidEmail() && form.email.isNotEmpty()) || (!isValidPassword() && form.password.isNotEmpty())) {
             onShowErrorToast(R.string.error_fix_fields)
             return false
         }
-
         if (form.email.isBlank() || form.password.isBlank()) {
             onShowErrorToast(R.string.error_fill_all_fields)
             return false

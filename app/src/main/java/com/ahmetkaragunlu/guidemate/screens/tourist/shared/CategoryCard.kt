@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.shared
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,26 +25,27 @@ import com.ahmetkaragunlu.guidemate.R
 fun CategoryCard(
     category: CategoryItem,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier.clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFF4FC3F7) else MaterialTheme.colorScheme.onPrimary,
-            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else colorResource(R.color.text_color)
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = if (isSelected) Color(0xFF4FC3F7) else MaterialTheme.colorScheme.onPrimary,
+                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else colorResource(R.color.text_color),
+            ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 1.dp),
     ) {
         Row(
             modifier = Modifier.padding(all = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(category.icon, null)
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
             Text(
                 text = stringResource(id = category.titleResId),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }

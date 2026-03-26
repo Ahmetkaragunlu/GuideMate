@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -44,32 +42,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.GuideMateTabRow
 import compose.icons.TablerIcons
-import compose.icons.tablericons.Calendar
 import compose.icons.tablericons.MapPin
 
 @Composable
 fun TouristTripsScreen(
     viewModel: TouristTripsViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val trips by viewModel.trips.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
-
         GuideMateTabRow(
             tabs = TripTab.entries,
             selectedTab = selectedTab,
             onTabSelected = { newTab ->
                 viewModel.changeTab(newTab)
-            }
+            },
         )
 
         LazyColumn(
             contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             items(trips) { trip ->
                 TripCard(trip = trip)
@@ -79,40 +75,46 @@ fun TouristTripsScreen(
 }
 
 @Composable
- private fun TripCard(trip: TripUiModel) {
+private fun TripCard(trip: TripUiModel) {
     val alphaValue = if (trip.isPast) 0.9f else 1f
-    val colorFilter = if (trip.isPast) {
-        ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
-    } else null
+    val colorFilter =
+        if (trip.isPast) {
+            ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+        } else {
+            null
+        }
 
     Card(
-        modifier = Modifier
-            .widthIn(max = 720.dp)
-            .fillMaxWidth()
-            .height(128.dp)
-            .alpha(alphaValue),
+        modifier =
+            Modifier
+                .widthIn(max = 720.dp)
+                .fillMaxWidth()
+                .height(128.dp)
+                .alpha(alphaValue),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-
             Image(
                 painter = painterResource(id = trip.imageUrl),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 colorFilter = colorFilter,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(0.42f)
+                modifier =
+                    Modifier
+                        .fillMaxHeight()
+                        .weight(0.42f),
             )
 
             Column(
-                modifier = Modifier
-                    .fillMaxHeight().weight(0.58f)
-                    .padding(dimensionResource(R.dimen.spacing_medium)),
+                modifier =
+                    Modifier
+                        .fillMaxHeight()
+                        .weight(0.58f)
+                        .padding(dimensionResource(R.dimen.spacing_medium)),
                 verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.Start
+                horizontalAlignment = Alignment.Start,
             ) {
                 Text(
                     text = trip.title,
@@ -120,12 +122,11 @@ fun TouristTripsScreen(
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(start = 2.dp)
+                    modifier = Modifier.padding(start = 2.dp),
                 )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-
                 ) {
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
@@ -138,20 +139,17 @@ fun TouristTripsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = colorResource(R.color.text_color),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-
                 ) {
                     Icon(
                         imageVector = TablerIcons.MapPin,
                         contentDescription = null,
                         tint = colorResource(R.color.text_color),
-
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
@@ -159,7 +157,7 @@ fun TouristTripsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = colorResource(R.color.text_color),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

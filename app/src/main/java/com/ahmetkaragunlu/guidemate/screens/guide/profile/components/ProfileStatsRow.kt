@@ -45,28 +45,28 @@ fun ProfileStatsRow(
     guideLevel: String,
     rating: Double,
     tourCount: Int,
-    onGuideLevelInfoClick: () -> Unit
+    onGuideLevelInfoClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         StatCard(
             icon = Icons.Rounded.EmojiEvents,
             title = guideLevel,
             showInfoIcon = true,
-            onInfoClick = onGuideLevelInfoClick
+            onInfoClick = onGuideLevelInfoClick,
         )
 
         StatCard(
             icon = Icons.Rounded.Star,
-            title = stringResource(R.string.rating_format, rating.toString())
+            title = stringResource(R.string.rating_format, rating.toString()),
         )
 
         StatCard(
             icon = TablerIcons.Flag,
             iconTint = colorResource(R.color.brand_color),
-            title = stringResource(R.string.tour_count_format, tourCount.toString())
+            title = stringResource(R.string.tour_count_format, tourCount.toString()),
         )
     }
 }
@@ -77,41 +77,44 @@ private fun RowScope.StatCard(
     title: String,
     iconTint: Color = Color(0xFFFFD700),
     showInfoIcon: Boolean = false,
-    onInfoClick: (() -> Unit)? = null
+    onInfoClick: (() -> Unit)? = null,
 ) {
     Card(
-        modifier = Modifier
-            .weight(1f)
-            .height(120.dp),
+        modifier =
+            Modifier
+                .weight(1f)
+                .height(120.dp),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Box(contentAlignment = Alignment.BottomEnd) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = iconTint,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(36.dp),
                 )
                 if (showInfoIcon) {
                     Icon(
                         imageVector = Icons.Rounded.Info,
                         contentDescription = stringResource(R.string.info),
                         tint = Color.LightGray,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .offset(x = 6.dp, y = 4.dp)
-                            .background(Color.White, CircleShape)
-                            .clip(CircleShape)
-                            .clickable { onInfoClick?.invoke() }
+                        modifier =
+                            Modifier
+                                .size(20.dp)
+                                .offset(x = 6.dp, y = 4.dp)
+                                .background(Color.White, CircleShape)
+                                .clip(CircleShape)
+                                .clickable { onInfoClick?.invoke() },
                     )
                 }
             }
@@ -120,7 +123,7 @@ private fun RowScope.StatCard(
                 text = title,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.text_color)
+                color = colorResource(R.color.text_color),
             )
         }
     }

@@ -1,9 +1,7 @@
 package com.ahmetkaragunlu.guidemate.navigation
 
-
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-
 
 fun NavController.switchRoot(route: String) {
     this.navigate(route) {
@@ -27,6 +25,3 @@ fun NavController.navigateBottomBar(route: String) {
         restoreState = true
     }
 }
-
-
-

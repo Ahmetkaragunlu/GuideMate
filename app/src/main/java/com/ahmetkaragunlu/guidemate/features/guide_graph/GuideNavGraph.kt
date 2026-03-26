@@ -25,10 +25,9 @@ import com.ahmetkaragunlu.guidemate.screens.guide.profile.GuideProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.GuideMyToursScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.GuideMyWalletScreen
 
-
 fun NavGraphBuilder.guideNavGraph(
     guideNavController: NavController,
-    routeNavController: NavController
+    routeNavController: NavController,
 ) {
     composable(route = GuideRoute.GuideHomeScreen.route) {
         GuideHomeScreen()
@@ -43,7 +42,7 @@ fun NavGraphBuilder.guideNavGraph(
         GuideChatScreen(
             onNavigateToDetail = { chatId ->
                 guideNavController.navigateTo(GuideRoute.GuideChatDetailScreen.route)
-            }
+            },
         )
     }
 
@@ -58,7 +57,7 @@ fun NavGraphBuilder.guideNavGraph(
 @Composable
 fun GuideNavGraphScaffold(
     routeNavController: NavController,
-    viewModel: GuideHomeViewModel = hiltViewModel()
+    viewModel: GuideHomeViewModel = hiltViewModel(),
 ) {
     val guideNavController = rememberNavController()
     val navBackStackEntry by guideNavController.currentBackStackEntryAsState()
@@ -70,25 +69,25 @@ fun GuideNavGraphScaffold(
             GuideTopBar(
                 currentRoute = currentRoute,
                 navController = guideNavController,
-                userName = getUserName
+                userName = getUserName,
             )
         },
         bottomBar = {
             AppBottomBar(
                 navController = guideNavController,
                 currentRoute = currentRoute,
-                items = guideNavItems
+                items = guideNavItems,
             )
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = guideNavController,
             startDestination = GuideRoute.GuideHomeScreen.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             guideNavGraph(
                 guideNavController = guideNavController,
-                routeNavController = routeNavController
+                routeNavController = routeNavController,
             )
         }
     }

@@ -26,20 +26,18 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 
-
-
-
 @Composable
 fun ChatInputArea(
     inputValue: String,
     onValueChange: (String) -> Unit,
-    onSendClick: () -> Unit
+    onSendClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.spacing_medium)),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.spacing_medium)),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         OutlinedTextField(
             value = inputValue,
@@ -47,24 +45,26 @@ fun ChatInputArea(
             placeholder = { Text("Mesaj yazın...", color = Color.Gray) },
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.brand_color),
-                unfocusedBorderColor = Color.LightGray,
-                cursorColor = colorResource(R.color.brand_color)
-            ),
-            maxLines = 4
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorResource(R.color.brand_color),
+                    unfocusedBorderColor = Color.LightGray,
+                    cursorColor = colorResource(R.color.brand_color),
+                ),
+            maxLines = 4,
         )
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
         IconButton(
             onClick = onSendClick,
-            modifier = Modifier
-                .size(48.dp)
-                .background(colorResource(R.color.brand_color), CircleShape)
+            modifier =
+                Modifier
+                    .size(48.dp)
+                    .background(colorResource(R.color.brand_color), CircleShape),
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = MaterialTheme.colorScheme.onPrimary,
             )
         }
     }

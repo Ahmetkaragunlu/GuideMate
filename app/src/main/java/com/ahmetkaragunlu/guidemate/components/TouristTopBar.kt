@@ -33,13 +33,12 @@ import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Bell
 import compose.icons.tablericons.Logout
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TouristAppBar(
     currentRoute: String,
     navController: NavController,
-    userName: String?
+    userName: String?,
 ) {
     val isChatDetail = currentRoute == TouristRoute.TouristChatDetailScreen.route
 
@@ -49,16 +48,16 @@ fun TouristAppBar(
                 Text(
                     text = stringResource(id = R.string.welcome_message, userName ?: ""),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             },
             actions = {
                 Icon(
                     imageVector = TablerIcons.Bell,
                     contentDescription = null,
-                    modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small))
+                    modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small)),
                 )
-            }
+            },
         )
     } else {
         CenterAlignedTopAppBar(
@@ -69,9 +68,10 @@ fun TouristAppBar(
                             painter = painterResource(id = R.drawable.example),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
+                            modifier =
+                                Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
@@ -79,7 +79,7 @@ fun TouristAppBar(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 } else {
@@ -87,18 +87,18 @@ fun TouristAppBar(
                     Text(
                         text = stringResource(id = titleResId),
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             },
             navigationIcon = {
                 if (currentRoute == TouristRoute.TouristFilterScreen.route || isChatDetail) {
                     IconButton(
-                        onClick = { navController.navigateUp() }
+                        onClick = { navController.navigateUp() },
                     ) {
                         Icon(
                             imageVector = TablerIcons.ArrowLeft,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                 }
@@ -112,14 +112,13 @@ fun TouristAppBar(
                         )
                     }
                 }
-            }
+            },
         )
     }
 }
 
-
-fun getTouristScreenTitle(route: String?): Int {
-    return when (route) {
+fun getTouristScreenTitle(route: String?): Int =
+    when (route) {
         TouristRoute.TouristHomeScreen.route -> R.string.welcome_message
         TouristRoute.TouristExploreScreen.route -> R.string.tourist_explore
         TouristRoute.TouristMyTripsScreen.route -> R.string.tourist_trips
@@ -128,4 +127,3 @@ fun getTouristScreenTitle(route: String?): Int {
         TouristRoute.TouristFilterScreen.route -> R.string.filter
         else -> R.string.app_name
     }
-}

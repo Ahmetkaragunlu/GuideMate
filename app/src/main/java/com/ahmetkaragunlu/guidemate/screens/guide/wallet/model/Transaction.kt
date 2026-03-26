@@ -6,5 +6,5 @@ data class Transaction(
     val timestampMs: Long,
     val formattedDate: String,
     val amount: Double,
-    val type: TransactionType
+    val type: TransactionType,
 )

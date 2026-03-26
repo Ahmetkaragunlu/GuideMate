@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours.components
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -29,7 +28,7 @@ import compose.icons.tablericons.Users
 @Composable
 fun PastTourCard(
     tour: GuideTourUiModel,
-    onDetails: () -> Unit
+    onDetails: () -> Unit,
 ) {
     val matrix = ColorMatrix().apply { setToSaturation(0.7f) }
 
@@ -37,32 +36,33 @@ fun PastTourCard(
         imageUrl = tour.imageUrl,
         colorFilter = ColorFilter.colorMatrix(matrix),
         alpha = 0.85f,
-        elevation = 2.dp
+        elevation = 2.dp,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.spacing_medium)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.spacing_medium)),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.Top,
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
                         text = tour.title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     InfoRow(Icons.Default.CalendarMonth, tour.date)
                     InfoRow(TablerIcons.MapPin, tour.location)
                     InfoRow(
                         icon = TablerIcons.Users,
-                        text = stringResource(R.string.participant_count, tour.participantCount)
+                        text = stringResource(R.string.participant_count, tour.participantCount),
                     )
                 }
 
@@ -70,29 +70,32 @@ fun PastTourCard(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = null,
                     tint = colorResource(R.color.text_color),
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .size(24.dp)
-                        .clickable { onDetails() }
+                    modifier =
+                        Modifier
+                            .padding(start = 16.dp)
+                            .size(24.dp)
+                            .clickable { onDetails() },
                 )
             }
 
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = dimensionResource(R.dimen.spacing_medium))
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(R.string.earnings_format, tour.earnings ?: 0.0),
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.Green
+                        color = Color.Green,
                     )
 
                     if (tour.rating != null && tour.reviewCount != null) {
@@ -101,13 +104,13 @@ fun PastTourCard(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = null,
                                 tint = Color(0xFFFFC107),
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                             Text(
                                 text = "${tour.rating} (${tour.reviewCount})",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = colorResource(R.color.text_color)
+                                color = colorResource(R.color.text_color),
                             )
                         }
                     }

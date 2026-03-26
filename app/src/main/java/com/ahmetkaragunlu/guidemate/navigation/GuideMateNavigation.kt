@@ -19,7 +19,7 @@ fun GuideMateNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Graph.TouristGraph.route
+        startDestination = Graph.AuthGraph.route,
     ) {
         authNavGraph(navController = navController)
 
@@ -33,13 +33,14 @@ fun GuideMateNavigation() {
 
         composable(
             route = "${Graph.AccountGraph.route}/{targetRoute}",
-            arguments = listOf(navArgument("targetRoute") { type = NavType.StringType })
+            arguments = listOf(navArgument("targetRoute") { type = NavType.StringType }),
         ) { backStackEntry ->
-            val targetRoute = backStackEntry.arguments?.getString("targetRoute")
-                ?: AccountRoute.SavedCards.route
+            val targetRoute =
+                backStackEntry.arguments?.getString("targetRoute")
+                    ?: AccountRoute.SavedCards.route
             AccountNavGraphScaffold(
                 routeNavController = navController,
-                startDestination = targetRoute
+                startDestination = targetRoute,
             )
         }
     }

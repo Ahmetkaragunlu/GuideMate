@@ -9,23 +9,32 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class GuideChatViewModel @Inject constructor() : ViewModel() {
-
-
-    //Mock Data
-    private val _chatList = MutableStateFlow(
-        listOf(
-            ChatUiModel(
-                id = "101", remoteUserId = "t1", name = "Hans Müller (Turist)",
-                lastMessage = "Ne zaman buluşuyoruz?", time = "10:30",
-                avatarResId = R.drawable.example, unreadCount = 1
-            ),
-            ChatUiModel(
-                id = "102", remoteUserId = "t2", name = "John Doe",
-                lastMessage = "Teşekkürler, harika turdu.", time = "Dün",
-                avatarResId = R.drawable.example, unreadCount = 0
+class GuideChatViewModel
+    @Inject
+    constructor() : ViewModel() {
+        // Mock Data
+        private val _chatList =
+            MutableStateFlow(
+                listOf(
+                    ChatUiModel(
+                        id = "101",
+                        remoteUserId = "t1",
+                        name = "Hans Müller (Turist)",
+                        lastMessage = "Ne zaman buluşuyoruz?",
+                        time = "10:30",
+                        avatarResId = R.drawable.example,
+                        unreadCount = 1,
+                    ),
+                    ChatUiModel(
+                        id = "102",
+                        remoteUserId = "t2",
+                        name = "John Doe",
+                        lastMessage = "Teşekkürler, harika turdu.",
+                        time = "Dün",
+                        avatarResId = R.drawable.example,
+                        unreadCount = 0,
+                    ),
+                ),
             )
-        )
-    )
-    val chatList = _chatList.asStateFlow()
-}
+        val chatList = _chatList.asStateFlow()
+    }
