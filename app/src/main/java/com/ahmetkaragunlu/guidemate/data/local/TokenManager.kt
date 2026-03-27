@@ -20,9 +20,6 @@ class TokenManager
             private const val KEY_REFRESH_TOKEN = "refresh_token"
             private const val KEY_DEVICE_ID = "device_id"
             private const val KEY_USER_ROLE = "user_role"
-
-            private const val KEY_USER_NAME = "user_name"
-            private const val KEY_USER_LAST_NAME = "user_last_name"
         }
 
         private val lock = Any()
@@ -48,17 +45,6 @@ class TokenManager
 
         fun getAccessToken(): String? = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
 
-        fun saveUserName(name: String) {
-            sharedPreferences.edit { putString(KEY_USER_NAME, name) }
-        }
-
-        fun getUserName(): String? = sharedPreferences.getString(KEY_USER_NAME, null)
-
-        fun saveUserLastName(lastName: String) {
-            sharedPreferences.edit { putString(KEY_USER_LAST_NAME, lastName) }
-        }
-
-        fun getUserLastName(): String? = sharedPreferences.getString(KEY_USER_LAST_NAME, null)
 
         fun saveRefreshToken(token: String) {
             sharedPreferences.edit { putString(KEY_REFRESH_TOKEN, token) }
@@ -81,14 +67,12 @@ class TokenManager
             sharedPreferences.edit { putString(KEY_USER_ROLE, role) }
         }
 
-        fun getUserRole(): String? = sharedPreferences.getString(KEY_USER_ROLE, null)
 
         fun clearTokens() {
             sharedPreferences.edit {
                 remove(KEY_ACCESS_TOKEN)
                 remove(KEY_REFRESH_TOKEN)
                 remove(KEY_USER_ROLE)
-                remove(KEY_USER_NAME)
             }
         }
     }

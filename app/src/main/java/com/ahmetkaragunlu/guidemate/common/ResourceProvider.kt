@@ -17,7 +17,6 @@ interface ResourceProvider {
     ): String
 }
 
-@Singleton
 class ResourceProviderImpl
 @Inject
 constructor(
