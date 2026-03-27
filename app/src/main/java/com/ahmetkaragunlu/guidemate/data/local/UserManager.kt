@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.ahmetkaragunlu.guidemate.domain.model.UserState
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,11 +29,7 @@ class UserManager @Inject constructor(
 
     val userState: StateFlow<UserState> = _userState.asStateFlow()
 
-    fun saveUser(
-        firstName: String?,
-        lastName: String?,
-        role: String?
-    ) {
+    fun saveUser(firstName: String?, lastName: String?, role: String?) {
         prefs.edit {
             putString("first_name", firstName)
             putString("last_name", lastName)
@@ -41,9 +39,7 @@ class UserManager @Inject constructor(
     }
 
     fun saveUserRole(role: String) {
-        prefs.edit {
-            putString("user_role", role)
-        }
+        prefs.edit { putString("user_role", role) }
         _userState.value = _userState.value.copy(role = role)
     }
 

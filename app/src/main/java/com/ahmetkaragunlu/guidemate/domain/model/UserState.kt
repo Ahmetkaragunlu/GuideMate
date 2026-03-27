@@ -1,8 +1,7 @@
-package com.ahmetkaragunlu.guidemate.data.local
+package com.ahmetkaragunlu.guidemate.domain.model
 
 data class UserState(
     val firstName: String? = null,
     val lastName: String? = null,
     val role: String? = null
 )
-

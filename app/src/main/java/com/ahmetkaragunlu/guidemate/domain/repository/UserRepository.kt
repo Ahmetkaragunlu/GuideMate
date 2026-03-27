@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.domain.repository
 
-import com.ahmetkaragunlu.guidemate.data.local.UserState
+import com.ahmetkaragunlu.guidemate.domain.model.UserState
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {

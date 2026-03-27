@@ -23,7 +23,8 @@ class TokenAuthenticator
             val path = response.request.url.encodedPath
             if (path.contains("/auth/login") ||
                 path.contains("/auth/register") ||
-                path.contains("/auth/google")
+                path.contains("/auth/google") ||
+                path.contains("/auth/logout")
             ) {
                 return null
             }
