@@ -2,8 +2,8 @@ package com.ahmetkaragunlu.guidemate.di
 
 import com.ahmetkaragunlu.guidemate.data.repository.AuthRepositoryImpl
 import com.ahmetkaragunlu.guidemate.data.repository.UserRepositoryImpl
-import com.ahmetkaragunlu.guidemate.domain.AuthRepository
-import com.ahmetkaragunlu.guidemate.domain.UserRepository
+import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

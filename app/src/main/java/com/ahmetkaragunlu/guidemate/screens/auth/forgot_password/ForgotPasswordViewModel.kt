@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.common.ResourceProvider
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
-import com.ahmetkaragunlu.guidemate.domain.AuthRepository
 import com.ahmetkaragunlu.guidemate.domain.usecase.ForgotPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

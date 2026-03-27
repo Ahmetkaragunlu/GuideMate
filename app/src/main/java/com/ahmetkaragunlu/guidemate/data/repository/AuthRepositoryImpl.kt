@@ -15,8 +15,8 @@ import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResetPasswordReque
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.RoleSelectionRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.ErrorResponse
-import com.ahmetkaragunlu.guidemate.domain.AuthRepository
-import com.ahmetkaragunlu.guidemate.domain.UserRepository
+import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.domain.model.AuthResult
 import com.ahmetkaragunlu.guidemate.domain.model.UserRole
 import com.google.gson.Gson
@@ -68,15 +68,21 @@ class AuthRepositoryImpl @Inject constructor(
         password: String
     ): DataResult<String> = try {
         api.register(RegisterRequest(firstName, lastName, email, password)).toDataResult()
-    } catch (e: Exception) { handleException(e) }
+    } catch (e: Exception) {
+        handleException(e)
+    }
 
     override suspend fun login(email: String, password: String): DataResult<AuthResult> = try {
         handleAuthResponse(api.login(LoginRequest(email, password)))
-    } catch (e: Exception) { handleException(e) }
+    } catch (e: Exception) {
+        handleException(e)
+    }
 
     override suspend fun googleLogin(idToken: String): DataResult<AuthResult> = try {
         handleAuthResponse(api.googleLogin(GoogleLoginRequest(idToken)))
-    } catch (e: Exception) { handleException(e) }
+    } catch (e: Exception) {
+        handleException(e)
+    }
 
     override suspend fun logout(): DataResult<String> {
         return try {
@@ -98,19 +104,23 @@ class AuthRepositoryImpl @Inject constructor(
         val token = tokenManager.getRefreshToken()
             ?: return DataResult.Error(resourceProvider.getString(R.string.error_session_expired))
         handleAuthResponse(api.refreshToken(RefreshTokenRequest(token)))
-    } catch (e: Exception) { handleException(e) }
+    } catch (e: Exception) {
+        handleException(e)
+    }
 
     override suspend fun selectRole(role: UserRole): DataResult<AuthResult> = try {
         val response = api.selectRole(RoleSelectionRequest(role.toRoleType()))
         if (response.isSuccessful && response.body() != null) {
             val body = response.body()!!
-            body.role?.let { tokenManager.saveUserRole(it) }
+            body.role?.let { userRepository.saveUserRole(it) }
             DataResult.Success(body.toDomain())
         } else {
             val errorMsg = parseError(response.errorBody()?.string())
             DataResult.Error(errorMsg ?: resourceProvider.getString(R.string.error_generic_failure))
         }
-    } catch (e: Exception) { handleException(e) }
+    } catch (e: Exception) {
+        handleException(e)
+    }
 
     override suspend fun forgotPassword(
         email: String,
@@ -118,7 +128,9 @@ class AuthRepositoryImpl @Inject constructor(
         lastName: String
     ): DataResult<String> = try {
         api.forgotPassword(ForgotPasswordRequest(email, firstName, lastName)).toDataResult()
-    } catch (e: Exception) { handleException(e) }
+    } catch (e: Exception) {
+        handleException(e)
+    }
 
     override suspend fun resetPassword(
         token: String,
@@ -126,7 +138,9 @@ class AuthRepositoryImpl @Inject constructor(
         confirmPassword: String
     ): DataResult<String> = try {
         api.resetPassword(ResetPasswordRequest(token, newPassword, confirmPassword)).toDataResult()
-    } catch (e: Exception) { handleException(e) }
+    } catch (e: Exception) {
+        handleException(e)
+    }
 
     private fun clearLocalData() {
         tokenManager.clearTokens()
@@ -138,12 +152,13 @@ class AuthRepositoryImpl @Inject constructor(
             val body = response.body()!!
             body.accessToken?.let { tokenManager.saveAccessToken(it) }
             body.refreshToken?.let { tokenManager.saveRefreshToken(it) }
-            body.role?.let { tokenManager.saveUserRole(it) }
+
             val firstName = body.firstName.orEmpty().trim()
             val lastName = body.lastName.orEmpty().trim()
             userRepository.saveUser(
                 firstName = firstName.ifEmpty { null },
-                lastName = lastName.ifEmpty { null }
+                lastName = lastName.ifEmpty { null },
+                role = body.role
             )
             DataResult.Success(body.toDomain())
         } else {
@@ -153,8 +168,18 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     private fun <T> handleException(e: Exception): DataResult<T> = when (e) {
-        is IOException -> DataResult.Error(resourceProvider.getString(R.string.error_no_internet), e)
-        is HttpException -> DataResult.Error(resourceProvider.getString(R.string.error_server, e.code()), e)
+        is IOException -> DataResult.Error(
+            resourceProvider.getString(R.string.error_no_internet),
+            e
+        )
+
+        is HttpException -> DataResult.Error(
+            resourceProvider.getString(
+                R.string.error_server,
+                e.code()
+            ), e
+        )
+
         else -> DataResult.Error(resourceProvider.getString(R.string.error_unknown), e)
     }
 
@@ -162,6 +187,8 @@ class AuthRepositoryImpl @Inject constructor(
         if (json.isNullOrEmpty()) return null
         return try {
             Gson().fromJson(json, ErrorResponse::class.java).message
-        } catch (e: Exception) { null }
+        } catch (e: Exception) {
+            null
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.domain
+package com.ahmetkaragunlu.guidemate.domain.repository
 
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.domain.model.AuthResult

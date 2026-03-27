@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.common.ResourceProvider
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
-import com.ahmetkaragunlu.guidemate.domain.AuthRepository
 import com.ahmetkaragunlu.guidemate.domain.usecase.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -103,7 +101,8 @@ class SignUpViewModel @Inject constructor(
     private fun registerUser() {
         viewModelScope.launch {
             val form = _formState.value
-            when (val result = registerUseCase(form.firstName, form.lastName, form.email, form.password)) {
+            when (val result =
+                registerUseCase(form.firstName, form.lastName, form.email, form.password)) {
                 is DataResult.Success -> _screenState.update { it.copy(isRegistrationSuccess = true) }
                 is DataResult.Error -> _screenState.update { it.copy(errorMessage = result.message) }
             }
