@@ -104,7 +104,21 @@
     <string name="recent_activities">Son hareketler</string>
 
 
+    <string name="saved_cards_description">Kartlarını görüntüleyebilir, silebilir veya varsayılan kartını değiştirebilirsin.</string>
+    <string name="card_holder">Kart Sahibi</string>
+    <string name="expiry_date">Son Kullanma</string>
+    <string name="set_as_default">Varsayılan Yap</string>
+    <string name="default_card">Varsayılan</string>
 
+
+    <string name="delete_card_title">Kartı Sil</string>
+    <string name="delete_card_desc">Bu kartı silmek istediğinize emin misiniz?</string>
+
+    <string name="make_default_title">Varsayılan Kart Yap</string>
+    <string name="make_default_desc">Bu kartı varsayılan ödeme yönteminiz yapmak istiyor musunuz?</string>
+
+    <string name="yes">Evet</string>
+    <string name="no">Hayır</string>
 
     <string name="tab_upcoming">Yaklaşan</string>
     <string name="tab_past">Geçmiş</string>

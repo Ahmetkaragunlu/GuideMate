@@ -1,7 +1,11 @@
 package com.ahmetkaragunlu.guidemate.screens.auth.sign_in
 
+import android.content.Context
+import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -239,73 +243,86 @@ fun SignInScreen(
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
 
-        // Google Sign-In Button
-        Button(
-            onClick = {
-                val gso =
-                    GoogleSignInOptions
-                        .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(viewModel.webClientId) // <--- Viewmodel üzerinden çağrılıyor
-                        .requestEmail()
-                        .build()
-                val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                googleSignInClient.signOut().addOnCompleteListener {
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
-                }
-            },
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-            border = BorderStroke(width = 1.dp, color = Color.LightGray),
-            modifier =
-                Modifier
-                    .widthIn(max = 400.dp)
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
-            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.google_icon),
-                contentDescription = null,
-                tint = Color.Unspecified,
-            )
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
-            Text(
-                text = stringResource(R.string.google),
-                style = MaterialTheme.typography.labelLarge,
-                color = colorResource(R.color.text_color).copy(alpha = 0.8f),
-            )
-        }
+        GoogleSignInButton(viewModel, context, googleSignInLauncher)
 
         Spacer(modifier = Modifier.weight(1f))
 
-        TextButton(
-            onClick = { onNavigateToSignUp() },
-        ) {
-            Text(
-                text =
-                    buildAnnotatedString {
-                        withStyle(
-                            style =
-                                SpanStyle(
-                                    color = colorResource(R.color.text_color),
-                                ),
-                        ) {
-                            append(stringResource(R.string.dont_have_an_account))
-                            append("  ")
-                        }
-                        withStyle(
-                            style =
-                                SpanStyle(
-                                    color = colorResource(R.color.brand_color),
-                                ),
-                        ) {
-                            append(stringResource(R.string.sign_up_text))
-                        }
-                    },
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
+        SignUpTextButton(onNavigateToSignUp)
+    }
+}
+
+@Composable
+private fun GoogleSignInButton(
+    viewModel: SignInViewModel,
+    context: Context,
+    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    Button(
+        onClick = {
+            val gso =
+                GoogleSignInOptions
+                    .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(viewModel.webClientId) // <--- Viewmodel üzerinden çağrılıyor
+                    .requestEmail()
+                    .build()
+            val googleSignInClient = GoogleSignIn.getClient(context, gso)
+            googleSignInClient.signOut().addOnCompleteListener {
+                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+            }
+        },
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+        border = BorderStroke(width = 1.dp, color = Color.LightGray),
+        modifier =
+            Modifier
+                .widthIn(max = 400.dp)
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.google_icon),
+            contentDescription = null,
+            tint = Color.Unspecified,
+        )
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
+        Text(
+            text = stringResource(R.string.google),
+            style = MaterialTheme.typography.labelLarge,
+            color = colorResource(R.color.text_color).copy(alpha = 0.8f),
+        )
+    }
+}
+
+@Composable
+private fun SignUpTextButton(onNavigateToSignUp: () -> Unit) {
+    TextButton(
+        onClick = { onNavigateToSignUp() },
+    ) {
+        Text(
+            text =
+                buildAnnotatedString {
+                    withStyle(
+                        style =
+                            SpanStyle(
+                                color = colorResource(R.color.text_color),
+                            ),
+                    ) {
+                        append(stringResource(R.string.dont_have_an_account))
+                        append("  ")
+                    }
+                    withStyle(
+                        style =
+                            SpanStyle(
+                                color = colorResource(R.color.brand_color),
+                            ),
+                    ) {
+                        append(stringResource(R.string.sign_up_text))
+                    }
+                },
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }

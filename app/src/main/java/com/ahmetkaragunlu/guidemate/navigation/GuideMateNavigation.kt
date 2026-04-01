@@ -19,7 +19,7 @@ fun GuideMateNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Graph.AuthGraph.route,
+        startDestination = Graph.TouristGraph.route,
     ) {
         authNavGraph(navController = navController)
 

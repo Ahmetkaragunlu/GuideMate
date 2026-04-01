@@ -7,7 +7,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideProfileUiSt
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -36,17 +36,15 @@ class GuideProfileViewModel @Inject constructor(
             )
 
     val profileState: StateFlow<GuideProfileUiState> =
-        flow {
-            val mockData =
-                GuideProfileUiState(
-                    profileImageUrl = null,
-                    title = "Profesyonel Tur Rehberi",
-                    guideLevel = "Süper Rehber",
-                    rating = 4.9,
-                    tourCount = 124,
-                )
-            emit(mockData)
-        }.stateIn(
+        flowOf(
+            GuideProfileUiState(
+                profileImageUrl = null,
+                title = "Profesyonel Tur Rehberi",
+                guideLevel = "Süper Rehber",
+                rating = 4.9,
+                tourCount = 124,
+            )
+        ).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = GuideProfileUiState(),

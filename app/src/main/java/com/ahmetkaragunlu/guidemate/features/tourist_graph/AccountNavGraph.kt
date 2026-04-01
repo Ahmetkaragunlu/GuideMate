@@ -22,7 +22,7 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.ChangePasswo
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.HelpSupportScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.LegalAgreementsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.NotificationSettingsScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.SavedCardsScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.SavedCardsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.menuOptions
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
