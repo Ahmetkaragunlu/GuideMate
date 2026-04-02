@@ -182,12 +182,14 @@
 
 
     <string name="withdraw_title">Para Çekme</string>
+    <string name="add_money_title">Para Yükleme</string>
     <string name="available_balance_format">Kullanılabilir Bakiye: %1$s</string>
     <string name="withdraw_all">Tümünü Çek</string>
     <string name="bank_not_selected">Banka Seçilmedi</string>
     <string name="default_masked_iban">TR** **** ****</string>
     <string name="change">Değiştir</string>
     <string name="withdraw_info_text">Tutar 1 iş günü içerisinde hesabınıza aktarılacaktır.</string>
+    <string name="add_money_info_text">Yuklenecek tutar guvenli odeme altyapisi uzerinden bakiyenize aktarilacaktir.</string>
     <string name="confirm">ONAYLA</string>
 
     <string name="clear">Temizle</string>

@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.common
+package com.ahmetkaragunlu.guidemate.components
 
 import java.text.NumberFormat
 import java.util.Locale

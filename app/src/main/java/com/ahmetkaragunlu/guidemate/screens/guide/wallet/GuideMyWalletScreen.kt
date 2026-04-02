@@ -14,10 +14,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.common.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.components.MoneyActionBottomSheetContent
+import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +29,7 @@ fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
     val transactionsScrollState = rememberScrollState()
 
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var withdrawAmount by rememberSaveable { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -131,11 +133,19 @@ fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
                 containerColor = Color.White,
                 dragHandle = { BottomSheetDefaults.DragHandle() },
             ) {
-                WithdrawBottomSheetContent(
-                    availableBalance = uiState.totalBalance,
+                MoneyActionBottomSheetContent(
+                    title = stringResource(R.string.withdraw_title),
+                    amountText = withdrawAmount,
+                    onAmountChange = { withdrawAmount = it },
+                    actionButtonText = stringResource(R.string.confirm),
+                    helperText = stringResource(R.string.withdraw_info_text),
                     selectedBank = uiState.selectedBankAccount,
+                    presetAmounts = emptyList(),
+                    onPresetAmountClick = { },
+                    onChangeBankClick = { },
                     onConfirm = { amount ->
                         viewModel.withdrawMoney(amount)
+                        withdrawAmount = ""
                         showBottomSheet = false
                     },
                 )

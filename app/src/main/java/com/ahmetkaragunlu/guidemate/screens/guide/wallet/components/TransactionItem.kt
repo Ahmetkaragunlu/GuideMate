@@ -25,7 +25,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.common.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.TransactionType
 import compose.icons.TablerIcons

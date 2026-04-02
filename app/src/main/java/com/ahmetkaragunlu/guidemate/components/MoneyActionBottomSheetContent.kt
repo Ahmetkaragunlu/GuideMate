@@ -1,9 +1,10 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.wallet.components
+package com.ahmetkaragunlu.guidemate.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,15 +16,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,8 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.EditTextField
-import com.ahmetkaragunlu.guidemate.screens.common.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.BankAccount
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CreditCard
@@ -45,20 +42,23 @@ import java.util.Currency
 import java.util.Locale
 
 @Composable
-fun WithdrawBottomSheetContent(
-    availableBalance: Double,
+fun MoneyActionBottomSheetContent(
+    title: String,
+    amountText: String,
+    onAmountChange: (String) -> Unit,
+    actionButtonText: String,
+    helperText: String,
     selectedBank: BankAccount?,
+    presetAmounts: List<Int>,
+    onPresetAmountClick: (Int) -> Unit,
+    onChangeBankClick: () -> Unit,
     onConfirm: (Double) -> Unit,
 ) {
-    var amountText by remember { mutableStateOf("") }
-
     val currencySymbol =
-        remember {
-            try {
-                Currency.getInstance(Locale.getDefault()).symbol
-            } catch (e: Exception) {
-                "₺"
-            }
+        try {
+            Currency.getInstance(Locale.getDefault()).symbol
+        } catch (e: Exception) {
+            "₺"
         }
 
     Column(
@@ -70,7 +70,7 @@ fun WithdrawBottomSheetContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = stringResource(R.string.withdraw_title),
+            text = title,
             color = colorResource(R.color.brand_color),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
@@ -81,7 +81,7 @@ fun WithdrawBottomSheetContent(
         EditTextField(
             value = amountText,
             onValueChange = { newValue ->
-                if (newValue.isEmpty() || newValue.all { it.isDigit() }) amountText = newValue
+                if (newValue.isEmpty() || newValue.all { it.isDigit() }) onAmountChange(newValue)
             },
             placeholder = R.string.zero,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
@@ -104,30 +104,31 @@ fun WithdrawBottomSheetContent(
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = stringResource(R.string.available_balance_format, availableBalance.toLocalCurrency()),
-                color = colorResource(R.color.text_color),
-                style = MaterialTheme.typography.bodySmall,
-            )
-            Text(
-                text = stringResource(R.string.withdraw_all),
-                color = colorResource(R.color.brand_color),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold,
-                modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable { amountText = availableBalance.toInt().toString() }
-                        .padding(4.dp),
-            )
-        }
+        if (presetAmounts.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                presetAmounts.forEach { amount ->
+                    val formattedAmount = amount.toDouble().toLocalCurrency()
+                    FilterChip(
+                        selected = amountText == amount.toString(),
+                        onClick = { onPresetAmountClick(amount) },
+                        label = { Text(text = formattedAmount) },
+                        colors =
+                            FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = colorResource(R.color.brand_color).copy(
+                                    alpha = 0.12f
+                                ),
+                                selectedLabelColor = colorResource(R.color.brand_color),
+                            ),
+                    )
+                }
+            }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         Row(
             modifier =
@@ -155,7 +156,8 @@ fun WithdrawBottomSheetContent(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = selectedBank?.maskedIban ?: stringResource(R.string.default_masked_iban),
+                        text = selectedBank?.maskedIban
+                            ?: stringResource(R.string.default_masked_iban),
                         color = colorResource(R.color.text_color),
                         style = MaterialTheme.typography.labelSmall,
                     )
@@ -166,7 +168,7 @@ fun WithdrawBottomSheetContent(
                 modifier =
                     Modifier
                         .clip(RoundedCornerShape(4.dp))
-                        .clickable { }
+                        .clickable(onClick = onChangeBankClick)
                         .padding(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -189,7 +191,7 @@ fun WithdrawBottomSheetContent(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.radius_medium)))
 
         Text(
-            text = stringResource(R.string.withdraw_info_text),
+            text = helperText,
             color = colorResource(R.color.text_color),
             style = MaterialTheme.typography.bodySmall,
         )
@@ -206,7 +208,7 @@ fun WithdrawBottomSheetContent(
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
         ) {
             Text(
-                text = stringResource(R.string.confirm),
+                text = actionButtonText,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary,

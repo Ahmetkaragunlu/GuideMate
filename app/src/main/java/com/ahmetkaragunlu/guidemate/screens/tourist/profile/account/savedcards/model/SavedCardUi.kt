@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.model
 
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.BankAccount
 
 data class SavedCardUi(
     val cardId: String,
@@ -9,3 +10,10 @@ data class SavedCardUi(
     val expiryDate: String,
     val isDefault: Boolean,
 )
+
+fun SavedCardUi.toBankAccount(): BankAccount =
+    BankAccount(
+        id = cardId,
+        bankName = bankName,
+        maskedIban = cardNumber,
+    )

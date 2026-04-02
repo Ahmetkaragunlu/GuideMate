@@ -1,22 +1,33 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.model.SavedCardUi
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.model.SavedCardsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SavedCardsViewModel @Inject constructor() : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        SavedCardsUiState(savedCards = manualSavedCards())
+        SavedCardsUiState(savedCards = getSavedCards())
     )
     val uiState: StateFlow<SavedCardsUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            savedCards.collectLatest { savedCards ->
+                _uiState.update { it.copy(savedCards = savedCards) }
+            }
+        }
+    }
 
     fun onShowDeleteDialog(cardId: String) {
         _uiState.update { it.copy(showDeleteDialogFor = cardId) }
@@ -38,19 +49,9 @@ class SavedCardsViewModel @Inject constructor() : ViewModel() {
     fun onConfirmDeleteCard() {
         val cardIdToDelete = _uiState.value.showDeleteDialogFor ?: return
 
+        deleteCard(cardIdToDelete)
         _uiState.update { currentState ->
-            val filteredList = currentState.savedCards.filterNot { it.cardId == cardIdToDelete }
-            val finalList =
-                if (filteredList.isNotEmpty() && (filteredList.size == 1 || filteredList.none { it.isDefault })) {
-                    filteredList.mapIndexed { index, card ->
-                        card.copy(isDefault = index == 0)
-                    }
-                } else {
-                    filteredList
-                }
-
             currentState.copy(
-                savedCards = finalList,
                 showDeleteDialogFor = null
             )
         }
@@ -58,41 +59,66 @@ class SavedCardsViewModel @Inject constructor() : ViewModel() {
 
     fun onConfirmMakeDefaultCard() {
         val cardIdToMakeDefault = _uiState.value.showMakeDefaultDialogFor ?: return
+        makeDefault(cardIdToMakeDefault)
         _uiState.update { currentState ->
             currentState.copy(
-                savedCards = currentState.savedCards.map { card ->
-                    card.copy(isDefault = card.cardId == cardIdToMakeDefault)
-                }.sortedByDescending { it.isDefault },
                 showMakeDefaultDialogFor = null
             )
         }
     }
 
+    companion object {
+        private val _savedCards =
+            MutableStateFlow(
+                listOf(
+                    SavedCardUi(
+                        cardId = "card_1",
+                        bankName = "Garanti BBVA",
+                        cardNumber = "**** **** **** 4567",
+                        cardHolderName = "Ahmet Karagünlü",
+                        expiryDate = "12/28",
+                        isDefault = true,
+                    ),
+                    SavedCardUi(
+                        cardId = "card_2",
+                        bankName = "Ziraat Bankası",
+                        cardNumber = "**** **** **** 9821",
+                        cardHolderName = "Ahmet Karagünlü",
+                        expiryDate = "07/27",
+                        isDefault = false,
+                    ),
+                    SavedCardUi(
+                        cardId = "card_3",
+                        bankName = "İş Bankası",
+                        cardNumber = "**** **** **** 1122",
+                        cardHolderName = "Ahmet Karagünlü",
+                        expiryDate = "05/29",
+                        isDefault = false,
+                    ),
+                ),
+            )
 
-    private fun manualSavedCards(): List<SavedCardUi> = listOf(
-        SavedCardUi(
-            "card_1",
-            "Garanti BBVA",
-            "**** **** **** 4567",
-            "Ahmet Karagünlü",
-            "12/28",
-            true
-        ),
-        SavedCardUi(
-            "card_2",
-            "Ziraat Bankası",
-            "**** **** **** 9821",
-            "Ahmet Karagünlü",
-            "07/27",
-            false
-        ),
-        SavedCardUi(
-            "card_3",
-            "İş Bankası",
-            "**** **** **** 1122",
-            "Ahmet Karagünlü",
-            "05/29",
-            false
-        ),
-    )
+        val savedCards: StateFlow<List<SavedCardUi>> = _savedCards.asStateFlow()
+
+        fun getSavedCards(): List<SavedCardUi> = _savedCards.value
+
+        fun deleteCard(cardId: String): List<SavedCardUi> {
+            val filteredCards = _savedCards.value.filterNot { it.cardId == cardId }
+            _savedCards.value =
+                if (filteredCards.isNotEmpty() && filteredCards.none { it.isDefault }) {
+                    filteredCards.mapIndexed { index, card -> card.copy(isDefault = index == 0) }
+                } else {
+                    filteredCards
+                }
+            return _savedCards.value
+        }
+
+        fun makeDefault(cardId: String): List<SavedCardUi> {
+            _savedCards.value =
+                _savedCards.value
+                    .map { card -> card.copy(isDefault = card.cardId == cardId) }
+                    .sortedByDescending { it.isDefault }
+            return _savedCards.value
+        }
+    }
 }

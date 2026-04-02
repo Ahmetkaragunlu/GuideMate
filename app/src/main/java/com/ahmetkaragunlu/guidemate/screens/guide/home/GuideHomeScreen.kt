@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideStatistic
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.RecentActivity
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.dashboardStats
@@ -49,7 +50,7 @@ import compose.icons.tablericons.ArrowRight
 @Composable
 fun GuideHomeScreen(modifier: Modifier = Modifier) {
     // Mock Data
-    val monthlyEarnings = "12.500$"
+    val monthlyEarnings = 12500.0
     val pendingCount = "1"
 
     val activeCount = "3"
@@ -148,7 +149,7 @@ private fun GuideStatCard(
 
 @Composable
 private fun MonthlyEarningsCard(
-    earnings: String,
+    earnings: Double,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -171,7 +172,7 @@ private fun MonthlyEarningsCard(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = earnings,
+                text = earnings.toLocalCurrency(),
                 color = Color(0xFF888ded),
                 fontWeight = FontWeight.Bold,
             )

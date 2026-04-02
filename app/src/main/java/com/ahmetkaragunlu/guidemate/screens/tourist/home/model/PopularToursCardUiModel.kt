@@ -8,7 +8,7 @@ data class PopularToursCardUiModel(
     val imageUrl: Int,
     val rating: String,
     val reviewCount: String,
-    val price: String,
+    val price: Double,
     val languagesFlag: String,
     val languagesText: String,
     val guideName: String,

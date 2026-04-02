@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
 
 @Composable
@@ -96,7 +97,7 @@ fun PopularTourCard(tour: PopularToursCardUiModel) {
                     )
                 }
                 Text(
-                    text = tour.price,
+                    text = tour.price.toLocalCurrency(),
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),
                 )
