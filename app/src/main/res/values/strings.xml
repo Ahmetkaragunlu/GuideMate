@@ -231,6 +231,24 @@
     <string name="security_alerts_desc">Şifre değişimi, yeni giriş bildirimleri</string>
 
 
+    <string name="legal_title">Kullanıcı Sözleşmesi ve Şartlar</string>
+    <string name="legal_intro">GuideMate platformunu kullanarak aşağıdaki temel şartları ve yasal yükümlülükleri kabul etmiş sayılırsınız. Lütfen dikkatlice okuyunuz.</string>
+
+    <string name="legal_clause_1_title">1. Hizmet Kullanımı ve Sorumluluklar</string>
+    <string name="legal_clause_1_desc">Kullanıcılar, platform üzerinden sundukları veya aldıkları tur hizmetlerinde doğru bilgi vermekle yükümlüdür. GuideMate, rehber ve turist arasındaki doğrudan iletişimde yalnızca bir aracı platformdur.</string>
+
+    <string name="legal_clause_2_title">2. Gizlilik ve Veri Güvenliği</string>
+    <string name="legal_clause_2_desc">Kişisel verileriniz ve ödeme bilgileriniz uluslararası güvenlik standartlarında ve KVKK kapsamında korunmaktadır. Verileriniz, yalnızca rezervasyon süreçlerinin yürütülmesi amacıyla işlenir.</string>
+
+    <string name="legal_clause_3_title">3. İptal ve İade Koşulları</string>
+    <string name="legal_clause_3_desc">Tura 48 saat kalana kadar yapılan iptallerde platform üzerinden tam iade sağlanır. Daha geç yapılan iptallerde sistemin standart kesinti politikaları devreye girer.</string>
+
+    <string name="legal_clause_4_title">4. Fikri Mülkiyet Hakları</string>
+    <string name="legal_clause_4_desc">Uygulama içerisindeki tüm tasarımlar, metinler, logolar ve sistemin işleyiş algoritmaları GuideMate\'in yasal mülkiyetindedir. İzinsiz kopyalanamaz ve dağıtılamaz.</string>
+
+    <string name="app_version">GuideMate v1.0.0</string>
+
+
 
 
     <string name="terms_and_conditions_full_text">
