@@ -6,7 +6,7 @@ sealed interface DataResult<out T> {
     ) : DataResult<T>
 
     data class Error(
-        val message: String,
+        val error: AppError,
         val exception: Throwable? = null,
     ) : DataResult<Nothing>
 }

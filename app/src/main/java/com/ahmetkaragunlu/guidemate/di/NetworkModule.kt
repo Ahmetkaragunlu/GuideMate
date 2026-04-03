@@ -1,9 +1,9 @@
 package com.ahmetkaragunlu.guidemate.di
 
 import com.ahmetkaragunlu.guidemate.BuildConfig
-import com.ahmetkaragunlu.guidemate.data.local.TokenAuthenticator
 import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
 import com.ahmetkaragunlu.guidemate.data.remote.interceptor.AuthInterceptor
+import com.ahmetkaragunlu.guidemate.data.remote.interceptor.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

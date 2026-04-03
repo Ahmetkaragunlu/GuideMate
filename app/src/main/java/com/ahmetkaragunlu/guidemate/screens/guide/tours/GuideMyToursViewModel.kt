@@ -10,8 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,7 +20,8 @@ class GuideMyToursViewModel
     @Inject
     constructor() : ViewModel() {
         // Mock Data
-        private val allTours =
+        private val _allTours =
+            MutableStateFlow(
             listOf(
                 GuideTourUiModel(
                     id = "1",
@@ -85,14 +87,14 @@ class GuideMyToursViewModel
                     isActive = false,
                     earnings = 10800.0,
                 ),
-            )
+            ),
+        )
 
         private val _selectedTab = MutableStateFlow(GuideTourTab.ACTIVE)
         val selectedTab = _selectedTab.asStateFlow()
 
         val tours: StateFlow<List<GuideTourUiModel>> =
-            _selectedTab
-                .map { tab ->
+            combine(_allTours, _selectedTab) { allTours, tab ->
                     when (tab) {
                         GuideTourTab.ACTIVE -> allTours.filter { it.isActive }
                         GuideTourTab.PAST -> allTours.filter { !it.isActive }
@@ -100,10 +102,25 @@ class GuideMyToursViewModel
                 }.stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = allTours.filter { it.isActive },
+                    initialValue = _allTours.value.filter { it.isActive },
                 )
 
         fun changeTab(tab: GuideTourTab) {
             _selectedTab.value = tab
+        }
+
+        fun toggleLive(
+            tourId: String,
+            isLive: Boolean,
+        ) {
+            _allTours.update { tours ->
+                tours.map { tour ->
+                    if (tour.id == tourId) {
+                        tour.copy(isLive = isLive)
+                    } else {
+                        tour
+                    }
+                }
+            }
         }
     }

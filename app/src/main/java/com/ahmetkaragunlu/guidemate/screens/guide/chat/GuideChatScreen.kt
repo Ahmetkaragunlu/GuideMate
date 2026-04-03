@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ahmetkaragunlu.guidemate.screens.common.chat.screens.SharedChatListContent
+import com.ahmetkaragunlu.guidemate.screens.common.chat.content.SharedChatListContent
 
 @Composable
 fun GuideChatScreen(

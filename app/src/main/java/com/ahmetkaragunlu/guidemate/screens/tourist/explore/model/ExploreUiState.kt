@@ -7,4 +7,6 @@ data class ExploreUiState(
     val selectedCategory: TourCategory = TourCategory.ALL,
     val selectedRating: Int = 0,
     val priceRange: ClosedFloatingPointRange<Float> = 0f..500f,
+    val toursSearchQuery: String = "",
+    val guidesSearchQuery: String = "",
 )

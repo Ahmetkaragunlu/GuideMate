@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.ActiveTourCard
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.PastTourCard
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.GuideMateTabRow
+import com.ahmetkaragunlu.guidemate.screens.common.tab.GuideMateTabRow
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Plus
 
@@ -48,7 +48,9 @@ fun GuideMyToursScreen(
                         GuideTourTab.ACTIVE ->
                             ActiveTourCard(
                                 tour = tour,
-                                onToggleLive = { /* ViewModel action */ },
+                                onToggleLive = { isLive ->
+                                    viewModel.toggleLive(tour.id, isLive)
+                                },
                                 onEdit = { /* Navigate to edit */ },
                             )
                         GuideTourTab.PAST ->

@@ -3,7 +3,7 @@ package com.ahmetkaragunlu.guidemate.screens.tourist.profile.model
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.features.tourist_graph.AccountRoute
+import com.ahmetkaragunlu.guidemate.navigation.tourist.AccountRoute
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Bell
 import compose.icons.tablericons.CreditCard

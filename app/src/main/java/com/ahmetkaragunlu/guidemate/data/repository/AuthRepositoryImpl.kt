@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.data.repository
 
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.AppError
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.common.ResourceProvider
 import com.ahmetkaragunlu.guidemate.data.local.TokenManager
@@ -38,9 +39,9 @@ class AuthRepositoryImpl @Inject constructor(
         accessToken = accessToken,
         refreshToken = refreshToken,
         isRoleSelected = isRoleSelected,
-        role = role,
+        role = role?.toUserRole(),
         firstName = firstName,
-        lastName = lastName
+        lastName = lastName,
     )
 
     private fun UserRole.toRoleType() = when (this) {
@@ -49,14 +50,20 @@ class AuthRepositoryImpl @Inject constructor(
         UserRole.ADMIN -> RoleType.ROLE_ADMIN
     }
 
+    private fun RoleType.toUserRole() = when (this) {
+        RoleType.ROLE_TOURIST -> UserRole.TOURIST
+        RoleType.ROLE_GUIDE -> UserRole.GUIDE
+        RoleType.ROLE_ADMIN -> UserRole.ADMIN
+    }
+
     private fun Response<ResponseBody>.toDataResult(): DataResult<String> {
         return if (isSuccessful) {
             val bodyString = body()?.string()
             if (!bodyString.isNullOrBlank()) DataResult.Success(bodyString)
-            else DataResult.Error(resourceProvider.getString(R.string.error_no_response_from_server))
+            else DataResult.Error(AppError.NoResponseFromServer)
         } else {
             val errorMsg = parseError(errorBody()?.string())
-            DataResult.Error(errorMsg ?: resourceProvider.getString(R.string.error_generic_failure))
+            DataResult.Error(errorMsg?.let(AppError::Backend) ?: AppError.GenericFailure)
         }
     }
 
@@ -102,7 +109,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun refreshToken(): DataResult<AuthResult> = try {
         val token = tokenManager.getRefreshToken()
-            ?: return DataResult.Error(resourceProvider.getString(R.string.error_session_expired))
+            ?: return DataResult.Error(AppError.SessionExpired)
         handleAuthResponse(api.refreshToken(RefreshTokenRequest(token)))
     } catch (e: Exception) {
         handleException(e)
@@ -112,11 +119,11 @@ class AuthRepositoryImpl @Inject constructor(
         val response = api.selectRole(RoleSelectionRequest(role.toRoleType()))
         if (response.isSuccessful && response.body() != null) {
             val body = response.body()!!
-            body.role?.let { userRepository.saveUserRole(it) }
+            body.role?.toUserRole()?.let(userRepository::saveUserRole)
             DataResult.Success(body.toDomain())
         } else {
             val errorMsg = parseError(response.errorBody()?.string())
-            DataResult.Error(errorMsg ?: resourceProvider.getString(R.string.error_generic_failure))
+            DataResult.Error(errorMsg?.let(AppError::Backend) ?: AppError.GenericFailure)
         }
     } catch (e: Exception) {
         handleException(e)
@@ -158,29 +165,21 @@ class AuthRepositoryImpl @Inject constructor(
             userRepository.saveUser(
                 firstName = firstName.ifEmpty { null },
                 lastName = lastName.ifEmpty { null },
-                role = body.role
+                role = body.role?.toUserRole(),
             )
             DataResult.Success(body.toDomain())
         } else {
             val errorMsg = parseError(response.errorBody()?.string())
-            DataResult.Error(errorMsg ?: resourceProvider.getString(R.string.error_generic_failure))
+            DataResult.Error(errorMsg?.let(AppError::Backend) ?: AppError.GenericFailure)
         }
     }
 
     private fun <T> handleException(e: Exception): DataResult<T> = when (e) {
-        is IOException -> DataResult.Error(
-            resourceProvider.getString(R.string.error_no_internet),
-            e
-        )
+        is IOException -> DataResult.Error(AppError.NoInternet, e)
 
-        is HttpException -> DataResult.Error(
-            resourceProvider.getString(
-                R.string.error_server,
-                e.code()
-            ), e
-        )
+        is HttpException -> DataResult.Error(AppError.Server(e.code()), e)
 
-        else -> DataResult.Error(resourceProvider.getString(R.string.error_unknown), e)
+        else -> DataResult.Error(AppError.Unknown, e)
     }
 
     private fun parseError(json: String?): String? {

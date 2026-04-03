@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.model
 
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.BankAccount
+import com.ahmetkaragunlu.guidemate.screens.common.model.BankAccount
 
 data class SavedCardUi(
     val cardId: String,

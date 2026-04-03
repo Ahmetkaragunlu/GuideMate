@@ -2,7 +2,6 @@ package com.ahmetkaragunlu.guidemate.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-// 3. ENUM
 enum class RoleType {
     @SerializedName("ROLE_TOURIST")
     ROLE_TOURIST,

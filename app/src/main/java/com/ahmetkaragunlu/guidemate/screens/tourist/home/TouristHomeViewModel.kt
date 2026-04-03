@@ -6,16 +6,13 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.TouristHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategoriesData
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -37,29 +34,28 @@ class TouristHomeViewModel @Inject constructor(
     val categories = TourCategoriesData.categories
 
     private val _selectedCategory = MutableStateFlow(TourCategory.ALL)
-    val selectedCategory = _selectedCategory.asStateFlow()
 
     fun updateSelectedCategory(category: TourCategory) {
         _selectedCategory.value = category
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val popularTours: StateFlow<List<PopularToursCardUiModel>> =
-        selectedCategory
-            .flatMapLatest { currentCategory ->
-                flow { emit(getDummyTours(currentCategory)) }
+    val uiState: StateFlow<TouristHomeUiState> =
+        _selectedCategory
+            .map { selectedCategory ->
+                TouristHomeUiState(
+                    selectedCategory = selectedCategory,
+                    popularTours = getDummyTours(selectedCategory),
+                    bestGuides = getDummyGuides(),
+                )
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList(),
-            )
-
-    val bestGuides: StateFlow<List<BestGuideUiModel>> =
-        flow { emit(getDummyGuides()) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList(),
+                initialValue =
+                    TouristHomeUiState(
+                        selectedCategory = TourCategory.ALL,
+                        popularTours = getDummyTours(TourCategory.ALL),
+                        bestGuides = getDummyGuides(),
+                    ),
             )
 
     private fun getDummyTours(category: TourCategory): List<PopularToursCardUiModel> {

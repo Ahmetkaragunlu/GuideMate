@@ -1,0 +1,103 @@
+package com.ahmetkaragunlu.guidemate.navigation.guide
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.ahmetkaragunlu.guidemate.components.AppBottomBar
+import com.ahmetkaragunlu.guidemate.components.GuideTopBar
+import com.ahmetkaragunlu.guidemate.navigation.graph.Graph
+import com.ahmetkaragunlu.guidemate.navigation.guideNavItems
+import com.ahmetkaragunlu.guidemate.navigation.navigateTo
+import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatDetailScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
+import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.GuideProfileScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.GuideMyToursScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.GuideMyWalletScreen
+
+fun NavGraphBuilder.guideNavGraph(
+    guideNavController: NavController,
+    routeNavController: NavController,
+    guideHomeUiState: GuideHomeUiState,
+) {
+    composable(route = GuideRoute.GuideHomeScreen.route) {
+        GuideHomeScreen(uiState = guideHomeUiState)
+    }
+    composable(route = GuideRoute.GuideMyToursScreen.route) {
+        GuideMyToursScreen()
+    }
+    composable(route = GuideRoute.GuideMyWalletScreen.route) {
+        GuideMyWalletScreen()
+    }
+    composable(route = GuideRoute.GuideChatScreen.route) {
+        GuideChatScreen(
+            onNavigateToDetail = { chatId ->
+                guideNavController.navigateTo(GuideRoute.GuideChatDetailScreen.route)
+            },
+        )
+    }
+
+    composable(route = GuideRoute.GuideChatDetailScreen.route) {
+        GuideChatDetailScreen()
+    }
+    composable(route = GuideRoute.GuideProfileScreen.route) {
+        GuideProfileScreen(
+            onNavigateToAccount = { targetRoute ->
+                routeNavController.navigateTo("${Graph.GuideAccountGraph.route}/${targetRoute.route}")
+            },
+        )
+    }
+}
+
+@Composable
+fun GuideNavGraphScaffold(
+    routeNavController: NavController,
+    viewModel: GuideHomeViewModel = hiltViewModel(),
+) {
+    val guideNavController = rememberNavController()
+    val navBackStackEntry by guideNavController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route ?: GuideRoute.GuideHomeScreen.route
+    val getUserName by viewModel.userName.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Scaffold(
+        topBar = {
+            GuideTopBar(
+                currentRoute = currentRoute,
+                navController = guideNavController,
+                userName = getUserName,
+            )
+        },
+        bottomBar = {
+            AppBottomBar(
+                navController = guideNavController,
+                currentRoute = currentRoute,
+                items = guideNavItems,
+            )
+        },
+    ) { innerPadding ->
+        NavHost(
+            navController = guideNavController,
+            startDestination = GuideRoute.GuideHomeScreen.route,
+            modifier = Modifier.padding(innerPadding),
+        ) {
+            guideNavGraph(
+                guideNavController = guideNavController,
+                routeNavController = routeNavController,
+                guideHomeUiState = uiState,
+            )
+        }
+    }
+}

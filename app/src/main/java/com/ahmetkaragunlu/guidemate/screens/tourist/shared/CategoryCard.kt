@@ -32,7 +32,9 @@ fun CategoryCard(
         colors =
             CardDefaults.cardColors(
                 containerColor = if (isSelected) Color(0xFF4FC3F7) else MaterialTheme.colorScheme.onPrimary,
-                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else colorResource(R.color.text_color),
+                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else colorResource(
+                    R.color.text_color
+                ),
             ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 1.dp),

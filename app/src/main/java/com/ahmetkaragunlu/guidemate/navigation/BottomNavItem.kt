@@ -3,8 +3,8 @@ package com.ahmetkaragunlu.guidemate.navigation
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.features.guide_graph.GuideRoute
-import com.ahmetkaragunlu.guidemate.features.tourist_graph.TouristRoute
+import com.ahmetkaragunlu.guidemate.navigation.guide.GuideRoute
+import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristRoute
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Compass
 import compose.icons.tablericons.CreditCard

@@ -3,9 +3,9 @@ package com.ahmetkaragunlu.guidemate.screens.guide.chat
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ahmetkaragunlu.guidemate.screens.common.chat.screens.SharedChatDetailContent
+import com.ahmetkaragunlu.guidemate.screens.common.chat.content.SharedChatDetailContent
 
 @Composable
 fun GuideChatDetailScreen(

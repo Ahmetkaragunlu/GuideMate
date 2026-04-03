@@ -2,7 +2,7 @@ package com.ahmetkaragunlu.guidemate.screens.guide.wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.BankAccount
+import com.ahmetkaragunlu.guidemate.screens.common.model.BankAccount
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction

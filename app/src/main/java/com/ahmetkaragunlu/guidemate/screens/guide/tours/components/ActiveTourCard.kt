@@ -6,7 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -27,11 +27,9 @@ import compose.icons.tablericons.Users
 @Composable
 fun ActiveTourCard(
     tour: GuideTourUiModel,
-    onToggleLive: () -> Unit,
+    onToggleLive: (Boolean) -> Unit,
     onEdit: () -> Unit,
 ) {
-    var switchState by remember { mutableStateOf(tour.isLive) }
-
     TourBaseCard(imageUrl = tour.imageUrl) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
@@ -84,11 +82,8 @@ fun ActiveTourCard(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Switch(
-                            checked = switchState,
-                            onCheckedChange = {
-                                switchState = it
-                                onToggleLive()
-                            },
+                            checked = tour.isLive,
+                            onCheckedChange = onToggleLive,
                             colors =
                                 SwitchDefaults.colors(
                                     checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
@@ -99,7 +94,7 @@ fun ActiveTourCard(
                         )
                         Text(
                             text =
-                                if (switchState) {
+                                if (tour.isLive) {
                                     stringResource(R.string.live)
                                 } else {
                                     stringResource(
@@ -107,7 +102,7 @@ fun ActiveTourCard(
                                     )
                                 },
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (switchState) Color.Green else Color.LightGray,
+                            color = if (tour.isLive) Color.Green else Color.LightGray,
                         )
                     }
 

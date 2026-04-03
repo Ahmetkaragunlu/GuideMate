@@ -13,6 +13,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,131 +26,186 @@ import com.ahmetkaragunlu.guidemate.screens.guide.wallet.components.*
 @Composable
 fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val earningsScrollState = rememberScrollState()
-    val transactionsScrollState = rememberScrollState()
-
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     var withdrawAmount by rememberSaveable { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
-                    .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-        ) {
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-
-            WalletCard(
-                formattedBalance = uiState.totalBalance.toLocalCurrency(),
-                maskedIban = uiState.selectedBankAccount?.maskedIban ?: "TR** **** ****",
-            )
-
-            Button(
-                onClick = { showBottomSheet = true },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.spacing_tiny)),
-                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
-            ) {
-                Text(
-                    text = stringResource(R.string.withdraw_money),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-
-            Column {
-                Text(
-                    text = stringResource(R.string.earnings_by_month),
-                    color = colorResource(R.color.brand_color),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp),
-                )
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(160.dp)
-                            .simpleVerticalScrollbar(earningsScrollState),
-                ) {
-                    Column(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .verticalScroll(earningsScrollState)
-                                .padding(end = 12.dp),
-                    ) {
-                        uiState.earningSummaries.forEach { earning ->
-                            EarningSummaryItem(earning = earning)
-                        }
-                    }
-                }
-            }
-
-            Column {
-                Text(
-                    text = stringResource(R.string.recent_transactions),
-                    color = colorResource(R.color.brand_color),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp),
-                )
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .simpleVerticalScrollbar(transactionsScrollState),
-                ) {
-                    Column(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .verticalScroll(transactionsScrollState)
-                                .padding(end = 12.dp),
-                    ) {
-                        uiState.recentTransactions.forEach { transaction ->
-                            TransactionItem(transaction = transaction)
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-        }
+        GuideMyWalletContent(
+            uiState = uiState,
+            onWithdrawClick = { showBottomSheet = true },
+        )
 
         if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
+            WithdrawBottomSheet(
                 sheetState = sheetState,
-                containerColor = Color.White,
-                dragHandle = { BottomSheetDefaults.DragHandle() },
-            ) {
-                MoneyActionBottomSheetContent(
-                    title = stringResource(R.string.withdraw_title),
-                    amountText = withdrawAmount,
-                    onAmountChange = { withdrawAmount = it },
-                    actionButtonText = stringResource(R.string.confirm),
-                    helperText = stringResource(R.string.withdraw_info_text),
-                    selectedBank = uiState.selectedBankAccount,
-                    presetAmounts = emptyList(),
-                    onPresetAmountClick = { },
-                    onChangeBankClick = { },
-                    onConfirm = { amount ->
-                        viewModel.withdrawMoney(amount)
-                        withdrawAmount = ""
-                        showBottomSheet = false
-                    },
-                )
-            }
+                amount = withdrawAmount,
+                selectedBank = uiState.selectedBankAccount,
+                onAmountChange = { withdrawAmount = it },
+                onDismiss = { showBottomSheet = false },
+                onConfirm = { amount ->
+                    viewModel.withdrawMoney(amount)
+                    withdrawAmount = ""
+                    showBottomSheet = false
+                },
+            )
         }
+    }
+}
+
+@Composable
+private fun GuideMyWalletContent(
+    uiState: com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState,
+    onWithdrawClick: () -> Unit,
+) {
+    val screenScrollState = rememberScrollState()
+    val earningsScrollState = rememberScrollState()
+    val transactionsScrollState = rememberScrollState()
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+                .verticalScroll(screenScrollState),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
+    ) {
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+
+        WalletCard(
+            formattedBalance = uiState.totalBalance.toLocalCurrency(),
+            maskedIban = uiState.selectedBankAccount?.maskedIban ?: "TR** **** ****",
+        )
+
+        WithdrawButton(onClick = onWithdrawClick)
+
+        EarningsSection(
+            items = uiState.earningSummaries,
+            scrollState = earningsScrollState,
+        )
+
+        RecentTransactionsSection(
+            items = uiState.recentTransactions,
+            scrollState = transactionsScrollState,
+        )
+
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+    }
+}
+
+@Composable
+private fun WithdrawButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.spacing_tiny)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
+    ) {
+        Text(
+            text = stringResource(R.string.withdraw_money),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+private fun EarningsSection(
+    items: List<com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary>,
+    scrollState: androidx.compose.foundation.ScrollState,
+) {
+    WalletSection(
+        titleResId = R.string.earnings_by_month,
+        height = 160.dp,
+        scrollState = scrollState,
+    ) {
+        items.forEach { earning ->
+            EarningSummaryItem(earning = earning)
+        }
+    }
+}
+
+@Composable
+private fun RecentTransactionsSection(
+    items: List<com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction>,
+    scrollState: androidx.compose.foundation.ScrollState,
+) {
+    WalletSection(
+        titleResId = R.string.recent_transactions,
+        height = 200.dp,
+        scrollState = scrollState,
+    ) {
+        items.forEach { transaction ->
+            TransactionItem(transaction = transaction)
+        }
+    }
+}
+
+@Composable
+private fun WalletSection(
+    titleResId: Int,
+    height: Dp,
+    scrollState: androidx.compose.foundation.ScrollState,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column {
+        Text(
+            text = stringResource(titleResId),
+            color = colorResource(R.color.brand_color),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 12.dp),
+        )
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(height)
+                    .simpleVerticalScrollbar(scrollState),
+        ) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(end = 12.dp),
+                content = content,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun WithdrawBottomSheet(
+    sheetState: SheetState,
+    amount: String,
+    selectedBank: com.ahmetkaragunlu.guidemate.screens.common.model.BankAccount?,
+    onAmountChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: (Double) -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = Color.White,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+    ) {
+        MoneyActionBottomSheetContent(
+            title = stringResource(R.string.withdraw_title),
+            amountText = amount,
+            onAmountChange = onAmountChange,
+            actionButtonText = stringResource(R.string.confirm),
+            helperText = stringResource(R.string.withdraw_info_text),
+            selectedBank = selectedBank,
+            presetAmounts = emptyList(),
+            onPresetAmountClick = { },
+            onChangeBankClick = { },
+            onConfirm = onConfirm,
+        )
     }
 }

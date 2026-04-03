@@ -3,9 +3,14 @@ package com.ahmetkaragunlu.guidemate.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 
-fun NavController.switchRoot(route: String) {
-    this.navigate(route) {
-        popUpTo(0) { inclusive = true }
+fun NavController.switchRoot(
+    targetRoute: String,
+    clearBackStackFrom: String,
+) {
+    this.navigate(targetRoute) {
+        popUpTo(clearBackStackFrom) { inclusive = true }
+        launchSingleTop = true
+        restoreState = false
     }
 }
 

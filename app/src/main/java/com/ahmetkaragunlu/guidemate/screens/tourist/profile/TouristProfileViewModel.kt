@@ -41,7 +41,6 @@ class TouristProfileViewModel @Inject constructor(
                     it.copy(
                         fullName = listOfNotNull(user.firstName, user.lastName).joinToString(" "),
                         email = "ahmet@gmail.com",
-                        balanceAmount = 1500.0,
                         selectedCardId = defaultCard?.cardId,
                         selectedBankAccount = defaultCard?.toBankAccount(),
                     )

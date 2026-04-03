@@ -24,6 +24,14 @@ class TouristExploreViewModel
             _uiState.update { it.copy(selectedTab = tab) }
         }
 
+        fun updateToursSearchQuery(query: String) {
+            _uiState.update { it.copy(toursSearchQuery = query) }
+        }
+
+        fun updateGuidesSearchQuery(query: String) {
+            _uiState.update { it.copy(guidesSearchQuery = query) }
+        }
+
         fun updateSelectedCategory(category: TourCategory) {
             _uiState.update { it.copy(selectedCategory = category) }
         }

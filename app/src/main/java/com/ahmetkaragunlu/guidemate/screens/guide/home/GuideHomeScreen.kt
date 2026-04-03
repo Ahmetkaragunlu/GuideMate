@@ -40,21 +40,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideStatistic
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.RecentActivity
-import com.ahmetkaragunlu.guidemate.screens.guide.home.model.dashboardStats
-import com.ahmetkaragunlu.guidemate.screens.guide.home.model.recentActivities
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowRight
 
 @Composable
-fun GuideHomeScreen(modifier: Modifier = Modifier) {
-    // Mock Data
-    val monthlyEarnings = 12500.0
-    val pendingCount = "1"
-
-    val activeCount = "3"
-
+fun GuideHomeScreen(
+    uiState: GuideHomeUiState,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier =
             modifier
@@ -70,7 +66,7 @@ fun GuideHomeScreen(modifier: Modifier = Modifier) {
                     .padding(top = dimensionResource(R.dimen.spacing_medium)),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
         ) {
-            dashboardStats.forEach { stat ->
+            uiState.dashboardStats.forEach { stat ->
                 GuideStatCard(
                     stat = stat,
                     modifier =
@@ -80,7 +76,7 @@ fun GuideHomeScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-        MonthlyEarningsCard(earnings = monthlyEarnings)
+        MonthlyEarningsCard(earnings = uiState.monthlyEarnings)
         Text(
             text = stringResource(R.string.tour_status),
             style = MaterialTheme.typography.titleMedium,
@@ -89,8 +85,8 @@ fun GuideHomeScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
         TourStatusCard(
-            pendingCount = pendingCount,
-            activeCount = activeCount,
+            pendingCount = uiState.pendingCount,
+            activeCount = uiState.activeCount,
         )
         Text(
             text = stringResource(R.string.recent_activities),
@@ -99,7 +95,7 @@ fun GuideHomeScreen(modifier: Modifier = Modifier) {
             color = colorResource(R.color.text_color),
             modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
-        RecentActivities(activities = recentActivities, modifier = Modifier.heightIn(max = 200.dp))
+        RecentActivities(activities = uiState.recentActivities, modifier = Modifier.heightIn(max = 200.dp))
     }
 }
 
@@ -189,8 +185,8 @@ private fun MonthlyEarningsCard(
 @Composable
 private fun TourStatusCard(
     modifier: Modifier = Modifier,
-    pendingCount: String,
-    activeCount: String,
+    pendingCount: Int,
+    activeCount: Int,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().height(IntrinsicSize.Max),
@@ -215,7 +211,7 @@ private fun TourStatusCard(
 
 @Composable
 private fun StatusItemCard(
-    count: String,
+    count: Int,
     label: String,
     indicatorColor: Color,
     modifier: Modifier = Modifier,
@@ -246,7 +242,7 @@ private fun StatusItemCard(
                             .background(color = indicatorColor, shape = CircleShape),
                 )
                 Text(
-                    text = count,
+                    text = count.toString(),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }

@@ -13,20 +13,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditTextField
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.model.ExploreTab
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.GuideMateTabRow
+import com.ahmetkaragunlu.guidemate.screens.common.tab.GuideMateTabRow
 import compose.icons.TablerIcons
 import compose.icons.tablericons.AdjustmentsHorizontal
 
@@ -56,6 +53,8 @@ fun TouristExploreScreen(
                         Modifier
                             .fillMaxSize()
                             .padding(dimensionResource(R.dimen.spacing_medium)),
+                    searchQuery = uiState.toursSearchQuery,
+                    onSearchQueryChange = viewModel::updateToursSearchQuery,
                     onNavigateToFilter = onNavigateToFilter,
                 )
 
@@ -65,6 +64,8 @@ fun TouristExploreScreen(
                         Modifier
                             .fillMaxSize()
                             .padding(dimensionResource(R.dimen.spacing_medium)),
+                    searchQuery = uiState.guidesSearchQuery,
+                    onSearchQueryChange = viewModel::updateGuidesSearchQuery,
                 )
         }
     }
@@ -73,16 +74,16 @@ fun TouristExploreScreen(
 @Composable
 private fun ToursContent(
     modifier: Modifier = Modifier,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     onNavigateToFilter: () -> Unit,
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-
     Column(
         modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium)),
     ) {
         EditTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = onSearchQueryChange,
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colorResource(R.color.brand_color),
@@ -113,15 +114,17 @@ private fun ToursContent(
 }
 
 @Composable
-private fun GuidesContent(modifier: Modifier = Modifier) {
-    var searchQuery by remember { mutableStateOf("") }
-
+private fun GuidesContent(
+    modifier: Modifier = Modifier,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+) {
     Column(
         modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium)),
     ) {
         EditTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = onSearchQueryChange,
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colorResource(R.color.brand_color),

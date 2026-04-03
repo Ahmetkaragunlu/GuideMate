@@ -18,20 +18,20 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileMenuItem
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.guideProfileMenuItems
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.guideProfileMenuOptions
 
 @Composable
-fun GuideProfileScreen(viewModel: GuideProfileViewModel = hiltViewModel()) {
-    val firstName by viewModel.firstName.collectAsStateWithLifecycle()
-    val lastName by viewModel.lastName.collectAsStateWithLifecycle()
+fun GuideProfileScreen(
+    viewModel: GuideProfileViewModel = hiltViewModel(),
+    onNavigateToAccount: (GuideAccountRoute) -> Unit = {},
+) {
     val profileState by viewModel.profileState.collectAsStateWithLifecycle()
-
-    val displayName = "${firstName ?: "Ahmet"} ${lastName ?: "Karagünlü"}"
 
     Column(
         modifier =
@@ -84,7 +84,7 @@ fun GuideProfileScreen(viewModel: GuideProfileViewModel = hiltViewModel()) {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = displayName,
+                text = profileState.displayName,
                 color = colorResource(R.color.brand_color),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
@@ -133,14 +133,14 @@ fun GuideProfileScreen(viewModel: GuideProfileViewModel = hiltViewModel()) {
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
         Column(modifier = Modifier.fillMaxWidth()) {
-            guideProfileMenuItems.forEachIndexed { index, item ->
+            guideProfileMenuOptions.forEachIndexed { index, item ->
                 ProfileMenuItem(
                     icon = item.icon,
                     title = stringResource(id = item.titleResId),
-                    onClick = item.onClick,
+                    onClick = { onNavigateToAccount(item.targetRoute) },
                 )
 
-                if (index < guideProfileMenuItems.lastIndex) {
+                if (index < guideProfileMenuOptions.lastIndex) {
                     HorizontalDivider(color = Color(0xFFF0F0F0), thickness = 1.dp)
                 }
             }
