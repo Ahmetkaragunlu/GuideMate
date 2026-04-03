@@ -217,6 +217,22 @@
     <string name="default_web_client_id">677861073392-4ni851g7ggkhb8ngk9418u346t4so9rd.apps.googleusercontent.com</string>
 
 
+    <string name="notification_tours_and_reservations">Turlar ve Rezervasyonlar</string>
+    <string name="upcoming_tour_reminders">Yaklaşan Tur Hatırlatıcıları</string>
+    <string name="upcoming_tour_reminders_desc">Tur saati ve buluşma noktası</string>
+    <string name="guide_messages">Rehber Mesajları</string>
+    <string name="guide_messages_desc">Rehberden gelen anlık mesajlar</string>
+    <string name="reservation_updates">Rezervasyon Güncellemeleri</string>
+    <string name="reservation_updates_desc">Onay, iptal ve değişiklik detayları</string>
+    <string name="account_and_interaction">Hesap ve Etkileşim</string>
+    <string name="review_requests">Değerlendirme İstekleri</string>
+    <string name="review_requests_desc">Tur sonrası yorum hatırlatmaları</string>
+    <string name="security_alerts">Güvenlik Uyarıları</string>
+    <string name="security_alerts_desc">Şifre değişimi, yeni giriş bildirimleri</string>
+
+
+
+
     <string name="terms_and_conditions_full_text">
         GUIDEMATE KULLANICI SÖZLEŞMESİ, GİZLİLİK POLİTİKASI VE AÇIK RIZA METNİ\n\n
         1. TARAFLAR VE KONU\n

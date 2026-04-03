@@ -20,8 +20,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.HelpSupportScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.LegalAgreementsScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.NotificationSettingsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassword.ChangePasswordScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.notificationsettings.NotificationSettingsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.SavedCardsScreen
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
