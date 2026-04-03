@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.data.remote.api
 
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ChangePasswordRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
@@ -58,5 +59,10 @@ interface AuthApi {
     @POST("reset-password")
     suspend fun resetPassword(
         @Body request: ResetPasswordRequest,
+    ): Response<ResponseBody>
+
+    @POST("change-password")
+    suspend fun changePassword(
+        @Body request: ChangePasswordRequest,
     ): Response<ResponseBody>
 }

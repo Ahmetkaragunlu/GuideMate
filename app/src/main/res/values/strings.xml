@@ -162,6 +162,11 @@
 
     <string name="saved_cards">Kayıtlı Kartlarım</string>
     <string name="change_password">Şifre Değiştir</string>
+    <string name="current_password">Mevcut Şifre</string>
+    <string name="new_password">Yeni Şifre</string>
+    <string name="new_password_repeat">Yeni Şifre Tekrar</string>
+    <string name="change_password_helper_text">Şifreniz en az 6 karakter uzunluğunda olmalıdır.</string>
+    <string name="update_password_action">ŞİFREYİ GÜNCELLE</string>
     <string name="notification_settings">Bildirim Ayarları</string>
     <string name="legal_agreements">Yasal &amp; Sözleşmeler</string>
     <string name="help_support">Yardım &amp; Destek</string>

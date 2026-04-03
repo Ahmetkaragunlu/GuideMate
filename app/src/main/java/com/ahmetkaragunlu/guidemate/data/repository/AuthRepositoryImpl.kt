@@ -7,6 +7,7 @@ import com.ahmetkaragunlu.guidemate.common.ResourceProvider
 import com.ahmetkaragunlu.guidemate.data.local.TokenManager
 import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
 import com.ahmetkaragunlu.guidemate.data.remote.model.RoleType
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ChangePasswordRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
@@ -145,6 +146,22 @@ class AuthRepositoryImpl @Inject constructor(
         confirmPassword: String
     ): DataResult<String> = try {
         api.resetPassword(ResetPasswordRequest(token, newPassword, confirmPassword)).toDataResult()
+    } catch (e: Exception) {
+        handleException(e)
+    }
+
+    override suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        confirmPassword: String
+    ): DataResult<String> = try {
+        api.changePassword(
+            ChangePasswordRequest(
+                currentPassword = currentPassword,
+                newPassword = newPassword,
+                confirmPassword = confirmPassword,
+            ),
+        ).toDataResult()
     } catch (e: Exception) {
         handleException(e)
     }

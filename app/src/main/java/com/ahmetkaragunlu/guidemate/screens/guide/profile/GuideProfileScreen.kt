@@ -128,7 +128,7 @@ fun GuideProfileScreen(
             guideLevel = profileState.guideLevel,
             rating = profileState.rating,
             tourCount = profileState.tourCount,
-            onGuideLevelInfoClick = { /* TODO: BottomSheet Göster */ },
+            onGuideLevelInfoClick = {  },
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 

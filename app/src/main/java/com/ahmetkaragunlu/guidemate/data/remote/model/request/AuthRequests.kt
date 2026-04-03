@@ -38,3 +38,9 @@ data class ResetPasswordRequest(
     @SerializedName("newPassword") val newPassword: String,
     @SerializedName("confirmPassword") val confirmPassword: String,
 )
+
+data class ChangePasswordRequest(
+    @SerializedName("currentPassword") val currentPassword: String,
+    @SerializedName("newPassword") val newPassword: String,
+    @SerializedName("confirmPassword") val confirmPassword: String,
+)

@@ -13,4 +13,5 @@ interface AuthRepository {
     suspend fun selectRole(role: UserRole): DataResult<AuthResult>
     suspend fun forgotPassword(email: String, firstName: String, lastName: String): DataResult<String>
     suspend fun resetPassword(token: String, newPassword: String, confirmPassword: String): DataResult<String>
+    suspend fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String): DataResult<String>
 }
