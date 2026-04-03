@@ -251,6 +251,27 @@
 
 
 
+    <string name="support_title">Yardım ve Destek</string>
+    <string name="support_intro">GuideMate deneyiminizle ilgili en çok merak edilen soruların yanıtlarını aşağıda bulabilirsiniz.</string>
+
+    <string name="faq_1_title">Nasıl tur rezervasyonu yapabilirim?</string>
+    <string name="faq_1_desc">Arama ekranından gitmek istediğiniz şehri veya turistik mekanı seçin. Size uygun rehberi bulduktan sonra takvimden tarih ve saat seçerek ödeme adımına geçebilir ve rezervasyonunuzu anında tamamlayabilirsiniz.</string>
+
+    <string name="faq_2_title">Rezervasyonumu iptal edebilir miyim?</string>
+    <string name="faq_2_desc">Evet, tur başlangıç saatine 48 saat kalana kadar yaptığınız iptallerde tam iade alırsınız. Daha yakın saatlerdeki iptallerde sistemin standart kesinti politikaları devreye girer.</string>
+
+    <string name="faq_3_title">Rehberimle nasıl iletişime geçeceğim?</string>
+    <string name="faq_3_desc">Rezervasyonunuz onaylandıktan sonra, uygulama içindeki \"Mesajlar\" sekmesi üzerinden rehberinizle doğrudan mesajlaşabilirsiniz. Buluşma noktası ve diğer detayları buradan netleştirebilirsiniz.</string>
+
+    <string name="faq_4_title">Tur sırasında bir sorun yaşarsam ne yapmalıyım?</string>
+    <string name="faq_4_desc">Rehberin buluşma noktasına gelmemesi veya hizmetin taahhüt edildiği gibi olmaması durumunda anında destek ekibimize ulaşarak iade talebinde bulunabilirsiniz.</string>
+
+    <string name="contact_support_question">Sorunuzun yanıtını bulamadınız mı?</string>
+    <string name="contact_support_action">Canlı Desteğe Bağlan</string>
+
+
+
+
     <string name="terms_and_conditions_full_text">
         GUIDEMATE KULLANICI SÖZLEŞMESİ, GİZLİLİK POLİTİKASI VE AÇIK RIZA METNİ\n\n
         1. TARAFLAR VE KONU\n
