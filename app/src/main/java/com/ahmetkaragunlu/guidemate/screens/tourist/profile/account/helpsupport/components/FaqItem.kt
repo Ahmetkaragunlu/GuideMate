@@ -22,9 +22,7 @@ fun FaqItem(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(
-            dimensionResource(R.dimen.spacing_small)
-        ),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
     ) {
         Text(
             text = stringResource(titleResId),

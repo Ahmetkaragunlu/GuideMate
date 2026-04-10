@@ -110,7 +110,7 @@ private fun RowScope.StatCard(
                         tint = Color.LightGray,
                         modifier =
                             Modifier
-                                .size(20.dp)
+                                .size(24.dp)
                                 .offset(x = 6.dp, y = 4.dp)
                                 .background(Color.White, CircleShape)
                                 .clip(CircleShape)

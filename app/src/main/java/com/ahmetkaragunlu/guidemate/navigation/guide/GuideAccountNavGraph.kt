@@ -20,14 +20,14 @@ import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AboutLanguagesScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AccountSettingsScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.BankAccountsScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.SavedCardsScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.HelpFaqScreen
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 
 fun NavGraphBuilder.guideAccountNavGraph(accountNavController: NavController) {
     composable(route = GuideAccountRoute.BankAccounts.route) {
-        BankAccountsScreen()
+        SavedCardsScreen()
     }
     composable(route = GuideAccountRoute.AboutLanguages.route) {
         AboutLanguagesScreen()

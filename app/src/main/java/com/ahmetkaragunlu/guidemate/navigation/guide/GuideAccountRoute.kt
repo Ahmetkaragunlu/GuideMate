@@ -9,7 +9,7 @@ enum class GuideAccountRoute(
 ) {
     BankAccounts(
         route = "guide_account_bank_accounts",
-        titleResId = R.string.menu_bank_accounts,
+        titleResId = R.string.saved_cars,
     ),
     AboutLanguages(
         route = "guide_account_about_languages",
