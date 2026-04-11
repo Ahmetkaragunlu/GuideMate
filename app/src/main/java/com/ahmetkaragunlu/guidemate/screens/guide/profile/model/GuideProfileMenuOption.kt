@@ -21,7 +21,7 @@ val guideProfileMenuOptions =
     listOf(
         GuideProfileMenuOption(
             icon = TablerIcons.CreditCard,
-            titleResId = R.string.saved_cars,
+            titleResId = R.string.saved_cards,
             targetRoute = GuideAccountRoute.BankAccounts,
         ),
         GuideProfileMenuOption(

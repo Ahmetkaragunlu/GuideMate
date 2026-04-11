@@ -3,7 +3,9 @@ package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassw
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -85,6 +87,7 @@ private fun HandleChangePasswordMessages(
 
 @Composable
 private fun ChangePasswordContent(
+    modifier: Modifier = Modifier,
     formState: ChangePasswordFormState,
     onCurrentPasswordChange: (String) -> Unit,
     onNewPasswordChange: (String) -> Unit,
@@ -96,8 +99,8 @@ private fun ChangePasswordContent(
 ) {
     Column(
         modifier =
-            Modifier
-                .fillMaxSize()
+            modifier
+                .fillMaxSize().verticalScroll(rememberScrollState())
                 .padding(dimensionResource(R.dimen.spacing_medium)),
         horizontalAlignment = Alignment.Start,
     ) {
@@ -117,16 +120,16 @@ private fun ChangePasswordContent(
             text = stringResource(R.string.change_password_helper_text),
             color = Color.Gray,
             style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 4.dp),
-        )
+            modifier = Modifier.padding(horizontal = 4.dp).align(Alignment.CenterHorizontally)
+            )
 
         Spacer(modifier = Modifier.weight(1f))
 
         EditButton(
             text = R.string.update_password_action,
             onClick = onSubmit,
-            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_large)),
-        )
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
     }
 }
 

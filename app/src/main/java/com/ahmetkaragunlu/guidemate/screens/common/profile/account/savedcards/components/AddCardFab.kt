@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.components
+package com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.components
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -25,7 +25,7 @@ fun AddCardFab(
     ) {
         Icon(
             imageVector = Icons.Outlined.Add,
-            contentDescription = null
+            contentDescription = null,
         )
     }
 }

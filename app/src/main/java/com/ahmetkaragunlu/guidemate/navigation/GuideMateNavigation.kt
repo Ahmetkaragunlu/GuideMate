@@ -11,7 +11,7 @@ import com.ahmetkaragunlu.guidemate.navigation.graph.Graph
 import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountNavGraphScaffold
 import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
 import com.ahmetkaragunlu.guidemate.navigation.guide.GuideNavGraphScaffold
-import com.ahmetkaragunlu.guidemate.navigation.tourist.AccountRoute
+import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristAccountRoute
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristAccountNavGraphScaffold
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristNavGraphScaffold
 
@@ -21,7 +21,7 @@ fun GuideMateNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Graph.GuideGraph.route,
+        startDestination = Graph.TouristGraph.route,
     ) {
         authNavGraph(navController = navController)
 
@@ -52,7 +52,7 @@ fun GuideMateNavigation() {
         ) { backStackEntry ->
             val targetRoute =
                 backStackEntry.arguments?.getString("targetRoute")
-                    ?: AccountRoute.SavedCards.route
+                    ?: TouristAccountRoute.SavedCards.route
             TouristAccountNavGraphScaffold(
                 routeNavController = navController,
                 startDestination = targetRoute,

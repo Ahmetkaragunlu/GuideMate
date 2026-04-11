@@ -20,8 +20,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AboutLanguagesScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AccountSettingsScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.SavedCardsScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.HelpFaqScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.SavedCardsScreen
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 

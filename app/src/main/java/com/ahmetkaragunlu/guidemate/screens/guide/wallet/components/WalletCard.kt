@@ -70,7 +70,7 @@ fun WalletCard(
                     )
                 }
                 Text(
-                    "GuideMate",
+                    text = stringResource(R.string.profile_brand_name),
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyLarge,

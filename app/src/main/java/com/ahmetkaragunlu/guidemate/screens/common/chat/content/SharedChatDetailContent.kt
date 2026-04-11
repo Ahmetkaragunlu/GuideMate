@@ -44,14 +44,14 @@ fun SharedChatDetailContent(
                     .fillMaxWidth()
                     .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         ) {
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium))) }
 
             items(messages) { message ->
                 MessageBubble(message = message)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             }
 
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium))) }
         }
 
         ChatInputArea(

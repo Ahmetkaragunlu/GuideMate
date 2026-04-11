@@ -63,6 +63,7 @@ private fun LazyListScope.categoriesSection(
 ) {
     item {
         Column(
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
         ) {
             Text(
@@ -89,35 +90,30 @@ private fun LazyListScope.categoriesSection(
             }
         }
     }
-
-    item {
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-    }
 }
 
 private fun LazyListScope.popularToursSection(tours: List<PopularToursCardUiModel>) {
     item {
-        Text(
-            text = stringResource(id = R.string.popular_experiences),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
-        )
-    }
-
-    item {
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-            contentPadding = PaddingValues(horizontal = 4.dp),
+        Column(
+            modifier = Modifier.padding(bottom = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
         ) {
-            items(tours, key = { it.id }) { tour ->
-                PopularTourCard(tour = tour)
+            Text(
+                text = stringResource(id = R.string.popular_experiences),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
+            )
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
+                contentPadding = PaddingValues(horizontal = 4.dp),
+            ) {
+                items(tours, key = { it.id }) { tour ->
+                    PopularTourCard(tour = tour)
+                }
             }
         }
-    }
-
-    item {
-        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
@@ -127,12 +123,11 @@ private fun LazyListScope.bestGuidesSection(guides: List<BestGuideUiModel>) {
             text = stringResource(id = R.string.best_guides_in_region),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
+            modifier =
+                Modifier
+                    .padding(start = dimensionResource(R.dimen.spacing_small))
+                    .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
         )
-    }
-
-    item {
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
     }
 
     items(guides, key = { it.id }) { guide ->

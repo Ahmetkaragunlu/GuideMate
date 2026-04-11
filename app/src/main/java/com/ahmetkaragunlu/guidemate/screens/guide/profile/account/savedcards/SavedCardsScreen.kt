@@ -1,15 +1,15 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards
+package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.SavedCardsContent
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.viewmodel.TouristSavedCardsViewModel
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.viewmodel.GuideSavedCardsViewModel
 
 @Composable
 fun SavedCardsScreen(
-    viewModel: TouristSavedCardsViewModel = hiltViewModel(),
+    viewModel: GuideSavedCardsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

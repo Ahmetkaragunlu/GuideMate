@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.components
+package com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.model.SavedCardUi
+import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.SavedCardUi
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Trash
 
@@ -51,18 +51,15 @@ fun SavedCardItem(
     Card(
         modifier = cardModifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp,
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -92,7 +89,6 @@ fun SavedCardItem(
                 }
             }
 
-
             Text(
                 text = card.cardNumber,
                 style = MaterialTheme.typography.titleLarge,
@@ -117,7 +113,6 @@ fun SavedCardItem(
             }
 
             if (!card.isDefault) {
-
                 OutlinedButton(
                     onClick = onMakeDefaultClick,
                     modifier = Modifier.fillMaxWidth(),

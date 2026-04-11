@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.wallet
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -18,8 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.MoneyActionBottomSheetContent
 import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.content.MoneyActionBottomSheetContent
+import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.model.MoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,6 +32,16 @@ fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     var withdrawAmount by rememberSaveable { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    LaunchedEffect(Unit) {
+        viewModel.loadWalletData()
+    }
+
+    LaunchedEffect(showBottomSheet) {
+        if (showBottomSheet) {
+            viewModel.syncSelectedCardWithDefault()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         GuideMyWalletContent(
@@ -40,8 +53,13 @@ fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
             WithdrawBottomSheet(
                 sheetState = sheetState,
                 amount = withdrawAmount,
-                selectedBank = uiState.selectedBankAccount,
+                selectedMethod = uiState.selectedMethod,
+                availableBalance = uiState.totalBalance,
                 onAmountChange = { withdrawAmount = it },
+                onChangeMethodClick = viewModel::onChangeBankClick,
+                onWithdrawAllClick = {
+                    withdrawAmount = uiState.totalBalance.toInt().toString()
+                },
                 onDismiss = { showBottomSheet = false },
                 onConfirm = { amount ->
                     viewModel.withdrawMoney(amount)
@@ -74,7 +92,8 @@ private fun GuideMyWalletContent(
 
         WalletCard(
             formattedBalance = uiState.totalBalance.toLocalCurrency(),
-            maskedIban = uiState.selectedBankAccount?.maskedIban ?: "TR** **** ****",
+            maskedIban = uiState.selectedMethod?.subtitle
+                ?: stringResource(R.string.default_masked_iban),
         )
 
         WithdrawButton(onClick = onWithdrawClick)
@@ -184,8 +203,11 @@ private fun WalletSection(
 private fun WithdrawBottomSheet(
     sheetState: SheetState,
     amount: String,
-    selectedBank: com.ahmetkaragunlu.guidemate.screens.common.model.BankAccount?,
+    selectedMethod: MoneyActionMethodUi?,
+    availableBalance: Double,
     onAmountChange: (String) -> Unit,
+    onChangeMethodClick: () -> Unit,
+    onWithdrawAllClick: () -> Unit,
     onDismiss: () -> Unit,
     onConfirm: (Double) -> Unit,
 ) {
@@ -201,11 +223,40 @@ private fun WithdrawBottomSheet(
             onAmountChange = onAmountChange,
             actionButtonText = stringResource(R.string.confirm),
             helperText = stringResource(R.string.withdraw_info_text),
-            selectedBank = selectedBank,
-            presetAmounts = emptyList(),
-            onPresetAmountClick = { },
-            onChangeBankClick = { },
+            selectedMethod = selectedMethod,
+            presetAmounts = listOf(100, 250, 500, 1000),
+            onPresetAmountClick = { onAmountChange(it.toString()) },
+            onChangeMethodClick = onChangeMethodClick,
             onConfirm = onConfirm,
+            extraContent = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_tiny)),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text =
+                            stringResource(
+                                R.string.available_balance_format,
+                                availableBalance.toLocalCurrency(),
+                            ),
+                        color = colorResource(R.color.text_color),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = stringResource(R.string.withdraw_all),
+                        color = colorResource(R.color.brand_color),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier =
+                            Modifier
+                                .clickable(onClick = onWithdrawAllClick)
+                                .padding(start = dimensionResource(R.dimen.spacing_medium)),
+                    )
+                }
+            },
         )
     }
 }

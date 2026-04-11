@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.components
+package com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
@@ -19,13 +19,13 @@ import com.ahmetkaragunlu.guidemate.R
 fun DefaultBadge() {
     Text(
         text = stringResource(R.string.default_card),
-        modifier = Modifier
-            .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
-            .background(colorResource(id = R.color.brand_color).copy(alpha = 0.12f))
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
+                .background(colorResource(id = R.color.brand_color).copy(alpha = 0.12f))
+                .padding(horizontal = 10.dp, vertical = 6.dp),
         style = MaterialTheme.typography.labelMedium,
         fontWeight = FontWeight.SemiBold,
         color = colorResource(id = R.color.brand_color),
     )
 }
-

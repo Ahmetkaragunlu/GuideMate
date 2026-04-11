@@ -22,7 +22,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileMenuItem
+import com.ahmetkaragunlu.guidemate.screens.common.profile.components.CommonProfileMenuItem
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.guideProfileMenuOptions
 
@@ -134,7 +134,7 @@ fun GuideProfileScreen(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             guideProfileMenuOptions.forEachIndexed { index, item ->
-                ProfileMenuItem(
+                CommonProfileMenuItem(
                     icon = item.icon,
                     title = stringResource(id = item.titleResId),
                     onClick = { onNavigateToAccount(item.targetRoute) },

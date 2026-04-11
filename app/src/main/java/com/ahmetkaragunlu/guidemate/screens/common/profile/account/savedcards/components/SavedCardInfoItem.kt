@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.components
+package com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,16 +12,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import com.ahmetkaragunlu.guidemate.R
 
-
 @Composable
 fun SavedCardInfoItem(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier,
-    ) {
+    Column(modifier = modifier) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,

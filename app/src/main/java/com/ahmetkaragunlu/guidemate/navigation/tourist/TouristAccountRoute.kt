@@ -3,7 +3,7 @@ package com.ahmetkaragunlu.guidemate.navigation.tourist
 import androidx.annotation.StringRes
 import com.ahmetkaragunlu.guidemate.R
 
-enum class AccountRoute(
+enum class TouristAccountRoute(
     val route: String,
     @StringRes val titleResId: Int,
 ) {
@@ -30,6 +30,6 @@ enum class AccountRoute(
     ;
 
     companion object {
-        fun fromRoute(route: String?): AccountRoute? = entries.firstOrNull { it.route == route }
+        fun fromRoute(route: String?): TouristAccountRoute? = entries.firstOrNull { it.route == route }
     }
 }

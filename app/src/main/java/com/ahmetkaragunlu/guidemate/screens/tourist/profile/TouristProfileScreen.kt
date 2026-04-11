@@ -18,10 +18,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,24 +35,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.MoneyActionBottomSheetContent
-import com.ahmetkaragunlu.guidemate.navigation.graph.Graph
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.components.ProfileMenuItem
+import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristAccountRoute
+import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.content.MoneyActionBottomSheetContent
+import com.ahmetkaragunlu.guidemate.screens.common.profile.components.CommonProfileMenuItem
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.components.WalletCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.ProfileUiState
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.menuOptions
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.saveable.rememberSaveable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TouristProfileScreen(
     viewModel: TouristProfileViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
-    onNavigateToAccount: (String) -> Unit = {},
+    onNavigateToAccount: (TouristAccountRoute) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -94,7 +94,7 @@ private fun TouristProfileContent(
     modifier: Modifier = Modifier,
     uiState: ProfileUiState,
     onAddMoneyClick: () -> Unit,
-    onNavigateToAccount: (String) -> Unit,
+    onNavigateToAccount: (TouristAccountRoute) -> Unit,
 ) {
     Column(
         modifier =
@@ -153,15 +153,14 @@ private fun ProfileHeader(
 
 @Composable
 private fun ProfileMenuSection(
-    onNavigateToAccount: (String) -> Unit,
+    onNavigateToAccount: (TouristAccountRoute) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         menuOptions.forEachIndexed { index, option ->
-            ProfileMenuItem(
-                option = option,
-                onClick = {
-                    onNavigateToAccount("${Graph.AccountGraph.route}/${option.targetRoute}")
-                },
+            CommonProfileMenuItem(
+                icon = option.icon,
+                title = stringResource(id = option.titleResId),
+                onClick = { onNavigateToAccount(option.targetRoute) },
             )
             if (index < menuOptions.lastIndex) {
                 HorizontalDivider(
@@ -196,10 +195,10 @@ private fun AddMoneyBottomSheet(
             onAmountChange = onAmountChange,
             actionButtonText = stringResource(R.string.profile_add_money),
             helperText = stringResource(R.string.add_money_info_text),
-            selectedBank = uiState.selectedBankAccount,
-            presetAmounts = listOf(50, 100, 200, 1000),
+            selectedMethod = uiState.selectedMethod,
+            presetAmounts = listOf(100, 250, 500, 1000),
             onPresetAmountClick = onPresetAmountClick,
-            onChangeBankClick = onChangeBankClick,
+            onChangeMethodClick = onChangeBankClick,
             onConfirm = { onConfirm() },
         )
     }

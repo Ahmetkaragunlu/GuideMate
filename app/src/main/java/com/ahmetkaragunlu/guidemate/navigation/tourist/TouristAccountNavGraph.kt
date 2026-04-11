@@ -27,19 +27,19 @@ import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 
 fun NavGraphBuilder.touristAccountNavGraph(accountNavController: NavController) {
-    composable(route = AccountRoute.SavedCards.route) {
+    composable(route = TouristAccountRoute.SavedCards.route) {
         SavedCardsScreen()
     }
-    composable(route = AccountRoute.ChangePassword.route) {
+    composable(route = TouristAccountRoute.ChangePassword.route) {
         ChangePasswordScreen()
     }
-    composable(route = AccountRoute.NotificationSettings.route) {
+    composable(route = TouristAccountRoute.NotificationSettings.route) {
         NotificationSettingsScreen()
     }
-    composable(route = AccountRoute.LegalAgreements.route) {
+    composable(route = TouristAccountRoute.LegalAgreements.route) {
         LegalAgreementsScreen()
     }
-    composable(route = AccountRoute.HelpSupport.route) {
+    composable(route = TouristAccountRoute.HelpSupport.route) {
         HelpSupportScreen()
     }
 }
@@ -48,10 +48,10 @@ fun NavGraphBuilder.touristAccountNavGraph(accountNavController: NavController) 
 @Composable
 fun TouristAccountNavGraphScaffold(
     routeNavController: NavController,
-    startDestination: String = AccountRoute.SavedCards.route,
+    startDestination: String = TouristAccountRoute.SavedCards.route,
 ) {
     val accountNavController = rememberNavController()
-    val titleResId = AccountRoute.fromRoute(startDestination)?.titleResId ?: R.string.account_settings
+    val titleResId = TouristAccountRoute.fromRoute(startDestination)?.titleResId ?: R.string.account_settings
 
     Scaffold(
         topBar = {

@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.components.AppBottomBar
 import com.ahmetkaragunlu.guidemate.components.TouristAppBar
+import com.ahmetkaragunlu.guidemate.navigation.graph.Graph
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.touristNavItems
 import com.ahmetkaragunlu.guidemate.screens.tourist.chat.TouristChatDetailScreen
@@ -54,7 +55,7 @@ fun NavGraphBuilder.touristNavGraph(
     composable(route = TouristRoute.TouristProfileScreen.route) {
         TouristProfileScreen(
             onNavigateToAccount = { targetRoute ->
-                routeNavController.navigateTo(targetRoute)
+                routeNavController.navigateTo("${Graph.AccountGraph.route}/${targetRoute.route}")
             },
         )
     }
