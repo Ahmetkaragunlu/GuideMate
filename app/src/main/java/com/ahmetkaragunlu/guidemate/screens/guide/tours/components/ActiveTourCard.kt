@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.tours.components.InfoRow
+import com.ahmetkaragunlu.guidemate.screens.common.tours.components.TourBaseCard
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
@@ -78,7 +80,7 @@ fun ActiveTourCard(
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-                    modifier = Modifier.padding(start = 16.dp),
+                    modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_medium)),
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Switch(
@@ -110,7 +112,7 @@ fun ActiveTourCard(
                         modifier =
                             Modifier
                                 .clickable { onEdit() }
-                                .padding(end = 8.dp),
+                                .padding(end = dimensionResource(R.dimen.spacing_small)),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
@@ -159,7 +161,7 @@ fun ActiveTourCard(
                             )
                             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                             Text(
-                                text = "${tour.rating} (${tour.reviewCount})",
+                                text = stringResource(R.string.rating_review_format, tour.rating, tour.reviewCount),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colorResource(R.color.text_color),
                             )

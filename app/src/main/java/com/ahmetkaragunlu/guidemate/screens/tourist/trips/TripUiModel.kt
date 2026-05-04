@@ -6,5 +6,12 @@ data class TripUiModel(
     val date: String,
     val location: String,
     val imageUrl: Int,
+    val participantCount: Int,
+    val category: String,
+    val languagesFlag: String,
+    val languagesText: String,
+    val price: Double,
+    val rating: Double? = null,
+    val reviewCount: Int? = null,
     val isPast: Boolean = false,
 )

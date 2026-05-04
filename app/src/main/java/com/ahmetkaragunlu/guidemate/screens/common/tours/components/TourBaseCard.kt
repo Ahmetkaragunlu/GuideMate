@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.tours.components
+package com.ahmetkaragunlu.guidemate.screens.common.tours.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*

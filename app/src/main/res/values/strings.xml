@@ -193,6 +193,8 @@
     <string name="create_new_tour">Yeni Tur Oluştur</string>
     <string name="price_format">₺%.0f</string>
     <string name="earnings_format">Kazanç: ₺%.0f</string>
+    <string name="amount_format">Tutar: ₺%.0f</string>
+    <string name="rating_review_format">%1$.1f (%2$d)</string>
 
     <string name="category_label">Kategori: %1$s</string>
     <string name="participant_count">%1$d Katılımcı</string>
@@ -216,6 +218,7 @@
     <string name="ok">Tamam</string>
     <string name="zero">0</string>
     <string name="cancel">İptal</string>
+    <string name="cancel_action">İptal Et</string>
     <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>
     <string name="price_plus">%1$s +</string>
 
