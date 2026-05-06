@@ -1,8 +1,14 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassword
+package com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -33,9 +39,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
 import com.ahmetkaragunlu.guidemate.components.EditTextField
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassword.model.ChangePasswordFormState
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassword.model.ChangePasswordScreenState
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassword.viewmodel.ChangePasswordViewModel
+import com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword.model.ChangePasswordFormState
+import com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword.model.ChangePasswordScreenState
+import com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword.viewmodel.ChangePasswordViewModel
 
 @Composable
 fun ChangePasswordScreen(
@@ -87,7 +93,6 @@ private fun HandleChangePasswordMessages(
 
 @Composable
 private fun ChangePasswordContent(
-    modifier: Modifier = Modifier,
     formState: ChangePasswordFormState,
     onCurrentPasswordChange: (String) -> Unit,
     onNewPasswordChange: (String) -> Unit,
@@ -96,11 +101,13 @@ private fun ChangePasswordContent(
     onToggleNewPasswordVisibility: () -> Unit,
     onToggleConfirmNewPasswordVisibility: () -> Unit,
     onSubmit: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier =
             modifier
-                .fillMaxSize().verticalScroll(rememberScrollState())
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(dimensionResource(R.dimen.spacing_medium)),
         horizontalAlignment = Alignment.Start,
     ) {
@@ -120,8 +127,11 @@ private fun ChangePasswordContent(
             text = stringResource(R.string.change_password_helper_text),
             color = Color.Gray,
             style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 4.dp).align(Alignment.CenterHorizontally)
-            )
+            modifier =
+                Modifier
+                    .padding(horizontal = 4.dp)
+                    .align(Alignment.CenterHorizontally),
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -129,7 +139,7 @@ private fun ChangePasswordContent(
             text = R.string.update_password_action,
             onClick = onSubmit,
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            )
+        )
     }
 }
 
@@ -208,7 +218,6 @@ private fun PasswordInputField(
     isError: Boolean,
     supportingText: Int?,
 ) {
-
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -243,7 +252,7 @@ private fun PasswordInputField(
                         },
                     contentDescription = null,
                     tint = Color.Gray,
-                    modifier = Modifier.clickable { onTogglePasswordVisibility() },
+                    modifier = Modifier.clickable(onClick = onTogglePasswordVisibility),
                 )
             },
             isError = isError,

@@ -7,21 +7,29 @@ enum class GuideAccountRoute(
     val route: String,
     @StringRes val titleResId: Int,
 ) {
-    BankAccounts(
-        route = "guide_account_bank_accounts",
-        titleResId = R.string.saved_cards
+    SavedCards(
+        route = "guide_account_saved_cards",
+        titleResId = R.string.saved_cards,
     ),
-    AboutLanguages(
-        route = "guide_account_about_languages",
-        titleResId = R.string.menu_about_languages,
+    About(
+        route = "guide_account_about",
+        titleResId = R.string.about,
     ),
-    AccountSettings(
-        route = "guide_account_settings",
-        titleResId = R.string.menu_account_settings,
+    ChangePassword(
+        route = "guide_account_change_password",
+        titleResId = R.string.change_password,
     ),
-    HelpFaq(
-        route = "guide_account_help_faq",
-        titleResId = R.string.menu_help_faq,
+    NotificationSettings(
+        route = "guide_account_notification_settings",
+        titleResId = R.string.notification_settings,
+    ),
+    LegalAgreements(
+        route = "guide_account_legal_agreements",
+        titleResId = R.string.legal_agreements,
+    ),
+    HelpSupport(
+        route = "guide_account_help_support",
+        titleResId = R.string.help_support,
     ),
     ;
 

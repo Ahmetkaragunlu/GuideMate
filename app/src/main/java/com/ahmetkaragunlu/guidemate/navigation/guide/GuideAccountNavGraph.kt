@@ -18,25 +18,33 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AboutLanguagesScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AccountSettingsScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.HelpFaqScreen
+import com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword.ChangePasswordScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AboutScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.HelpSupportScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.LegalAgreementsScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.NotificationSettingsScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.SavedCardsScreen
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 
 fun NavGraphBuilder.guideAccountNavGraph(accountNavController: NavController) {
-    composable(route = GuideAccountRoute.BankAccounts.route) {
+    composable(route = GuideAccountRoute.SavedCards.route) {
         SavedCardsScreen()
     }
-    composable(route = GuideAccountRoute.AboutLanguages.route) {
-        AboutLanguagesScreen()
+    composable(route = GuideAccountRoute.About.route) {
+        AboutScreen()
     }
-    composable(route = GuideAccountRoute.AccountSettings.route) {
-        AccountSettingsScreen()
+    composable(route = GuideAccountRoute.ChangePassword.route) {
+        ChangePasswordScreen()
     }
-    composable(route = GuideAccountRoute.HelpFaq.route) {
-        HelpFaqScreen()
+    composable(route = GuideAccountRoute.NotificationSettings.route) {
+        NotificationSettingsScreen()
+    }
+    composable(route = GuideAccountRoute.LegalAgreements.route) {
+        LegalAgreementsScreen()
+    }
+    composable(route = GuideAccountRoute.HelpSupport.route) {
+        HelpSupportScreen()
     }
 }
 
@@ -44,10 +52,10 @@ fun NavGraphBuilder.guideAccountNavGraph(accountNavController: NavController) {
 @Composable
 fun GuideAccountNavGraphScaffold(
     routeNavController: NavController,
-    startDestination: String = GuideAccountRoute.BankAccounts.route,
+    startDestination: String = GuideAccountRoute.SavedCards.route,
 ) {
     val accountNavController = rememberNavController()
-    val titleResId = GuideAccountRoute.fromRoute(startDestination)?.titleResId ?: R.string.menu_account_settings
+    val titleResId = GuideAccountRoute.fromRoute(startDestination)?.titleResId ?: R.string.saved_cards
 
     Scaffold(
         topBar = {

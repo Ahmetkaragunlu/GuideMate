@@ -29,8 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.common.tours.components.InfoRow
-import com.ahmetkaragunlu.guidemate.screens.common.tours.components.TourBaseCard
+import com.ahmetkaragunlu.guidemate.screens.common.tours.InfoRow
+import com.ahmetkaragunlu.guidemate.screens.common.tours.TourBaseCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TripUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.MapPin

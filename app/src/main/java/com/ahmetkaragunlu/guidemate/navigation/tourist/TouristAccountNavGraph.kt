@@ -18,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassword.ChangePasswordScreen
+import com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword.ChangePasswordScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.helpsupport.HelpSupportScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.legalagreements.LegalAgreementsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.notificationsettings.NotificationSettingsScreen

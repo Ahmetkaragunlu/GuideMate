@@ -21,7 +21,7 @@ fun GuideMateNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Graph.TouristGraph.route,
+        startDestination = Graph.GuideGraph.route,
     ) {
         authNavGraph(navController = navController)
 
@@ -39,7 +39,7 @@ fun GuideMateNavigation() {
         ) { backStackEntry ->
             val targetRoute =
                 backStackEntry.arguments?.getString("targetRoute")
-                    ?: GuideAccountRoute.BankAccounts.route
+                    ?: GuideAccountRoute.SavedCards.route
             GuideAccountNavGraphScaffold(
                 routeNavController = navController,
                 startDestination = targetRoute,

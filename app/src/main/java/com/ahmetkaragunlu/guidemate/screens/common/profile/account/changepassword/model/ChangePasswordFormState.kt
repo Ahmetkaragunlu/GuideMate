@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.changepassword.model
+package com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword.model
 
 data class ChangePasswordFormState(
     val currentPassword: String = "",
