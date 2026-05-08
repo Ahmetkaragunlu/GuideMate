@@ -222,7 +222,7 @@ private fun PasswordInputField(
         Text(
             text = label,
             color = colorResource(R.color.text_color),
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(bottom = 6.dp, start = 4.dp),
         )

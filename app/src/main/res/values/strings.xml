@@ -50,6 +50,14 @@
 
     <string name="menu_about_languages">Hakkımda</string>
     <string name="about">Hakkımda</string>
+    <string name="about_specialty_title">Uzmanlık Unvanı</string>
+    <string name="about_specialty_placeholder">Sanat Tarihçisi</string>
+    <string name="about_specialty_helper">* Turistlerin göreceği ana unvanınız.</string>
+    <string name="about_biography_title">Biyografi (Hakkımda)</string>
+    <string name="about_biography_placeholder">İstanbul’un tarihi dokusunu ve kültürel hikayelerini anlatmayı seven bir rehberim.</string>
+    <string name="about_languages_title">Konuşulan Diller</string>
+    <string name="about_add_language">+ Dil Ekle</string>
+    <string name="about_save_action">KAYDET</string>
     <string name="menu_account_settings">Hesap Ayarları</string>
     <string name="menu_help_faq">Yardım ve S.S.S.</string>
 
@@ -89,6 +97,7 @@
     <string name="guide_home">Anasayfa</string>
     <string name="guide_tours">Turlarım</string>
     <string name="guide_chat">Sohbet</string>
+    <string name="chat_input_placeholder">Mesaj yazın...</string>
     <string name="guide_profile">Hesabım</string>
     <string name="guide_wallet">Cüzdan</string>
 
@@ -248,6 +257,21 @@
     <string name="security_alerts">Güvenlik Uyarıları</string>
     <string name="security_alerts_desc">Şifre değişimi, yeni giriş bildirimleri</string>
 
+    <string name="guide_notification_tours_and_reservations">Turlar ve Rezervasyonlar</string>
+    <string name="guide_upcoming_tour_reminders">Yaklaşan Tur Hatırlatıcıları</string>
+    <string name="guide_upcoming_tour_reminders_desc">Başlamak üzere olan turlarınız için saat ve buluşma noktası detayları.</string>
+    <string name="guide_tourist_messages">Turist Mesajları</string>
+    <string name="guide_tourist_messages_desc">Tura katılacak misafirlerinizden gelen anlık mesajlar ve sorular.</string>
+    <string name="guide_reservation_updates">Rezervasyon Güncellemeleri</string>
+    <string name="guide_reservation_updates_desc">Turlarınıza yapılan yeni rezervasyonlar ve turist iptalleri.</string>
+    <string name="guide_account_and_interaction">Hesap ve Etkileşim</string>
+    <string name="guide_payments_and_earnings">Ödeme ve Hak Edişler</string>
+    <string name="guide_payments_and_earnings_desc">Tamamlanan turların hizmet bedeli banka hesabınıza aktarıldığında.</string>
+    <string name="guide_new_reviews">Yeni Değerlendirmeler</string>
+    <string name="guide_new_reviews_desc">Turistler profilinize veya turunuza yeni bir puan ve yorum bıraktığında.</string>
+    <string name="guide_security_alerts">Güvenlik Uyarıları</string>
+    <string name="guide_security_alerts_desc">Şifre değişimi ve yeni giriş bildirimleri.</string>
+
 
     <string name="legal_title">Kullanıcı Sözleşmesi ve Şartlar</string>
     <string name="legal_intro">GuideMate platformunu kullanarak aşağıdaki temel şartları ve yasal yükümlülükleri kabul etmiş sayılırsınız. Lütfen dikkatlice okuyunuz.</string>
@@ -264,6 +288,19 @@
     <string name="legal_clause_4_title">4. Fikri Mülkiyet Hakları</string>
     <string name="legal_clause_4_desc">Uygulama içerisindeki tüm tasarımlar, metinler, logolar ve sistemin işleyiş algoritmaları GuideMate\'in yasal mülkiyetindedir. İzinsiz kopyalanamaz ve dağıtılamaz.</string>
 
+    <string name="guide_legal_title">Rehber Hizmet Sözleşmesi ve Şartlar</string>
+    <string name="guide_legal_intro">GuideMate platformunda "Rehber" olarak hizmet vererek aşağıdaki temel şartları ve yasal yükümlülükleri kabul etmiş sayılırsınız. Lütfen dikkatlice okuyunuz.</string>
+    <string name="guide_legal_clause_1_title">1. Hizmet Sunumu ve Profesyonellik</string>
+    <string name="guide_legal_clause_1_desc">Rehberler, platformda yayınladıkları turların içeriği hakkında doğru bilgi vermek ve onaylanan rezervasyonları taahhüt edilen saatte, eksiksiz olarak gerçekleştirmekle yükümlüdür. GuideMate, hizmet sağlayıcı ile turist arasındaki doğrudan iletişimde yalnızca bir aracı platformdur.</string>
+    <string name="guide_legal_clause_2_title">2. Gizlilik ve Veri Güvenliği</string>
+    <string name="guide_legal_clause_2_desc">Kişisel verileriniz, banka hesap bilgileriniz ve turistlerle olan iletişiminiz uluslararası güvenlik standartlarında ve KVKK kapsamında korunmaktadır. Verileriniz, yalnızca operasyonel süreçlerin yürütülmesi amacıyla işlenir.</string>
+    <string name="guide_legal_clause_3_title">3. İptal Politikası ve Sorumluluklar</string>
+    <string name="guide_legal_clause_3_desc">Turistlerin, tura 48 saat kalana kadar ücretsiz iptal ve tam iade hakkı bulunmaktadır. Rehber tarafından yapılan mazeretsiz ve son dakika iptalleri, turist mağduriyetine yol açacağından; profil puanının düşürülmesine, hesabın askıya alınmasına veya platformdan tamamen ihraca neden olabilir.</string>
+    <string name="guide_legal_clause_4_title">4. Ödemeler ve Komisyon (Yeni Eklenen Kritik Madde)</string>
+    <string name="guide_legal_clause_4_desc">GuideMate, platform üzerinden başarıyla tamamlanan turlar üzerinden önceden belirlenen oranlarda hizmet bedeli (komisyon) tahsil eder. Rehber hak edişleri, turun sorunsuz bir şekilde tamamlanmasını takip eden 3 iş günü içerisinde sisteme kayıtlı banka hesaplarına aktarılır.</string>
+    <string name="guide_legal_clause_5_title">5. Fikri Mülkiyet Hakları</string>
+    <string name="guide_legal_clause_5_desc">Uygulama içerisindeki tüm tasarımlar, metinler, logolar ve sistemin işleyiş algoritmaları GuideMate\'in yasal mülkiyetindedir. İzinsiz kopyalanamaz ve dağıtılamaz.</string>
+
     <string name="app_version">GuideMate v1.0.0</string>
 
 
@@ -271,6 +308,7 @@
 
     <string name="support_title">Yardım ve Destek</string>
     <string name="support_intro">GuideMate deneyiminizle ilgili en çok merak edilen soruların yanıtlarını aşağıda bulabilirsiniz.</string>
+    <string name="guide_support_intro">GuideMate rehber deneyiminizle ilgili en çok merak edilen soruların yanıtlarını aşağıda bulabilirsiniz.</string>
 
     <string name="faq_1_title">Nasıl tur rezervasyonu yapabilirim?</string>
     <string name="faq_1_desc">Arama ekranından gitmek istediğiniz şehri veya turistik mekanı seçin. Size uygun rehberi bulduktan sonra takvimden tarih ve saat seçerek ödeme adımına geçebilir ve rezervasyonunuzu anında tamamlayabilirsiniz.</string>
@@ -283,6 +321,15 @@
 
     <string name="faq_4_title">Tur sırasında bir sorun yaşarsam ne yapmalıyım?</string>
     <string name="faq_4_desc">Rehberin buluşma noktasına gelmemesi veya hizmetin taahhüt edildiği gibi olmaması durumunda anında destek ekibimize ulaşarak iade talebinde bulunabilirsiniz.</string>
+
+    <string name="guide_faq_1_title">Nasıl yeni bir tur oluşturup yayınlayabilirim?</string>
+    <string name="guide_faq_1_desc">Profilinizdeki "Turlarım" sekmesinden yeni bir tur ekleyebilir; turun içeriğini, fiyatını, süresini ve maksimum kontenjanını belirleyerek onay sonrasında turistlerin rezervasyonuna açabilirsiniz.</string>
+    <string name="guide_faq_2_title">Bir turist rezervasyonunu iptal ederse ne olur?</string>
+    <string name="guide_faq_2_desc">Turistlerin tura 48 saat kalana kadar ücretsiz iptal hakkı vardır. Ancak 48 saatten daha az bir süre kala yapılan iptallerde, rehber olarak sizin mağduriyetinizi önlemek adına standart kesinti politikalarımız çerçevesinde hesabınıza belirli bir telafi ödemesi yansıtılır.</string>
+    <string name="guide_faq_3_title">Turistlerimle nasıl iletişime geçeceğim?</string>
+    <string name="guide_faq_3_desc">Rezervasyonunuz onaylandıktan sonra, uygulama içindeki "Mesajlar" sekmesi üzerinden turistlerle doğrudan mesajlaşabilirsiniz. Buluşma noktası, saat teyidi ve diğer detayları buradan netleştirebilirsiniz.</string>
+    <string name="guide_faq_4_title">Ödememi ne zaman ve nasıl alacağım?</string>
+    <string name="guide_faq_4_desc">Rehber hak edişleriniz (komisyon düşüldükten sonraki net tutar), turun sorunsuz bir şekilde tamamlanmasını takip eden 3 iş günü içerisinde sistemde kayıtlı banka hesabınıza otomatik olarak aktarılır.</string>
 
     <string name="contact_support_question">Sorunuzun yanıtını bulamadınız mı?</string>
     <string name="contact_support_action">Canlı Desteğe Bağlan</string>

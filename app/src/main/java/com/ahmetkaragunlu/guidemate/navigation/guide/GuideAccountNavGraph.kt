@@ -19,10 +19,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.profile.account.changepassword.ChangePasswordScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.AboutScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.HelpSupportScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.LegalAgreementsScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.NotificationSettingsScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.AboutScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.helpsupport.HelpSupportScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements.LegalAgreementsScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.notificationsettings.NotificationSettingsScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.SavedCardsScreen
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft

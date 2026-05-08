@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 
@@ -42,7 +43,7 @@ fun ChatInputArea(
         OutlinedTextField(
             value = inputValue,
             onValueChange = onValueChange,
-            placeholder = { Text("Mesaj yazın...", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.chat_input_placeholder), color = Color.Gray) },
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
             colors =
