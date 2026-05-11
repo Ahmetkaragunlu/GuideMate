@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,8 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,6 +33,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.guideProfileMenu
 fun GuideProfileScreen(
     viewModel: GuideProfileViewModel = hiltViewModel(),
     onNavigateToAccount: (GuideAccountRoute) -> Unit = {},
+    onNavigateToProfilePreview: () -> Unit = {},
 ) {
     val profileState by viewModel.profileState.collectAsStateWithLifecycle()
 
@@ -44,6 +48,7 @@ fun GuideProfileScreen(
     ) {
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
+        val profileImageResId = profileState.profileImageResId
         Box(contentAlignment = Alignment.BottomEnd) {
             Box(
                 modifier =
@@ -53,12 +58,21 @@ fun GuideProfileScreen(
                         .background(Color.LightGray),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    Icons.Rounded.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(48.dp),
-                )
+                if (profileImageResId != null) {
+                    Image(
+                        painter = painterResource(id = profileImageResId),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                } else {
+                    Icon(
+                        Icons.Rounded.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(48.dp),
+                    )
+                }
             }
 
             Surface(
@@ -98,7 +112,7 @@ fun GuideProfileScreen(
         }
 
         Surface(
-            onClick = { },
+            onClick = onNavigateToProfilePreview,
             shape = CircleShape,
             color = colorResource(R.color.brand_color).copy(alpha = 0.1f),
         ) {

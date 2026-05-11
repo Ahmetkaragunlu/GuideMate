@@ -62,6 +62,18 @@
     <string name="menu_help_faq">Yardım ve S.S.S.</string>
 
     <string name="view_as_tourist">Turistin Gözünden Gör</string>
+    <string name="preview_screen_title">Önizleme Ekranı</string>
+    <string name="preview_super_guide">Süper Rehber</string>
+    <string name="preview_about_text">Merhaba, ben Ahmet. Yıllardır İstanbul’un tarihi semtlerinde yürüyüş turları düzenliyorum. Tur boyunca sadece yapıları değil, o yapıların ardındaki insan hikayelerini, kültürel dönüşümleri ve günlük hayatı da paylaşmayı seviyorum. Amacım, şehri turist gibi değil, yerel biri gibi hissettirerek gezdirmek.</string>
+    <string name="preview_read_more">Devamını Gör</string>
+    <string name="preview_popular_tours_title">Popüler Turlar</string>
+    <string name="preview_see_all">Tümünü Gör</string>
+    <string name="preview_send_message">Mesaj Gönder</string>
+    <string name="preview_language_turkish">🇹🇷 Türkçe</string>
+    <string name="preview_language_english">🇬🇧 İngilizce</string>
+    <string name="preview_language_german">🇩🇪 Almanca</string>
+    <string name="preview_language_french">🇫🇷 Fransızca</string>
+    <string name="preview_language_italian">🇮🇹 İtalyanca</string>
     <string name="rating_format">%1$s Puan</string>
     <string name="tour_count_format">%1$s Tur</string>
 

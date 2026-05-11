@@ -24,6 +24,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.GuideProfileScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.GuideProfilePreviewScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.GuideMyToursScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.GuideMyWalletScreen
 
@@ -57,7 +58,13 @@ fun NavGraphBuilder.guideNavGraph(
             onNavigateToAccount = { targetRoute ->
                 routeNavController.navigateTo("${Graph.GuideAccountGraph.route}/${targetRoute.route}")
             },
+            onNavigateToProfilePreview = {
+                guideNavController.navigateTo(GuideRoute.GuideProfilePreviewScreen.route)
+            },
         )
+    }
+    composable(route = GuideRoute.GuideProfilePreviewScreen.route) {
+        GuideProfilePreviewScreen()
     }
 }
 

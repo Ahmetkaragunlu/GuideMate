@@ -1,20 +1,20 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.GuideAboutLanguageUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.GuideAboutUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.toUpdatePayload
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
-class GuideAboutViewModel @Inject constructor() : ViewModel() {
+class GuideAboutViewModel
+    @Inject
+    constructor() : ViewModel() {
     private val _uiState =
         MutableStateFlow(
             GuideAboutUiState(
@@ -22,8 +22,8 @@ class GuideAboutViewModel @Inject constructor() : ViewModel() {
                 biography = "",
                 spokenLanguages =
                     listOf(
-                        GuideAboutLanguageUi(code = "tr", displayText = "🇹🇷 Türkçe"),
-                        GuideAboutLanguageUi(code = "en", displayText = "🇬🇧 İngilizce"),
+                        GuideSpokenLanguageUi(code = "tr", displayText = "🇹🇷 Türkçe"),
+                        GuideSpokenLanguageUi(code = "en", displayText = "🇬🇧 İngilizce"),
                     ),
             ),
         )
@@ -47,12 +47,9 @@ class GuideAboutViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onSaveClick() {
+        // MVP aşamasında sadece payload üretip backend entegrasyonu için hazır tutuyoruz.
+        // Bu aşamada kalıcı güncelleme yapmıyoruz.
         val payload = _uiState.value.toUpdatePayload()
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true) }
-            payload.languageCodes.size
-            _uiState.update { it.copy(isSaving = false) }
-        }
+        payload.languageCodes.size
     }
 }

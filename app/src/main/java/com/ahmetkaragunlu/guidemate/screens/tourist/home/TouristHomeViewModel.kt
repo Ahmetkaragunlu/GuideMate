@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
-import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.TouristHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategoriesData
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
@@ -58,67 +58,84 @@ class TouristHomeViewModel @Inject constructor(
                     ),
             )
 
-    private fun getDummyTours(category: TourCategory): List<PopularToursCardUiModel> {
+    private data class CategorizedTour(
+        val category: TourCategory,
+        val tour: PopularTourCardUiModel,
+    )
+
+    private fun getDummyTours(category: TourCategory): List<PopularTourCardUiModel> {
         val allTours =
             listOf(
-                PopularToursCardUiModel(
-                    id = "1",
-                    title = "Sultanahmet ve Gizli Sokaklar",
-                    imageUrl = R.drawable.example,
-                    rating = "4.9",
-                    reviewCount = "(120)",
-                    price = 750.0,
-                    languagesFlag = "🇹🇷 🇬🇧 🇩🇪",
-                    languagesText = "TR, EN, DE",
-                    guideName = "Ahmet K.",
-                    guideImageUrl = R.drawable.unnamed,
+                CategorizedTour(
                     category = TourCategory.CULTURE,
+                    tour =
+                        PopularTourCardUiModel(
+                            id = "1",
+                            title = "Sultanahmet ve Gizli Sokaklar",
+                            imageUrl = R.drawable.example,
+                            rating = "4.9",
+                            reviewCount = "(120)",
+                            price = 750.0,
+                            languagesFlag = "🇹🇷 🇬🇧 🇩🇪",
+                            languagesText = "TR, EN, DE",
+                            guideName = "Ahmet K.",
+                            guideImageUrl = R.drawable.unnamed,
+                        ),
                 ),
-                PopularToursCardUiModel(
-                    id = "2",
-                    title = "Kapadokya Balon Turu",
-                    imageUrl = R.drawable.example,
-                    rating = "5.0",
-                    reviewCount = "(85)",
-                    price = 2500.0,
-                    languagesFlag = "🇬🇧 🇫🇷",
-                    languagesText = "EN, FR",
-                    guideName = "Mehmet Y.",
-                    guideImageUrl = R.drawable.unnamed,
+                CategorizedTour(
                     category = TourCategory.ADVENTURE,
+                    tour =
+                        PopularTourCardUiModel(
+                            id = "2",
+                            title = "Kapadokya Balon Turu",
+                            imageUrl = R.drawable.example,
+                            rating = "5.0",
+                            reviewCount = "(85)",
+                            price = 2500.0,
+                            languagesFlag = "🇬🇧 🇫🇷",
+                            languagesText = "EN, FR",
+                            guideName = "Mehmet Y.",
+                            guideImageUrl = R.drawable.unnamed,
+                        ),
                 ),
-                PopularToursCardUiModel(
-                    id = "3",
-                    title = "Efes Antik Kent Gezisi",
-                    imageUrl = R.drawable.example,
-                    rating = "4.8",
-                    reviewCount = "(210)",
-                    price = 600.0,
-                    languagesFlag = "🇹🇷 🇬🇧",
-                    languagesText = "TR, EN",
-                    guideName = "Ayşe Z.",
-                    guideImageUrl = R.drawable.unnamed,
+                CategorizedTour(
                     category = TourCategory.CULTURE,
+                    tour =
+                        PopularTourCardUiModel(
+                            id = "3",
+                            title = "Efes Antik Kent Gezisi",
+                            imageUrl = R.drawable.example,
+                            rating = "4.8",
+                            reviewCount = "(210)",
+                            price = 600.0,
+                            languagesFlag = "🇹🇷 🇬🇧",
+                            languagesText = "TR, EN",
+                            guideName = "Ayşe Z.",
+                            guideImageUrl = R.drawable.unnamed,
+                        ),
                 ),
-                PopularToursCardUiModel(
-                    id = "4",
-                    title = "Boğaz Tekne ve Yemek",
-                    imageUrl = R.drawable.example,
-                    rating = "4.7",
-                    reviewCount = "(300)",
-                    price = 1200.0,
-                    languagesFlag = "🇬🇧 🇸🇦",
-                    languagesText = "EN, AR",
-                    guideName = "Caner E.",
-                    guideImageUrl = R.drawable.unnamed,
+                CategorizedTour(
                     category = TourCategory.FOOD,
+                    tour =
+                        PopularTourCardUiModel(
+                            id = "4",
+                            title = "Boğaz Tekne ve Yemek",
+                            imageUrl = R.drawable.example,
+                            rating = "4.7",
+                            reviewCount = "(300)",
+                            price = 1200.0,
+                            languagesFlag = "🇬🇧 🇸🇦",
+                            languagesText = "EN, AR",
+                            guideName = "Caner E.",
+                            guideImageUrl = R.drawable.unnamed,
+                        ),
                 ),
             )
 
         return if (category == TourCategory.ALL) {
-            allTours
+            allTours.map { it.tour }
         } else {
-            allTours.filter { it.category == category }
+            allTours.filter { it.category == category }.map { it.tour }
         }
     }
 

@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.home.components
+package com.ahmetkaragunlu.guidemate.screens.common.tours
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -38,10 +38,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
-import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 
 @Composable
-fun PopularTourCard(tour: PopularToursCardUiModel) {
+fun PopularTourCard(tour: PopularTourCardUiModel) {
     Card(
         modifier =
             Modifier

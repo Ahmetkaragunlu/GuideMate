@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.tours.PopularTourCard
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.components.BestGuideCard
-import com.ahmetkaragunlu.guidemate.screens.tourist.home.components.PopularTourCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
-import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.PopularToursCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.CategoryItem
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.CategoryCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
@@ -92,7 +92,7 @@ private fun LazyListScope.categoriesSection(
     }
 }
 
-private fun LazyListScope.popularToursSection(tours: List<PopularToursCardUiModel>) {
+private fun LazyListScope.popularToursSection(tours: List<PopularTourCardUiModel>) {
     item {
         Column(
             modifier = Modifier.padding(bottom = 20.dp),

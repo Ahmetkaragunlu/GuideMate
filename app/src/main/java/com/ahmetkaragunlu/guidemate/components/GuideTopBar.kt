@@ -12,11 +12,12 @@ fun GuideTopBar(
     userName: String?,
 ) {
     val isChatDetail = currentRoute == GuideRoute.GuideChatDetailScreen.route
+    val isProfilePreview = currentRoute == GuideRoute.GuideProfilePreviewScreen.route
     val config =
         AppTopBarConfig(
             isHome = currentRoute == GuideRoute.GuideHomeScreen.route,
             isChatDetail = isChatDetail,
-            showBackButton = isChatDetail,
+            showBackButton = isChatDetail || isProfilePreview,
             showLogoutButton = currentRoute == GuideRoute.GuideProfileScreen.route,
             titleResId = getGuideScreenTitle(currentRoute),
             chatTitle = "Hans Müller",
@@ -37,5 +38,6 @@ fun getGuideScreenTitle(route: String?): Int =
         GuideRoute.GuideMyWalletScreen.route -> R.string.guide_wallet
         GuideRoute.GuideChatScreen.route -> R.string.guide_chat
         GuideRoute.GuideProfileScreen.route -> R.string.guide_profile
+        GuideRoute.GuideProfilePreviewScreen.route -> R.string.preview_screen_title
         else -> R.string.app_name
     }

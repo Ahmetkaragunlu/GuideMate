@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
 import com.ahmetkaragunlu.guidemate.components.EditTextField
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.GuideAboutLanguageUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.GuideAboutUiState
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -174,7 +174,7 @@ private fun BiographySection(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LanguagesSection(
-    languages: List<GuideAboutLanguageUi>,
+    languages: List<GuideSpokenLanguageUi>,
     onRemoveLanguageClick: (String) -> Unit,
     onAddLanguageClick: () -> Unit,
 ) {
@@ -206,7 +206,7 @@ private fun LanguagesSection(
 
 @Composable
 private fun LanguageChip(
-    language: GuideAboutLanguageUi,
+    language: GuideSpokenLanguageUi,
     onRemoveClick: () -> Unit,
 ) {
     Surface(

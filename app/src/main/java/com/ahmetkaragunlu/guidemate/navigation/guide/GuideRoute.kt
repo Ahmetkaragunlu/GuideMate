@@ -6,6 +6,7 @@ enum class GuideRoute(
     GuideHomeScreen(route = "GuideHomeScreen"),
     GuideMyToursScreen(route = "GuideMyToursScreen"),
     GuideProfileScreen(route = "GuideProfileScreen"),
+    GuideProfilePreviewScreen(route = "GuideProfilePreviewScreen"),
     GuideChatScreen(route = "GuideChatScreen"),
     GuideMyWalletScreen(route = "GuideMyWalletScreen"),
     GuideChatDetailScreen(route = "GuideChatDetailScreen"),

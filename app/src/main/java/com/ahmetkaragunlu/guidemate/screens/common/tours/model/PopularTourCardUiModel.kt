@@ -1,8 +1,6 @@
-package com.ahmetkaragunlu.guidemate.screens.tourist.home.model
+package com.ahmetkaragunlu.guidemate.screens.common.tours.model
 
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
-
-data class PopularToursCardUiModel(
+data class PopularTourCardUiModel(
     val id: String,
     val title: String,
     val imageUrl: Int,
@@ -13,5 +11,4 @@ data class PopularToursCardUiModel(
     val languagesText: String,
     val guideName: String,
     val guideImageUrl: Int,
-    val category: TourCategory? = null,
 )
