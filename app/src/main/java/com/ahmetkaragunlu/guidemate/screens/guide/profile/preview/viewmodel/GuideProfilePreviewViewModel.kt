@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.model.GuideProfilePreviewUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.shared.GuideProfileStateProvider
@@ -40,7 +41,7 @@ class GuideProfilePreviewViewModel
                         profileImageResId = R.drawable.unnamed,
                         displayName = "Ahmet Karagünlü",
                         title = "Sanat Tarihçisi",
-                        guideLevel = "Süper Rehber",
+                        guideLevel = GuideLevelTier.SUPER,
                         rating = 4.9,
                         tourCount = 124,
                         biography = "Merhaba, ben Ahmet. Yıllardır İstanbul’un tarihi semtlerinde yürüyüş turları düzenliyorum. Tur boyunca sadece yapıları değil, o yapıların ardındaki insan hikayelerini, kültürel dönüşümleri ve günlük hayatı da paylaşmayı seviyorum. Amacım, şehri turist gibi değil, yerel biri gibi hissettirerek gezdirmek.",

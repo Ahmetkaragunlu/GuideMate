@@ -21,7 +21,6 @@ class GuideProfileSharedStore
                     profileImageResId = R.drawable.unnamed,
                     profileImageUrl = null,
                     title = "Sanat Tarihçisi",
-                    guideLevel = "Süper Rehber",
                     rating = 4.9,
                     tourCount = 124,
                     biography = "Merhaba, ben Ahmet. Yıllardır İstanbul’un tarihi semtlerinde yürüyüş turları düzenliyorum. Tur boyunca sadece yapıları değil, o yapıların ardındaki insan hikayelerini, kültürel dönüşümleri ve günlük hayatı da paylaşmayı seviyorum. Amacım, şehri turist gibi değil, yerel biri gibi hissettirerek gezdirmek.",

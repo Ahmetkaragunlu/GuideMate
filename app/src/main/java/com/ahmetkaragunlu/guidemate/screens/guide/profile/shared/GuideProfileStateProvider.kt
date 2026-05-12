@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile.shared
 
 import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.calculateGuideLevelTier
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideProfileUiState
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,7 +23,7 @@ class GuideProfileStateProvider
                     profileImageResId = shared.profileImageResId,
                     profileImageUrl = shared.profileImageUrl,
                     title = shared.title,
-                    guideLevel = shared.guideLevel,
+                    guideLevel = calculateGuideLevelTier(shared.tourCount, shared.rating),
                     rating = shared.rating,
                     tourCount = shared.tourCount,
                     biography = shared.biography,

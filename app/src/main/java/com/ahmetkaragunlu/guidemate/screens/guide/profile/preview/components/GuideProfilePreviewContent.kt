@@ -41,6 +41,8 @@ import com.ahmetkaragunlu.guidemate.components.EditButton
 import com.ahmetkaragunlu.guidemate.screens.common.tours.PopularTourCard
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.GuideLevelInfoBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.GuideLevelViewerType
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.model.GuideProfilePreviewUiState
 
@@ -50,6 +52,7 @@ fun GuideProfilePreviewContent(
     modifier: Modifier = Modifier,
 ) {
     var isAboutExpanded by rememberSaveable { mutableStateOf(false) }
+    var showGuideLevelInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
     val screenScrollState = rememberScrollState()
     val aboutScrollState = rememberScrollState()
 
@@ -63,10 +66,10 @@ fun GuideProfilePreviewContent(
         ProfileHeaderSection(uiState = uiState)
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
         ProfileStatsRow(
-            guideLevel = uiState.guideLevel.ifBlank { stringResource(R.string.preview_super_guide) },
+            guideLevel = stringResource(uiState.guideLevel.titleResId),
             rating = uiState.rating,
             tourCount = uiState.tourCount,
-            onGuideLevelInfoClick = { },
+            onGuideLevelInfoClick = { showGuideLevelInfoBottomSheet = true },
         )
         Spacer(modifier = Modifier.height(24.dp))
         AboutSection(
@@ -82,6 +85,13 @@ fun GuideProfilePreviewContent(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
         MessageButtonSection()
     }
+
+    GuideLevelInfoBottomSheet(
+        isVisible = showGuideLevelInfoBottomSheet,
+        onDismiss = { showGuideLevelInfoBottomSheet = false },
+        currentLevel = uiState.guideLevel,
+        viewerType = GuideLevelViewerType.VISITOR,
+    )
 }
 
 @Composable

@@ -76,6 +76,29 @@
     <string name="preview_language_italian">🇮🇹 İtalyanca</string>
     <string name="rating_format">%1$s Puan</string>
     <string name="tour_count_format">%1$s Tur</string>
+    <string name="guide_level_sheet_title">Rozet Seviyeleri</string>
+    <string name="guide_level_sheet_subtitle">GuideMate platformundaki başarı durumunuz</string>
+    <string name="guide_level_sheet_close_icon">✖</string>
+    <string name="guide_level_sheet_confirm">Anladım</string>
+
+    <string name="guide_level_current_level_owner">Şu anki seviyeniz</string>
+    <string name="guide_level_current_level_visitor">Rehberin seviyesi</string>
+
+    <string name="guide_level_approved_icon">🟢</string>
+    <string name="guide_level_approved_title">Onaylı Rehber</string>
+    <string name="guide_level_approved_desc">Belgeleri onaylanmış resmi rehber.</string>
+
+    <string name="guide_level_silver_icon">🥉</string>
+    <string name="guide_level_silver_title">Gümüş Rehber</string>
+    <string name="guide_level_silver_desc">Şartlar: En az 5 Tur ve 3.7 Puan.</string>
+
+    <string name="guide_level_super_icon">🥇</string>
+    <string name="guide_level_super_title">Süper Rehber</string>
+    <string name="guide_level_super_desc">Şartlar: En az 20 Tur ve 4.5 Puan.</string>
+
+    <string name="guide_level_legendary_icon">💎</string>
+    <string name="guide_level_legendary_title">Efsane Rehber</string>
+    <string name="guide_level_legendary_desc">Şartlar: En az 100 Tur ve 4.8 Puan.</string>
 
     <string name="default_first_name">Ahmet</string>
     <string name="default_last_name">Karagünlü</string>

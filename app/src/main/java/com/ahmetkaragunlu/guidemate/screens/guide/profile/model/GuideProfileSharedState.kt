@@ -6,7 +6,6 @@ data class GuideProfileSharedState(
     val profileImageResId: Int,
     val profileImageUrl: String? = null,
     val title: String,
-    val guideLevel: String,
     val rating: Double,
     val tourCount: Int,
     val biography: String,

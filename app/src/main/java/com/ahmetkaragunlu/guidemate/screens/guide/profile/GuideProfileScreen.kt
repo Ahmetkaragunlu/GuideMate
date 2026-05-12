@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +28,8 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
 import com.ahmetkaragunlu.guidemate.screens.common.profile.components.CommonProfileMenuItem
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.GuideLevelInfoBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.GuideLevelViewerType
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.guideProfileMenuOptions
 
 @Composable
@@ -36,6 +39,7 @@ fun GuideProfileScreen(
     onNavigateToProfilePreview: () -> Unit = {},
 ) {
     val profileState by viewModel.profileState.collectAsStateWithLifecycle()
+    var showGuideLevelInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier =
@@ -139,10 +143,10 @@ fun GuideProfileScreen(
         }
 
         ProfileStatsRow(
-            guideLevel = profileState.guideLevel,
+            guideLevel = stringResource(profileState.guideLevel.titleResId),
             rating = profileState.rating,
             tourCount = profileState.tourCount,
-            onGuideLevelInfoClick = {  },
+            onGuideLevelInfoClick = { showGuideLevelInfoBottomSheet = true },
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
@@ -160,4 +164,11 @@ fun GuideProfileScreen(
             }
         }
     }
+
+    GuideLevelInfoBottomSheet(
+        isVisible = showGuideLevelInfoBottomSheet,
+        onDismiss = { showGuideLevelInfoBottomSheet = false },
+        currentLevel = profileState.guideLevel,
+        viewerType = GuideLevelViewerType.OWNER,
+    )
 }
