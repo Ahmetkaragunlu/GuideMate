@@ -25,6 +25,11 @@ import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.GuideProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.GuideProfilePreviewScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step1.GuideTourPublishStep1LocationDateScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step2.GuideTourPublishStep2CategoryPriceScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step3.GuideTourPublishStep3DetailsMediaScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step4.GuideTourPublishStep4PreviewPublishScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.viewmodel.GuideTourPublishViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.GuideMyToursScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.GuideMyWalletScreen
 
@@ -32,12 +37,56 @@ fun NavGraphBuilder.guideNavGraph(
     guideNavController: NavController,
     routeNavController: NavController,
     guideHomeUiState: GuideHomeUiState,
+    tourPublishViewModel: GuideTourPublishViewModel,
 ) {
     composable(route = GuideRoute.GuideHomeScreen.route) {
         GuideHomeScreen(uiState = guideHomeUiState)
     }
     composable(route = GuideRoute.GuideMyToursScreen.route) {
-        GuideMyToursScreen()
+        GuideMyToursScreen(
+            onNavigateToTourPublish = {
+                tourPublishViewModel.resetDraft()
+                guideNavController.navigateTo(GuideRoute.GuideTourPublishStep1Screen.route)
+            },
+        )
+    }
+    composable(route = GuideRoute.GuideTourPublishStep1Screen.route) {
+        val uiState by tourPublishViewModel.uiState.collectAsStateWithLifecycle()
+        GuideTourPublishStep1LocationDateScreen(
+            uiState = uiState,
+            onLocationClick = { },
+            onDateClick = { },
+            onNext = { guideNavController.navigateTo(GuideRoute.GuideTourPublishStep2Screen.route) },
+        )
+    }
+    composable(route = GuideRoute.GuideTourPublishStep2Screen.route) {
+        val uiState by tourPublishViewModel.uiState.collectAsStateWithLifecycle()
+        GuideTourPublishStep2CategoryPriceScreen(
+            uiState = uiState,
+            onCategoryClick = { },
+            onAddLanguageClick = { },
+            onRemoveLanguageClick = tourPublishViewModel::onRemoveLanguageClick,
+            onPriceChange = tourPublishViewModel::onPriceChange,
+            onNext = { guideNavController.navigateTo(GuideRoute.GuideTourPublishStep3Screen.route) },
+        )
+    }
+    composable(route = GuideRoute.GuideTourPublishStep3Screen.route) {
+        val uiState by tourPublishViewModel.uiState.collectAsStateWithLifecycle()
+        GuideTourPublishStep3DetailsMediaScreen(
+            uiState = uiState,
+            onTourNameChange = tourPublishViewModel::onTourNameChange,
+            onUploadPhotosClick = { },
+            onDescriptionChange = tourPublishViewModel::onTourDescriptionChange,
+            onMeetingPointChange = tourPublishViewModel::onMeetingPointChange,
+            onNext = { guideNavController.navigateTo(GuideRoute.GuideTourPublishStep4Screen.route) },
+        )
+    }
+    composable(route = GuideRoute.GuideTourPublishStep4Screen.route) {
+        val uiState by tourPublishViewModel.uiState.collectAsStateWithLifecycle()
+        GuideTourPublishStep4PreviewPublishScreen(
+            uiState = uiState,
+            onPublish = tourPublishViewModel::onPublishClick,
+        )
     }
     composable(route = GuideRoute.GuideMyWalletScreen.route) {
         GuideMyWalletScreen()
@@ -72,10 +121,12 @@ fun NavGraphBuilder.guideNavGraph(
 fun GuideNavGraphScaffold(
     routeNavController: NavController,
     viewModel: GuideHomeViewModel = hiltViewModel(),
+    tourPublishViewModel: GuideTourPublishViewModel = hiltViewModel(),
 ) {
     val guideNavController = rememberNavController()
     val navBackStackEntry by guideNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: GuideRoute.GuideHomeScreen.route
+    val isTourPublishRoute = currentRoute.isGuideTourPublishRoute()
     val getUserName by viewModel.userName.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -88,11 +139,13 @@ fun GuideNavGraphScaffold(
             )
         },
         bottomBar = {
-            AppBottomBar(
-                navController = guideNavController,
-                currentRoute = currentRoute,
-                items = guideNavItems,
-            )
+            if (!isTourPublishRoute) {
+                AppBottomBar(
+                    navController = guideNavController,
+                    currentRoute = currentRoute,
+                    items = guideNavItems,
+                )
+            }
         },
     ) { innerPadding ->
         NavHost(
@@ -104,7 +157,14 @@ fun GuideNavGraphScaffold(
                 guideNavController = guideNavController,
                 routeNavController = routeNavController,
                 guideHomeUiState = uiState,
+                tourPublishViewModel = tourPublishViewModel,
             )
         }
     }
 }
+
+private fun String.isGuideTourPublishRoute(): Boolean =
+    this == GuideRoute.GuideTourPublishStep1Screen.route ||
+        this == GuideRoute.GuideTourPublishStep2Screen.route ||
+        this == GuideRoute.GuideTourPublishStep3Screen.route ||
+        this == GuideRoute.GuideTourPublishStep4Screen.route

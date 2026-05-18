@@ -23,6 +23,7 @@ fun EditTextField(
     isError: Boolean = false,
     onValueChange: (String) -> Unit,
     @StringRes placeholder: Int? = null,
+    placeholderText: String? = null,
     @StringRes supportingText: Int? = null,
     keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier,
@@ -30,6 +31,7 @@ fun EditTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
+    placeholderColor: Color = Color.Gray,
     shape: Shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
     colors: TextFieldColors =
         OutlinedTextFieldDefaults.colors(
@@ -43,16 +45,25 @@ fun EditTextField(
         readOnly = readOnly,
         onValueChange = onValueChange,
         shape = shape,
-        placeholder =
-            placeholder?.let {
-                {
+        placeholder = {
+            when {
+                placeholder != null -> {
                     Text(
-                        text = stringResource(it),
+                        text = stringResource(placeholder),
                         style = MaterialTheme.typography.labelLarge,
-                        color = Color.Gray,
+                        color = placeholderColor,
                     )
                 }
-            },
+
+                !placeholderText.isNullOrBlank() -> {
+                    Text(
+                        text = placeholderText,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = placeholderColor,
+                    )
+                }
+            }
+        },
         supportingText = supportingText?.let { { Text(text = stringResource(it), color = MaterialTheme.colorScheme.error) } },
         keyboardOptions = keyboardOptions,
         visualTransformation = visualTransformation,

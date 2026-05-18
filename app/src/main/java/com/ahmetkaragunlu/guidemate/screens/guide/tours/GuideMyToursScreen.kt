@@ -23,6 +23,7 @@ import compose.icons.tablericons.Plus
 
 @Composable
 fun GuideMyToursScreen(
+    onNavigateToTourPublish: () -> Unit,
     viewModel: GuideMyToursViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
@@ -65,7 +66,7 @@ fun GuideMyToursScreen(
 
         if (selectedTab == GuideTourTab.ACTIVE) {
             FloatingActionButton(
-                onClick = { /* Navigate to create tour */ },
+                onClick = onNavigateToTourPublish,
                 modifier =
                     Modifier
                         .align(Alignment.BottomEnd)

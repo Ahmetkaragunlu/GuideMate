@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.wallet
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +24,9 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.content.MoneyActionBottomSheetContent
 import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.model.MoneyActionMethodUi
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +77,7 @@ fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
 
 @Composable
 private fun GuideMyWalletContent(
-    uiState: com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState,
+    uiState: GuideWalletUiState,
     onWithdrawClick: () -> Unit,
 ) {
     val screenScrollState = rememberScrollState()
@@ -134,8 +138,8 @@ private fun WithdrawButton(onClick: () -> Unit) {
 
 @Composable
 private fun EarningsSection(
-    items: List<com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary>,
-    scrollState: androidx.compose.foundation.ScrollState,
+    items: List<EarningSummary>,
+    scrollState: ScrollState,
 ) {
     WalletSection(
         titleResId = R.string.earnings_by_month,
@@ -150,8 +154,8 @@ private fun EarningsSection(
 
 @Composable
 private fun RecentTransactionsSection(
-    items: List<com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction>,
-    scrollState: androidx.compose.foundation.ScrollState,
+    items: List<Transaction>,
+    scrollState: ScrollState,
 ) {
     WalletSection(
         titleResId = R.string.recent_transactions,
@@ -168,7 +172,7 @@ private fun RecentTransactionsSection(
 private fun WalletSection(
     titleResId: Int,
     height: Dp,
-    scrollState: androidx.compose.foundation.ScrollState,
+    scrollState: ScrollState,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column {
