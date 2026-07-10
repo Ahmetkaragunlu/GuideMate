@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -24,14 +26,21 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.content.MoneyActionBottomSheetContent
 import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.model.MoneyActionMethodUi
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary
+import com.ahmetkaragunlu.guidemate.screens.guide.earnings.components.MonthlyEarningItem
+import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.components.*
 
+private const val WALLET_EARNINGS_PREVIEW_COUNT = 4
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
+fun GuideMyWalletScreen(
+    earnings: List<MonthlyEarningUiModel>,
+    onNavigateToEarnings: () -> Unit,
+    viewModel: GuideMyWalletViewModel = hiltViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     var withdrawAmount by rememberSaveable { mutableStateOf("") }
@@ -50,7 +59,9 @@ fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
         GuideMyWalletContent(
             uiState = uiState,
+            earnings = earnings,
             onWithdrawClick = { showBottomSheet = true },
+            onNavigateToEarnings = onNavigateToEarnings,
         )
 
         if (showBottomSheet) {
@@ -78,7 +89,9 @@ fun GuideMyWalletScreen(viewModel: GuideMyWalletViewModel = hiltViewModel()) {
 @Composable
 private fun GuideMyWalletContent(
     uiState: GuideWalletUiState,
+    earnings: List<MonthlyEarningUiModel>,
     onWithdrawClick: () -> Unit,
+    onNavigateToEarnings: () -> Unit,
 ) {
     val screenScrollState = rememberScrollState()
     val earningsScrollState = rememberScrollState()
@@ -103,8 +116,9 @@ private fun GuideMyWalletContent(
         WithdrawButton(onClick = onWithdrawClick)
 
         EarningsSection(
-            items = uiState.earningSummaries,
+            items = earnings.take(WALLET_EARNINGS_PREVIEW_COUNT),
             scrollState = earningsScrollState,
+            onViewAllClick = onNavigateToEarnings,
         )
 
         RecentTransactionsSection(
@@ -138,16 +152,23 @@ private fun WithdrawButton(onClick: () -> Unit) {
 
 @Composable
 private fun EarningsSection(
-    items: List<EarningSummary>,
+    items: List<MonthlyEarningUiModel>,
     scrollState: ScrollState,
+    onViewAllClick: () -> Unit,
 ) {
     WalletSection(
         titleResId = R.string.earnings_by_month,
         height = 160.dp,
         scrollState = scrollState,
+        headerAction = {
+            ViewAllEarningsAction(onClick = onViewAllClick)
+        },
     ) {
-        items.forEach { earning ->
-            EarningSummaryItem(earning = earning)
+        items.forEachIndexed { index, earning ->
+            MonthlyEarningItem(
+                earning = earning,
+                showDivider = index < items.lastIndex,
+            )
         }
     }
 }
@@ -173,16 +194,26 @@ private fun WalletSection(
     titleResId: Int,
     height: Dp,
     scrollState: ScrollState,
+    headerAction: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column {
-        Text(
-            text = stringResource(titleResId),
-            color = colorResource(R.color.brand_color),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 12.dp),
-        )
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(titleResId),
+                color = colorResource(R.color.brand_color),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            headerAction?.invoke()
+        }
         Box(
             modifier =
                 Modifier
@@ -199,6 +230,29 @@ private fun WalletSection(
                 content = content,
             )
         }
+    }
+}
+
+@Composable
+private fun ViewAllEarningsAction(onClick: () -> Unit) {
+    Row(
+        modifier =
+            Modifier
+                .clickable(onClick = onClick)
+                .padding(dimensionResource(R.dimen.spacing_tiny)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.view_all),
+            style = MaterialTheme.typography.labelLarge,
+            color = colorResource(R.color.brand_color),
+            fontWeight = FontWeight.Bold,
+        )
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = colorResource(R.color.brand_color),
+        )
     }
 }
 

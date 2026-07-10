@@ -7,7 +7,6 @@ import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.fi
 import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.SavedCardUi
 import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.toMoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.viewmodel.GuideSavedCardsViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.EarningSummary
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.TransactionType
@@ -27,13 +26,6 @@ class GuideMyWalletViewModel
             MutableStateFlow(
                 GuideWalletUiState(
                     totalBalance = 20000.0,
-                    earningSummaries =
-                        listOf(
-                            EarningSummary("1", "Şubat 2026", 10000.0),
-                            EarningSummary("2", "Ocak 2026", 8500.0),
-                            EarningSummary("3", "Aralık 2025", 12000.0),
-                            EarningSummary("4", "Kasım 2025", 7000.0),
-                        ),
                     recentTransactions =
                         listOf(
                             Transaction("1", "Ayasofya Turu", 1707996600000, "15 Şub 2026, 14:30", 750.0, TransactionType.TOUR_INCOME),

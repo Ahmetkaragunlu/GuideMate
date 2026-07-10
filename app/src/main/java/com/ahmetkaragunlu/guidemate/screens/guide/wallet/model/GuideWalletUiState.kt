@@ -6,6 +6,5 @@ data class GuideWalletUiState(
     val totalBalance: Double = 0.0,
     val selectedCardId: String? = null,
     val selectedMethod: MoneyActionMethodUi? = null,
-    val earningSummaries: List<EarningSummary> = emptyList(),
     val recentTransactions: List<Transaction> = emptyList(),
 )

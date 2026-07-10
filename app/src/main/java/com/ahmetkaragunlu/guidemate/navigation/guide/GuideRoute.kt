@@ -4,6 +4,7 @@ enum class GuideRoute(
     val route: String,
 ) {
     GuideHomeScreen(route = "GuideHomeScreen"),
+    GuideEarningsScreen(route = "GuideEarningsScreen"),
     GuideMyToursScreen(route = "GuideMyToursScreen"),
     GuideTourPublishStep1Screen(route = "GuideTourPublishStep1Screen"),
     GuideTourPublishStep2Screen(route = "GuideTourPublishStep2Screen"),

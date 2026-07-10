@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideStatistic
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.RecentActivity
@@ -50,6 +51,8 @@ import compose.icons.tablericons.ArrowRight
 @Composable
 fun GuideHomeScreen(
     uiState: GuideHomeUiState,
+    currentMonthEarning: MonthlyEarningUiModel,
+    onNavigateToEarnings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -77,7 +80,10 @@ fun GuideHomeScreen(
                 )
             }
         }
-        MonthlyEarningsCard(earnings = uiState.monthlyEarnings)
+        MonthlyEarningsCard(
+            earning = currentMonthEarning,
+            onClick = onNavigateToEarnings,
+        )
         Text(
             text = stringResource(R.string.tour_status),
             style = MaterialTheme.typography.titleMedium,
@@ -146,10 +152,12 @@ private fun GuideStatCard(
 
 @Composable
 private fun MonthlyEarningsCard(
-    earnings: Double,
+    earning: MonthlyEarningUiModel,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFf2f2fd)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
@@ -169,7 +177,7 @@ private fun MonthlyEarningsCard(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = earnings.toLocalCurrency(),
+                text = earning.amount.toLocalCurrency(),
                 color = Color(0xFF888ded),
                 fontWeight = FontWeight.Bold,
             )

@@ -2,8 +2,11 @@ package com.ahmetkaragunlu.guidemate.components
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.navigation.guide.GuideRoute
+import com.ahmetkaragunlu.guidemate.navigation.guide.guideScreenTitleResId
+import com.ahmetkaragunlu.guidemate.navigation.guide.isGuideChatDetailRoute
+import com.ahmetkaragunlu.guidemate.navigation.guide.isGuideHomeRoute
+import com.ahmetkaragunlu.guidemate.navigation.guide.isGuideProfileRoute
+import com.ahmetkaragunlu.guidemate.navigation.guide.shouldShowGuideBackButton
 
 @Composable
 fun GuideTopBar(
@@ -11,20 +14,14 @@ fun GuideTopBar(
     navController: NavController,
     userName: String?,
 ) {
-    val isChatDetail = currentRoute == GuideRoute.GuideChatDetailScreen.route
-    val isProfilePreview = currentRoute == GuideRoute.GuideProfilePreviewScreen.route
-    val isTourPublishFlow =
-        currentRoute == GuideRoute.GuideTourPublishStep1Screen.route ||
-            currentRoute == GuideRoute.GuideTourPublishStep2Screen.route ||
-            currentRoute == GuideRoute.GuideTourPublishStep3Screen.route ||
-            currentRoute == GuideRoute.GuideTourPublishStep4Screen.route
+    val isChatDetail = currentRoute.isGuideChatDetailRoute()
     val config =
         AppTopBarConfig(
-            isHome = currentRoute == GuideRoute.GuideHomeScreen.route,
+            isHome = currentRoute.isGuideHomeRoute(),
             isChatDetail = isChatDetail,
-            showBackButton = isChatDetail || isProfilePreview || isTourPublishFlow,
-            showLogoutButton = currentRoute == GuideRoute.GuideProfileScreen.route,
-            titleResId = getGuideScreenTitle(currentRoute),
+            showBackButton = currentRoute.shouldShowGuideBackButton(),
+            showLogoutButton = currentRoute.isGuideProfileRoute(),
+            titleResId = currentRoute.guideScreenTitleResId(),
             chatTitle = "Hans Müller",
         )
 
@@ -35,18 +32,3 @@ fun GuideTopBar(
         onLogoutClick = { },
     )
 }
-
-fun getGuideScreenTitle(route: String?): Int =
-    when (route) {
-        GuideRoute.GuideHomeScreen.route -> R.string.welcome_message
-        GuideRoute.GuideMyToursScreen.route -> R.string.guide_tours
-        GuideRoute.GuideMyWalletScreen.route -> R.string.guide_wallet
-        GuideRoute.GuideChatScreen.route -> R.string.guide_chat
-        GuideRoute.GuideProfileScreen.route -> R.string.guide_profile
-        GuideRoute.GuideProfilePreviewScreen.route -> R.string.preview_screen_title
-        GuideRoute.GuideTourPublishStep1Screen.route -> R.string.guide_tour_publish_topbar_step1_title
-        GuideRoute.GuideTourPublishStep2Screen.route -> R.string.guide_tour_publish_topbar_step2_title
-        GuideRoute.GuideTourPublishStep3Screen.route -> R.string.guide_tour_publish_topbar_step3_title
-        GuideRoute.GuideTourPublishStep4Screen.route -> R.string.guide_tour_publish_topbar_step4_title
-        else -> R.string.app_name
-    }

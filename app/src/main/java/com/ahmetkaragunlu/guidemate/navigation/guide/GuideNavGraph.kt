@@ -20,6 +20,9 @@ import com.ahmetkaragunlu.guidemate.navigation.guideNavItems
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatDetailScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.earnings.GuideEarningsScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.GuideEarningsUiState
+import com.ahmetkaragunlu.guidemate.screens.guide.earnings.viewmodel.GuideEarningsViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
@@ -37,10 +40,20 @@ fun NavGraphBuilder.guideNavGraph(
     guideNavController: NavController,
     routeNavController: NavController,
     guideHomeUiState: GuideHomeUiState,
+    guideEarningsUiState: GuideEarningsUiState,
     tourPublishViewModel: GuideTourPublishViewModel,
 ) {
     composable(route = GuideRoute.GuideHomeScreen.route) {
-        GuideHomeScreen(uiState = guideHomeUiState)
+        GuideHomeScreen(
+            uiState = guideHomeUiState,
+            currentMonthEarning = guideEarningsUiState.currentMonth,
+            onNavigateToEarnings = {
+                guideNavController.navigateTo(GuideRoute.GuideEarningsScreen.route)
+            },
+        )
+    }
+    composable(route = GuideRoute.GuideEarningsScreen.route) {
+        GuideEarningsScreen(uiState = guideEarningsUiState)
     }
     composable(route = GuideRoute.GuideMyToursScreen.route) {
         GuideMyToursScreen(
@@ -89,7 +102,12 @@ fun NavGraphBuilder.guideNavGraph(
         )
     }
     composable(route = GuideRoute.GuideMyWalletScreen.route) {
-        GuideMyWalletScreen()
+        GuideMyWalletScreen(
+            earnings = guideEarningsUiState.allEarnings,
+            onNavigateToEarnings = {
+                guideNavController.navigateTo(GuideRoute.GuideEarningsScreen.route)
+            },
+        )
     }
     composable(route = GuideRoute.GuideChatScreen.route) {
         GuideChatScreen(
@@ -120,15 +138,16 @@ fun NavGraphBuilder.guideNavGraph(
 @Composable
 fun GuideNavGraphScaffold(
     routeNavController: NavController,
-    viewModel: GuideHomeViewModel = hiltViewModel(),
+    homeViewModel: GuideHomeViewModel = hiltViewModel(),
+    earningsViewModel: GuideEarningsViewModel = hiltViewModel(),
     tourPublishViewModel: GuideTourPublishViewModel = hiltViewModel(),
 ) {
     val guideNavController = rememberNavController()
     val navBackStackEntry by guideNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: GuideRoute.GuideHomeScreen.route
-    val isTourPublishRoute = currentRoute.isGuideTourPublishRoute()
-    val getUserName by viewModel.userName.collectAsStateWithLifecycle()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val getUserName by homeViewModel.userName.collectAsStateWithLifecycle()
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val earningsUiState by earningsViewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -139,7 +158,7 @@ fun GuideNavGraphScaffold(
             )
         },
         bottomBar = {
-            if (!isTourPublishRoute) {
+            if (currentRoute.shouldShowGuideBottomBar()) {
                 AppBottomBar(
                     navController = guideNavController,
                     currentRoute = currentRoute,
@@ -157,14 +176,9 @@ fun GuideNavGraphScaffold(
                 guideNavController = guideNavController,
                 routeNavController = routeNavController,
                 guideHomeUiState = uiState,
+                guideEarningsUiState = earningsUiState,
                 tourPublishViewModel = tourPublishViewModel,
             )
         }
     }
 }
-
-private fun String.isGuideTourPublishRoute(): Boolean =
-    this == GuideRoute.GuideTourPublishStep1Screen.route ||
-        this == GuideRoute.GuideTourPublishStep2Screen.route ||
-        this == GuideRoute.GuideTourPublishStep3Screen.route ||
-        this == GuideRoute.GuideTourPublishStep4Screen.route

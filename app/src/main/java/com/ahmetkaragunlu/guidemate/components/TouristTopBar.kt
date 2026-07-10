@@ -2,8 +2,11 @@ package com.ahmetkaragunlu.guidemate.components
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristRoute
+import com.ahmetkaragunlu.guidemate.navigation.tourist.isTouristChatDetailRoute
+import com.ahmetkaragunlu.guidemate.navigation.tourist.isTouristHomeRoute
+import com.ahmetkaragunlu.guidemate.navigation.tourist.isTouristProfileRoute
+import com.ahmetkaragunlu.guidemate.navigation.tourist.shouldShowTouristBackButton
+import com.ahmetkaragunlu.guidemate.navigation.tourist.touristScreenTitleResId
 
 @Composable
 fun TouristAppBar(
@@ -11,14 +14,14 @@ fun TouristAppBar(
     navController: NavController,
     userName: String?,
 ) {
-    val isChatDetail = currentRoute == TouristRoute.TouristChatDetailScreen.route
+    val isChatDetail = currentRoute.isTouristChatDetailRoute()
     val config =
         AppTopBarConfig(
-            isHome = currentRoute == TouristRoute.TouristHomeScreen.route,
+            isHome = currentRoute.isTouristHomeRoute(),
             isChatDetail = isChatDetail,
-            showBackButton = currentRoute == TouristRoute.TouristFilterScreen.route || isChatDetail,
-            showLogoutButton = currentRoute == TouristRoute.TouristProfileScreen.route,
-            titleResId = getTouristScreenTitle(currentRoute),
+            showBackButton = currentRoute.shouldShowTouristBackButton(),
+            showLogoutButton = currentRoute.isTouristProfileRoute(),
+            titleResId = currentRoute.touristScreenTitleResId(),
             chatTitle = "Ahmet Rehber",
         )
 
@@ -29,14 +32,3 @@ fun TouristAppBar(
         onLogoutClick = { },
     )
 }
-
-fun getTouristScreenTitle(route: String?): Int =
-    when (route) {
-        TouristRoute.TouristHomeScreen.route -> R.string.welcome_message
-        TouristRoute.TouristExploreScreen.route -> R.string.tourist_explore
-        TouristRoute.TouristMyTripsScreen.route -> R.string.tourist_trips
-        TouristRoute.TouristChatScreen.route -> R.string.tourist_chat
-        TouristRoute.TouristProfileScreen.route -> R.string.tourist_profile
-        TouristRoute.TouristFilterScreen.route -> R.string.filter
-        else -> R.string.app_name
-    }

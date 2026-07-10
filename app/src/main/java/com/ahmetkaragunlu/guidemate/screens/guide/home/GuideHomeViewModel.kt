@@ -23,7 +23,6 @@ class GuideHomeViewModel @Inject constructor(
     private val _uiState =
         MutableStateFlow(
             GuideHomeUiState(
-                monthlyEarnings = 12500.0,
                 pendingCount = 1,
                 activeCount = 3,
                 dashboardStats = dashboardStats,

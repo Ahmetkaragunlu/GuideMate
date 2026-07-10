@@ -142,6 +142,10 @@
     <string name="average_rating">Ortalama Puan</string>
     <string name="this_month_earnings">Bu ayki kazanç</string>
     <string name="earnings_by_month">Aylık Kazançlar</string>
+    <string name="guide_earnings">Kazançlarım</string>
+    <string name="earnings_history">Geçmiş Kazançlar</string>
+    <string name="earnings_empty_year">Bu yıl için geçmiş kazanç bulunmuyor.</string>
+    <string name="view_all">Tümünü Gör</string>
     <string name="tour_status">Tur Durumu</string>
     <string name="active_tours">Yayında</string>
     <string name="pending_tours">Onay Bekliyor</string>
