@@ -64,6 +64,10 @@ class GuideProfileSharedStore
 
         val state: StateFlow<GuideProfileSharedState> = _state.asStateFlow()
 
+        fun updateSelectedProfileImage(uri: String) {
+            _state.update { current -> current.copy(selectedProfileImageUri = uri) }
+        }
+
         fun updateAbout(
             specialtyTitle: String,
             biography: String,

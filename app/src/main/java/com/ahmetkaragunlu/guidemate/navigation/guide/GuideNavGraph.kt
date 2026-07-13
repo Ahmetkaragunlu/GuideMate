@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,17 +15,23 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.AppBottomBar
 import com.ahmetkaragunlu.guidemate.components.GuideTopBar
+import com.ahmetkaragunlu.guidemate.domain.model.UserRole
+import com.ahmetkaragunlu.guidemate.navigation.chat.CHAT_ID_ARGUMENT
 import com.ahmetkaragunlu.guidemate.navigation.graph.Graph
 import com.ahmetkaragunlu.guidemate.navigation.guideNavItems
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatDetailScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.chat.GuideChatScreen
+import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatDetailScreen
+import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatListScreen
+import com.ahmetkaragunlu.guidemate.screens.common.chat.viewmodel.ChatListViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.GuideEarningsScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.viewmodel.GuideEarningsViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeScreen
@@ -52,6 +59,7 @@ fun NavGraphBuilder.guideNavGraph(
     earningsViewModel: GuideEarningsViewModel,
     notificationsViewModel: GuideNotificationsViewModel,
     tourPublishViewModel: GuideTourPublishViewModel,
+    chatListViewModel: ChatListViewModel,
     onBackActionChanged: ((() -> Unit)?) -> Unit,
 ) {
     composable(route = GuideRoute.GuideHomeScreen.route) {
@@ -185,15 +193,20 @@ fun NavGraphBuilder.guideNavGraph(
         )
     }
     composable(route = GuideRoute.GuideChatScreen.route) {
-        GuideChatScreen(
+        val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
+        ChatListScreen(
+            uiState = chatListUiState,
             onNavigateToDetail = { chatId ->
-                guideNavController.navigateTo(GuideRoute.GuideChatDetailScreen.route)
+                guideNavController.navigateTo(guideChatDetailRoute(chatId))
             },
         )
     }
 
-    composable(route = GuideRoute.GuideChatDetailScreen.route) {
-        GuideChatDetailScreen()
+    composable(
+        route = GUIDE_CHAT_DETAIL_ROUTE_PATTERN,
+        arguments = listOf(navArgument(CHAT_ID_ARGUMENT) { type = NavType.StringType }),
+    ) {
+        ChatDetailScreen(viewerRole = UserRole.GUIDE)
     }
     composable(route = GuideRoute.GuideProfileScreen.route) {
         GuideProfileScreen(
@@ -217,14 +230,22 @@ fun GuideNavGraphScaffold(
     earningsViewModel: GuideEarningsViewModel = hiltViewModel(),
     notificationsViewModel: GuideNotificationsViewModel = hiltViewModel(),
     tourPublishViewModel: GuideTourPublishViewModel = hiltViewModel(),
+    chatListViewModel: ChatListViewModel = hiltViewModel(),
 ) {
     val guideNavController = rememberNavController()
     val navBackStackEntry by guideNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: GuideRoute.GuideHomeScreen.route
     val getUserName by homeViewModel.userName.collectAsStateWithLifecycle()
     val notificationsUiState by notificationsViewModel.uiState.collectAsStateWithLifecycle()
+    val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
+    val activeChatId = navBackStackEntry?.arguments?.getString(CHAT_ID_ARGUMENT)
+    val activeChat = chatListUiState.chats.firstOrNull { it.chatId == activeChatId }
     var showNotifications by rememberSaveable { mutableStateOf(false) }
     var customBackAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    LaunchedEffect(chatListViewModel) {
+        chatListViewModel.setViewerRole(UserRole.GUIDE)
+    }
 
     Box {
         Scaffold(
@@ -235,6 +256,8 @@ fun GuideNavGraphScaffold(
                     userName = getUserName,
                     unreadNotificationCount = notificationsUiState.unreadCount,
                     onNotificationClick = { showNotifications = true },
+                    chatTitle = activeChat?.name.orEmpty(),
+                    chatAvatarResId = activeChat?.avatarResId ?: R.drawable.example,
                     onBackClick = { customBackAction?.invoke() ?: guideNavController.navigateUp() },
                 )
             },
@@ -244,6 +267,11 @@ fun GuideNavGraphScaffold(
                         navController = guideNavController,
                         currentRoute = currentRoute,
                         items = guideNavItems,
+                        badgeCounts =
+                            mapOf(
+                                GuideRoute.GuideChatScreen.route to
+                                    chatListUiState.totalUnreadCount,
+                            ),
                     )
                 }
             },
@@ -260,6 +288,7 @@ fun GuideNavGraphScaffold(
                     earningsViewModel = earningsViewModel,
                     notificationsViewModel = notificationsViewModel,
                     tourPublishViewModel = tourPublishViewModel,
+                    chatListViewModel = chatListViewModel,
                     onBackActionChanged = { customBackAction = it },
                 )
             }

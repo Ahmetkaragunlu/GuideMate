@@ -8,6 +8,7 @@ data class GuideProfileUiState(
     val lastName: String? = null,
     val profileImageResId: Int? = null,
     val profileImageUrl: String? = null,
+    val selectedProfileImageUri: String? = null,
     val title: String = "",
     val guideLevel: GuideLevelTier = GuideLevelTier.APPROVED,
     val rating: Double = 0.0,
@@ -16,6 +17,9 @@ data class GuideProfileUiState(
     val spokenLanguages: List<GuideSpokenLanguageUi> = emptyList(),
     val popularTours: List<PopularTourCardUiModel> = emptyList(),
 ) {
+    val displayProfileImageUrl: String?
+        get() = selectedProfileImageUri ?: profileImageUrl
+
     val displayName: String
         get() =
             listOfNotNull(

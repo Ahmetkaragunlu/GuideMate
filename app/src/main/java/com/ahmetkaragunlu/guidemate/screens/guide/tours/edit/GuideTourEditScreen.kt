@@ -18,7 +18,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditAlertDialog
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.TourCoverImagePicker
+import com.ahmetkaragunlu.guidemate.components.ImageSourcePicker
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
 
@@ -71,8 +71,9 @@ fun GuideTourEditScreen(
         modifier = modifier,
     )
 
-    TourCoverImagePicker(
+    ImageSourcePicker(
         isVisible = showPhotoSourceSheet,
+        titleResId = R.string.tour_cover_photo_source_title,
         onDismissRequest = { showPhotoSourceSheet = false },
         onImageSelected = viewModel::onCoverImageSelected,
         onError = viewModel::onCoverImageSelectionError,

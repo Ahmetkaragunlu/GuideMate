@@ -1,10 +1,9 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,7 +43,6 @@ import com.ahmetkaragunlu.guidemate.components.EditTextField
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.GuideAboutUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AboutContent(
     uiState: GuideAboutUiState,
@@ -74,11 +72,13 @@ fun AboutContent(
             SpecialtySection(
                 title = uiState.specialtyTitle,
                 onTitleChange = onSpecialtyTitleChange,
+                isError = uiState.showValidationErrors && !uiState.isSpecialtyTitleValid,
             )
 
             BiographySection(
                 biography = uiState.biography,
                 onBiographyChange = onBiographyChange,
+                isError = uiState.showValidationErrors && !uiState.isBiographyValid,
             )
 
             LanguagesSection(
@@ -86,6 +86,13 @@ fun AboutContent(
                 onRemoveLanguageClick = onRemoveLanguageClick,
                 onAddLanguageClick = onAddLanguageClick,
             )
+            if (uiState.showValidationErrors) {
+                Text(
+                    text = stringResource(R.string.about_form_validation_error),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             Spacer(modifier = Modifier.weight(1f))
 
             EditButton(
@@ -101,6 +108,7 @@ fun AboutContent(
 private fun SpecialtySection(
     title: String,
     onTitleChange: (String) -> Unit,
+    isError: Boolean,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
@@ -115,6 +123,7 @@ private fun SpecialtySection(
             value = title,
             onValueChange = onTitleChange,
             placeholder = R.string.about_specialty_placeholder,
+            supportingText = if (isError) R.string.about_specialty_validation_error else null,
             keyboardOptions = KeyboardOptions.Default,
             colors =
                 OutlinedTextFieldDefaults.colors(
@@ -138,6 +147,7 @@ private fun SpecialtySection(
 private fun BiographySection(
     biography: String,
     onBiographyChange: (String) -> Unit,
+    isError: Boolean,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
@@ -160,18 +170,27 @@ private fun BiographySection(
                 )
             },
             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-            textStyle = MaterialTheme.typography.titleMedium,
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colorResource(R.color.brand_color),
                     unfocusedBorderColor = Color(0xFFE0E0E0),
                     cursorColor = colorResource(R.color.brand_color),
                 ),
+            supportingText =
+                if (isError) {
+                    {
+                        Text(
+                            text = stringResource(R.string.about_biography_validation_error),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                } else {
+                    null
+                },
         )
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LanguagesSection(
     languages: List<GuideSpokenLanguageUi>,
@@ -187,10 +206,13 @@ private fun LanguagesSection(
             color = colorResource(R.color.brand_color),
         )
 
-        FlowRow(
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             languages.forEach { language ->
                 LanguageChip(

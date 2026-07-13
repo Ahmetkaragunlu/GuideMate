@@ -6,6 +6,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLangu
 
 data class GuideProfilePreviewUiState(
     val profileImageResId: Int,
+    val profileImageUrl: String?,
     val displayName: String,
     val title: String,
     val guideLevel: GuideLevelTier,

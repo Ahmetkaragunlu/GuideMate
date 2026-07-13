@@ -22,6 +22,7 @@ class GuideProfileStateProvider
                     lastName = user.lastName,
                     profileImageResId = shared.profileImageResId,
                     profileImageUrl = shared.profileImageUrl,
+                    selectedProfileImageUri = shared.selectedProfileImageUri,
                     title = shared.title,
                     guideLevel = calculateGuideLevelTier(shared.tourCount, shared.rating),
                     rating = shared.rating,

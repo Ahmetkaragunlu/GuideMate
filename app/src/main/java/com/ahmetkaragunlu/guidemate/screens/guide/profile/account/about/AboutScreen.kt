@@ -10,6 +10,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.viewmode
 
 @Composable
 fun AboutScreen(
+    onSaved: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: GuideAboutViewModel = hiltViewModel(),
 ) {
@@ -22,6 +23,8 @@ fun AboutScreen(
         onBiographyChange = viewModel::onBiographyChange,
         onRemoveLanguageClick = viewModel::onRemoveLanguageClick,
         onAddLanguageClick = viewModel::onAddLanguageClick,
-        onSaveClick = viewModel::onSaveClick,
+        onSaveClick = {
+            if (viewModel.onSaveClick()) onSaved()
+        },
     )
 }

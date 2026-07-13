@@ -27,12 +27,12 @@ import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.Sav
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 
-fun NavGraphBuilder.guideAccountNavGraph(accountNavController: NavController) {
+fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {
     composable(route = GuideAccountRoute.SavedCards.route) {
         SavedCardsScreen()
     }
     composable(route = GuideAccountRoute.About.route) {
-        AboutScreen()
+        AboutScreen(onSaved = onAboutSaved)
     }
     composable(route = GuideAccountRoute.ChangePassword.route) {
         ChangePasswordScreen()
@@ -83,7 +83,7 @@ fun GuideAccountNavGraphScaffold(
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding),
         ) {
-            guideAccountNavGraph(accountNavController = accountNavController)
+            guideAccountNavGraph(onAboutSaved = { routeNavController.navigateUp() })
         }
     }
 }

@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.chat.components.ChatInputArea
 import com.ahmetkaragunlu.guidemate.screens.common.chat.components.MessageBubble
@@ -29,7 +28,7 @@ fun SharedChatDetailContent(
 ) {
     val listState = rememberLazyListState()
 
-    LaunchedEffect(messages.size) {
+    LaunchedEffect(messages.lastOrNull()?.messageId) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
@@ -46,7 +45,10 @@ fun SharedChatDetailContent(
         ) {
             item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium))) }
 
-            items(messages) { message ->
+            items(
+                items = messages,
+                key = MessageUiModel::messageId,
+            ) { message ->
                 MessageBubble(message = message)
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             }

@@ -53,8 +53,11 @@
     <string name="about_specialty_title">Uzmanlık Unvanı</string>
     <string name="about_specialty_placeholder">Sanat Tarihçisi</string>
     <string name="about_specialty_helper">* Turistlerin göreceği ana unvanınız.</string>
+    <string name="about_specialty_validation_error">Uzmanlık unvanı en az 2 karakter olmalıdır.</string>
     <string name="about_biography_title">Biyografi (Hakkımda)</string>
     <string name="about_biography_placeholder">İstanbul’un tarihi dokusunu ve kültürel hikayelerini anlatmayı seven bir rehberim.</string>
+    <string name="about_biography_validation_error">Biyografi en az 20 karakter olmalıdır.</string>
+    <string name="about_form_validation_error">Kaydetmeden önce unvan ve biyografi alanlarını kontrol edin.</string>
     <string name="about_languages_title">Konuşulan Diller</string>
     <string name="about_add_language">+ Dil Ekle</string>
     <string name="about_save_action">KAYDET</string>
@@ -133,6 +136,7 @@
     <string name="guide_tours">Turlarım</string>
     <string name="guide_chat">Sohbet</string>
     <string name="chat_input_placeholder">Mesaj yazın...</string>
+    <string name="chat_empty_history">Henüz sohbet geçmişiniz yok.</string>
     <string name="guide_profile">Hesabım</string>
     <string name="guide_wallet">Cüzdan</string>
 
@@ -258,8 +262,8 @@
     <string name="error_tour_step1_invalid">Konumu, gelecekteki tur tarihini, başlangıç saatini ve tur süresini kontrol edin.</string>
     <string name="error_tour_step2_invalid">Kategori, en az bir hizmet dili, pozitif ücret ve kapasite gereklidir.</string>
     <string name="error_tour_step3_invalid">Tur adı, kapak fotoğrafı, açıklama ve buluşma noktası alanlarını doldurun.</string>
-    <string name="error_tour_cover_too_large">Kapak fotoğrafı en fazla 10 MB olabilir.</string>
-    <string name="error_tour_photo_source_unavailable">Fotoğraf kaynağı açılamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_image_too_large">Fotoğraf en fazla 10 MB olabilir.</string>
+    <string name="error_image_source_unavailable">Fotoğraf kaynağı açılamadı. Lütfen tekrar deneyin.</string>
     <string name="error_session_creation">Tarih, saat, süre, fiyat ve kapasiteyi kontrol edin. Başka bir turunuzla saat çakışması da olabilir.</string>
     <string name="tab_guides">Rehberler</string>
     <string name="search_tours">Tur Ara</string>
@@ -325,6 +329,7 @@
     <string name="guide_tour_publish_step3_photos_placeholder">Kapak fotoğrafı seçmek için dokunun</string>
     <string name="guide_tour_publish_step3_photos_meta">JPG/PNG • Max 10 MB</string>
     <string name="tour_cover_photo_source_title">Kapak fotoğrafı ekle</string>
+    <string name="profile_photo_source_title">Profil fotoğrafı ekle</string>
     <string name="choose_from_gallery">Galeriden seç</string>
     <string name="take_photo">Fotoğraf çek</string>
     <string name="change_cover_photo">Kapak fotoğrafını değiştirmek için dokunun</string>

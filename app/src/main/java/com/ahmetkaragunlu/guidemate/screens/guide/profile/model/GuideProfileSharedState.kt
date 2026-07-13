@@ -5,6 +5,7 @@ import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUi
 data class GuideProfileSharedState(
     val profileImageResId: Int,
     val profileImageUrl: String? = null,
+    val selectedProfileImageUri: String? = null,
     val title: String,
     val rating: Double,
     val tourCount: Int,

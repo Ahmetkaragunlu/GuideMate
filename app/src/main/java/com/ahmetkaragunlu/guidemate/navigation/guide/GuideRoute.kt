@@ -1,5 +1,8 @@
 package com.ahmetkaragunlu.guidemate.navigation.guide
 
+import com.ahmetkaragunlu.guidemate.navigation.chat.chatDetailRoute
+import com.ahmetkaragunlu.guidemate.navigation.chat.chatDetailRoutePattern
+
 enum class GuideRoute(
     val route: String,
 ) {
@@ -32,3 +35,9 @@ internal val GUIDE_TOUR_EDIT_ROUTE_PATTERN =
 
 internal fun guideTourEditRoute(sessionId: String): String =
     "${GuideRoute.GuideTourEditScreen.route}/$sessionId"
+
+internal val GUIDE_CHAT_DETAIL_ROUTE_PATTERN =
+    chatDetailRoutePattern(GuideRoute.GuideChatDetailScreen.route)
+
+internal fun guideChatDetailRoute(chatId: String): String =
+    chatDetailRoute(GuideRoute.GuideChatDetailScreen.route, chatId)

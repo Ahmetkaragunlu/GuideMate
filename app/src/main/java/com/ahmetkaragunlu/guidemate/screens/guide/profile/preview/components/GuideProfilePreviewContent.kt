@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -32,12 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
+import com.ahmetkaragunlu.guidemate.components.GuideMateImage
 import com.ahmetkaragunlu.guidemate.screens.common.tours.PopularTourCard
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
@@ -105,8 +104,9 @@ private fun ProfileHeaderSection(
                 .clip(CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        Image(
-            painter = painterResource(id = uiState.profileImageResId),
+        GuideMateImage(
+            fallbackImageResId = uiState.profileImageResId,
+            imageUrl = uiState.profileImageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),

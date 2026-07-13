@@ -1,7 +1,8 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile
 
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -16,15 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.components.GuideMateImage
+import com.ahmetkaragunlu.guidemate.components.ImageSourcePicker
 import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
 import com.ahmetkaragunlu.guidemate.screens.common.profile.components.CommonProfileMenuItem
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
@@ -40,6 +43,8 @@ fun GuideProfileScreen(
 ) {
     val profileState by viewModel.profileState.collectAsStateWithLifecycle()
     var showGuideLevelInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showPhotoSourceSheet by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier =
@@ -59,12 +64,14 @@ fun GuideProfileScreen(
                     Modifier
                         .size(100.dp)
                         .clip(CircleShape)
-                        .background(Color.LightGray),
+                        .background(Color.LightGray)
+                        .clickable { showPhotoSourceSheet = true },
                 contentAlignment = Alignment.Center,
             ) {
                 if (profileImageResId != null) {
-                    Image(
-                        painter = painterResource(id = profileImageResId),
+                    GuideMateImage(
+                        fallbackImageResId = profileImageResId,
+                        imageUrl = profileState.displayProfileImageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize(),
@@ -80,7 +87,7 @@ fun GuideProfileScreen(
             }
 
             Surface(
-                onClick = { },
+                onClick = { showPhotoSourceSheet = true },
                 modifier =
                     Modifier
                         .size(32.dp)
@@ -170,5 +177,15 @@ fun GuideProfileScreen(
         onDismiss = { showGuideLevelInfoBottomSheet = false },
         currentLevel = profileState.guideLevel,
         viewerType = GuideLevelViewerType.OWNER,
+    )
+
+    ImageSourcePicker(
+        isVisible = showPhotoSourceSheet,
+        titleResId = R.string.profile_photo_source_title,
+        onDismissRequest = { showPhotoSourceSheet = false },
+        onImageSelected = viewModel::onProfileImageSelected,
+        onError = { errorResId ->
+            Toast.makeText(context, context.getString(errorResId), Toast.LENGTH_LONG).show()
+        },
     )
 }

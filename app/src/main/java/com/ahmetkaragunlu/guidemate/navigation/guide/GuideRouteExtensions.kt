@@ -14,7 +14,7 @@ private val guideTourPublishRoutes =
 internal fun String?.isGuideTourPublishRoute(): Boolean = this in guideTourPublishRoutes
 
 internal fun String?.isGuideChatDetailRoute(): Boolean =
-    this == GuideRoute.GuideChatDetailScreen.route
+    this == GUIDE_CHAT_DETAIL_ROUTE_PATTERN
 
 internal fun String?.isGuideProfilePreviewRoute(): Boolean =
     this == GuideRoute.GuideProfilePreviewScreen.route

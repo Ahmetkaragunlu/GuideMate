@@ -24,6 +24,7 @@ class GuideProfilePreviewViewModel
             .map { profile ->
                 GuideProfilePreviewUiState(
                     profileImageResId = profile.profileImageResId ?: R.drawable.unnamed,
+                    profileImageUrl = profile.displayProfileImageUrl,
                     displayName = profile.displayName,
                     title = profile.title,
                     guideLevel = profile.guideLevel,
@@ -39,6 +40,7 @@ class GuideProfilePreviewViewModel
                 initialValue =
                     GuideProfilePreviewUiState(
                         profileImageResId = R.drawable.unnamed,
+                        profileImageUrl = null,
                         displayName = "Ahmet Karagünlü",
                         title = "Sanat Tarihçisi",
                         guideLevel = GuideLevelTier.SUPER,

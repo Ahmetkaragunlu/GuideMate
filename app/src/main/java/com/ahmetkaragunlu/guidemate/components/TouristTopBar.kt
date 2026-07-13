@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.components
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.navigation.tourist.isTouristChatDetailRoute
 import com.ahmetkaragunlu.guidemate.navigation.tourist.isTouristHomeRoute
 import com.ahmetkaragunlu.guidemate.navigation.tourist.isTouristProfileRoute
@@ -13,6 +14,8 @@ fun TouristAppBar(
     currentRoute: String,
     navController: NavController,
     userName: String?,
+    chatTitle: String = "",
+    chatAvatarResId: Int = R.drawable.example,
 ) {
     val isChatDetail = currentRoute.isTouristChatDetailRoute()
     val config =
@@ -22,7 +25,8 @@ fun TouristAppBar(
             showBackButton = currentRoute.shouldShowTouristBackButton(),
             showLogoutButton = currentRoute.isTouristProfileRoute(),
             titleResId = currentRoute.touristScreenTitleResId(),
-            chatTitle = "Ahmet Rehber",
+            chatTitle = chatTitle,
+            chatAvatarResId = chatAvatarResId,
         )
 
     AppTopBar(

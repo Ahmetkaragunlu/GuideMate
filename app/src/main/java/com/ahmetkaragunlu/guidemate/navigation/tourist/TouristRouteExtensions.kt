@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.ahmetkaragunlu.guidemate.R
 
 internal fun String?.isTouristChatDetailRoute(): Boolean =
-    this == TouristRoute.TouristChatDetailScreen.route
+    this == TOURIST_CHAT_DETAIL_ROUTE_PATTERN
 
 internal fun String?.isTouristFilterRoute(): Boolean =
     this == TouristRoute.TouristFilterScreen.route

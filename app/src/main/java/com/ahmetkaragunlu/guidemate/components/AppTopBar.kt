@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.components
 
 import androidx.annotation.StringRes
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,8 +40,9 @@ data class AppTopBarConfig(
     val isChatDetail: Boolean,
     val showBackButton: Boolean,
     val showLogoutButton: Boolean,
-    @StringRes val titleResId: Int,
+    @param:StringRes val titleResId: Int,
     val chatTitle: String = "",
+    @param:DrawableRes val chatAvatarResId: Int = R.drawable.example,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +92,7 @@ fun AppTopBar(
                 if (config.isChatDetail) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
-                            painter = painterResource(id = R.drawable.example),
+                            painter = painterResource(id = config.chatAvatarResId),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier =

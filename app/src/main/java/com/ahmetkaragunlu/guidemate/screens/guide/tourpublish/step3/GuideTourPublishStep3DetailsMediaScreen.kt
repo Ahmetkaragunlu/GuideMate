@@ -7,9 +7,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.components.ImageSourcePicker
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step3.content.GuideTourPublishStep3DetailsMediaContent
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.TourCoverImagePicker
 
 @Composable
 fun GuideTourPublishStep3DetailsMediaScreen(
@@ -35,8 +35,9 @@ fun GuideTourPublishStep3DetailsMediaScreen(
         modifier = modifier,
     )
 
-    TourCoverImagePicker(
+    ImageSourcePicker(
         isVisible = showPhotoSourceSheet,
+        titleResId = R.string.tour_cover_photo_source_title,
         onDismissRequest = { showPhotoSourceSheet = false },
         onImageSelected = { uri ->
             coverImageErrorResId = null

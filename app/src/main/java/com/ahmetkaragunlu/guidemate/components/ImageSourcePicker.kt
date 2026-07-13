@@ -1,10 +1,11 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.tours.components
+package com.ahmetkaragunlu.guidemate.components
 
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,12 +38,13 @@ import androidx.core.net.toUri
 import com.ahmetkaragunlu.guidemate.R
 import java.io.File
 
-private const val MAX_COVER_IMAGE_BYTES = 10L * 1024 * 1024
-private const val CAMERA_IMAGE_DIRECTORY = "tour_cover_images"
+private const val MAX_IMAGE_BYTES = 10L * 1024 * 1024
+private const val CAMERA_IMAGE_DIRECTORY = "selected_images"
 
 @Composable
-fun TourCoverImagePicker(
+fun ImageSourcePicker(
     isVisible: Boolean,
+    @StringRes titleResId: Int,
     onDismissRequest: () -> Unit,
     onImageSelected: (String) -> Unit,
     onError: (Int) -> Unit,
@@ -56,7 +58,7 @@ fun TourCoverImagePicker(
         if (isValid) {
             onImageSelected(uri.toString())
         } else {
-            onError(R.string.error_tour_cover_too_large)
+            onError(R.string.error_image_too_large)
         }
         isValid
     }
@@ -78,7 +80,8 @@ fun TourCoverImagePicker(
 
     if (!isVisible) return
 
-    CoverPhotoSourceBottomSheet(
+    ImageSourceBottomSheet(
+        titleResId = titleResId,
         onDismiss = onDismissRequest,
         onGalleryClick = {
             onDismissRequest()
@@ -86,16 +89,15 @@ fun TourCoverImagePicker(
                     galleryLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
                     )
-                }
-                .onFailure { onError(R.string.error_tour_photo_source_unavailable) }
+                }.onFailure { onError(R.string.error_image_source_unavailable) }
         },
         onCameraClick = {
             onDismissRequest()
             val pendingImage =
                 runCatching { context.createPendingCameraImage() }
                     .getOrElse {
-                        onError(R.string.error_tour_photo_source_unavailable)
-                        return@CoverPhotoSourceBottomSheet
+                        onError(R.string.error_image_source_unavailable)
+                        return@ImageSourceBottomSheet
                     }
             pendingCameraUri = pendingImage.uri.toString()
             pendingCameraFilePath = pendingImage.file.absolutePath
@@ -104,7 +106,7 @@ fun TourCoverImagePicker(
                     pendingImage.file.delete()
                     pendingCameraUri = null
                     pendingCameraFilePath = null
-                    onError(R.string.error_tour_photo_source_unavailable)
+                    onError(R.string.error_image_source_unavailable)
                 }
         },
     )
@@ -112,7 +114,8 @@ fun TourCoverImagePicker(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CoverPhotoSourceBottomSheet(
+private fun ImageSourceBottomSheet(
+    @StringRes titleResId: Int,
     onDismiss: () -> Unit,
     onGalleryClick: () -> Unit,
     onCameraClick: () -> Unit,
@@ -125,7 +128,7 @@ private fun CoverPhotoSourceBottomSheet(
                     .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         ) {
             Text(
-                text = stringResource(R.string.tour_cover_photo_source_title),
+                text = stringResource(titleResId),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -168,7 +171,7 @@ private data class PendingCameraImage(
 
 private fun Context.createPendingCameraImage(): PendingCameraImage {
     val imageDirectory = File(cacheDir, CAMERA_IMAGE_DIRECTORY).apply { mkdirs() }
-    val imageFile = File.createTempFile("tour_cover_", ".jpg", imageDirectory)
+    val imageFile = File.createTempFile("selected_image_", ".jpg", imageDirectory)
     val imageUri =
         FileProvider.getUriForFile(
             this,
@@ -181,7 +184,6 @@ private fun Context.createPendingCameraImage(): PendingCameraImage {
 private fun Context.isImageWithinSizeLimit(uri: Uri): Boolean =
     runCatching {
             contentResolver.openAssetFileDescriptor(uri, "r")?.use { descriptor ->
-                descriptor.length < 0 || descriptor.length <= MAX_COVER_IMAGE_BYTES
+                descriptor.length < 0 || descriptor.length <= MAX_IMAGE_BYTES
             } ?: false
-        }
-        .getOrDefault(false)
+        }.getOrDefault(false)
