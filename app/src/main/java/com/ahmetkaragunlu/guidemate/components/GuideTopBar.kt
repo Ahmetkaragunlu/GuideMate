@@ -13,6 +13,9 @@ fun GuideTopBar(
     currentRoute: String,
     navController: NavController,
     userName: String?,
+    unreadNotificationCount: Int,
+    onNotificationClick: () -> Unit,
+    onBackClick: () -> Unit = navController::navigateUp,
 ) {
     val isChatDetail = currentRoute.isGuideChatDetailRoute()
     val config =
@@ -28,7 +31,9 @@ fun GuideTopBar(
     AppTopBar(
         config = config,
         userName = userName,
-        onBackClick = navController::navigateUp,
+        onBackClick = onBackClick,
         onLogoutClick = { },
+        unreadNotificationCount = unreadNotificationCount,
+        onNotificationClick = onNotificationClick,
     )
 }

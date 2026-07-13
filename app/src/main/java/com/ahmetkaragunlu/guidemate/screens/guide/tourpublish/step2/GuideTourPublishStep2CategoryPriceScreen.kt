@@ -12,6 +12,7 @@ fun GuideTourPublishStep2CategoryPriceScreen(
     onAddLanguageClick: () -> Unit,
     onRemoveLanguageClick: (String) -> Unit,
     onPriceChange: (String) -> Unit,
+    onCapacityChange: (String) -> Unit,
     onNext: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -21,8 +22,8 @@ fun GuideTourPublishStep2CategoryPriceScreen(
         onAddLanguageClick = onAddLanguageClick,
         onRemoveLanguageClick = onRemoveLanguageClick,
         onPriceChange = onPriceChange,
+        onCapacityChange = onCapacityChange,
         onNext = onNext,
         modifier = modifier,
     )
 }
-

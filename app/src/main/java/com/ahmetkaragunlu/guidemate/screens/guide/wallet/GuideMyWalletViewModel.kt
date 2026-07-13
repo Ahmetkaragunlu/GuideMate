@@ -8,8 +8,8 @@ import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.mo
 import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.toMoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.viewmodel.GuideSavedCardsViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.TransactionType
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionType
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,17 +28,38 @@ class GuideMyWalletViewModel
                     totalBalance = 20000.0,
                     recentTransactions =
                         listOf(
-                            Transaction("1", "Ayasofya Turu", 1707996600000, "15 Şub 2026, 14:30", 750.0, TransactionType.TOUR_INCOME),
-                            Transaction("2", "Para Çekimi", 1707729300000, "12 Şub 2026, 09:15", 5000.0, TransactionType.WITHDRAWAL),
-                            Transaction(
+                            WalletTransactionUiModel(
+                                "1",
+                                "Ayasofya Turu",
+                                1707996600000,
+                                "15 Şub 2026, 14:30",
+                                750.0,
+                                WalletTransactionType.TOUR_INCOME,
+                            ),
+                            WalletTransactionUiModel(
+                                "2",
+                                "Para Çekimi",
+                                1707729300000,
+                                "12 Şub 2026, 09:15",
+                                5000.0,
+                                WalletTransactionType.WITHDRAWAL,
+                            ),
+                            WalletTransactionUiModel(
                                 "3",
                                 "Kapadokya Balon Turu",
                                 1707544800000,
                                 "10 Şub 2026, 06:00",
                                 1500.0,
-                                TransactionType.TOUR_INCOME,
+                                WalletTransactionType.TOUR_INCOME,
                             ),
-                            Transaction("4", "Para Çekimi", 1707147900000, "05 Şub 2026, 16:45", 3000.0, TransactionType.WITHDRAWAL),
+                            WalletTransactionUiModel(
+                                "4",
+                                "Para Çekimi",
+                                1707147900000,
+                                "05 Şub 2026, 16:45",
+                                3000.0,
+                                WalletTransactionType.WITHDRAWAL,
+                            ),
                         ),
                 ),
             )

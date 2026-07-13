@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step3.content
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,11 +25,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -38,8 +41,12 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
 import com.ahmetkaragunlu.guidemate.components.EditTextField
+import com.ahmetkaragunlu.guidemate.components.GuideMateImage
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.components.GuideTourPublishStepProgress
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.components.GuideTourPublishValidationMessage
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishStep
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishUiState
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.GuideTourMeetingPointField
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CameraPlus
 
@@ -48,6 +55,7 @@ fun GuideTourPublishStep3DetailsMediaContent(
     uiState: GuideTourPublishUiState,
     onTourNameChange: (String) -> Unit,
     onUploadPhotosClick: () -> Unit,
+    @StringRes coverImageErrorResId: Int?,
     onDescriptionChange: (String) -> Unit,
     onMeetingPointChange: (String) -> Unit,
     onNext: () -> Unit,
@@ -79,14 +87,22 @@ fun GuideTourPublishStep3DetailsMediaContent(
                 value = uiState.tourName,
                 onTourNameChange = onTourNameChange,
             )
-            Step3UploadArea(onClick = onUploadPhotosClick)
+            Step3UploadArea(
+                selectedImageUri = uiState.selectedCoverImageUri,
+                onClick = onUploadPhotosClick,
+            )
             Step3DescriptionField(
                 description = uiState.tourDescription,
                 onDescriptionChange = onDescriptionChange,
             )
-            Step3MeetingPointField(
-                meetingPoint = uiState.meetingPoint,
-                onMeetingPointChange = onMeetingPointChange,
+            GuideTourMeetingPointField(
+                value = uiState.meetingPoint,
+                onValueChange = onMeetingPointChange,
+            )
+            GuideTourPublishValidationMessage(
+                errorResId =
+                    coverImageErrorResId
+                        ?: uiState.validationErrorFor(GuideTourPublishStep.CONTENT_AND_MEDIA),
             )
         }
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
@@ -141,6 +157,7 @@ private fun Step3TourNameField(
 
 @Composable
 private fun Step3UploadArea(
+    selectedImageUri: String?,
     onClick: () -> Unit,
 ) {
     val uploadCornerRadius = dimensionResource(R.dimen.radius_medium)
@@ -174,44 +191,59 @@ private fun Step3UploadArea(
                 .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
-        ) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(56.dp)
-                        .background(
-                            color = colorResource(R.color.brand_color).copy(alpha = 0.14f),
-                            shape = RoundedCornerShape(16.dp),
-                        ),
-                contentAlignment = Alignment.Center,
+        if (selectedImageUri == null) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement =
+                    Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
             ) {
-                Icon(
-                    imageVector = TablerIcons.CameraPlus,
-                    contentDescription = null,
-                    tint = colorResource(R.color.brand_color),
-                    modifier = Modifier.size(28.dp),
+                Box(
+                    modifier =
+                        Modifier
+                            .size(56.dp)
+                            .background(
+                                color = colorResource(R.color.brand_color).copy(alpha = 0.14f),
+                                shape = RoundedCornerShape(16.dp),
+                            ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = TablerIcons.CameraPlus,
+                        contentDescription = null,
+                        tint = colorResource(R.color.brand_color),
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.guide_tour_publish_step3_photos_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colorResource(R.color.brand_color),
+                )
+                Text(
+                    text = stringResource(R.string.guide_tour_publish_step3_photos_placeholder),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colorResource(R.color.text_color),
+                    textAlign = TextAlign.Center,
+                    modifier =
+                        Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+                )
+                Text(
+                    text = stringResource(R.string.guide_tour_publish_step3_photos_meta),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray,
                 )
             }
-            Text(
-                text = stringResource(R.string.guide_tour_publish_step3_photos_title),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = colorResource(R.color.brand_color),
-            )
-            Text(
-                text = stringResource(R.string.guide_tour_publish_step3_photos_placeholder),
-                style = MaterialTheme.typography.bodySmall,
-                color = colorResource(R.color.text_color),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
-            )
-            Text(
-                text = stringResource(R.string.guide_tour_publish_step3_photos_meta),
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray,
+        } else {
+            GuideMateImage(
+                fallbackImageResId = R.drawable.example,
+                imageUrl = selectedImageUri,
+                contentDescription = stringResource(R.string.change_cover_photo),
+                contentScale = ContentScale.Crop,
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(uploadCornerRadius)),
             )
         }
     }
@@ -249,40 +281,5 @@ private fun Step3DescriptionField(
             Modifier
                 .fillMaxWidth()
                 .height(170.dp),
-    )
-}
-
-@Composable
-private fun Step3MeetingPointField(
-    meetingPoint: String,
-    onMeetingPointChange: (String) -> Unit,
-) {
-    Text(
-        text = stringResource(R.string.guide_tour_publish_step3_meeting_label),
-        style = MaterialTheme.typography.labelLarge,
-        fontWeight = FontWeight.Medium,
-    )
-
-    OutlinedTextField(
-        value = meetingPoint,
-        onValueChange = onMeetingPointChange,
-        placeholder = {
-            Text(
-                text = stringResource(R.string.guide_tour_publish_step3_meeting_placeholder),
-                style = MaterialTheme.typography.labelLarge,
-                color = Color.Gray,
-            )
-        },
-        textStyle = MaterialTheme.typography.bodyMedium,
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-        colors =
-            OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
-            ),
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(130.dp),
     )
 }

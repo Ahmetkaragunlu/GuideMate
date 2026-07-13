@@ -28,6 +28,7 @@ fun EditTextField(
     keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier,
     readOnly: Boolean = false,
+    enabled: Boolean = true,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -42,6 +43,7 @@ fun EditTextField(
     OutlinedTextField(
         value = value,
         modifier = modifier,
+        enabled = enabled,
         readOnly = readOnly,
         onValueChange = onValueChange,
         shape = shape,

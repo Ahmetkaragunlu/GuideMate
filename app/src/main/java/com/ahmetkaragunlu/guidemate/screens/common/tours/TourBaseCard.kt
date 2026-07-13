@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.common.tours
 
-import androidx.compose.foundation.Image
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -23,19 +23,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.components.GuideMateImage
 
 @Composable
 fun TourBaseCard(
-    imageUrl: Int,
+    @DrawableRes imageResId: Int,
     modifier: Modifier = Modifier,
+    imageUrl: String? = null,
     colorFilter: ColorFilter? = null,
     alpha: Float = 1f,
     elevation: Dp = 4.dp,
@@ -52,10 +52,10 @@ fun TourBaseCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = imageUrl),
+            GuideMateImage(
+                fallbackImageResId = imageResId,
+                imageUrl = imageUrl,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
                 colorFilter = colorFilter,
                 modifier =
                     Modifier

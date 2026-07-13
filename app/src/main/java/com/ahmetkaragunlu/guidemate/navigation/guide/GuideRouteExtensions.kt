@@ -22,6 +22,12 @@ internal fun String?.isGuideProfilePreviewRoute(): Boolean =
 internal fun String?.isGuideEarningsRoute(): Boolean =
     this == GuideRoute.GuideEarningsScreen.route
 
+internal fun String?.isGuideTourDetailRoute(): Boolean =
+    this == GUIDE_TOUR_DETAIL_ROUTE_PATTERN
+
+internal fun String?.isGuideTourEditRoute(): Boolean =
+    this == GUIDE_TOUR_EDIT_ROUTE_PATTERN
+
 internal fun String?.isGuideHomeRoute(): Boolean =
     this == GuideRoute.GuideHomeScreen.route
 
@@ -32,10 +38,15 @@ internal fun String?.shouldShowGuideBackButton(): Boolean =
     isGuideChatDetailRoute() ||
         isGuideProfilePreviewRoute() ||
         isGuideEarningsRoute() ||
+        isGuideTourDetailRoute() ||
+        isGuideTourEditRoute() ||
         isGuideTourPublishRoute()
 
 internal fun String?.shouldShowGuideBottomBar(): Boolean =
-    !isGuideTourPublishRoute() && !isGuideEarningsRoute()
+    !isGuideTourPublishRoute() &&
+        !isGuideEarningsRoute() &&
+        !isGuideTourDetailRoute() &&
+        !isGuideTourEditRoute()
 
 @StringRes
 internal fun String?.guideScreenTitleResId(): Int =
@@ -43,6 +54,8 @@ internal fun String?.guideScreenTitleResId(): Int =
         GuideRoute.GuideHomeScreen.route -> R.string.welcome_message
         GuideRoute.GuideEarningsScreen.route -> R.string.guide_earnings
         GuideRoute.GuideMyToursScreen.route -> R.string.guide_tours
+        GUIDE_TOUR_DETAIL_ROUTE_PATTERN -> R.string.tour_details
+        GUIDE_TOUR_EDIT_ROUTE_PATTERN -> R.string.edit_tour
         GuideRoute.GuideMyWalletScreen.route -> R.string.guide_wallet
         GuideRoute.GuideChatScreen.route -> R.string.guide_chat
         GuideRoute.GuideProfileScreen.route -> R.string.guide_profile

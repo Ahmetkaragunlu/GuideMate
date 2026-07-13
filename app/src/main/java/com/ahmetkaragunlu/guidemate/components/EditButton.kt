@@ -23,11 +23,13 @@ import com.ahmetkaragunlu.guidemate.R
 fun EditButton(
     @StringRes text: Int,
     onClick: () -> Unit,
-    icon: ImageVector? = null,
     modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = { onClick() },
+        enabled = enabled,
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
         modifier =

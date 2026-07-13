@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.wallet.model
 
-enum class TransactionType {
+enum class WalletTransactionType {
     TOUR_INCOME,
     WITHDRAWAL,
 }

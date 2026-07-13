@@ -1,126 +1,80 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.mapper.toGuideTourCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourCatalogState
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourUiModel
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourWithSession
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.shared.GuideTourStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import javax.inject.Inject
+import kotlinx.coroutines.launch
+
+internal const val GUIDE_MY_TOURS_SELECTED_TAB_RESULT = "guideMyToursSelectedTab"
 
 @HiltViewModel
 class GuideMyToursViewModel
     @Inject
-    constructor() : ViewModel() {
-        // Mock Data
-        private val _allTours =
-            MutableStateFlow(
-            listOf(
-                GuideTourUiModel(
-                    id = "1",
-                    title = "Kapadokya Balon Turu",
-                    date = "24 Mayıs 2026",
-                    location = "Nevşehir, Ürgüp",
-                    imageUrl = R.drawable.example,
-                    participantCount = 8,
-                    price = 1500.0,
-                    languagesFlag = "🇩🇪🇹🇷",
-                    languagesText = "DE, TR",
-                    category = "Macera",
-                    rating = 4.9,
-                    reviewCount = 120,
-                    isActive = true,
-                    isLive = true,
-                ),
-                GuideTourUiModel(
-                    id = "2",
-                    title = "Efes Antik Kent",
-                    date = "10 Haziran 2026",
-                    location = "İzmir, Selçuk",
-                    imageUrl = R.drawable.example,
-                    participantCount = 5,
-                    price = 800.0,
-                    languagesFlag = "🇬🇧🇹🇷",
-                    languagesText = "EN, TR",
-                    category = "Tarih",
-                    rating = null,
-                    reviewCount = null,
-                    isActive = true,
-                    isLive = false,
-                ),
-                GuideTourUiModel(
-                    id = "3",
-                    title = "İstanbul Boğaz Turu",
-                    date = "12 Ocak 2025",
-                    location = "İstanbul",
-                    imageUrl = R.drawable.example,
-                    participantCount = 10,
-                    price = 600.0,
-                    languagesFlag = "🇫🇷🇹🇷",
-                    languagesText = "FR, TR",
-                    category = "Tekne",
-                    rating = 4.8,
-                    reviewCount = 210,
-                    isActive = false,
-                    earnings = 6000.0,
-                ),
-                GuideTourUiModel(
-                    id = "4",
-                    title = "Pamukkale Gezisi",
-                    date = "05 Kasım 2024",
-                    location = "Denizli",
-                    imageUrl = R.drawable.example,
-                    participantCount = 12,
-                    price = 900.0,
-                    languagesFlag = "🇪🇸🇹🇷",
-                    languagesText = "ES, TR",
-                    category = "Doğa",
-                    rating = 5.0,
-                    reviewCount = 45,
-                    isActive = false,
-                    earnings = 10800.0,
-                ),
-            ),
-        )
-
+    constructor(
+        savedStateHandle: SavedStateHandle,
+        private val tourStore: GuideTourStore,
+    ) : ViewModel() {
         private val _selectedTab = MutableStateFlow(GuideTourTab.ACTIVE)
         val selectedTab = _selectedTab.asStateFlow()
 
-        val tours: StateFlow<List<GuideTourUiModel>> =
-            combine(_allTours, _selectedTab) { allTours, tab ->
-                    when (tab) {
-                        GuideTourTab.ACTIVE -> allTours.filter { it.isActive }
-                        GuideTourTab.PAST -> allTours.filter { !it.isActive }
+        init {
+            viewModelScope.launch {
+                savedStateHandle
+                    .getStateFlow(GUIDE_MY_TOURS_SELECTED_TAB_RESULT, "")
+                    .filter(String::isNotBlank)
+                    .collect { tabName ->
+                        GuideTourTab.entries.firstOrNull { it.name == tabName }?.let { tab ->
+                            _selectedTab.value = tab
+                        }
+                        savedStateHandle[GUIDE_MY_TOURS_SELECTED_TAB_RESULT] = ""
                     }
-                }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = _allTours.value.filter { it.isActive },
-                )
+            }
+        }
+
+        val tours: StateFlow<List<GuideTourCardUiModel>> =
+            combine(tourStore.state, _selectedTab) { catalog, tab ->
+                catalog.toursFor(tab).map { it.toGuideTourCardUiModel() }
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList(),
+            )
 
         fun changeTab(tab: GuideTourTab) {
             _selectedTab.value = tab
         }
 
-        fun toggleLive(
-            tourId: String,
-            isLive: Boolean,
+        fun toggleBookingAvailability(
+            sessionId: String,
+            isOpen: Boolean,
         ) {
-            _allTours.update { tours ->
-                tours.map { tour ->
-                    if (tour.id == tourId) {
-                        tour.copy(isLive = isLive)
-                    } else {
-                        tour
-                    }
-                }
-            }
+            tourStore.setSessionBookingOpen(sessionId = sessionId, isOpen = isOpen)
         }
+
+        fun archiveRejectedTour(tourId: String) {
+            tourStore.archiveRejectedTour(tourId)
+        }
+
+    }
+
+private fun GuideTourCatalogState.toursFor(tab: GuideTourTab): List<TourWithSession> =
+    when (tab) {
+        GuideTourTab.ACTIVE -> activeTourItems
+        GuideTourTab.REVIEW -> reviewTourItems
+        GuideTourTab.PAST -> pastTourItems
     }

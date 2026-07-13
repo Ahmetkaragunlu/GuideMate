@@ -29,7 +29,7 @@ import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.model.MoneyAction
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.components.MonthlyEarningItem
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.components.*
 
 private const val WALLET_EARNINGS_PREVIEW_COUNT = 4
@@ -121,7 +121,7 @@ private fun GuideMyWalletContent(
             onViewAllClick = onNavigateToEarnings,
         )
 
-        RecentTransactionsSection(
+        RecentFinancialTransactionsSection(
             items = uiState.recentTransactions,
             scrollState = transactionsScrollState,
         )
@@ -174,8 +174,8 @@ private fun EarningsSection(
 }
 
 @Composable
-private fun RecentTransactionsSection(
-    items: List<Transaction>,
+private fun RecentFinancialTransactionsSection(
+    items: List<WalletTransactionUiModel>,
     scrollState: ScrollState,
 ) {
     WalletSection(
@@ -184,7 +184,7 @@ private fun RecentTransactionsSection(
         scrollState = scrollState,
     ) {
         items.forEach { transaction ->
-            TransactionItem(transaction = transaction)
+            WalletTransactionItem(transaction = transaction)
         }
     }
 }

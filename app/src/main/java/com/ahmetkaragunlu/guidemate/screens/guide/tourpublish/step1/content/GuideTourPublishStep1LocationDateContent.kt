@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step1.content
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -18,7 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,18 +30,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
+import com.ahmetkaragunlu.guidemate.components.EditDatePickerField
+import com.ahmetkaragunlu.guidemate.components.EditDurationDropdown
 import com.ahmetkaragunlu.guidemate.components.EditTextField
+import com.ahmetkaragunlu.guidemate.components.EditTimePickerField
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.components.GuideTourPublishStepProgress
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.components.GuideTourPublishValidationMessage
+import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishStep
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishUiState
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 
 @Composable
 fun GuideTourPublishStep1LocationDateContent(
     uiState: GuideTourPublishUiState,
     onLocationClick: () -> Unit,
-    onDateClick: () -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
+    onStartTimeSelected: (LocalTime) -> Unit,
+    onDurationSelected: (Int) -> Unit,
     onNext: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tourZoneId =
+        remember(uiState.timeZoneId) {
+            runCatching { ZoneId.of(uiState.timeZoneId) }.getOrDefault(ZoneId.systemDefault())
+        }
+    val today = LocalDate.now(tourZoneId)
+
     Column(
         modifier =
             modifier
@@ -66,9 +83,44 @@ fun GuideTourPublishStep1LocationDateContent(
                 value = uiState.locationDisplay,
                 onClick = onLocationClick,
             )
-            Step1DateField(
-                value = uiState.tourDate,
-                onClick = onDateClick,
+            EditDatePickerField(
+                labelResId = R.string.guide_tour_publish_step1_date_label,
+                placeholderResId = R.string.select_tour_date,
+                selectedDate = uiState.tourDate,
+                minimumDate = today,
+                onDateSelected = onDateSelected,
+                leadingIcon = { Text(text = "🗓️") },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = colorResource(R.color.text_color),
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            EditTimePickerField(
+                labelResId = R.string.guide_tour_publish_step1_time_label,
+                placeholderResId = R.string.select_tour_time,
+                selectedTime = uiState.startTime,
+                initialTime = LocalTime.now(tourZoneId),
+                isTimeSelectable = { selectedTime ->
+                    uiState.tourDate != today || selectedTime.isAfter(LocalTime.now(tourZoneId))
+                },
+                onTimeSelected = onStartTimeSelected,
+                leadingIcon = { Text(text = "🕘") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            EditDurationDropdown(
+                labelResId = R.string.guide_tour_publish_step1_duration_label,
+                placeholderResId = R.string.select_tour_duration,
+                selectedDurationMinutes = uiState.durationMinutes,
+                onDurationSelected = onDurationSelected,
+                leadingIcon = { Text(text = "⏱️") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            GuideTourPublishValidationMessage(
+                errorResId = uiState.validationErrorFor(GuideTourPublishStep.LOCATION_AND_TIME),
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -112,43 +164,6 @@ private fun Step1LocationField(
         readOnly = true,
         keyboardOptions = KeyboardOptions.Default,
         leadingIcon = { Text(text = "🌍") },
-        trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = colorResource(R.color.text_color),
-                modifier = Modifier.clickable(onClick = onClick),
-            )
-        },
-        colors =
-            OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
-                cursorColor = Color.Transparent,
-                unfocusedTextColor = colorResource(R.color.text_color),
-            ),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
-
-@Composable
-private fun Step1DateField(
-    value: String,
-    onClick: () -> Unit,
-) {
-    Text(
-        text = stringResource(R.string.guide_tour_publish_step1_date_label),
-        style = MaterialTheme.typography.labelLarge,
-        fontWeight = FontWeight.Medium,
-    )
-
-    EditTextField(
-        value = value,
-        onValueChange = { },
-        readOnly = true,
-        keyboardOptions = KeyboardOptions.Default,
-        leadingIcon = { Text(text = "🗓️") },
         trailingIcon = {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,

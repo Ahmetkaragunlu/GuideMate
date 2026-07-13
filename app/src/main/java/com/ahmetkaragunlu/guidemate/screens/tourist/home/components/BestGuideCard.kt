@@ -57,7 +57,7 @@ fun BestGuideCard(guide: BestGuideUiModel) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
-                painter = painterResource(id = guide.imageUrl),
+                painter = painterResource(id = guide.imageResId),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier =

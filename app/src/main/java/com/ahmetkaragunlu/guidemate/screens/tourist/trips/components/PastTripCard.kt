@@ -45,7 +45,7 @@ fun PastTripCard(
     val matrix = ColorMatrix().apply { setToSaturation(0.7f) }
 
     TourBaseCard(
-        imageUrl = trip.imageUrl,
+        imageResId = trip.imageResId,
         modifier = modifier,
         colorFilter = ColorFilter.colorMatrix(matrix),
         alpha = 0.85f,

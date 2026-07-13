@@ -26,15 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.Transaction
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.TransactionType
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionType
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CreditCard
 import compose.icons.tablericons.Ticket
 
 @Composable
-fun TransactionItem(transaction: Transaction) {
-    val isIncome = transaction.type == TransactionType.TOUR_INCOME
+fun WalletTransactionItem(transaction: WalletTransactionUiModel) {
+    val isIncome = transaction.type == WalletTransactionType.TOUR_INCOME
     val icon = if (isIncome) TablerIcons.Ticket else TablerIcons.CreditCard
     val amountColor = if (isIncome) Color(0xFF388E3C) else Color(0xFFD32F2F)
     val amountPrefix = if (isIncome) "+" else "-"

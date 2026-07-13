@@ -39,7 +39,7 @@ fun UpcomingTripCard(
     modifier: Modifier = Modifier,
 ) {
     TourBaseCard(
-        imageUrl = trip.imageUrl,
+        imageResId = trip.imageResId,
         modifier = modifier,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {

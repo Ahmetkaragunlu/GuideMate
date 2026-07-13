@@ -1,11 +1,13 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.trips
 
+import androidx.annotation.DrawableRes
+
 data class TripUiModel(
     val id: String,
     val title: String,
     val date: String,
     val location: String,
-    val imageUrl: Int,
+    @param:DrawableRes val imageResId: Int,
     val participantCount: Int,
     val category: String,
     val languagesFlag: String,

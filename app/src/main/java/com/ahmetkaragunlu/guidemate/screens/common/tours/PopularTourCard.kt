@@ -53,7 +53,7 @@ fun PopularTourCard(tour: PopularTourCardUiModel) {
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Image(
-                painter = painterResource(id = tour.imageUrl),
+                painter = painterResource(id = tour.imageResId),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier =
@@ -112,7 +112,7 @@ fun PopularTourCard(tour: PopularTourCardUiModel) {
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
-                        painter = painterResource(id = tour.guideImageUrl),
+                        painter = painterResource(id = tour.guideImageResId),
                         contentDescription = "Rehber",
                         contentScale = ContentScale.Crop,
                         modifier =
@@ -125,7 +125,11 @@ fun PopularTourCard(tour: PopularTourCardUiModel) {
                     Text(
                         text =
                             buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append("Rehber: ") }
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append(
+                                        "Rehber: "
+                                    )
+                                }
                                 withStyle(
                                     style =
                                         SpanStyle(

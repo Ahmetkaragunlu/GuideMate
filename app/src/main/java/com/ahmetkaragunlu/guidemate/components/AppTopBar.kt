@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +50,8 @@ fun AppTopBar(
     userName: String?,
     onBackClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    unreadNotificationCount: Int = 0,
+    onNotificationClick: () -> Unit = {},
 ) {
     if (config.isHome) {
         TopAppBar(
@@ -59,11 +63,25 @@ fun AppTopBar(
                 )
             },
             actions = {
-                Icon(
-                    imageVector = TablerIcons.Bell,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small)),
-                )
+                IconButton(
+                    onClick = onNotificationClick,
+                    modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_tiny)),
+                ) {
+                    BadgedBox(
+                        badge = {
+                            if (unreadNotificationCount > 0) {
+                                Badge {
+                                    Text(text = unreadNotificationCount.coerceAtMost(99).toString())
+                                }
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = TablerIcons.Bell,
+                            contentDescription = stringResource(R.string.notifications),
+                        )
+                    }
+                }
             },
         )
     } else {

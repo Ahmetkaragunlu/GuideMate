@@ -7,5 +7,6 @@ enum class GuideTourTab(
     override val titleResId: Int,
 ) : GuideMateTab {
     ACTIVE(R.string.tab_active),
+    REVIEW(R.string.tab_review),
     PAST(R.string.tab_past),
 }

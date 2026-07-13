@@ -44,7 +44,10 @@ import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideStatistic
-import com.ahmetkaragunlu.guidemate.screens.guide.home.model.RecentActivity
+import com.ahmetkaragunlu.guidemate.screens.guide.notifications.components.notificationIcon
+import com.ahmetkaragunlu.guidemate.screens.guide.notifications.components.notificationMessage
+import com.ahmetkaragunlu.guidemate.screens.guide.notifications.components.notificationRelativeTime
+import com.ahmetkaragunlu.guidemate.screens.guide.notifications.model.GuideNotificationUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowRight
 
@@ -52,6 +55,7 @@ import compose.icons.tablericons.ArrowRight
 fun GuideHomeScreen(
     uiState: GuideHomeUiState,
     currentMonthEarning: MonthlyEarningUiModel,
+    recentNotifications: List<GuideNotificationUiModel>,
     onNavigateToEarnings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -102,7 +106,10 @@ fun GuideHomeScreen(
             color = colorResource(R.color.text_color),
             modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
-        RecentActivities(activities = uiState.recentActivities, modifier = Modifier.heightIn(max = 200.dp))
+        RecentActivities(
+            notifications = recentNotifications,
+            modifier = Modifier.heightIn(max = 200.dp),
+        )
     }
 }
 
@@ -267,7 +274,7 @@ private fun StatusItemCard(
 
 @Composable
 private fun RecentActivities(
-    activities: List<RecentActivity>,
+    notifications: List<GuideNotificationUiModel>,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -283,7 +290,10 @@ private fun RecentActivities(
                     .fillMaxWidth()
                     .padding(dimensionResource(R.dimen.spacing_medium)),
         ) {
-            itemsIndexed(activities) { index, item ->
+            itemsIndexed(
+                items = notifications,
+                key = { _, notification -> notification.id },
+            ) { index, notification ->
                 Column {
                     Row(
                         modifier =
@@ -293,13 +303,13 @@ private fun RecentActivities(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            imageVector = item.icon,
+                            imageVector = notification.type.notificationIcon(),
                             contentDescription = null,
                             tint = Color.Gray,
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = item.description,
+                            text = notificationMessage(notification),
                             style = MaterialTheme.typography.bodySmall,
                             color = colorResource(R.color.text_color),
                             modifier = Modifier.weight(1f),
@@ -307,15 +317,16 @@ private fun RecentActivities(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = item.time,
-                            style = MaterialTheme.typography.bodySmall,
+                            text = notificationRelativeTime(notification.occurredAtMillis),
+                            style = MaterialTheme.typography.labelSmall,
                             color = colorResource(R.color.text_color),
+                            modifier = Modifier.align(Alignment.Bottom),
                         )
                     }
 
-                    if (index < activities.lastIndex) {
+                    if (index < notifications.lastIndex) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
                             thickness = 0.5.dp,
                             color = Color(0xFFeeedf1),
                         )

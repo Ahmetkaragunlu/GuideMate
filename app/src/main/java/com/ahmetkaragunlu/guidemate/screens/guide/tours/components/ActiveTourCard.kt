@@ -1,11 +1,23 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.tours.InfoRow
 import com.ahmetkaragunlu.guidemate.screens.common.tours.TourBaseCard
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourUiModel
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourCardUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.MapPin
@@ -28,11 +40,17 @@ import compose.icons.tablericons.Users
 
 @Composable
 fun ActiveTourCard(
-    tour: GuideTourUiModel,
+    tour: GuideTourCardUiModel,
     onToggleLive: (Boolean) -> Unit,
     onEdit: () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    TourBaseCard(imageUrl = tour.imageUrl) {
+    TourBaseCard(
+        imageResId = tour.imageResId,
+        imageUrl = tour.imageUrl,
+        modifier = modifier.clickable(onClick = onClick),
+    ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier =
@@ -84,7 +102,7 @@ fun ActiveTourCard(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Switch(
-                            checked = tour.isLive,
+                            checked = tour.isBookingOpen,
                             onCheckedChange = onToggleLive,
                             colors =
                                 SwitchDefaults.colors(
@@ -96,7 +114,7 @@ fun ActiveTourCard(
                         )
                         Text(
                             text =
-                                if (tour.isLive) {
+                                if (tour.isBookingOpen) {
                                     stringResource(R.string.live)
                                 } else {
                                     stringResource(
@@ -104,7 +122,7 @@ fun ActiveTourCard(
                                     )
                                 },
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (tour.isLive) Color.Green else Color.LightGray,
+                            color = if (tour.isBookingOpen) Color.Green else Color.LightGray,
                         )
                     }
 
