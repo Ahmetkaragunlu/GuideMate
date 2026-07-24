@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model
 
 import androidx.annotation.DrawableRes
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 
 data class TourDetailUiState(
     val sessionId: String = "",
@@ -16,7 +17,7 @@ data class TourDetailUiState(
     val location: String = "",
     val languagesFlag: String = "",
     val languagesText: String = "",
-    val category: String = "",
+    val category: TourCategory? = null,
     val price: Double = 0.0,
     val bookedCount: Int = 0,
     val capacity: Int = 0,

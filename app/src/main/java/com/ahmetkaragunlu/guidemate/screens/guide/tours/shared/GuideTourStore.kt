@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours.shared
 
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.CancelTourSessionRequest
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.CreateTourSessionRequest
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourCatalogState
@@ -42,7 +43,6 @@ class GuideTourStore
                     session.meetingPoint.isBlank() ||
                     tour.country.isBlank() ||
                     tour.city.isBlank() ||
-                    tour.category.isBlank() ||
                     tour.languages.isEmpty() ||
                     tour.approvalStatus != TourApprovalStatus.PENDING_REVIEW ||
                     tour.publishedAt != null ||
@@ -115,7 +115,7 @@ class GuideTourStore
             val locationChanged =
                 request.country.trim() != current.tour.country ||
                     request.city.trim() != current.tour.city
-            val categoryChanged = request.category.trim() != current.tour.category
+            val categoryChanged = request.category != current.tour.category
             if (current.tour.publishedAt != null && locationChanged) return false
             if (
                 current.session.bookedCount > 0 &&
@@ -132,7 +132,6 @@ class GuideTourStore
                     request.description.isBlank() ||
                     request.country.isBlank() ||
                     request.city.isBlank() ||
-                    request.category.isBlank() ||
                     request.languages.isEmpty() ||
                     request.meetingPoint.isBlank() ||
                     !request.startsAt.isAfter(now) ||
@@ -174,7 +173,7 @@ class GuideTourStore
                                     description = request.description.trim(),
                                     country = request.country.trim(),
                                     city = request.city.trim(),
-                                    category = request.category.trim(),
+                                    category = request.category,
                                     languages = request.languages,
                                     coverImageUrl =
                                         request.selectedCoverImageUri ?: tour.coverImageUrl,
@@ -365,7 +364,7 @@ class GuideTourStore
                             country = "Türkiye",
                             city = "Nevşehir, Ürgüp",
                             timeZoneId = "Europe/Istanbul",
-                            category = "Macera",
+                            category = TourCategory.ADVENTURE,
                             languages = languagesTrDe,
                             coverImageResId = R.drawable.example,
                             approvalStatus = TourApprovalStatus.APPROVED,
@@ -391,7 +390,7 @@ class GuideTourStore
                             country = "Türkiye",
                             city = "İzmir, Selçuk",
                             timeZoneId = "Europe/Istanbul",
-                            category = "Tarih",
+                            category = TourCategory.CULTURE,
                             languages = languagesTrEn,
                             coverImageResId = R.drawable.example,
                             approvalStatus = TourApprovalStatus.APPROVED,
@@ -405,7 +404,7 @@ class GuideTourStore
                             country = "Türkiye",
                             city = "İstanbul",
                             timeZoneId = "Europe/Istanbul",
-                            category = "Tekne",
+                            category = TourCategory.ENTERTAINMENT,
                             languages = languagesTrEn,
                             coverImageResId = R.drawable.example,
                             approvalStatus = TourApprovalStatus.APPROVED,
@@ -421,7 +420,7 @@ class GuideTourStore
                             country = "Türkiye",
                             city = "Denizli",
                             timeZoneId = "Europe/Istanbul",
-                            category = "Doğa",
+                            category = TourCategory.NATURE,
                             languages = languagesTrEn,
                             coverImageResId = R.drawable.example,
                             approvalStatus = TourApprovalStatus.APPROVED,
@@ -437,7 +436,7 @@ class GuideTourStore
                             country = "Türkiye",
                             city = "İstanbul",
                             timeZoneId = "Europe/Istanbul",
-                            category = "Tarih ve Kültür",
+                            category = TourCategory.CULTURE,
                             languages = languagesTrEn,
                             coverImageResId = R.drawable.example,
                             approvalStatus = TourApprovalStatus.PENDING_REVIEW,
@@ -451,7 +450,7 @@ class GuideTourStore
                             country = "Türkiye",
                             city = "Mardin",
                             timeZoneId = "Europe/Istanbul",
-                            category = "Tarih ve Kültür",
+                            category = TourCategory.CULTURE,
                             languages = languagesTrEn,
                             coverImageResId = R.drawable.example,
                             approvalStatus = TourApprovalStatus.REJECTED,

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.tours.InfoRow
 import com.ahmetkaragunlu.guidemate.screens.common.tours.TourBaseCard
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
 import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TripUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.MapPin
@@ -65,7 +66,11 @@ fun UpcomingTripCard(
                     InfoRow(icon = Icons.Default.CalendarMonth, text = trip.date)
                     InfoRow(icon = TablerIcons.MapPin, text = trip.location)
                     Text(
-                        text = stringResource(R.string.category_label, trip.category),
+                        text =
+                            stringResource(
+                                R.string.category_label,
+                                stringResource(TourCategoryCatalog.uiModelFor(trip.category).titleResId),
+                            ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = colorResource(R.color.text_color),
                     )

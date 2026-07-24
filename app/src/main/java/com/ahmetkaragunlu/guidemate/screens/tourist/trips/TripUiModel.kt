@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.trips
 
 import androidx.annotation.DrawableRes
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 
 data class TripUiModel(
     val id: String,
@@ -9,7 +10,7 @@ data class TripUiModel(
     val location: String,
     @param:DrawableRes val imageResId: Int,
     val participantCount: Int,
-    val category: String,
+    val category: TourCategory,
     val languagesFlag: String,
     val languagesText: String,
     val price: Double,

@@ -1,8 +1,10 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.ahmetkaragunlu.guidemate.screens.common.selection.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.GuideAboutUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.model.toUpdatePayload
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.shared.GuideProfileSharedStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -47,7 +49,18 @@ class GuideAboutViewModel
             }
         }
 
-        fun onAddLanguageClick() {
+        fun onLanguagesSelected(languages: List<LanguageOption>) {
+            _uiState.update { current ->
+                current.copy(
+                    spokenLanguages =
+                        languages.map { language ->
+                            GuideSpokenLanguageUi(
+                                code = language.code,
+                                displayText = language.chipLabel,
+                            )
+                        },
+                )
+            }
         }
 
         fun onSaveClick(): Boolean {

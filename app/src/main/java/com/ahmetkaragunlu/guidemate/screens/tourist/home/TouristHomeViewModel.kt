@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.TouristHomeUiState
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategoriesData
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,11 +31,11 @@ class TouristHomeViewModel @Inject constructor(
                 initialValue = null,
             )
 
-    val categories = TourCategoriesData.categories
+    val categories = TourCategoryCatalog.filterOptions
 
-    private val _selectedCategory = MutableStateFlow(TourCategory.ALL)
+    private val _selectedCategory = MutableStateFlow<TourCategory?>(null)
 
-    fun updateSelectedCategory(category: TourCategory) {
+    fun updateSelectedCategory(category: TourCategory?) {
         _selectedCategory.value = category
     }
 
@@ -52,8 +52,8 @@ class TouristHomeViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue =
                     TouristHomeUiState(
-                        selectedCategory = TourCategory.ALL,
-                        popularTours = getDummyTours(TourCategory.ALL),
+                        selectedCategory = null,
+                        popularTours = getDummyTours(category = null),
                         bestGuides = getDummyGuides(),
                     ),
             )
@@ -63,7 +63,7 @@ class TouristHomeViewModel @Inject constructor(
         val tour: PopularTourCardUiModel,
     )
 
-    private fun getDummyTours(category: TourCategory): List<PopularTourCardUiModel> {
+    private fun getDummyTours(category: TourCategory?): List<PopularTourCardUiModel> {
         val allTours =
             listOf(
                 CategorizedTour(
@@ -132,7 +132,7 @@ class TouristHomeViewModel @Inject constructor(
                 ),
             )
 
-        return if (category == TourCategory.ALL) {
+        return if (category == null) {
             allTours.map { it.tour }
         } else {
             allTours.filter { it.category == category }.map { it.tour }

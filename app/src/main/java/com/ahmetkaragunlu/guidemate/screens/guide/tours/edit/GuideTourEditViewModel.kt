@@ -5,10 +5,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.navigation.guide.GUIDE_TOUR_SESSION_ID_ARGUMENT
+import com.ahmetkaragunlu.guidemate.screens.common.selection.model.LanguageOption
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.edit.model.GuideTourEditUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourEditRequest
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.toTourLanguage
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.shared.GuideTourStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
@@ -44,6 +47,8 @@ class GuideTourEditViewModel
 
         fun onDescriptionChange(value: String) = updateForm { copy(description = value) }
 
+        fun onCategorySelected(category: TourCategory) = updateForm { copy(category = category) }
+
         fun onTourDateSelected(date: LocalDate) {
             updateForm {
                 val today = LocalDate.now()
@@ -77,6 +82,15 @@ class GuideTourEditViewModel
             }
         }
 
+        fun onLanguagesSelected(languages: List<LanguageOption>) {
+            updateForm {
+                copy(
+                    languages =
+                        languages.map(LanguageOption::toTourLanguage),
+                )
+            }
+        }
+
         fun onCoverImageSelected(uri: String) = updateForm { copy(selectedCoverImageUri = uri) }
 
         fun onCoverImageSelectionError(@StringRes errorResId: Int) {
@@ -85,6 +99,7 @@ class GuideTourEditViewModel
 
         fun saveChanges(): GuideTourTab? {
             val form = _uiState.value
+            val category = form.category ?: return showError()
             val tourDate = form.tourDate ?: return showError()
             val startTime = form.startTime ?: return showError()
             val startsAt =
@@ -101,7 +116,7 @@ class GuideTourEditViewModel
                             description = form.description,
                             country = form.country,
                             city = form.location,
-                            category = form.category,
+                            category = category,
                             languages = form.languages,
                             selectedCoverImageUri = form.selectedCoverImageUri,
                             meetingPoint = form.meetingPoint,

@@ -19,6 +19,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditAlertDialog
 import com.ahmetkaragunlu.guidemate.components.ImageSourcePicker
+import com.ahmetkaragunlu.guidemate.screens.common.selection.components.LanguageSelectionBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.category.GuideTourCategorySelectionBottomSheet
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
 
@@ -34,6 +36,8 @@ fun GuideTourEditScreen(
     var showDiscardDialog by rememberSaveable { mutableStateOf(false) }
     var showReviewConfirmationDialog by rememberSaveable { mutableStateOf(false) }
     var showPhotoSourceSheet by rememberSaveable { mutableStateOf(false) }
+    var showCategoryPicker by rememberSaveable { mutableStateOf(false) }
+    var showLanguagePicker by rememberSaveable { mutableStateOf(false) }
     val requestExit = {
         if (uiState.hasUnsavedChanges) {
             showDiscardDialog = true
@@ -52,6 +56,7 @@ fun GuideTourEditScreen(
         uiState = uiState,
         onTitleChange = viewModel::onTitleChange,
         onDescriptionChange = viewModel::onDescriptionChange,
+        onCategoryClick = { showCategoryPicker = true },
         onDateSelected = viewModel::onTourDateSelected,
         onStartTimeSelected = viewModel::onStartTimeSelected,
         onMeetingPointChange = viewModel::onMeetingPointChange,
@@ -59,7 +64,7 @@ fun GuideTourEditScreen(
         onPriceChange = viewModel::onPriceChange,
         onCapacityChange = viewModel::onCapacityChange,
         onRemoveLanguage = viewModel::removeLanguage,
-        onAddLanguage = { },
+        onAddLanguage = { showLanguagePicker = true },
         onChangePhotos = { showPhotoSourceSheet = true },
         onSave = {
             if (uiState.requiresReviewConfirmation) {
@@ -77,6 +82,23 @@ fun GuideTourEditScreen(
         onDismissRequest = { showPhotoSourceSheet = false },
         onImageSelected = viewModel::onCoverImageSelected,
         onError = viewModel::onCoverImageSelectionError,
+    )
+
+    GuideTourCategorySelectionBottomSheet(
+        isVisible = showCategoryPicker,
+        selectedCategory = uiState.category,
+        onDismissRequest = { showCategoryPicker = false },
+        onCategorySelected = viewModel::onCategorySelected,
+    )
+
+    LanguageSelectionBottomSheet(
+        isVisible = showLanguagePicker,
+        selectedLanguageCodes = uiState.languages.mapTo(mutableSetOf()) { it.code },
+        onDismissRequest = { showLanguagePicker = false },
+        onLanguagesSelected = { languages ->
+            viewModel.onLanguagesSelected(languages)
+            showLanguagePicker = false
+        },
     )
 
     if (showDiscardDialog) {

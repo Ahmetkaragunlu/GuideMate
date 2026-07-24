@@ -4,6 +4,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.selection.model.LanguageOption
+import com.ahmetkaragunlu.guidemate.screens.common.selection.model.LocationOption
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.shared.GuideProfileStateProvider
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishStep
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishUiState
@@ -12,6 +15,7 @@ import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourLanguage
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourSession
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourSessionStatus
+import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.toTourLanguage
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.shared.GuideTourStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
@@ -71,6 +75,30 @@ class GuideTourPublishViewModel
 
         fun onDurationSelected(durationMinutes: Int) {
             updateDraft { copy(durationMinutes = durationMinutes) }
+        }
+
+        fun onLocationSelected(location: LocationOption) {
+            updateDraft {
+                copy(
+                    countryCode = location.country.code,
+                    country = location.country.displayName,
+                    cityPlaceId = location.city.placeId,
+                    city = location.city.displayName,
+                )
+            }
+        }
+
+        fun onLanguagesSelected(languages: List<LanguageOption>) {
+            updateDraft {
+                copy(
+                    spokenLanguages =
+                        languages.map(LanguageOption::toTourLanguage),
+                )
+            }
+        }
+
+        fun onCategorySelected(category: TourCategory) {
+            updateDraft { copy(category = category) }
         }
 
         fun onRemoveLanguageClick(code: String) {
@@ -158,6 +186,12 @@ class GuideTourPublishViewModel
             val duration = form.durationMinutes
             val price = form.price.toDoubleOrNull()
             val capacity = form.capacity.toIntOrNull()
+            val category =
+                form.category
+                    ?: return showValidationError(
+                        R.string.error_tour_step2_invalid,
+                        GuideTourPublishStep.PREVIEW,
+                    )
             if (
                 startsAt == null ||
                     !startsAt.isAfter(Instant.now()) ||
@@ -173,35 +207,17 @@ class GuideTourPublishViewModel
                     GuideTourPublishStep.PREVIEW,
                 )
             }
-            val tourId = UUID.randomUUID().toString()
-            val tour =
-                Tour(
-                    id = tourId,
-                    guideId = "guide-current",
-                    title = form.tourName.trim(),
-                    description = form.tourDescription.trim(),
-                    country = form.country.trim(),
-                    city = form.city.trim(),
-                    timeZoneId = form.timeZoneId,
-                    category = form.category.trim(),
-                    languages = form.spokenLanguages,
-                    coverImageResId = form.previewImageResId,
-                    coverImageUrl = form.selectedCoverImageUri,
-                    approvalStatus = TourApprovalStatus.PENDING_REVIEW,
-                )
-            val session =
-                TourSession(
-                    id = UUID.randomUUID().toString(),
-                    tourId = tourId,
-                    meetingPoint = form.meetingPoint.trim(),
+            val submission =
+                form.toReviewSubmission(
+                    tourId = UUID.randomUUID().toString(),
+                    sessionId = UUID.randomUUID().toString(),
                     startsAt = startsAt,
                     durationMinutes = duration,
                     price = price,
                     capacity = capacity,
-                    bookedCount = 0,
-                    status = TourSessionStatus.CLOSED,
+                    category = category,
                 )
-            return if (tourStore.submitForReview(tour = tour, session = session)) {
+            return if (tourStore.submitForReview(tour = submission.tour, session = submission.session)) {
                 hasSubmittedCurrentDraft = true
                 true
             } else {
@@ -245,13 +261,16 @@ class GuideTourPublishViewModel
         }
 
         private fun GuideTourPublishUiState.isStep1Valid(): Boolean =
-            country.isNotBlank() &&
+            countryCode.isNotBlank() &&
+                country.isNotBlank() &&
+                cityPlaceId.isNotBlank() &&
                 city.isNotBlank() &&
                 toStartInstant()?.isAfter(Instant.now()) == true &&
                 durationMinutes?.let { it > 0 } == true
 
         private fun GuideTourPublishUiState.isStep2Valid(): Boolean =
-            spokenLanguages.isNotEmpty() &&
+            category != null &&
+                spokenLanguages.isNotEmpty() &&
                 price.toDoubleOrNull()?.let { it > 0 } == true &&
                 capacity.toIntOrNull()?.let { it > 0 } == true
 
@@ -267,6 +286,47 @@ class GuideTourPublishViewModel
             return runCatching { date.atTime(time).atZone(timeZoneId.toZoneId()).toInstant() }.getOrNull()
         }
 
+        private fun GuideTourPublishUiState.toReviewSubmission(
+            tourId: String,
+            sessionId: String,
+            startsAt: Instant,
+            durationMinutes: Int,
+            price: Double,
+            capacity: Int,
+            category: TourCategory,
+        ): TourReviewSubmission =
+            TourReviewSubmission(
+                tour =
+                    Tour(
+                        id = tourId,
+                        guideId = "guide-current",
+                        title = tourName.trim(),
+                        description = tourDescription.trim(),
+                        countryCode = countryCode,
+                        country = country.trim(),
+                        cityPlaceId = cityPlaceId,
+                        city = city.trim(),
+                        timeZoneId = timeZoneId,
+                        category = category,
+                        languages = spokenLanguages,
+                        coverImageResId = previewImageResId,
+                        coverImageUrl = selectedCoverImageUri,
+                        approvalStatus = TourApprovalStatus.PENDING_REVIEW,
+                    ),
+                session =
+                    TourSession(
+                        id = sessionId,
+                        tourId = tourId,
+                        meetingPoint = meetingPoint.trim(),
+                        startsAt = startsAt,
+                        durationMinutes = durationMinutes,
+                        price = price,
+                        capacity = capacity,
+                        bookedCount = 0,
+                        status = TourSessionStatus.CLOSED,
+                    ),
+            )
+
         private fun String.toZoneId(): ZoneId =
             runCatching { ZoneId.of(this) }.getOrDefault(ZoneId.systemDefault())
 
@@ -274,13 +334,15 @@ class GuideTourPublishViewModel
             // Mock data (MVP)
             fun initialUiState(): GuideTourPublishUiState =
                 GuideTourPublishUiState(
+                    countryCode = "TR",
                     country = "Türkiye",
+                    cityPlaceId = "mock-istanbul",
                     city = "İstanbul",
                     timeZoneId = "Europe/Istanbul",
                     tourDate = LocalDate.of(2027, 5, 24),
                     startTime = LocalTime.of(9, 0),
                     durationMinutes = 180,
-                    category = "Tarih ve Kültür",
+                    category = TourCategory.CULTURE,
                     spokenLanguages =
                         listOf(
                             TourLanguage(
@@ -301,3 +363,8 @@ class GuideTourPublishViewModel
                 )
         }
     }
+
+private data class TourReviewSubmission(
+    val tour: Tour,
+    val session: TourSession,
+)

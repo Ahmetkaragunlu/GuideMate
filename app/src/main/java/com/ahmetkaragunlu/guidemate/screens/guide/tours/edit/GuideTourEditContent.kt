@@ -42,6 +42,7 @@ import com.ahmetkaragunlu.guidemate.components.EditDropdown
 import com.ahmetkaragunlu.guidemate.components.EditTextField
 import com.ahmetkaragunlu.guidemate.components.EditTimePickerField
 import com.ahmetkaragunlu.guidemate.components.GuideMateImage
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.components.GuideTourLanguageSelector
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.edit.model.GuideTourEditUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
@@ -53,6 +54,7 @@ fun GuideTourEditContent(
     uiState: GuideTourEditUiState,
     onTitleChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onCategoryClick: () -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onStartTimeSelected: (LocalTime) -> Unit,
     onMeetingPointChange: (String) -> Unit,
@@ -106,9 +108,14 @@ fun GuideTourEditContent(
             )
             TourEditDropdownField(
                 labelResId = R.string.guide_tour_publish_step2_category_label,
-                value = uiState.category,
+                value =
+                    uiState.category
+                        ?.let(TourCategoryCatalog::uiModelFor)
+                        ?.let { stringResource(it.titleResId) }
+                        .orEmpty(),
                 placeholderResId = R.string.guide_tour_publish_step2_category_label,
                 leadingText = "🏷️",
+                onClick = onCategoryClick,
             )
             if (uiState.isTourIdentityLocked) {
                 Text(
@@ -289,6 +296,7 @@ private fun TourEditDropdownField(
     value: String,
     @StringRes placeholderResId: Int,
     leadingText: String,
+    onClick: () -> Unit = {},
 ) {
     Text(
         text = stringResource(labelResId),
@@ -298,6 +306,7 @@ private fun TourEditDropdownField(
     EditDropdown(
         value = value,
         placeholder = placeholderResId,
+        onClick = onClick,
         leadingIcon = { Text(text = leadingText) },
         modifier = Modifier.fillMaxWidth(),
     )

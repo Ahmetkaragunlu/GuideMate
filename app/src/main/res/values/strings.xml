@@ -47,8 +47,6 @@
     <string name="choose_user_type_title">Nasıl kullanmak istersin?</string>
     <string name="choose_user_type_description">Deneyimini buna göre kişiselleştireceğiz.</string>
 
-
-    <string name="menu_about_languages">Hakkımda</string>
     <string name="about">Hakkımda</string>
     <string name="about_specialty_title">Uzmanlık Unvanı</string>
     <string name="about_specialty_placeholder">Sanat Tarihçisi</string>
@@ -72,11 +70,6 @@
     <string name="preview_popular_tours_title">Popüler Turlar</string>
     <string name="preview_see_all">Tümünü Gör</string>
     <string name="preview_send_message">Mesaj Gönder</string>
-    <string name="preview_language_turkish">🇹🇷 Türkçe</string>
-    <string name="preview_language_english">🇬🇧 İngilizce</string>
-    <string name="preview_language_german">🇩🇪 Almanca</string>
-    <string name="preview_language_french">🇫🇷 Fransızca</string>
-    <string name="preview_language_italian">🇮🇹 İtalyanca</string>
     <string name="rating_format">%1$s Puan</string>
     <string name="tour_count_format">%1$s Tur</string>
     <string name="guide_level_sheet_title">Rozet Seviyeleri</string>
@@ -274,6 +267,16 @@
     <string name="language">Dil Seç</string>
     <string name="select_country">Ülke Seç</string>
     <string name="select_city">Şehir Seç</string>
+    <string name="selection_search_country">Ülke ara</string>
+    <string name="selection_search_city">Şehir ara</string>
+    <string name="selection_search_language">Dil ara</string>
+    <string name="selection_city_title">%1$s şehirleri</string>
+    <string name="selection_city_query_hint">Şehirleri görmek için en az 2 karakter yazın.</string>
+    <string name="selection_no_results">Sonuç bulunamadı.</string>
+    <string name="selection_city_error">Şehirler yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="selection_retry">Tekrar Dene</string>
+    <string name="selection_done">Tamam</string>
+    <string name="selection_powered_by_google">Powered by Google</string>
     <string name="price_range">Fiyat Aralığı</string>
 
 

@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours.model
 
 import androidx.annotation.DrawableRes
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 
 data class GuideTourCardUiModel(
     val id: String,
@@ -14,7 +15,7 @@ data class GuideTourCardUiModel(
     val capacity: Int,
     val languagesFlag: String,
     val languagesText: String,
-    val category: String,
+    val category: TourCategory,
     val price: Double,
     val rating: Double?,
     val reviewCount: Int?,

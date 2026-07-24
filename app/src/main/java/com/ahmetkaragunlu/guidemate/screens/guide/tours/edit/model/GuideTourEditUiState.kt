@@ -3,6 +3,7 @@ package com.ahmetkaragunlu.guidemate.screens.guide.tours.edit.model
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourLanguage
 import java.time.LocalDate
@@ -15,7 +16,7 @@ data class GuideTourEditUiState(
     val description: String = "",
     val country: String = "",
     val location: String = "",
-    val category: String = "",
+    val category: TourCategory? = null,
     val meetingPoint: String = "",
     val tourDate: LocalDate? = null,
     val startTime: LocalTime? = null,

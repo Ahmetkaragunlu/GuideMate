@@ -3,6 +3,7 @@ package com.ahmetkaragunlu.guidemate.screens.tourist.trips
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,7 @@ class TouristTripsViewModel
                         location = "Nevşehir, Ürgüp",
                         imageResId = R.drawable.example,
                         participantCount = 8,
-                        category = "Macera",
+                        category = TourCategory.ADVENTURE,
                         languagesFlag = "🇩🇪🇹🇷",
                         languagesText = "DE, TR",
                         price = 1500.0,
@@ -41,7 +42,7 @@ class TouristTripsViewModel
                         location = "İzmir, Buca",
                         imageResId = R.drawable.example,
                         participantCount = 5,
-                        category = "Tarih",
+                        category = TourCategory.CULTURE,
                         languagesFlag = "🇬🇧🇹🇷",
                         languagesText = "EN, TR",
                         price = 800.0,
@@ -56,7 +57,7 @@ class TouristTripsViewModel
                         location = "İstanbul",
                         imageResId = R.drawable.example,
                         participantCount = 10,
-                        category = "Tekne",
+                        category = TourCategory.ENTERTAINMENT,
                         languagesFlag = "🇫🇷🇹🇷",
                         languagesText = "FR, TR",
                         price = 600.0,
@@ -71,7 +72,7 @@ class TouristTripsViewModel
                         location = "Denizli",
                         imageResId = R.drawable.example,
                         participantCount = 12,
-                        category = "Doğa",
+                        category = TourCategory.NATURE,
                         languagesFlag = "🇪🇸🇹🇷",
                         languagesText = "ES, TR",
                         price = 900.0,

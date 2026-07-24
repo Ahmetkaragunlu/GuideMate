@@ -20,6 +20,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -27,13 +30,19 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditDropdown
+import com.ahmetkaragunlu.guidemate.screens.common.selection.components.CitySelectionBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.common.selection.components.CountrySelectionBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.common.selection.components.LanguageSelectionBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryUiModel
+import com.ahmetkaragunlu.guidemate.screens.tourist.category.TourCategoryCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.components.PriceRangeSelector
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.components.RatingBar
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.CategoryCard
+import com.ahmetkaragunlu.guidemate.screens.tourist.explore.model.ExploreUiState
 
 @Composable
 fun TouristFilterScreen(
@@ -42,7 +51,69 @@ fun TouristFilterScreen(
 ) {
     val categories = viewModel.categories
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var activePicker by rememberSaveable { mutableStateOf<TouristFilterPicker?>(null) }
 
+    TouristFilterContent(
+        uiState = uiState,
+        categories = categories,
+        onCountryClick = { activePicker = TouristFilterPicker.COUNTRY },
+        onCityClick = { activePicker = TouristFilterPicker.CITY },
+        onCategorySelected = viewModel::updateSelectedCategory,
+        onRatingChanged = viewModel::updateSelectedRating,
+        onLanguageClick = { activePicker = TouristFilterPicker.LANGUAGE },
+        onPriceRangeChange = viewModel::updatePriceRange,
+        onClearFilters = viewModel::clearFilters,
+        onApplyFilters = { },
+        modifier = modifier,
+    )
+
+    CountrySelectionBottomSheet(
+        isVisible = activePicker == TouristFilterPicker.COUNTRY,
+        selectedCountryCode = uiState.selectedCountry?.code,
+        onDismissRequest = { activePicker = null },
+        onCountrySelected = { country ->
+            viewModel.updateSelectedCountry(country)
+            activePicker = null
+        },
+    )
+
+    uiState.selectedCountry?.let { country ->
+        CitySelectionBottomSheet(
+            isVisible = activePicker == TouristFilterPicker.CITY,
+            country = country,
+            onDismissRequest = { activePicker = null },
+            onCitySelected = { city ->
+                viewModel.updateSelectedCity(city)
+                activePicker = null
+            },
+        )
+    }
+
+    LanguageSelectionBottomSheet(
+        isVisible = activePicker == TouristFilterPicker.LANGUAGE,
+        selectedLanguageCodes = uiState.selectedLanguages.mapTo(mutableSetOf()) { it.code },
+        onDismissRequest = { activePicker = null },
+        onLanguagesSelected = { languages ->
+            viewModel.updateSelectedLanguages(languages)
+            activePicker = null
+        },
+    )
+}
+
+@Composable
+fun TouristFilterContent(
+    uiState: ExploreUiState,
+    categories: List<TourCategoryUiModel>,
+    onCountryClick: () -> Unit,
+    onCityClick: () -> Unit,
+    onCategorySelected: (TourCategory?) -> Unit,
+    onRatingChanged: (Int) -> Unit,
+    onLanguageClick: () -> Unit,
+    onPriceRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    onClearFilters: () -> Unit,
+    onApplyFilters: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier =
             modifier
@@ -52,12 +123,15 @@ fun TouristFilterScreen(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
         EditDropdown(
-            value = "",
+            value = uiState.selectedCountry?.displayName.orEmpty(),
             placeholder = R.string.select_country,
+            onClick = onCountryClick,
         )
         EditDropdown(
-            value = "",
+            value = uiState.selectedCity?.displayName.orEmpty(),
             placeholder = R.string.select_city,
+            enabled = uiState.selectedCountry != null,
+            onClick = onCityClick,
         )
 
         Text(
@@ -75,12 +149,10 @@ fun TouristFilterScreen(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
         ) {
             items(categories) { category ->
-                CategoryCard(
+                TourCategoryCard(
                     category = category,
-                    isSelected = (category.type == uiState.selectedCategory),
-                    onClick = {
-                        viewModel.updateSelectedCategory(category.type)
-                    },
+                    isSelected = category.category == uiState.selectedCategory,
+                    onClick = { onCategorySelected(category.category) },
                 )
             }
         }
@@ -98,9 +170,7 @@ fun TouristFilterScreen(
 
         RatingBar(
             rating = uiState.selectedRating,
-            onRatingChanged = { newRating ->
-                viewModel.updateSelectedRating(newRating)
-            },
+            onRatingChanged = onRatingChanged,
             modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
 
@@ -112,8 +182,9 @@ fun TouristFilterScreen(
         )
 
         EditDropdown(
-            value = "",
+            value = uiState.selectedLanguages.joinToString { it.displayName },
             placeholder = R.string.language,
+            onClick = onLanguageClick,
         )
 
         Text(
@@ -125,7 +196,7 @@ fun TouristFilterScreen(
 
         PriceRangeSelector(
             range = uiState.priceRange,
-            onRangeChange = { newRange -> viewModel.updatePriceRange(newRange) },
+            onRangeChange = onPriceRangeChange,
             minPrice = 0f,
             maxPrice = 1000f,
         )
@@ -136,7 +207,7 @@ fun TouristFilterScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             OutlinedButton(
-                onClick = { },
+                onClick = onClearFilters,
                 modifier = Modifier.weight(1f),
                 colors =
                     ButtonDefaults.outlinedButtonColors(
@@ -152,7 +223,7 @@ fun TouristFilterScreen(
                 )
             }
             Button(
-                onClick = { },
+                onClick = onApplyFilters,
                 modifier = Modifier.weight(1f),
                 colors =
                     ButtonDefaults.buttonColors(
@@ -168,4 +239,10 @@ fun TouristFilterScreen(
             }
         }
     }
+}
+
+private enum class TouristFilterPicker {
+    COUNTRY,
+    CITY,
+    LANGUAGE,
 }

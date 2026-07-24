@@ -24,12 +24,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.tours.PopularTourCard
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryUiModel
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.tourist.category.TourCategoryCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.components.BestGuideCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.CategoryItem
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.CategoryCard
-import com.ahmetkaragunlu.guidemate.screens.tourist.shared.TourCategory
 
 @Composable
 fun TouristHomeScreen(
@@ -57,9 +57,9 @@ fun TouristHomeScreen(
 }
 
 private fun LazyListScope.categoriesSection(
-    categories: List<CategoryItem>,
-    selectedCategory: TourCategory,
-    onCategoryClick: (TourCategory) -> Unit,
+    categories: List<TourCategoryUiModel>,
+    selectedCategory: TourCategory?,
+    onCategoryClick: (TourCategory?) -> Unit,
 ) {
     item {
         Column(
@@ -80,11 +80,11 @@ private fun LazyListScope.categoriesSection(
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
             ) {
-                items(categories, key = { it.type }) { category ->
-                    CategoryCard(
+                items(categories, key = { it.category?.code ?: "all" }) { category ->
+                    TourCategoryCard(
                         category = category,
-                        isSelected = category.type == selectedCategory,
-                        onClick = { onCategoryClick(category.type) },
+                        isSelected = category.category == selectedCategory,
+                        onClick = { onCategoryClick(category.category) },
                     )
                 }
             }

@@ -3,8 +3,12 @@ package com.ahmetkaragunlu.guidemate.components
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -16,14 +20,15 @@ fun EditDropdown(
     value: String,
     @StringRes placeholder: Int,
     modifier: Modifier = Modifier,
-    options: List<String> = emptyList(),
+    enabled: Boolean = true,
+    onClick: () -> Unit = {},
     leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     val expanded = false
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { },
+        onExpandedChange = { if (enabled) onClick() },
         modifier = modifier,
     ) {
         EditTextField(
@@ -37,6 +42,7 @@ fun EditDropdown(
                 ),
             onValueChange = {},
             readOnly = true,
+            enabled = enabled,
             placeholder = placeholder,
             keyboardOptions = KeyboardOptions.Default,
             leadingIcon = leadingIcon,
@@ -48,7 +54,7 @@ fun EditDropdown(
                     .fillMaxWidth()
                     .menuAnchor(
                         type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                        enabled = true,
+                        enabled = enabled,
                     ),
         )
     }

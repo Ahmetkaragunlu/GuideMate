@@ -123,7 +123,7 @@ fun NavGraphBuilder.guideNavGraph(
         val uiState by tourPublishViewModel.uiState.collectAsStateWithLifecycle()
         GuideTourPublishStep1LocationDateScreen(
             uiState = uiState,
-            onLocationClick = { },
+            onLocationSelected = tourPublishViewModel::onLocationSelected,
             onDateSelected = tourPublishViewModel::onTourDateSelected,
             onStartTimeSelected = tourPublishViewModel::onStartTimeSelected,
             onDurationSelected = tourPublishViewModel::onDurationSelected,
@@ -138,8 +138,8 @@ fun NavGraphBuilder.guideNavGraph(
         val uiState by tourPublishViewModel.uiState.collectAsStateWithLifecycle()
         GuideTourPublishStep2CategoryPriceScreen(
             uiState = uiState,
-            onCategoryClick = { },
-            onAddLanguageClick = { },
+            onCategorySelected = tourPublishViewModel::onCategorySelected,
+            onLanguagesSelected = tourPublishViewModel::onLanguagesSelected,
             onRemoveLanguageClick = tourPublishViewModel::onRemoveLanguageClick,
             onPriceChange = tourPublishViewModel::onPriceChange,
             onCapacityChange = tourPublishViewModel::onCapacityChange,

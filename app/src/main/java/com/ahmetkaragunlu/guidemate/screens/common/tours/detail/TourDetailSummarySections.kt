@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
 import com.ahmetkaragunlu.guidemate.components.GuideMateImage
 import com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model.TourDetailMode
 import com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model.TourDetailStatus
@@ -231,10 +232,12 @@ private fun LanguageCategoryRow(uiState: TourDetailUiState) {
             emoji = uiState.languagesFlag,
             label = uiState.languagesText,
         )
-        EmojiLabelItem(
-            emoji = "🏷️",
-            label = uiState.category,
-        )
+        uiState.category?.let { category ->
+            EmojiLabelItem(
+                emoji = "🏷️",
+                label = stringResource(TourCategoryCatalog.uiModelFor(category).titleResId),
+            )
+        }
     }
 }
 

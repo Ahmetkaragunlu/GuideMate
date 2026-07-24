@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.step2.content
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,20 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -31,7 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
-import com.ahmetkaragunlu.guidemate.components.EditTextField
+import com.ahmetkaragunlu.guidemate.components.EditDropdown
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.components.GuideTourPublishStepProgress
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.components.GuideTourPublishValidationMessage
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishStep
@@ -122,7 +116,7 @@ private fun Step2Header() {
 
 @Composable
 private fun Step2CategoryField(
-    category: String,
+    category: TourCategory?,
     onClick: () -> Unit,
 ) {
     Text(
@@ -131,28 +125,15 @@ private fun Step2CategoryField(
         fontWeight = FontWeight.Medium,
     )
 
-    EditTextField(
-        value = category,
-        onValueChange = { },
-        readOnly = true,
-        keyboardOptions = KeyboardOptions.Default,
+    EditDropdown(
+        value =
+            category
+                ?.let(TourCategoryCatalog::uiModelFor)
+                ?.let { stringResource(it.titleResId) }
+                .orEmpty(),
+        placeholder = R.string.guide_tour_publish_step2_category_label,
+        onClick = onClick,
         leadingIcon = { Text(text = "🏷️") },
-        trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = colorResource(R.color.text_color),
-                modifier = Modifier.clickable(onClick = onClick),
-            )
-        },
-        colors =
-            OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
-                cursorColor = Color.Transparent,
-                unfocusedTextColor = colorResource(R.color.text_color),
-            ),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         modifier = Modifier.fillMaxWidth(),
     )
 }

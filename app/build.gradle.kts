@@ -4,6 +4,7 @@ plugins {
   alias(libs.plugins.ksp)
   alias(libs.plugins.hilt)
   alias(libs.plugins.kotlin.ktfmt)
+  alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
@@ -86,6 +87,11 @@ dependencies {
 
   // Google Authentication
   implementation(libs.play.services.auth)
+
+  // Google Places
+  implementation(libs.places)
 }
+
+secrets { defaultPropertiesFileName = "local.defaults.properties" }
 
 ktfmt { googleStyle() }
