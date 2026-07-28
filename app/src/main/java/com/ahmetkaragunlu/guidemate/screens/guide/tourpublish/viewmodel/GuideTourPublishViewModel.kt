@@ -4,19 +4,23 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.isValidCurrencyInput
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toCurrencyMinorUnitsOrNull
+import com.ahmetkaragunlu.guidemate.screens.common.guide.model.GuidePublicSummary
+import com.ahmetkaragunlu.guidemate.screens.common.guide.model.MOCK_CURRENT_GUIDE_ID
 import com.ahmetkaragunlu.guidemate.screens.common.selection.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.screens.common.selection.model.LocationOption
 import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.Tour
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourApprovalStatus
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourLanguage
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.session.TourSession
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.session.TourSessionStatus
+import com.ahmetkaragunlu.guidemate.screens.common.tours.store.TourCatalogStore
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.shared.GuideProfileStateProvider
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishStep
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishUiState
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.Tour
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourLanguage
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourSession
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourSessionStatus
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.toTourLanguage
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.shared.GuideTourStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -35,7 +39,7 @@ import kotlinx.coroutines.flow.update
 class GuideTourPublishViewModel
     @Inject
     constructor(
-        private val tourStore: GuideTourStore,
+        private val tourStore: TourCatalogStore,
         guideProfileStateProvider: GuideProfileStateProvider,
     ) : ViewModel() {
         private val draftState = MutableStateFlow(initialUiState())
@@ -45,6 +49,7 @@ class GuideTourPublishViewModel
                 draft.copy(
                     guideName = profile.displayName,
                     guideImageResId = profile.profileImageResId ?: R.drawable.unnamed,
+                    guideImageUrl = profile.displayProfileImageUrl,
                 )
             }.stateIn(
                 scope = viewModelScope,
@@ -112,7 +117,7 @@ class GuideTourPublishViewModel
         }
 
         fun onPriceChange(input: String) {
-            if (input.all(Char::isDigit)) {
+            if (input.isValidCurrencyInput()) {
                 updateDraft { copy(price = input) }
             }
         }
@@ -184,7 +189,7 @@ class GuideTourPublishViewModel
 
             val startsAt = form.toStartInstant()
             val duration = form.durationMinutes
-            val price = form.price.toDoubleOrNull()
+            val priceMinor = form.price.toCurrencyMinorUnitsOrNull()
             val capacity = form.capacity.toIntOrNull()
             val category =
                 form.category
@@ -197,8 +202,8 @@ class GuideTourPublishViewModel
                     !startsAt.isAfter(Instant.now()) ||
                     duration == null ||
                     duration <= 0 ||
-                    price == null ||
-                    price <= 0 ||
+                    priceMinor == null ||
+                    priceMinor <= 0 ||
                     capacity == null ||
                     capacity <= 0
             ) {
@@ -208,12 +213,12 @@ class GuideTourPublishViewModel
                 )
             }
             val submission =
-                form.toReviewSubmission(
+                form.toApprovalSubmission(
                     tourId = UUID.randomUUID().toString(),
                     sessionId = UUID.randomUUID().toString(),
                     startsAt = startsAt,
                     durationMinutes = duration,
-                    price = price,
+                    priceMinor = priceMinor,
                     capacity = capacity,
                     category = category,
                 )
@@ -271,7 +276,7 @@ class GuideTourPublishViewModel
         private fun GuideTourPublishUiState.isStep2Valid(): Boolean =
             category != null &&
                 spokenLanguages.isNotEmpty() &&
-                price.toDoubleOrNull()?.let { it > 0 } == true &&
+                price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } == true &&
                 capacity.toIntOrNull()?.let { it > 0 } == true
 
         private fun GuideTourPublishUiState.isStep3Valid(): Boolean =
@@ -286,20 +291,26 @@ class GuideTourPublishViewModel
             return runCatching { date.atTime(time).atZone(timeZoneId.toZoneId()).toInstant() }.getOrNull()
         }
 
-        private fun GuideTourPublishUiState.toReviewSubmission(
+        private fun GuideTourPublishUiState.toApprovalSubmission(
             tourId: String,
             sessionId: String,
             startsAt: Instant,
             durationMinutes: Int,
-            price: Double,
+            priceMinor: Long,
             capacity: Int,
             category: TourCategory,
-        ): TourReviewSubmission =
-            TourReviewSubmission(
+        ): TourApprovalSubmission =
+            TourApprovalSubmission(
                 tour =
                     Tour(
                         id = tourId,
-                        guideId = "guide-current",
+                        guide =
+                            GuidePublicSummary(
+                                id = MOCK_CURRENT_GUIDE_ID,
+                                displayName = guideName,
+                                profileImageResId = guideImageResId,
+                                profileImageUrl = guideImageUrl,
+                            ),
                         title = tourName.trim(),
                         description = tourDescription.trim(),
                         countryCode = countryCode,
@@ -320,7 +331,7 @@ class GuideTourPublishViewModel
                         meetingPoint = meetingPoint.trim(),
                         startsAt = startsAt,
                         durationMinutes = durationMinutes,
-                        price = price,
+                        priceMinor = priceMinor,
                         capacity = capacity,
                         bookedCount = 0,
                         status = TourSessionStatus.CLOSED,
@@ -364,7 +375,7 @@ class GuideTourPublishViewModel
         }
     }
 
-private data class TourReviewSubmission(
+private data class TourApprovalSubmission(
     val tour: Tour,
     val session: TourSession,
 )

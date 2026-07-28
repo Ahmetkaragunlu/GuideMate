@@ -23,16 +23,16 @@ class GuideEarningsViewModel
                     MonthlyEarningUiModel(
                         year = 2026,
                         month = 7,
-                        amount = 12500.0,
+                        amountMinor = 1_250_000,
                     ),
                 history =
                     listOf(
-                        MonthlyEarningUiModel(2026, 6, 10000.0),
-                        MonthlyEarningUiModel(2026, 5, 8500.0),
-                        MonthlyEarningUiModel(2026, 4, 12000.0),
-                        MonthlyEarningUiModel(2026, 3, 7000.0),
-                        MonthlyEarningUiModel(2026, 2, 9500.0),
-                        MonthlyEarningUiModel(2026, 1, 8250.0),
+                        MonthlyEarningUiModel(2026, 6, 1_000_000),
+                        MonthlyEarningUiModel(2026, 5, 850_000),
+                        MonthlyEarningUiModel(2026, 4, 1_200_000),
+                        MonthlyEarningUiModel(2026, 3, 700_000),
+                        MonthlyEarningUiModel(2026, 2, 950_000),
+                        MonthlyEarningUiModel(2026, 1, 825_000),
                     ),
             )
     }

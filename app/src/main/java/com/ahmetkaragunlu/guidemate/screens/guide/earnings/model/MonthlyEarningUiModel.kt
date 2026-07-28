@@ -7,7 +7,7 @@ import java.util.Locale
 data class MonthlyEarningUiModel(
     val year: Int,
     val month: Int,
-    val amount: Double,
+    val amountMinor: Long,
 )
 
 fun MonthlyEarningUiModel.toPeriodLabel(locale: Locale = Locale.getDefault()): String =

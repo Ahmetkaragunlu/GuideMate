@@ -12,19 +12,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,63 +29,35 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristAccountRoute
-import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.content.MoneyActionBottomSheetContent
-import com.ahmetkaragunlu.guidemate.screens.common.profile.components.CommonProfileMenuItem
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.components.WalletCard
+import com.ahmetkaragunlu.guidemate.screens.common.profile.CommonProfileMenuItem
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.ProfileUiState
+import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.TouristProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.menuOptions
+import com.ahmetkaragunlu.guidemate.screens.tourist.wallet.components.TouristBalanceCard
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TouristProfileScreen(
     viewModel: TouristProfileViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
-    onNavigateToAccount: (TouristAccountRoute) -> Unit = {},
+    onNavigateToAccount: (TouristProfileMenuTarget) -> Unit = {},
+    onNavigateToWallet: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    LaunchedEffect(Unit) {
-        viewModel.loadProfileData()
-    }
-
-    LaunchedEffect(showBottomSheet) {
-        if (showBottomSheet) {
-            viewModel.syncSelectedCardWithDefault()
-        }
-    }
 
     TouristProfileContent(
         modifier = modifier,
         uiState = uiState,
-        onAddMoneyClick = { showBottomSheet = true },
+        onNavigateToWallet = onNavigateToWallet,
         onNavigateToAccount = onNavigateToAccount,
     )
-
-    if (showBottomSheet) {
-        AddMoneyBottomSheet(
-            sheetState = sheetState,
-            uiState = uiState,
-            onAmountChange = viewModel::onDepositAmountChange,
-            onPresetAmountClick = viewModel::onDepositPresetSelected,
-            onChangeBankClick = viewModel::onChangeBankClick,
-            onDismiss = { showBottomSheet = false },
-            onConfirm = {
-                viewModel.onAddMoneyConfirm()
-                showBottomSheet = false
-            },
-        )
-    }
 }
 
 @Composable
 private fun TouristProfileContent(
     modifier: Modifier = Modifier,
     uiState: ProfileUiState,
-    onAddMoneyClick: () -> Unit,
-    onNavigateToAccount: (TouristAccountRoute) -> Unit,
+    onNavigateToWallet: () -> Unit,
+    onNavigateToAccount: (TouristProfileMenuTarget) -> Unit,
 ) {
     Column(
         modifier =
@@ -113,9 +76,10 @@ private fun TouristProfileContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        WalletCard(
+        TouristBalanceCard(
             balance = uiState.balance,
-            onAddMoneyClick = onAddMoneyClick,
+            onWalletClick = onNavigateToWallet,
+            onAddMoneyClick = onNavigateToWallet,
         )
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
@@ -153,14 +117,14 @@ private fun ProfileHeader(
 
 @Composable
 private fun ProfileMenuSection(
-    onNavigateToAccount: (TouristAccountRoute) -> Unit,
+    onNavigateToAccount: (TouristProfileMenuTarget) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         menuOptions.forEachIndexed { index, option ->
             CommonProfileMenuItem(
                 icon = option.icon,
                 title = stringResource(id = option.titleResId),
-                onClick = { onNavigateToAccount(option.targetRoute) },
+                onClick = { onNavigateToAccount(option.target) },
             )
             if (index < menuOptions.lastIndex) {
                 HorizontalDivider(
@@ -169,37 +133,5 @@ private fun ProfileMenuSection(
                 )
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AddMoneyBottomSheet(
-    sheetState: SheetState,
-    uiState: ProfileUiState,
-    onAmountChange: (String) -> Unit,
-    onPresetAmountClick: (Int) -> Unit,
-    onChangeBankClick: () -> Unit,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = Color.White,
-        dragHandle = { BottomSheetDefaults.DragHandle() },
-    ) {
-        MoneyActionBottomSheetContent(
-            title = stringResource(R.string.add_money_title),
-            amountText = uiState.depositAmount,
-            onAmountChange = onAmountChange,
-            actionButtonText = stringResource(R.string.profile_add_money),
-            helperText = stringResource(R.string.add_money_info_text),
-            selectedMethod = uiState.selectedMethod,
-            presetAmounts = listOf(100, 250, 500, 1000),
-            onPresetAmountClick = onPresetAmountClick,
-            onChangeMethodClick = onChangeBankClick,
-            onConfirm = { onConfirm() },
-        )
     }
 }

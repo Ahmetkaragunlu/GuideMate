@@ -39,7 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.components.MonthlyEarningItem
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.GuideEarningsUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.MonthlyEarningUiModel
@@ -216,7 +216,7 @@ private fun CurrentMonthEarningsCard(
                 color = colorResource(R.color.text_color),
             )
             Text(
-                text = earning.amount.toLocalCurrency(),
+                text = earning.amountMinor.toLocalCurrencyFromMinorUnit(),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF888DED),

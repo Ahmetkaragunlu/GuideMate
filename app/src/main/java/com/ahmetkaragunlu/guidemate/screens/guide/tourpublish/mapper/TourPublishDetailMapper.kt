@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.mapper
 
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toCurrencyMinorUnitsOrNull
 import com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model.TourDetailUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.model.GuideTourPublishUiState
 import java.time.format.DateTimeFormatter
@@ -21,7 +22,7 @@ fun GuideTourPublishUiState.toPreviewDetailUiState(): TourDetailUiState =
         languagesFlag = spokenLanguages.joinToString(separator = " ") { it.flagEmoji },
         languagesText = spokenLanguages.joinToString(separator = ", ") { it.shortCode },
         category = category,
-        price = price.toDoubleOrNull() ?: 1500.0,
+        priceMinor = price.toCurrencyMinorUnitsOrNull() ?: 150_000,
         capacity = capacity.toIntOrNull() ?: 0,
         description =
             tourDescription.ifBlank {
@@ -33,6 +34,7 @@ fun GuideTourPublishUiState.toPreviewDetailUiState(): TourDetailUiState =
             },
         guideName = guideName,
         guideImageResId = guideImageResId,
+        guideImageUrl = guideImageUrl,
     )
 
 private fun localizedDateFormatter(): DateTimeFormatter =

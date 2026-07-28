@@ -2,158 +2,78 @@ package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.appendSavedCard
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.deleteSavedCard
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.makeDefaultSavedCard
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.AddSavedCardFormState
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.SavedCardUi
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.SavedCardsUiState
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.sanitizeCardHolderName
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.sanitizeCardNumber
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.sanitizeExpiryMonth
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.sanitizeExpiryYear
+import com.ahmetkaragunlu.guidemate.screens.tourist.finance.store.TouristFinanceStore
+import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.model.SavedCardsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
-class TouristSavedCardsViewModel @Inject constructor() : ViewModel() {
-    private val _uiState = MutableStateFlow(SavedCardsUiState(savedCards = getSavedCards()))
-    val uiState: StateFlow<SavedCardsUiState> = _uiState.asStateFlow()
+class TouristSavedCardsViewModel
+    @Inject
+    constructor(
+        private val financeStore: TouristFinanceStore,
+    ) : ViewModel() {
+        private val actionState = MutableStateFlow(SavedCardsUiState())
 
-    init {
-        viewModelScope.launch {
-            savedCards.collectLatest { cards ->
-                _uiState.update { it.copy(savedCards = cards) }
+        val uiState: StateFlow<SavedCardsUiState> =
+            combine(financeStore.state, actionState) { finance, action ->
+                action.copy(savedCards = finance.savedCards)
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue =
+                    SavedCardsUiState(savedCards = financeStore.state.value.savedCards),
+            )
+
+        fun onShowDeleteDialog(cardId: String) {
+            actionState.update { it.copy(showDeleteDialogFor = cardId) }
+        }
+
+        fun onDismissDeleteDialog() {
+            actionState.update { it.copy(showDeleteDialogFor = null) }
+        }
+
+        fun onShowMakeDefaultDialog(cardId: String) {
+            actionState.update { it.copy(showMakeDefaultDialogFor = cardId) }
+        }
+
+        fun onDismissMakeDefaultDialog() {
+            actionState.update { it.copy(showMakeDefaultDialogFor = null) }
+        }
+
+        fun onConfirmDeleteCard() {
+            val cardId = actionState.value.showDeleteDialogFor ?: return
+            financeStore.deleteCard(cardId)
+            onDismissDeleteDialog()
+        }
+
+        fun onConfirmMakeDefaultCard() {
+            val cardId = actionState.value.showMakeDefaultDialogFor ?: return
+            financeStore.makeDefaultCard(cardId)
+            onDismissMakeDefaultDialog()
+        }
+
+        fun onShowAddCardSheet() {
+            actionState.update { it.copy(isAddCardBottomSheetVisible = true) }
+        }
+
+        fun onDismissAddCardSheet() {
+            actionState.update {
+                it.copy(
+                    isAddCardBottomSheetVisible = false,
+                    saveCardConsentChecked = false,
+                )
             }
         }
-    }
 
-    fun onShowDeleteDialog(cardId: String) {
-        _uiState.update { it.copy(showDeleteDialogFor = cardId) }
-    }
-
-    fun onDismissDeleteDialog() {
-        _uiState.update { it.copy(showDeleteDialogFor = null) }
-    }
-
-    fun onShowMakeDefaultDialog(cardId: String) {
-        _uiState.update { it.copy(showMakeDefaultDialogFor = cardId) }
-    }
-
-    fun onDismissMakeDefaultDialog() {
-        _uiState.update { it.copy(showMakeDefaultDialogFor = null) }
-    }
-
-    fun onConfirmDeleteCard() {
-        val cardId = _uiState.value.showDeleteDialogFor ?: return
-        _savedCards.value = deleteSavedCard(_savedCards.value, cardId)
-        _uiState.update { it.copy(showDeleteDialogFor = null) }
-    }
-
-    fun onConfirmMakeDefaultCard() {
-        val cardId = _uiState.value.showMakeDefaultDialogFor ?: return
-        _savedCards.value = makeDefaultSavedCard(_savedCards.value, cardId)
-        _uiState.update { it.copy(showMakeDefaultDialogFor = null) }
-    }
-
-    fun onShowAddCardSheet() {
-        _uiState.update { it.copy(isAddCardBottomSheetVisible = true) }
-    }
-
-    fun onDismissAddCardSheet() {
-        _uiState.update {
-            it.copy(
-                isAddCardBottomSheetVisible = false,
-                addCardForm = AddSavedCardFormState(),
-            )
+        fun onSaveCardConsentChange(isChecked: Boolean) {
+            actionState.update { it.copy(saveCardConsentChecked = isChecked) }
         }
+
     }
-
-    fun onCardNumberChange(value: String) {
-        _uiState.update {
-            it.copy(
-                addCardForm = it.addCardForm.copy(cardNumber = sanitizeCardNumber(value)),
-            )
-        }
-    }
-
-    fun onCardHolderNameChange(value: String) {
-        _uiState.update {
-            it.copy(
-                addCardForm = it.addCardForm.copy(cardHolderName = sanitizeCardHolderName(value)),
-            )
-        }
-    }
-
-    fun onExpiryMonthChange(value: String) {
-        _uiState.update {
-            it.copy(
-                addCardForm = it.addCardForm.copy(expiryMonth = sanitizeExpiryMonth(value)),
-            )
-        }
-    }
-
-    fun onExpiryYearChange(value: String) {
-        _uiState.update {
-            it.copy(
-                addCardForm = it.addCardForm.copy(expiryYear = sanitizeExpiryYear(value)),
-            )
-        }
-    }
-
-    fun onConfirmAddCard() {
-        val form = _uiState.value.addCardForm
-        if (!form.canSubmit) return
-
-        _savedCards.value = appendSavedCard(_savedCards.value, form)
-
-        _uiState.update {
-            it.copy(
-                isAddCardBottomSheetVisible = false,
-                addCardForm = AddSavedCardFormState(),
-            )
-        }
-    }
-
-    companion object {
-        private val _savedCards =
-            MutableStateFlow(
-                listOf(
-                    SavedCardUi(
-                        cardId = "tourist_card_1",
-                        bankName = "Garanti BBVA",
-                        cardNumber = "**** **** **** 4567",
-                        cardHolderName = "Ahmet Karagünlü",
-                        expiryDate = "12/28",
-                        isDefault = true,
-                    ),
-                    SavedCardUi(
-                        cardId = "tourist_card_2",
-                        bankName = "Ziraat Bankası",
-                        cardNumber = "**** **** **** 9821",
-                        cardHolderName = "Ahmet Karagünlü",
-                        expiryDate = "07/27",
-                        isDefault = false,
-                    ),
-                    SavedCardUi(
-                        cardId = "tourist_card_3",
-                        bankName = "İş Bankası",
-                        cardNumber = "**** **** **** 1122",
-                        cardHolderName = "Ahmet Karagünlü",
-                        expiryDate = "05/29",
-                        isDefault = false,
-                    ),
-                ),
-            )
-
-        val savedCards: StateFlow<List<SavedCardUi>> = _savedCards.asStateFlow()
-
-        fun getSavedCards(): List<SavedCardUi> = _savedCards.value
-    }
-}

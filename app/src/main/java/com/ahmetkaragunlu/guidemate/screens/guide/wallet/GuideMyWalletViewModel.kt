@@ -2,112 +2,83 @@ package com.ahmetkaragunlu.guidemate.screens.guide.wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.findDefaultSavedCard
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.findNextSavedCard
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.SavedCardUi
-import com.ahmetkaragunlu.guidemate.screens.common.profile.account.savedcards.model.toMoneyActionMethodUi
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.savedcards.viewmodel.GuideSavedCardsViewModel
+import com.ahmetkaragunlu.guidemate.screens.guide.finance.model.toMoneyActionMethodUi
+import com.ahmetkaragunlu.guidemate.screens.guide.finance.store.GuideFinanceStore
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.GuideWalletUiState
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionType
-import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class GuideMyWalletViewModel
     @Inject
-    constructor() : ViewModel() {
-        private val _uiState =
-            MutableStateFlow(
-                GuideWalletUiState(
-                    totalBalance = 20000.0,
-                    recentTransactions =
-                        listOf(
-                            WalletTransactionUiModel(
-                                "1",
-                                "Ayasofya Turu",
-                                1707996600000,
-                                "15 Şub 2026, 14:30",
-                                750.0,
-                                WalletTransactionType.TOUR_INCOME,
-                            ),
-                            WalletTransactionUiModel(
-                                "2",
-                                "Para Çekimi",
-                                1707729300000,
-                                "12 Şub 2026, 09:15",
-                                5000.0,
-                                WalletTransactionType.WITHDRAWAL,
-                            ),
-                            WalletTransactionUiModel(
-                                "3",
-                                "Kapadokya Balon Turu",
-                                1707544800000,
-                                "10 Şub 2026, 06:00",
-                                1500.0,
-                                WalletTransactionType.TOUR_INCOME,
-                            ),
-                            WalletTransactionUiModel(
-                                "4",
-                                "Para Çekimi",
-                                1707147900000,
-                                "05 Şub 2026, 16:45",
-                                3000.0,
-                                WalletTransactionType.WITHDRAWAL,
-                            ),
-                        ),
-                ),
+    constructor(
+        private val financeStore: GuideFinanceStore,
+    ) : ViewModel() {
+        private val actionState = MutableStateFlow(GuideWalletUiState())
+
+        val uiState: StateFlow<GuideWalletUiState> =
+            combine(financeStore.state, actionState) { finance, action ->
+                val selectedBankAccount =
+                    finance.bankAccounts.firstOrNull {
+                        it.bankAccountId == action.selectedBankAccountId
+                } ?: finance.defaultBankAccount
+                action.copy(
+                    availableBalanceMinor = finance.availableWithdrawalBalanceMinor,
+                    selectedBankAccountId = selectedBankAccount?.bankAccountId,
+                    defaultMethod = finance.defaultBankAccount?.toMoneyActionMethodUi(),
+                    selectedMethod = selectedBankAccount?.toMoneyActionMethodUi(),
+                    recentTransactions = finance.recentTransactions,
+                )
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue =
+                    financeStore.state.value.let { finance ->
+                        GuideWalletUiState(
+                            availableBalanceMinor = finance.availableWithdrawalBalanceMinor,
+                            selectedBankAccountId = finance.defaultBankAccount?.bankAccountId,
+                            defaultMethod =
+                                finance.defaultBankAccount?.toMoneyActionMethodUi(),
+                            selectedMethod =
+                                finance.defaultBankAccount?.toMoneyActionMethodUi(),
+                            recentTransactions = finance.recentTransactions,
+                        )
+                    },
             )
-        val uiState: StateFlow<GuideWalletUiState> = _uiState.asStateFlow()
 
-        private var isWalletLoaded = false
-
-        fun loadWalletData() {
-            if (isWalletLoaded) return
-            isWalletLoaded = true
-
-            viewModelScope.launch {
-                GuideSavedCardsViewModel.savedCards.collect { cards ->
-                    updateSelectedMethodFromDefault(cards)
-                }
+        fun resetSelectedBankAccountToDefault() {
+            actionState.update {
+                it.copy(selectedBankAccountId = null)
             }
         }
 
-        fun syncSelectedCardWithDefault() {
-            updateSelectedMethodFromDefault(GuideSavedCardsViewModel.getSavedCards())
+        fun selectNextBankAccount() {
+            val nextAccount =
+                financeStore.nextBankAccount(uiState.value.selectedBankAccountId) ?: return
+            actionState.update { it.copy(selectedBankAccountId = nextAccount.bankAccountId) }
         }
 
-        fun onChangeBankClick() {
-            val nextCard =
-                findNextSavedCard(
-                    cards = GuideSavedCardsViewModel.getSavedCards(),
-                    currentCardId = _uiState.value.selectedCardId,
-                ) ?: return
-
-            _uiState.update {
-                it.copy(
-                    selectedCardId = nextCard.cardId,
-                    selectedMethod = nextCard.toMoneyActionMethodUi(),
+        fun requestWithdrawal(amountMinor: Long): Boolean {
+            val state = uiState.value
+            val selectedBankAccountId = state.selectedBankAccountId ?: return false
+            if (
+                !financeStore.addPendingWithdrawal(
+                    amountMinor = amountMinor,
+                    bankAccountId = selectedBankAccountId,
                 )
-            }
+            ) return false
+
+            actionState.update { it.copy(isWithdrawalRequestSubmitted = true) }
+            return true
         }
 
-        fun withdrawMoney(amount: Double) {
-            viewModelScope.launch {}
-        }
-
-        private fun updateSelectedMethodFromDefault(cards: List<SavedCardUi>) {
-            val defaultCard = findDefaultSavedCard(cards)
-            _uiState.update {
-                it.copy(
-                    selectedCardId = defaultCard?.cardId,
-                    selectedMethod = defaultCard?.toMoneyActionMethodUi(),
-                )
-            }
+        fun dismissWithdrawalConfirmation() {
+            actionState.update { it.copy(isWithdrawalRequestSubmitted = false) }
         }
     }

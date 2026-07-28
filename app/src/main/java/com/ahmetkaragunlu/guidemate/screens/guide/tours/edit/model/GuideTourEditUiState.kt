@@ -4,8 +4,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourLanguage
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourApprovalStatus
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourLanguage
 import java.time.LocalDate
 import java.time.LocalTime
 

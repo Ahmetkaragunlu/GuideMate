@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.components
 
+import androidx.annotation.StringRes
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -9,23 +10,27 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.navigation.BottomNavItem
-import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
+
+data class BottomBarItem<T>(
+    @param:StringRes val label: Int,
+    val icon: ImageVector,
+    val destination: T,
+)
 
 @Composable
-fun AppBottomBar(
-    navController: NavController,
-    currentRoute: String,
-    items: List<BottomNavItem>,
-    badgeCounts: Map<String, Int> = emptyMap(),
+fun <T> AppBottomBar(
+    selectedDestination: T?,
+    items: List<BottomBarItem<T>>,
+    badgeCounts: Map<T, Int> = emptyMap(),
+    onDestinationClick: (T) -> Unit,
 ) {
     NavigationBar(containerColor = Color.Transparent) {
         items.forEach { item ->
-            val badgeCount = badgeCounts[item.screen] ?: 0
+            val badgeCount = badgeCounts[item.destination] ?: 0
             NavigationBarItem(
                 label = { Text(stringResource(item.label)) },
                 icon = {
@@ -44,8 +49,8 @@ fun AppBottomBar(
                         )
                     }
                 },
-                selected = currentRoute == item.screen,
-                onClick = { navController.navigateBottomBar(item.screen) },
+                selected = selectedDestination == item.destination,
+                onClick = { onDestinationClick(item.destination) },
                 colors =
                     NavigationBarItemDefaults.colors(
                         selectedIconColor = colorResource(R.color.brand_color),

@@ -3,7 +3,6 @@ package com.ahmetkaragunlu.guidemate.screens.guide.profile.model
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Bell
 import compose.icons.tablericons.CreditCard
@@ -14,40 +13,49 @@ import compose.icons.tablericons.User
 
 data class GuideProfileMenuOption(
     val icon: ImageVector,
-    @StringRes val titleResId: Int,
-    val targetRoute: GuideAccountRoute,
+    @param:StringRes val titleResId: Int,
+    val target: GuideProfileMenuTarget,
 )
+
+enum class GuideProfileMenuTarget {
+    BANK_ACCOUNTS,
+    ABOUT,
+    CHANGE_PASSWORD,
+    NOTIFICATION_SETTINGS,
+    LEGAL_AGREEMENTS,
+    HELP_SUPPORT,
+}
 
 val guideProfileMenuOptions =
     listOf(
         GuideProfileMenuOption(
             icon = TablerIcons.CreditCard,
-            titleResId = R.string.saved_cards,
-            targetRoute = GuideAccountRoute.SavedCards,
+            titleResId = R.string.bank_accounts,
+            target = GuideProfileMenuTarget.BANK_ACCOUNTS,
         ),
         GuideProfileMenuOption(
             icon = TablerIcons.User,
             titleResId = R.string.about,
-            targetRoute = GuideAccountRoute.About,
+            target = GuideProfileMenuTarget.ABOUT,
         ),
         GuideProfileMenuOption(
             icon = TablerIcons.Lock,
             titleResId = R.string.change_password,
-            targetRoute = GuideAccountRoute.ChangePassword,
+            target = GuideProfileMenuTarget.CHANGE_PASSWORD,
         ),
         GuideProfileMenuOption(
             icon = TablerIcons.Bell,
             titleResId = R.string.notification_settings,
-            targetRoute = GuideAccountRoute.NotificationSettings,
+            target = GuideProfileMenuTarget.NOTIFICATION_SETTINGS,
         ),
         GuideProfileMenuOption(
             icon = TablerIcons.Scale,
             titleResId = R.string.legal_agreements,
-            targetRoute = GuideAccountRoute.LegalAgreements,
+            target = GuideProfileMenuTarget.LEGAL_AGREEMENTS,
         ),
         GuideProfileMenuOption(
             icon = TablerIcons.Help,
             titleResId = R.string.help_support,
-            targetRoute = GuideAccountRoute.HelpSupport,
+            target = GuideProfileMenuTarget.HELP_SUPPORT,
         ),
     )

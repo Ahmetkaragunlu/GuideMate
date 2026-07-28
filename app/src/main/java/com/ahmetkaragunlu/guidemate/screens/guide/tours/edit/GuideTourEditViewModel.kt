@@ -3,16 +3,20 @@ package com.ahmetkaragunlu.guidemate.screens.guide.tours.edit
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.navigation.guide.GUIDE_TOUR_SESSION_ID_ARGUMENT
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.isValidCurrencyInput
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toCurrencyInput
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toCurrencyMinorUnitsOrNull
+import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
 import com.ahmetkaragunlu.guidemate.screens.common.selection.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourApprovalStatus
+import com.ahmetkaragunlu.guidemate.screens.common.tours.store.TourCatalogStore
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.edit.model.GuideTourEditUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourEditRequest
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.operation.TourEditRequest
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.toTourLanguage
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.shared.GuideTourStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,10 +32,9 @@ class GuideTourEditViewModel
     @Inject
     constructor(
         savedStateHandle: SavedStateHandle,
-        private val tourStore: GuideTourStore,
+        private val tourStore: TourCatalogStore,
     ) : ViewModel() {
-        private val sessionId: String =
-            checkNotNull(savedStateHandle[GUIDE_TOUR_SESSION_ID_ARGUMENT])
+        private val sessionId = savedStateHandle.toRoute<GuideTourDestination.Edit>().sessionId
 
         private val originalApprovalStatus =
             tourStore.state.value.findBySessionId(sessionId)?.tour?.approvalStatus
@@ -69,7 +72,7 @@ class GuideTourEditViewModel
         }
 
         fun onPriceChange(value: String) {
-            if (value.all(Char::isDigit)) updateForm { copy(price = value) }
+            if (value.isValidCurrencyInput()) updateForm { copy(price = value) }
         }
 
         fun onCapacityChange(value: String) {
@@ -122,7 +125,9 @@ class GuideTourEditViewModel
                             meetingPoint = form.meetingPoint,
                             startsAt = startsAt,
                             durationMinutes = form.durationMinutes.toIntOrNull() ?: return showError(),
-                            price = form.price.toDoubleOrNull() ?: return showError(),
+                            priceMinor =
+                                form.price.toCurrencyMinorUnitsOrNull()
+                                    ?: return showError(),
                             capacity = form.capacity.toIntOrNull() ?: return showError(),
                         ),
                 )
@@ -152,7 +157,7 @@ class GuideTourEditViewModel
                 tourDate = current.session.startsAt.atZone(ZoneId.systemDefault()).toLocalDate(),
                 startTime = current.session.startsAt.atZone(ZoneId.systemDefault()).toLocalTime(),
                 durationMinutes = current.session.durationMinutes.toString(),
-                price = current.session.price.toInt().toString(),
+                price = current.session.priceMinor.toCurrencyInput(),
                 capacity = current.session.capacity.toString(),
                 languages = current.tour.languages,
                 coverImageResId = current.tour.coverImageResId,

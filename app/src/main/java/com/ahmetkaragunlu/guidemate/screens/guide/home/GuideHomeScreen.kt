@@ -40,7 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.screens.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.home.model.GuideStatistic
@@ -184,7 +184,7 @@ private fun MonthlyEarningsCard(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = earning.amount.toLocalCurrency(),
+                text = earning.amountMinor.toLocalCurrencyFromMinorUnit(),
                 color = Color(0xFF888ded),
                 fontWeight = FontWeight.Bold,
             )

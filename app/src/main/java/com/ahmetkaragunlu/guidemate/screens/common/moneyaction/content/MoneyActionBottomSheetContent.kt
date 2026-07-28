@@ -24,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,14 +38,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.isValidCurrencyInput
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.localCurrencySymbol
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toCurrencyMinorUnitsOrNull
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.components.EditTextField
-import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
 import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.model.MoneyActionMethodUi
+import com.ahmetkaragunlu.guidemate.screens.common.moneyaction.model.MoneyActionMethodType
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CreditCard
 import compose.icons.tablericons.Refresh
-import java.util.Currency
-import java.util.Locale
 
 @Composable
 fun MoneyActionBottomSheetContent(
@@ -54,19 +58,13 @@ fun MoneyActionBottomSheetContent(
     actionButtonText: String,
     helperText: String,
     selectedMethod: MoneyActionMethodUi?,
+    methodType: MoneyActionMethodType = MoneyActionMethodType.CARD,
     presetAmounts: List<Int>,
     onPresetAmountClick: (Int) -> Unit,
     onChangeMethodClick: () -> Unit,
-    onConfirm: (Double) -> Unit,
+    onConfirm: (Long) -> Unit,
     extraContent: @Composable (() -> Unit)? = null,
 ) {
-    val currencySymbol =
-        try {
-            Currency.getInstance(Locale.getDefault()).symbol
-        } catch (_: Exception) {
-            "₺"
-        }
-
     Column(
         modifier =
             modifier
@@ -82,7 +80,7 @@ fun MoneyActionBottomSheetContent(
 
         MoneyAmountField(
             amountText = amountText,
-            currencySymbol = currencySymbol,
+            currencySymbol = localCurrencySymbol(),
             onAmountChange = onAmountChange,
         )
 
@@ -105,6 +103,7 @@ fun MoneyActionBottomSheetContent(
 
         SelectedMethodCard(
             selectedMethod = selectedMethod,
+            methodType = methodType,
             onChangeMethodClick = onChangeMethodClick,
         )
 
@@ -117,6 +116,9 @@ fun MoneyActionBottomSheetContent(
         MoneyActionConfirmButton(
             amountText = amountText,
             actionButtonText = actionButtonText,
+            enabled =
+                selectedMethod != null &&
+                    amountText.toCurrencyMinorUnitsOrNull()?.let { it > 0 } == true,
             onConfirm = onConfirm,
         )
     }
@@ -141,12 +143,12 @@ private fun MoneyAmountField(
     EditTextField(
         value = amountText,
         onValueChange = { newValue ->
-            if (newValue.isEmpty() || newValue.all(Char::isDigit)) {
+            if (newValue.isValidCurrencyInput()) {
                 onAmountChange(newValue)
             }
         },
         placeholder = R.string.zero,
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors =
@@ -177,7 +179,7 @@ private fun PresetAmountsSection(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
     ) {
         presetAmounts.forEach { amount ->
-            val formattedAmount = amount.toDouble().toLocalCurrency()
+            val formattedAmount = (amount.toLong() * 100).toLocalCurrencyFromMinorUnit()
             FilterChip(
                 selected = amountText == amount.toString(),
                 onClick = { onPresetAmountClick(amount) },
@@ -196,6 +198,7 @@ private fun PresetAmountsSection(
 @Composable
 private fun SelectedMethodCard(
     selectedMethod: MoneyActionMethodUi?,
+    methodType: MoneyActionMethodType,
     onChangeMethodClick: () -> Unit,
 ) {
     Row(
@@ -210,7 +213,12 @@ private fun SelectedMethodCard(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                TablerIcons.CreditCard,
+                imageVector =
+                    if (methodType == MoneyActionMethodType.BANK_ACCOUNT) {
+                        Icons.Default.AccountBalance
+                    } else {
+                        TablerIcons.CreditCard
+                    },
                 contentDescription = null,
                 tint = colorResource(R.color.brand_color),
                 modifier = Modifier.size(24.dp),
@@ -218,12 +226,28 @@ private fun SelectedMethodCard(
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = selectedMethod?.title ?: stringResource(R.string.bank_not_selected),
+                    text =
+                        selectedMethod?.title
+                            ?: stringResource(
+                                if (methodType == MoneyActionMethodType.BANK_ACCOUNT) {
+                                    R.string.bank_account_not_selected
+                                } else {
+                                    R.string.card_not_selected
+                                },
+                            ),
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = selectedMethod?.subtitle ?: stringResource(R.string.default_masked_iban),
+                    text =
+                        selectedMethod?.subtitle
+                            ?: stringResource(
+                                if (methodType == MoneyActionMethodType.BANK_ACCOUNT) {
+                                    R.string.default_masked_iban
+                                } else {
+                                    R.string.no_saved_card
+                                },
+                            ),
                     color = colorResource(R.color.text_color),
                     style = MaterialTheme.typography.labelSmall,
                 )
@@ -268,10 +292,14 @@ private fun MoneyActionHelperText(helperText: String) {
 private fun MoneyActionConfirmButton(
     amountText: String,
     actionButtonText: String,
-    onConfirm: (Double) -> Unit,
+    enabled: Boolean,
+    onConfirm: (Long) -> Unit,
 ) {
     Button(
-        onClick = { onConfirm(amountText.toDoubleOrNull() ?: 0.0) },
+        onClick = {
+            amountText.toCurrencyMinorUnitsOrNull()?.let(onConfirm)
+        },
+        enabled = enabled,
         modifier =
             Modifier
                 .fillMaxWidth()

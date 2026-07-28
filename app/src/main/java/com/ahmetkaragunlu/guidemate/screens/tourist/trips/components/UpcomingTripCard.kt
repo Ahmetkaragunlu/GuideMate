@@ -25,10 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.screens.common.tours.InfoRow
 import com.ahmetkaragunlu.guidemate.screens.common.tours.TourBaseCard
 import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
-import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TripUiModel
+import com.ahmetkaragunlu.guidemate.screens.tourist.trips.model.TripUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Users
@@ -36,12 +37,14 @@ import compose.icons.tablericons.Users
 @Composable
 fun UpcomingTripCard(
     trip: TripUiModel,
+    onDetailsClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TourBaseCard(
         imageResId = trip.imageResId,
-        modifier = modifier,
+        imageUrl = trip.imageUrl,
+        modifier = modifier.clickable(onClick = onDetailsClick),
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
@@ -127,7 +130,7 @@ fun UpcomingTripCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.price_format, trip.price),
+                    text = trip.priceMinor.toLocalCurrencyFromMinorUnit(),
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),
                 )

@@ -22,7 +22,7 @@ import com.ahmetkaragunlu.guidemate.components.ImageSourcePicker
 import com.ahmetkaragunlu.guidemate.screens.common.selection.components.LanguageSelectionBottomSheet
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.category.GuideTourCategorySelectionBottomSheet
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourTab
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourApprovalStatus
 
 @Composable
 fun GuideTourEditScreen(

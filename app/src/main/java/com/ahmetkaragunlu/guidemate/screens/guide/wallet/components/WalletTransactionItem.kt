@@ -22,15 +22,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionStatus
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionType
 import com.ahmetkaragunlu.guidemate.screens.guide.wallet.model.WalletTransactionUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CreditCard
 import compose.icons.tablericons.Ticket
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @Composable
 fun WalletTransactionItem(transaction: WalletTransactionUiModel) {
@@ -38,6 +43,13 @@ fun WalletTransactionItem(transaction: WalletTransactionUiModel) {
     val icon = if (isIncome) TablerIcons.Ticket else TablerIcons.CreditCard
     val amountColor = if (isIncome) Color(0xFF388E3C) else Color(0xFFD32F2F)
     val amountPrefix = if (isIncome) "+" else "-"
+    val dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+    val title =
+        when (transaction.type) {
+            WalletTransactionType.TOUR_INCOME -> transaction.referenceTitle.orEmpty()
+            WalletTransactionType.WITHDRAWAL ->
+                stringResource(R.string.wallet_transaction_withdrawal_title)
+        }
 
     Row(
         modifier =
@@ -65,21 +77,33 @@ fun WalletTransactionItem(transaction: WalletTransactionUiModel) {
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = transaction.title,
+                    text = title,
                     style = MaterialTheme.typography.titleSmall,
                     color = colorResource(R.color.text_color),
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                 Text(
-                    text = transaction.formattedDate,
+                    text =
+                        dateFormatter.format(
+                            transaction.occurredAt.atZone(ZoneId.systemDefault()),
+                        ),
                     style = MaterialTheme.typography.bodySmall,
                     color = colorResource(R.color.text_color),
                 )
+                if (transaction.status == WalletTransactionStatus.PENDING) {
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
+                    Text(
+                        text = stringResource(R.string.payment_status_pending),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFD32F2F),
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
             }
         }
         Text(
-            text = "$amountPrefix${transaction.amount.toLocalCurrency()}",
+            text = "$amountPrefix${transaction.amountMinor.toLocalCurrencyFromMinorUnit()}",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = amountColor,

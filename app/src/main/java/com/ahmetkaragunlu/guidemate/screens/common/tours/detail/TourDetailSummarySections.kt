@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.screens.common.tours.detail
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,13 +25,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.components.GuideMateImage
+import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
 import com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model.TourDetailMode
 import com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model.TourDetailStatus
 import com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model.TourDetailUiState
@@ -269,7 +268,7 @@ private fun PriceRow(uiState: TourDetailUiState) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(R.string.price_format, uiState.price),
+            text = uiState.priceMinor.toLocalCurrencyFromMinorUnit(),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.brand_color),
@@ -314,8 +313,9 @@ private fun GuideInfoRow(uiState: TourDetailUiState) {
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
-                painter = painterResource(id = uiState.guideImageResId),
+            GuideMateImage(
+                fallbackImageResId = uiState.guideImageResId,
+                imageUrl = uiState.guideImageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier =

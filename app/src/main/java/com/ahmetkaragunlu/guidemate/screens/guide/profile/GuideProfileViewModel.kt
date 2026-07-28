@@ -24,7 +24,7 @@ class GuideProfileViewModel
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(5000),
-                    initialValue = GuideProfileUiState(),
+                    initialValue = stateProvider.currentProfileState(),
                 )
 
         fun onProfileImageSelected(uri: String) {

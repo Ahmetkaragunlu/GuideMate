@@ -30,10 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.screens.common.tours.InfoRow
 import com.ahmetkaragunlu.guidemate.screens.common.tours.TourBaseCard
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourCardUiModel
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourSessionStatus
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.session.TourSessionStatus
 import compose.icons.TablerIcons
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Users
@@ -123,14 +124,25 @@ fun PastTourCard(
                         Modifier
                             .fillMaxWidth()
                             .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement =
+                        if (tour.sessionStatus == TourSessionStatus.CANCELLED) {
+                            Arrangement.End
+                        } else {
+                            Arrangement.SpaceBetween
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = stringResource(R.string.earnings_format, tour.earnings ?: 0.0),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Green,
-                    )
+                    if (tour.sessionStatus != TourSessionStatus.CANCELLED) {
+                        Text(
+                            text =
+                                stringResource(
+                                    R.string.earnings_format,
+                                    (tour.earningsMinor ?: 0).toLocalCurrencyFromMinorUnit(),
+                                ),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.Green,
+                        )
+                    }
 
                     if (tour.rating != null && tour.reviewCount != null) {
                         Row(verticalAlignment = Alignment.CenterVertically) {

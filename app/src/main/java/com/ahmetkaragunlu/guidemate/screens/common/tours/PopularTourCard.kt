@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.common.tours
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -37,23 +36,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.components.GuideMateImage
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 
 @Composable
-fun PopularTourCard(tour: PopularTourCardUiModel) {
+fun PopularTourCard(
+    tour: PopularTourCardUiModel,
+    onClick: () -> Unit,
+) {
     Card(
         modifier =
             Modifier
                 .width(200.dp)
-                .height(260.dp),
+                .height(260.dp)
+                .clickable(onClick = onClick),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = tour.imageResId),
+            GuideMateImage(
+                fallbackImageResId = tour.imageResId,
+                imageUrl = tour.imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier =
@@ -97,7 +102,7 @@ fun PopularTourCard(tour: PopularTourCardUiModel) {
                     )
                 }
                 Text(
-                    text = tour.price.toLocalCurrency(),
+                    text = tour.priceMinor.toLocalCurrencyFromMinorUnit(),
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),
                 )
@@ -111,8 +116,9 @@ fun PopularTourCard(tour: PopularTourCardUiModel) {
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(id = tour.guideImageResId),
+                    GuideMateImage(
+                        fallbackImageResId = tour.guideImageResId,
+                        imageUrl = tour.guideImageUrl,
                         contentDescription = "Rehber",
                         contentScale = ContentScale.Crop,
                         modifier =

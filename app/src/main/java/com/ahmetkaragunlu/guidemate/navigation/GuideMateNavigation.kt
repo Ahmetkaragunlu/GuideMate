@@ -1,19 +1,15 @@
 package com.ahmetkaragunlu.guidemate.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.navigation.auth.authNavGraph
-import com.ahmetkaragunlu.guidemate.navigation.graph.Graph
-import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountNavGraphScaffold
-import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
-import com.ahmetkaragunlu.guidemate.navigation.guide.GuideNavGraphScaffold
-import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristAccountRoute
-import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristAccountNavGraphScaffold
-import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristNavGraphScaffold
+import com.ahmetkaragunlu.guidemate.navigation.guide.GuideNavigation
+import com.ahmetkaragunlu.guidemate.navigation.guide.account.GuideAccountNavigation
+import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristNavigation
+import com.ahmetkaragunlu.guidemate.navigation.tourist.account.TouristAccountNavigation
 
 @Composable
 fun GuideMateNavigation() {
@@ -21,41 +17,31 @@ fun GuideMateNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Graph.GuideGraph.route,
+        startDestination = RootDestination.Guide,
     ) {
         authNavGraph(navController = navController)
 
-        composable(route = Graph.TouristGraph.route) {
-            TouristNavGraphScaffold(routeNavController = navController)
+        composable<RootDestination.Tourist> {
+            TouristNavigation(routeNavController = navController)
         }
 
-        composable(route = Graph.GuideGraph.route) {
-            GuideNavGraphScaffold(routeNavController = navController)
+        composable<RootDestination.Guide> {
+            GuideNavigation(routeNavController = navController)
         }
 
-        composable(
-            route = "${Graph.GuideAccountGraph.route}/{targetRoute}",
-            arguments = listOf(navArgument("targetRoute") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            val targetRoute =
-                backStackEntry.arguments?.getString("targetRoute")
-                    ?: GuideAccountRoute.SavedCards.route
-            GuideAccountNavGraphScaffold(
-                routeNavController = navController,
-                startDestination = targetRoute,
+        composable<RootDestination.GuideAccount> { backStackEntry ->
+            val destination = backStackEntry.toRoute<RootDestination.GuideAccount>()
+            GuideAccountNavigation(
+                startDestination = destination.startDestination,
+                onClose = navController::navigateUp,
             )
         }
 
-        composable(
-            route = "${Graph.AccountGraph.route}/{targetRoute}",
-            arguments = listOf(navArgument("targetRoute") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            val targetRoute =
-                backStackEntry.arguments?.getString("targetRoute")
-                    ?: TouristAccountRoute.SavedCards.route
-            TouristAccountNavGraphScaffold(
-                routeNavController = navController,
-                startDestination = targetRoute,
+        composable<RootDestination.TouristAccount> { backStackEntry ->
+            val destination = backStackEntry.toRoute<RootDestination.TouristAccount>()
+            TouristAccountNavigation(
+                startDestination = destination.startDestination,
+                onClose = navController::navigateUp,
             )
         }
     }

@@ -3,8 +3,9 @@ package com.ahmetkaragunlu.guidemate.screens.common.chat.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.domain.model.UserRole
-import com.ahmetkaragunlu.guidemate.navigation.chat.CHAT_ID_ARGUMENT
+import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.screens.common.chat.model.ChatDetailUiState
 import com.ahmetkaragunlu.guidemate.screens.common.chat.model.toMessageUiModel
 import com.ahmetkaragunlu.guidemate.screens.common.chat.store.ChatStore
@@ -26,7 +27,7 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val chatStore: ChatStore,
 ) : ViewModel() {
-    private val chatId: String = checkNotNull(savedStateHandle[CHAT_ID_ARGUMENT])
+    private val chatId = savedStateHandle.toRoute<ChatDestination.Detail>().chatId
     private val viewerRole = MutableStateFlow<UserRole?>(null)
     private val inputText = MutableStateFlow("")
 

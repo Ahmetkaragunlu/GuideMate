@@ -41,7 +41,7 @@ import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.category.TourCategoryCard
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.components.PriceRangeSelector
-import com.ahmetkaragunlu.guidemate.screens.tourist.explore.components.RatingBar
+import com.ahmetkaragunlu.guidemate.screens.common.rating.RatingBar
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.model.ExploreUiState
 
 @Composable

@@ -1,135 +1,100 @@
 package com.ahmetkaragunlu.guidemate.navigation.tourist
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.AppBottomBar
-import com.ahmetkaragunlu.guidemate.components.TouristAppBar
 import com.ahmetkaragunlu.guidemate.domain.model.UserRole
-import com.ahmetkaragunlu.guidemate.navigation.chat.CHAT_ID_ARGUMENT
-import com.ahmetkaragunlu.guidemate.navigation.graph.Graph
+import com.ahmetkaragunlu.guidemate.navigation.RootDestination
+import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.navigation.touristNavItems
+import com.ahmetkaragunlu.guidemate.navigation.tourist.account.TouristAccountStart
+import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
+import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.touristPaymentNavGraph
 import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatDetailScreen
 import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatListScreen
 import com.ahmetkaragunlu.guidemate.screens.common.chat.viewmodel.ChatListViewModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristExploreScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristFilterScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.TouristProfileScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.TouristProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TouristTripsScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.tours.TouristTourDetailScreen
 
-fun NavGraphBuilder.touristNavGraph(
+internal fun NavGraphBuilder.touristNavGraph(
     touristNavController: NavController,
     routeNavController: NavController,
     chatListViewModel: ChatListViewModel,
 ) {
-    composable(route = TouristRoute.TouristHomeScreen.route) {
-        TouristHomeScreen()
+    composable<TouristDestination.Home> {
+        TouristHomeScreen(
+            onNavigateToTourDetail = { sessionId ->
+                touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
+            },
+        )
     }
-    composable(route = TouristRoute.TouristExploreScreen.route) {
+    composable<TouristDestination.Explore> {
         TouristExploreScreen(
             onNavigateToFilter = {
-                touristNavController.navigateTo(TouristRoute.TouristFilterScreen.route)
+                touristNavController.navigateTo(TouristDestination.Filter)
             },
         )
     }
-    composable(route = TouristRoute.TouristMyTripsScreen.route) {
-        TouristTripsScreen()
+    composable<TouristDestination.Trips> {
+        TouristTripsScreen(
+            onNavigateToTourDetail = { sessionId ->
+                touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
+            },
+        )
     }
-    composable(route = TouristRoute.TouristChatScreen.route) {
-        val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
+    composable<TouristDestination.Chat> {
+        val chatListUiState = chatListViewModel.uiState.collectAsStateWithLifecycle()
         ChatListScreen(
-            uiState = chatListUiState,
+            uiState = chatListUiState.value,
             onNavigateToDetail = { chatId ->
-                touristNavController.navigateTo(touristChatDetailRoute(chatId))
+                touristNavController.navigateTo(ChatDestination.Detail(chatId))
             },
         )
     }
-
-    composable(route = TouristRoute.TouristProfileScreen.route) {
+    composable<TouristDestination.Profile> {
         TouristProfileScreen(
-            onNavigateToAccount = { targetRoute ->
-                routeNavController.navigateTo("${Graph.AccountGraph.route}/${targetRoute.route}")
+            onNavigateToAccount = { target ->
+                routeNavController.navigateTo(
+                    RootDestination.TouristAccount(target.toTouristAccountStart()),
+                )
+            },
+            onNavigateToWallet = {
+                touristNavController.navigateTo(TouristPaymentDestination.Wallet)
             },
         )
     }
-    composable(route = TouristRoute.TouristFilterScreen.route) {
+    composable<TouristDestination.Filter> {
         TouristFilterScreen()
     }
-    composable(
-        route = TOURIST_CHAT_DETAIL_ROUTE_PATTERN,
-        arguments = listOf(navArgument(CHAT_ID_ARGUMENT) { type = NavType.StringType }),
-    ) {
+    composable<ChatDestination.Detail> {
         ChatDetailScreen(viewerRole = UserRole.TOURIST)
     }
-}
-
-@Composable
-fun TouristNavGraphScaffold(
-    viewModel: TouristHomeViewModel = hiltViewModel(),
-    chatListViewModel: ChatListViewModel = hiltViewModel(),
-    routeNavController: NavController,
-) {
-    val touristNavController = rememberNavController()
-    val navBackStackEntry by touristNavController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: TouristRoute.TouristHomeScreen.route
-    val getUserName by viewModel.userName.collectAsStateWithLifecycle()
-    val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
-    val activeChatId = navBackStackEntry?.arguments?.getString(CHAT_ID_ARGUMENT)
-    val activeChat = chatListUiState.chats.firstOrNull { it.chatId == activeChatId }
-
-    LaunchedEffect(chatListViewModel) {
-        chatListViewModel.setViewerRole(UserRole.TOURIST)
+    composable<TouristDestination.TourDetail> {
+        TouristTourDetailScreen(
+            onBookTour = { sessionId ->
+                touristNavController.navigateTo(TouristPaymentDestination.Checkout(sessionId))
+            },
+        )
     }
 
-    Scaffold(
-        topBar = {
-            TouristAppBar(
-                currentRoute = currentRoute,
-                navController = touristNavController,
-                userName = getUserName,
-                chatTitle = activeChat?.name.orEmpty(),
-                chatAvatarResId = activeChat?.avatarResId ?: R.drawable.example,
-            )
-        },
-        bottomBar = {
-            AppBottomBar(
-                navController = touristNavController,
-                currentRoute = currentRoute,
-                items = touristNavItems,
-                badgeCounts =
-                    mapOf(
-                        TouristRoute.TouristChatScreen.route to chatListUiState.totalUnreadCount,
-                    ),
-            )
-        },
-    ) { innerPadding ->
-        NavHost(
-            navController = touristNavController,
-            startDestination = TouristRoute.TouristHomeScreen.route,
-            modifier = Modifier.padding(innerPadding),
-        ) {
-            touristNavGraph(
-                touristNavController = touristNavController,
-                routeNavController = routeNavController,
-                chatListViewModel = chatListViewModel,
-            )
-        }
-    }
+    touristPaymentNavGraph(
+        touristNavController = touristNavController,
+        routeNavController = routeNavController,
+    )
 }
+
+private fun TouristProfileMenuTarget.toTouristAccountStart(): TouristAccountStart =
+    when (this) {
+        TouristProfileMenuTarget.SAVED_CARDS -> TouristAccountStart.SAVED_CARDS
+        TouristProfileMenuTarget.CHANGE_PASSWORD -> TouristAccountStart.CHANGE_PASSWORD
+        TouristProfileMenuTarget.NOTIFICATION_SETTINGS ->
+            TouristAccountStart.NOTIFICATION_SETTINGS
+        TouristProfileMenuTarget.LEGAL_AGREEMENTS -> TouristAccountStart.LEGAL_AGREEMENTS
+        TouristProfileMenuTarget.HELP_SUPPORT -> TouristAccountStart.HELP_SUPPORT
+    }

@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -28,23 +29,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.GuideMateImage
 import com.ahmetkaragunlu.guidemate.components.ImageSourcePicker
-import com.ahmetkaragunlu.guidemate.navigation.guide.GuideAccountRoute
-import com.ahmetkaragunlu.guidemate.screens.common.profile.components.CommonProfileMenuItem
+import com.ahmetkaragunlu.guidemate.screens.common.profile.CommonProfileMenuItem
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.GuideLevelInfoBottomSheet
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.GuideLevelViewerType
+import com.ahmetkaragunlu.guidemate.screens.common.guide.level.GuideLevelInfoBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.common.guide.level.model.GuideLevelViewerType
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.guideProfileMenuOptions
 
 @Composable
 fun GuideProfileScreen(
     viewModel: GuideProfileViewModel = hiltViewModel(),
-    onNavigateToAccount: (GuideAccountRoute) -> Unit = {},
+    onNavigateToAccount: (GuideProfileMenuTarget) -> Unit = {},
     onNavigateToProfilePreview: () -> Unit = {},
 ) {
     val profileState by viewModel.profileState.collectAsStateWithLifecycle()
     var showGuideLevelInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showPhotoSourceSheet by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     Column(
         modifier =
@@ -162,7 +164,7 @@ fun GuideProfileScreen(
                 CommonProfileMenuItem(
                     icon = item.icon,
                     title = stringResource(id = item.titleResId),
-                    onClick = { onNavigateToAccount(item.targetRoute) },
+                    onClick = { onNavigateToAccount(item.target) },
                 )
 
                 if (index < guideProfileMenuOptions.lastIndex) {
@@ -185,7 +187,7 @@ fun GuideProfileScreen(
         onDismissRequest = { showPhotoSourceSheet = false },
         onImageSelected = viewModel::onProfileImageSelected,
         onError = { errorResId ->
-            Toast.makeText(context, context.getString(errorResId), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, resources.getString(errorResId), Toast.LENGTH_LONG).show()
         },
     )
 }

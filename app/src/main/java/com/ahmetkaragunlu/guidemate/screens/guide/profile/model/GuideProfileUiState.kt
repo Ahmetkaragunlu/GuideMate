@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.profile.model
 
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.GuideLevelTier
+import com.ahmetkaragunlu.guidemate.screens.common.guide.level.model.GuideLevelTier
 
 data class GuideProfileUiState(
     val firstName: String? = null,

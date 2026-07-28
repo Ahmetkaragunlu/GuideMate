@@ -21,8 +21,24 @@ enum class TourDetailMode(
     GUIDE_ACTIVE(primaryActionTextResId = R.string.cancel_tour),
     GUIDE_PAST(primaryActionTextResId = R.string.republish_tour),
     GUIDE_REVIEW(primaryActionTextResId = null),
-    TOURIST(
+    TOURIST_BOOKABLE(
         primaryActionTextResId = R.string.book_tour,
+        showGuideInfo = true,
+    ),
+    TOURIST_BOOKED(
+        primaryActionTextResId = null,
+        showGuideInfo = true,
+    ),
+    TOURIST_UNAVAILABLE(
+        primaryActionTextResId = null,
+        showGuideInfo = true,
+    ),
+    TOURIST_REVIEWABLE(
+        primaryActionTextResId = R.string.review_tour,
+        showGuideInfo = true,
+    ),
+    TOURIST_PAST(
+        primaryActionTextResId = null,
         showGuideInfo = true,
     ),
 }

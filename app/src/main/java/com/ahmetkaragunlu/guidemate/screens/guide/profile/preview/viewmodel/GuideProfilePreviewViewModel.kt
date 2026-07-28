@@ -3,9 +3,7 @@ package com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.GuideLevelTier
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideProfileUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.model.GuideProfilePreviewUiState
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.shared.GuideProfileStateProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,67 +19,24 @@ class GuideProfilePreviewViewModel
     val uiState: StateFlow<GuideProfilePreviewUiState> =
         stateProvider
             .profileState()
-            .map { profile ->
-                GuideProfilePreviewUiState(
-                    profileImageResId = profile.profileImageResId ?: R.drawable.unnamed,
-                    profileImageUrl = profile.displayProfileImageUrl,
-                    displayName = profile.displayName,
-                    title = profile.title,
-                    guideLevel = profile.guideLevel,
-                    rating = profile.rating,
-                    tourCount = profile.tourCount,
-                    biography = profile.biography,
-                    spokenLanguages = profile.spokenLanguages,
-                    popularTours = profile.popularTours,
-                )
-            }.stateIn(
+            .map(GuideProfileUiState::toPreviewUiState)
+            .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue =
-                    GuideProfilePreviewUiState(
-                        profileImageResId = R.drawable.unnamed,
-                        profileImageUrl = null,
-                        displayName = "Ahmet Karagünlü",
-                        title = "Sanat Tarihçisi",
-                        guideLevel = GuideLevelTier.SUPER,
-                        rating = 4.9,
-                        tourCount = 124,
-                        biography = "Merhaba, ben Ahmet. Yıllardır İstanbul’un tarihi semtlerinde yürüyüş turları düzenliyorum. Tur boyunca sadece yapıları değil, o yapıların ardındaki insan hikayelerini, kültürel dönüşümleri ve günlük hayatı da paylaşmayı seviyorum. Amacım, şehri turist gibi değil, yerel biri gibi hissettirerek gezdirmek.",
-                        spokenLanguages =
-                            listOf(
-                                GuideSpokenLanguageUi(code = "tr", displayText = "🇹🇷 Türkçe"),
-                                GuideSpokenLanguageUi(code = "en", displayText = "🇬🇧 İngilizce"),
-                                GuideSpokenLanguageUi(code = "de", displayText = "🇩🇪 Almanca"),
-                                GuideSpokenLanguageUi(code = "fr", displayText = "🇫🇷 Fransızca"),
-                                GuideSpokenLanguageUi(code = "it", displayText = "🇮🇹 İtalyanca"),
-                            ),
-                        popularTours =
-                            listOf(
-                                PopularTourCardUiModel(
-                                    id = "preview-tour-1",
-                                    title = "Sultanahmet ve Gizli Sokaklar",
-                                    imageResId = R.drawable.example,
-                                    rating = "4.9",
-                                    reviewCount = "(120)",
-                                    price = 750.0,
-                                    languagesFlag = "🇹🇷 🇬🇧 🇩🇪",
-                                    languagesText = "TR, EN, DE",
-                                    guideName = "Ahmet K.",
-                                    guideImageResId = R.drawable.unnamed,
-                                ),
-                                PopularTourCardUiModel(
-                                    id = "preview-tour-2",
-                                    title = "Kapadokya Balon Turu",
-                                    imageResId = R.drawable.example,
-                                    rating = "5.0",
-                                    reviewCount = "(85)",
-                                    price = 2500.0,
-                                    languagesFlag = "🇬🇧 🇫🇷",
-                                    languagesText = "EN, FR",
-                                    guideName = "Ahmet K.",
-                                    guideImageResId = R.drawable.unnamed,
-                                ),
-                            ),
-                    ),
+                initialValue = stateProvider.currentProfileState().toPreviewUiState(),
             )
 }
+
+private fun GuideProfileUiState.toPreviewUiState(): GuideProfilePreviewUiState =
+    GuideProfilePreviewUiState(
+        profileImageResId = profileImageResId ?: R.drawable.unnamed,
+        profileImageUrl = displayProfileImageUrl,
+        displayName = displayName,
+        title = title,
+        guideLevel = guideLevel,
+        rating = rating,
+        tourCount = tourCount,
+        biography = biography,
+        spokenLanguages = spokenLanguages,
+        popularTours = popularTours,
+    )

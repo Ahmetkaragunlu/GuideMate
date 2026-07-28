@@ -6,13 +6,17 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategory
 import com.ahmetkaragunlu.guidemate.screens.common.tours.category.TourCategoryCatalog
-import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.common.tours.mapper.toPopularTourCardUiModel
+import com.ahmetkaragunlu.guidemate.screens.common.tours.store.TourCatalogStore
+import com.ahmetkaragunlu.guidemate.screens.common.tours.store.refreshAtSessionTransitions
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.TouristHomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -20,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TouristHomeViewModel @Inject constructor(
     userRepository: UserRepository,
+    tourCatalogStore: TourCatalogStore,
 ) : ViewModel() {
 
     val userName: StateFlow<String?> =
@@ -40,104 +45,37 @@ class TouristHomeViewModel @Inject constructor(
     }
 
     val uiState: StateFlow<TouristHomeUiState> =
-        _selectedCategory
-            .map { selectedCategory ->
+        combine(
+            _selectedCategory,
+            tourCatalogStore.state.refreshAtSessionTransitions(),
+        ) { selectedCategory, catalog ->
+                val now = Instant.now()
+                val popularTours =
+                    catalog
+                        .bookableTourItemsAt(now)
+                        .filter { selectedCategory == null || it.tour.category == selectedCategory }
+                        .map { it.toPopularTourCardUiModel() }
                 TouristHomeUiState(
                     selectedCategory = selectedCategory,
-                    popularTours = getDummyTours(selectedCategory),
+                    popularTours = popularTours,
                     bestGuides = getDummyGuides(),
                 )
-            }.stateIn(
+            }
+            .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue =
                     TouristHomeUiState(
                         selectedCategory = null,
-                        popularTours = getDummyTours(category = null),
+                        popularTours =
+                            tourCatalogStore.state.value
+                                .bookableTourItemsAt(Instant.now())
+                                .map {
+                                    it.toPopularTourCardUiModel()
+                                },
                         bestGuides = getDummyGuides(),
                     ),
             )
-
-    private data class CategorizedTour(
-        val category: TourCategory,
-        val tour: PopularTourCardUiModel,
-    )
-
-    private fun getDummyTours(category: TourCategory?): List<PopularTourCardUiModel> {
-        val allTours =
-            listOf(
-                CategorizedTour(
-                    category = TourCategory.CULTURE,
-                    tour =
-                        PopularTourCardUiModel(
-                            id = "1",
-                            title = "Sultanahmet ve Gizli Sokaklar",
-                            imageResId = R.drawable.example,
-                            rating = "4.9",
-                            reviewCount = "(120)",
-                            price = 750.0,
-                            languagesFlag = "🇹🇷 🇬🇧 🇩🇪",
-                            languagesText = "TR, EN, DE",
-                            guideName = "Ahmet K.",
-                            guideImageResId = R.drawable.unnamed,
-                        ),
-                ),
-                CategorizedTour(
-                    category = TourCategory.ADVENTURE,
-                    tour =
-                        PopularTourCardUiModel(
-                            id = "2",
-                            title = "Kapadokya Balon Turu",
-                            imageResId = R.drawable.example,
-                            rating = "5.0",
-                            reviewCount = "(85)",
-                            price = 2500.0,
-                            languagesFlag = "🇬🇧 🇫🇷",
-                            languagesText = "EN, FR",
-                            guideName = "Mehmet Y.",
-                            guideImageResId = R.drawable.unnamed,
-                        ),
-                ),
-                CategorizedTour(
-                    category = TourCategory.CULTURE,
-                    tour =
-                        PopularTourCardUiModel(
-                            id = "3",
-                            title = "Efes Antik Kent Gezisi",
-                            imageResId = R.drawable.example,
-                            rating = "4.8",
-                            reviewCount = "(210)",
-                            price = 600.0,
-                            languagesFlag = "🇹🇷 🇬🇧",
-                            languagesText = "TR, EN",
-                            guideName = "Ayşe Z.",
-                            guideImageResId = R.drawable.unnamed,
-                        ),
-                ),
-                CategorizedTour(
-                    category = TourCategory.FOOD,
-                    tour =
-                        PopularTourCardUiModel(
-                            id = "4",
-                            title = "Boğaz Tekne ve Yemek",
-                            imageResId = R.drawable.example,
-                            rating = "4.7",
-                            reviewCount = "(300)",
-                            price = 1200.0,
-                            languagesFlag = "🇬🇧 🇸🇦",
-                            languagesText = "EN, AR",
-                            guideName = "Caner E.",
-                            guideImageResId = R.drawable.unnamed,
-                        ),
-                ),
-            )
-
-        return if (category == null) {
-            allTours.map { it.tour }
-        } else {
-            allTours.filter { it.category == category }.map { it.tour }
-        }
-    }
 
     private fun getDummyGuides(): List<BestGuideUiModel> =
         listOf(

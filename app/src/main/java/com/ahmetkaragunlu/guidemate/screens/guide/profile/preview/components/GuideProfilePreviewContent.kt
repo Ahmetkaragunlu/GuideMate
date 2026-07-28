@@ -40,8 +40,8 @@ import com.ahmetkaragunlu.guidemate.components.GuideMateImage
 import com.ahmetkaragunlu.guidemate.screens.common.tours.PopularTourCard
 import com.ahmetkaragunlu.guidemate.screens.common.tours.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.components.ProfileStatsRow
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.GuideLevelInfoBottomSheet
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.guidelevel.model.GuideLevelViewerType
+import com.ahmetkaragunlu.guidemate.screens.common.guide.level.GuideLevelInfoBottomSheet
+import com.ahmetkaragunlu.guidemate.screens.common.guide.level.model.GuideLevelViewerType
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideSpokenLanguageUi
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.model.GuideProfilePreviewUiState
 
@@ -246,7 +246,10 @@ private fun PopularToursSection(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
         popularTours.forEach { tour ->
-            PopularTourCard(tour = tour)
+            PopularTourCard(
+                tour = tour,
+                onClick = { },
+            )
         }
     }
 }

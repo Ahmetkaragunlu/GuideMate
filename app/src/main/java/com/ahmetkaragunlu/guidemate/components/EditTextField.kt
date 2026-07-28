@@ -33,6 +33,9 @@ fun EditTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     placeholderColor: Color = Color.Gray,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     shape: Shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
     colors: TextFieldColors =
         OutlinedTextFieldDefaults.colors(
@@ -73,6 +76,8 @@ fun EditTextField(
         leadingIcon = leadingIcon,
         colors = colors,
         isError = isError,
-        singleLine = true,
+        singleLine = singleLine,
+        minLines = minLines,
+        maxLines = maxLines,
     )
 }

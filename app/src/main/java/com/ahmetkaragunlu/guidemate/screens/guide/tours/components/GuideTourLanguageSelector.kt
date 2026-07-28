@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourLanguage
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourLanguage
 
 @Composable
 fun GuideTourLanguageSelector(

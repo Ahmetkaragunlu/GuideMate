@@ -35,6 +35,7 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.home.model.BestGuideUiModel
 fun TouristHomeScreen(
     modifier: Modifier = Modifier,
     viewModel: TouristHomeViewModel = hiltViewModel(),
+    onNavigateToTourDetail: (String) -> Unit = {},
 ) {
     val categories = viewModel.categories
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -51,7 +52,10 @@ fun TouristHomeScreen(
             selectedCategory = uiState.selectedCategory,
             onCategoryClick = viewModel::updateSelectedCategory,
         )
-        popularToursSection(tours = uiState.popularTours)
+        popularToursSection(
+            tours = uiState.popularTours,
+            onTourClick = onNavigateToTourDetail,
+        )
         bestGuidesSection(guides = uiState.bestGuides)
     }
 }
@@ -92,7 +96,10 @@ private fun LazyListScope.categoriesSection(
     }
 }
 
-private fun LazyListScope.popularToursSection(tours: List<PopularTourCardUiModel>) {
+private fun LazyListScope.popularToursSection(
+    tours: List<PopularTourCardUiModel>,
+    onTourClick: (String) -> Unit,
+) {
     item {
         Column(
             modifier = Modifier.padding(bottom = 20.dp),
@@ -110,7 +117,10 @@ private fun LazyListScope.popularToursSection(tours: List<PopularTourCardUiModel
                 contentPadding = PaddingValues(horizontal = 4.dp),
             ) {
                 items(tours, key = { it.id }) { tour ->
-                    PopularTourCard(tour = tour)
+                    PopularTourCard(
+                        tour = tour,
+                        onClick = { onTourClick(tour.id) },
+                    )
                 }
             }
         }

@@ -59,12 +59,8 @@
     <string name="about_languages_title">Konuşulan Diller</string>
     <string name="about_add_language">+ Dil Ekle</string>
     <string name="about_save_action">KAYDET</string>
-    <string name="menu_account_settings">Hesap Ayarları</string>
-    <string name="menu_help_faq">Yardım ve S.S.S.</string>
-
     <string name="view_as_tourist">Turistin Gözünden Gör</string>
     <string name="preview_screen_title">Önizleme Ekranı</string>
-    <string name="preview_super_guide">Süper Rehber</string>
     <string name="preview_about_text">Merhaba, ben Ahmet. Yıllardır İstanbul’un tarihi semtlerinde yürüyüş turları düzenliyorum. Tur boyunca sadece yapıları değil, o yapıların ardındaki insan hikayelerini, kültürel dönüşümleri ve günlük hayatı da paylaşmayı seviyorum. Amacım, şehri turist gibi değil, yerel biri gibi hissettirerek gezdirmek.</string>
     <string name="preview_read_more">Devamını Gör</string>
     <string name="preview_popular_tours_title">Popüler Turlar</string>
@@ -86,18 +82,16 @@
 
     <string name="guide_level_silver_icon">🥉</string>
     <string name="guide_level_silver_title">Gümüş Rehber</string>
-    <string name="guide_level_silver_desc">Şartlar: En az 5 Tur ve 3.7 Puan.</string>
+    <string name="guide_level_silver_desc">Şartlar: En az 5 Tur, 3 Değerlendirme ve 3.7 Puan.</string>
 
     <string name="guide_level_super_icon">🥇</string>
     <string name="guide_level_super_title">Süper Rehber</string>
-    <string name="guide_level_super_desc">Şartlar: En az 20 Tur ve 4.5 Puan.</string>
+    <string name="guide_level_super_desc">Şartlar: En az 20 Tur, 10 Değerlendirme ve 4.5 Puan.</string>
 
     <string name="guide_level_legendary_icon">💎</string>
     <string name="guide_level_legendary_title">Efsane Rehber</string>
-    <string name="guide_level_legendary_desc">Şartlar: En az 100 Tur ve 4.8 Puan.</string>
+    <string name="guide_level_legendary_desc">Şartlar: En az 100 Tur, 30 Değerlendirme ve 4.8 Puan.</string>
 
-    <string name="default_first_name">Ahmet</string>
-    <string name="default_last_name">Karagünlü</string>
     <string name="info">Bilgi</string>
 
 
@@ -106,14 +100,11 @@
     <string name="error_unknown">Beklenmedik bir hata oluştu.</string>
     <string name="error_session_expired">Oturum süreniz doldu, lütfen tekrar giriş yapın.</string>
     <string name="error_generic_failure">İşlem başarısız oldu.</string>
-    <string name="error_json_parse">Veri işlenirken hata oluştu.</string>
     <string name="logout_success">Başarıyla çıkış yapıldı.</string>
     <string name="logout_offline">Çıkış yapıldı (Çevrimdışı mod).</string>
 
     <string name="error_terms_required">Lütfen Kullanıcı Sözleşmesini okuyup onaylayın.</string>
     <string name="terms_dialog_title">Kullanıcı Sözleşmesi ve Gizlilik Politikası</string>
-    <string name="close">Kapat</string>
-
     <string name="success">Başarılı</string>
     <string name="reset_password_link_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.</string>
 
@@ -168,23 +159,29 @@
     <string name="saved_cards_description">Kartlarını görüntüleyebilir, silebilir veya varsayılan kartını değiştirebilirsin.</string>
     <string name="add_new_card">Yeni Kart Ekle</string>
     <string name="add_card_action">KARTI EKLE</string>
-    <string name="add_card_helper_text">Kart bilgilerinizi eksiksiz girin. Kart numarası 16 haneli olmalıdır.</string>
     <string name="card_number">Kart Numarası</string>
     <string name="card_number_placeholder">1234 5678 9012 3456</string>
     <string name="card_holder_name">Kart Sahibinin Adı Soyadı</string>
     <string name="card_holder_name_placeholder">Ad Soyad</string>
     <string name="card_holder">Kart Sahibi</string>
     <string name="expiry_date">Son Kullanma</string>
-    <string name="expiry_month">Ay</string>
-    <string name="expiry_year">Yıl</string>
     <string name="expiry_month_placeholder">AA</string>
     <string name="expiry_year_placeholder">YY</string>
     <string name="set_as_default">Varsayılan Yap</string>
     <string name="default_card">Varsayılan</string>
     <string name="card_number_error_message">Kart numarası 16 haneli olmalıdır</string>
+    <string name="card_number_invalid">Kart numarası geçerli değil.</string>
+    <string name="sandbox_card_not_supported">Bu kart Sandbox test kartları arasında bulunamadı.</string>
     <string name="card_holder_name_error_message">Kart sahibinin adı soyadı boş bırakılamaz</string>
     <string name="expiry_month_error_message">Geçerli bir ay giriniz</string>
     <string name="expiry_year_error_message">Geçerli bir yıl giriniz</string>
+    <string name="card_expired_error">Kartın son kullanma tarihi geçmiş.</string>
+    <string name="cvv">CVV</string>
+    <string name="cvv_placeholder">123</string>
+    <string name="cvv_error_message">Geçerli bir CVV giriniz.</string>
+    <string name="secure_card_form_title">Güvenli Kart Ekleme</string>
+    <string name="secure_card_form_description">Kartınız doğrulandıktan sonra yalnızca güvenli ve maskelenmiş bilgiler saklanacaktır.</string>
+    <string name="card_added_success">Kartınız başarıyla eklendi.</string>
 
 
     <string name="delete_card_title">Kartı Sil</string>
@@ -198,9 +195,6 @@
 
     <string name="tab_upcoming">Yaklaşan</string>
     <string name="tab_past">Geçmiş</string>
-
-    <string name="trip_date_format">%s</string>
-
 
     <string name="category_culture">Kültür</string>
     <string name="category_all">Tümü</string>
@@ -236,6 +230,13 @@
     <string name="archive_tour_draft">Taslağı Sil</string>
     <string name="archive_tour_draft_title">Reddedilen Taslağı Sil</string>
     <string name="archive_tour_draft_message">Bu taslak İncelemede listesinden kaldırılacaktır. Devam etmek istiyor musunuz?</string>
+    <string name="tour_operation_session_not_found">Tur oturumu bulunamadı. Lütfen listeyi yenileyip tekrar deneyin.</string>
+    <string name="tour_operation_tour_not_found">Tur bulunamadı. Lütfen listeyi yenileyip tekrar deneyin.</string>
+    <string name="tour_operation_session_started">Başlamış veya süresi geçmiş bir turun yayın durumu değiştirilemez.</string>
+    <string name="tour_operation_not_approved">Tur onaylanmadan yeni rezervasyonlara açılamaz.</string>
+    <string name="tour_operation_capacity_full">Kontenjan dolu olduğu için tur yeni rezervasyonlara açılamaz.</string>
+    <string name="tour_operation_status_not_manageable">Turun mevcut durumu bu işlem için uygun değil.</string>
+    <string name="tour_operation_not_archivable">Bu tur İncelemede listesinden kaldırılamıyor.</string>
     <string name="cancel_tour_title">Turu İptal Et</string>
     <string name="cancel_tour_warning">Bu işlem geri alınamaz. Mevcut rezervasyonlar iptal edilecek ve turistlere tam iade süreci başlatılacaktır.</string>
     <string name="cancel_tour_no_booking_warning">Bu seans iptal edilerek Geçmiş bölümüne taşınacaktır.</string>
@@ -283,11 +284,11 @@
     <string name="profile_current_balance">MEVCUT BAKİYE</string>
     <string name="profile_add_money">PARA YÜKLE</string>
     <string name="withdraw_money">PARA ÇEK</string>
-    <string name="profile_logout">Çıkış Yap</string>
     <string name="profile_default_user">Misafir Kullanıcı</string>
     <string name="profile_brand_name">GuideMate</string>
 
     <string name="saved_cards">Kayıtlı Kartlarım</string>
+    <string name="add_card">Kart Ekle</string>
     <string name="change_password">Şifre Değiştir</string>
     <string name="current_password">Mevcut Şifre</string>
     <string name="new_password">Yeni Şifre</string>
@@ -352,9 +353,18 @@
     <string name="cancel_tour">TURU İPTAL ET</string>
     <string name="book_tour">TURU REZERVE ET</string>
     <string name="no_reviews_yet">Bu tur için henüz yorum yapılmadı.</string>
-    <string name="price_format">₺%.0f</string>
-    <string name="earnings_format">Kazanç: ₺%.0f</string>
-    <string name="amount_format">Tutar: ₺%.0f</string>
+    <string name="review_tour">TURU DEĞERLENDİR</string>
+    <string name="tour_review_title">Tur Deneyiminizi Değerlendirin</string>
+    <string name="tour_review_subtitle">Puanınız ve yorumunuz diğer turistlerin doğru turu seçmesine yardımcı olur.</string>
+    <string name="tour_review_comment_placeholder">Tur deneyiminizi paylaşın (isteğe bağlı)</string>
+    <string name="submit_tour_review">DEĞERLENDİRMEYİ GÖNDER</string>
+    <string name="tour_review_rating_required">Devam etmek için bir puan seçin.</string>
+    <string name="tour_review_submission_failed">Değerlendirmeniz gönderilemedi. Lütfen tekrar deneyin.</string>
+    <string name="tour_review_success_title">Değerlendirmeniz Alındı</string>
+    <string name="tour_review_success_message">Deneyiminizi paylaştığınız için teşekkür ederiz.</string>
+    <string name="tour_review_submitted_notice">Bu turu değerlendirdiniz.</string>
+    <string name="earnings_format">Kazanç: %1$s</string>
+    <string name="amount_format">Tutar: %1$s</string>
     <string name="rating_review_format">%1$.1f (%2$d)</string>
 
     <string name="category_label">Kategori: %1$s</string>
@@ -369,11 +379,111 @@
     <string name="add_money_title">Para Yükleme</string>
     <string name="available_balance_format">Kullanılabilir Bakiye: %1$s</string>
     <string name="withdraw_all">Tümünü Çek</string>
-    <string name="bank_not_selected">Banka Seçilmedi</string>
     <string name="default_masked_iban">TR** **** ****</string>
     <string name="change">Değiştir</string>
     <string name="withdraw_info_text">Tutar 1 iş günü içerisinde hesabınıza aktarılacaktır.</string>
     <string name="add_money_info_text">Yuklenecek tutar guvenli odeme altyapisi uzerinden bakiyenize aktarilacaktir.</string>
+    <string name="wallet">Cüzdanım</string>
+    <string name="wallet_transaction_history">Cüzdan Hareketleri</string>
+    <string name="wallet_transaction_withdrawal_title">Para Çekimi</string>
+    <string name="wallet_filter_all">Tümü</string>
+    <string name="wallet_filter_top_up">Para Yükleme</string>
+    <string name="wallet_filter_tour_payments">Tur Ödemeleri</string>
+    <string name="wallet_filter_refunds">İadeler</string>
+    <string name="wallet_filter_tour_income">Tur Kazançları</string>
+    <string name="wallet_filter_withdrawals">Para Çekimleri</string>
+    <string name="wallet_transactions_empty">Bu filtreye uygun cüzdan hareketi bulunamadı.</string>
+    <string name="default_payment_card">Varsayılan Ödeme Kartı</string>
+    <string name="add_payment_card_hint">Ödeme yapmak için güvenli bir kart ekleyin.</string>
+    <string name="manage">Yönet</string>
+    <string name="no_saved_card">Kayıtlı kartınız bulunmuyor.</string>
+    <string name="card_not_selected">Lütfen bir kart seçin.</string>
+    <string name="payment_status_pending">Bekliyor</string>
+    <string name="payment_status_completed">Tamamlandı</string>
+    <string name="payment_status_failed">Başarısız</string>
+    <string name="payment_status_refunded">İade Edildi</string>
+
+    <string name="secure_card_redirect_description">Kart bilgileriniz GuideMate tarafından alınmaz. Kart ekleme işlemi ödeme sağlayıcısının güvenli sayfasında tamamlanır.</string>
+    <string name="secure_card_provider_notice">Kart numarası, son kullanma tarihi ve CVV yalnızca güvenli ödeme sayfasına girilir.</string>
+    <string name="secure_card_storage_notice">GuideMate yalnızca sağlayıcının döndürdüğü kart kimliğini ve maskelenmiş kart bilgisini kullanır.</string>
+    <string name="save_card_consent">Kartımı sonraki ödemelerde kullanmak üzere güvenli şekilde kaydetmeyi kabul ediyorum.</string>
+    <string name="continue_to_secure_card_page">DEVAM ET</string>
+
+    <string name="checkout_topbar_title">Tur Satın Al</string>
+    <string name="checkout_title">Rezervasyonunuzu Tamamlayın</string>
+    <string name="checkout_subtitle">Katılımcı sayısını ve ödeme yönteminizi kontrol edin.</string>
+    <string name="checkout_participant_count">Katılımcı Sayısı</string>
+    <string name="checkout_remaining_capacity">Kalan kontenjan: %1$d</string>
+    <string name="checkout_unit_price">Kişi başı ücret</string>
+    <string name="checkout_payment_method">Ödeme Yöntemi</string>
+    <string name="wallet_payment">Cüzdan Bakiyesi</string>
+    <string name="wallet_balance_format">Kullanılabilir bakiye: %1$s</string>
+    <string name="saved_card_payment">Kayıtlı Kart</string>
+    <string name="secure_payment_provider_short">Güvenli ödeme sağlayıcısı üzerinden ödeyin.</string>
+    <string name="checkout_no_card">Ödeme için kullanabileceğiniz kayıtlı kart bulunmuyor.</string>
+    <string name="checkout_terms_acceptance">Rezervasyon, iptal ve iade koşullarını okudum ve kabul ediyorum.</string>
+    <string name="checkout_total">Toplam</string>
+    <string name="continue_to_secure_payment">GÜVENLİ ÖDEMEYE DEVAM ET</string>
+    <string name="tour_booking_unavailable">Bu tur şu anda rezervasyona uygun değil.</string>
+    <string name="tour_booking_not_approved">Bu tur şu anda yayında değil.</string>
+    <string name="tour_booking_closed">Bu tur rehber tarafından yeni rezervasyonlara kapatıldı.</string>
+    <string name="tour_booking_full">Bu turun kontenjanı doldu.</string>
+    <string name="tour_booking_started">Bu turun rezervasyon süresi sona erdi.</string>
+    <string name="checkout_error_already_reserved">Bu tur için zaten bir rezervasyonunuz bulunuyor.</string>
+    <string name="checkout_error_tour_completed">Bu tur tamamlandığı için yeni rezervasyon alınamıyor.</string>
+    <string name="checkout_error_tour_cancelled">Bu tur iptal edildiği için rezervasyon yapılamıyor.</string>
+    <string name="checkout_error_capacity_changed">Seçtiğiniz katılımcı sayısı için yeterli kontenjan kalmadı.</string>
+    <string name="checkout_error_terms_required">Devam etmek için rezervasyon koşullarını kabul edin.</string>
+    <string name="checkout_error_insufficient_balance">Cüzdan bakiyeniz bu işlem için yetersiz.</string>
+    <string name="checkout_error_card_required">Devam etmek için bir ödeme kartı seçin.</string>
+
+    <string name="payment_topbar_title">Ödeme Durumu</string>
+    <string name="payment_redirecting_title">Güvenli Ödemeye Yönlendiriliyorsunuz</string>
+    <string name="payment_redirecting_description">Ödeme sağlayıcısının güvenli sayfası hazırlanıyor.</string>
+    <string name="payment_verifying_title">Ödemeniz Doğrulanıyor</string>
+    <string name="payment_verifying_description">İşlem sonucunu güvenli şekilde kontrol ediyoruz. Lütfen bu ekranı kapatmayın.</string>
+    <string name="payment_success_title">Ödeme Başarılı</string>
+    <string name="payment_success_description">Ödeme işleminiz başarıyla doğrulandı.</string>
+    <string name="payment_failed_title">Ödeme Başarısız</string>
+    <string name="payment_failed_description">Ödeme işlemi tamamlanamadı. Bilgilerinizi kontrol ederek yeniden deneyebilirsiniz.</string>
+    <string name="payment_cancelled_title">Ödeme İptal Edildi</string>
+    <string name="payment_cancelled_description">İşlem tamamlanmadan ödeme sayfasından ayrıldınız.</string>
+    <string name="payment_timeout_title">Ödeme Zaman Aşımına Uğradı</string>
+    <string name="payment_timeout_description">Ödeme sağlayıcısından zamanında yanıt alınamadı. İşlem durumunu yeniden kontrol edin.</string>
+    <string name="payment_not_found_title">İşlem Bulunamadı</string>
+    <string name="payment_not_found_description">Bu ödeme işlemine ait güncel bilgiye ulaşılamadı.</string>
+    <string name="payment_reference_format">İşlem referansı: %1$s</string>
+    <string name="payment_done">TAMAM</string>
+    <string name="payment_retry">TEKRAR DENE</string>
+    <string name="payment_return">GERİ DÖN</string>
+    <string name="payment_exit">ÖDEMEDEN ÇIK</string>
+    <string name="payment_return_home">ANA SAYFAYA DÖN</string>
+    <string name="cancel_payment">Ödemeyi İptal Et</string>
+
+    <string name="bank_accounts">Banka Hesaplarım</string>
+    <string name="bank_accounts_description">Kazanç aktarımı ve para çekme işlemlerinde kullanılacak banka hesaplarınızı yönetin.</string>
+    <string name="add_bank_account">Banka Hesabı Ekle</string>
+    <string name="default_bank_account">Varsayılan Hesap</string>
+    <string name="bank_name">Banka Adı</string>
+    <string name="bank_name_placeholder">IBAN girildiğinde otomatik belirlenir</string>
+    <string name="account_holder_name">Hesap Sahibi</string>
+    <string name="iban">IBAN</string>
+    <string name="iban_placeholder">00 0000 0000 0000 0000 0000 00</string>
+    <string name="iban_error_message">Geçerli bir Türkiye IBAN bilgisi girin.</string>
+    <string name="iban_bank_not_recognized">IBAN geçerli ancak banka bilgisi belirlenemedi.</string>
+    <string name="bank_account_security_notice">Banka hesabı, yalnızca doğrulanmış rehber kazançlarının aktarımı için kullanılır.</string>
+    <string name="add_bank_account_action">HESABI EKLE</string>
+    <string name="bank_account_not_selected">Lütfen bir banka hesabı seçin.</string>
+    <string name="delete_bank_account_title">Banka Hesabını Sil</string>
+    <string name="delete_bank_account_description">Bu banka hesabını silmek istediğinizden emin misiniz?</string>
+    <string name="make_default_bank_account_title">Varsayılan Hesap Yap</string>
+    <string name="make_default_bank_account_description">Para çekme işlemlerinde bu hesabın kullanılmasını ister misiniz?</string>
+    <string name="withdrawal_request_received_title">Para Çekme Talebi Alındı</string>
+    <string name="withdrawal_request_received_description">Talebiniz kontrol edilmek üzere oluşturuldu. İşlem durumu cüzdan hareketlerinde gösterilecektir.</string>
+    <string name="withdrawal_confirmation_title">Para Çekme Onayı</string>
+    <string name="withdrawal_confirmation_description">Banka hesabınıza %1$s tutarında para çekme talebi oluşturulmasını onaylıyor musunuz?</string>
+    <string name="insufficient_balance_title">Yetersiz Bakiye</string>
+    <string name="withdrawal_insufficient_balance_description">Çekmek istediğiniz tutar kullanılabilir bakiyenizi aşıyor. Kullanılabilir bakiyeniz: %1$s.</string>
     <string name="confirm">ONAYLA</string>
 
     <string name="clear">Temizle</string>
@@ -382,6 +492,10 @@
     <string name="zero">0</string>
     <string name="cancel">İptal</string>
     <string name="cancel_action">İptal Et</string>
+    <string name="cancel_reservation_title">Rezervasyonu İptal Et</string>
+    <string name="cancel_reservation_message">Rezervasyonunuz iptal edilerek Geçmiş bölümüne taşınacaktır. İade durumu geçerli iptal koşullarına göre belirlenecektir.</string>
+    <string name="reservation_cancellation_failed_title">Rezervasyon İptal Edilemedi</string>
+    <string name="reservation_cancellation_failed_message">Rezervasyon durumu değişmiş olabilir. Lütfen tekrar deneyin.</string>
     <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>
     <string name="price_plus">%1$s +</string>
 
@@ -392,8 +506,6 @@
     <string name="registration_success_message">Kaydınız başarıyla alındı! E-posta adresinize gönderilen doğrulama bağlantısına tıklayın.</string>
 
 
-    <string name="google_sign_in_failed">Google Sign-In failed</string>
-    <string name="google_sign_in_error">Google Sign-In error: %1$s</string>
     <string name="default_web_client_id">677861073392-4ni851g7ggkhb8ngk9418u346t4so9rd.apps.googleusercontent.com</string>
 
 
@@ -459,7 +571,6 @@
 
 
 
-    <string name="support_title">Yardım ve Destek</string>
     <string name="support_intro">GuideMate deneyiminizle ilgili en çok merak edilen soruların yanıtlarını aşağıda bulabilirsiniz.</string>
     <string name="guide_support_intro">GuideMate rehber deneyiminizle ilgili en çok merak edilen soruların yanıtlarını aşağıda bulabilirsiniz.</string>
 

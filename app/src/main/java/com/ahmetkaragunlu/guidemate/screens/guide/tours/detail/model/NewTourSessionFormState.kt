@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.tours.detail.model
 
 import androidx.annotation.StringRes
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toCurrencyMinorUnitsOrNull
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -22,6 +23,6 @@ data class NewTourSessionFormState(
                 durationMinutes != null &&
                 durationMinutes > 0 &&
                 meetingPoint.isNotBlank() &&
-                price.toDoubleOrNull()?.let { it > 0 } == true &&
+                price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } == true &&
                 capacity.toIntOrNull()?.let { it > 0 } == true
 }

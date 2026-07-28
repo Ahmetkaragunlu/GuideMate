@@ -1,6 +1,8 @@
 package com.ahmetkaragunlu.guidemate.screens.guide.wallet.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -12,8 +14,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import compose.icons.TablerIcons
-import compose.icons.tablericons.CreditCard
 
 @Composable
 fun WalletCard(
@@ -57,7 +57,7 @@ fun WalletCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        TablerIcons.CreditCard,
+                        Icons.Default.AccountBalance,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(20.dp),

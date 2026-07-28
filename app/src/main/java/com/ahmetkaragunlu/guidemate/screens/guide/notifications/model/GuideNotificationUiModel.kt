@@ -8,7 +8,7 @@ data class GuideNotificationUiModel(
     val actorName: String = "",
     val tourTitle: String = "",
     val rating: Int? = null,
-    val amount: Double? = null,
+    val amountMinor: Long? = null,
     val commentPreview: String? = null,
     val rejectionReason: String? = null,
 )

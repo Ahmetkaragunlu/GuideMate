@@ -28,7 +28,7 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.tours.InfoRow
 import com.ahmetkaragunlu.guidemate.screens.common.tours.TourBaseCard
 import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.GuideTourCardUiModel
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.model.TourApprovalStatus
+import com.ahmetkaragunlu.guidemate.screens.common.tours.model.TourApprovalStatus
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Edit
 import compose.icons.tablericons.MapPin

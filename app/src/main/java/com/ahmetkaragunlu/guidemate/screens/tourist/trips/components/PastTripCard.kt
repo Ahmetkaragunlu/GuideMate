@@ -29,9 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.screens.common.tours.InfoRow
 import com.ahmetkaragunlu.guidemate.screens.common.tours.TourBaseCard
-import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TripUiModel
+import com.ahmetkaragunlu.guidemate.screens.common.tours.detail.model.TourDetailStatus
+import com.ahmetkaragunlu.guidemate.screens.tourist.trips.model.TripUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.MapPin
 import compose.icons.tablericons.Users
@@ -46,7 +48,8 @@ fun PastTripCard(
 
     TourBaseCard(
         imageResId = trip.imageResId,
-        modifier = modifier,
+        imageUrl = trip.imageUrl,
+        modifier = modifier.clickable(onClick = onDetailsClick),
         colorFilter = ColorFilter.colorMatrix(matrix),
         alpha = 0.85f,
         elevation = 2.dp,
@@ -71,6 +74,14 @@ fun PastTripCard(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
+                    if (trip.sessionStatus == TourDetailStatus.CANCELLED) {
+                        Text(
+                            text = stringResource(R.string.tour_status_cancelled),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                     InfoRow(icon = Icons.Default.CalendarMonth, text = trip.date)
                     InfoRow(icon = TablerIcons.MapPin, text = trip.location)
                     InfoRow(
@@ -86,8 +97,7 @@ fun PastTripCard(
                     modifier =
                         Modifier
                             .padding(start = dimensionResource(R.dimen.spacing_medium))
-                            .size(24.dp)
-                            .clickable(onClick = onDetailsClick),
+                            .size(24.dp),
                 )
             }
 
@@ -101,7 +111,11 @@ fun PastTripCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.amount_format, trip.price),
+                    text =
+                        stringResource(
+                            R.string.amount_format,
+                            trip.priceMinor.toLocalCurrencyFromMinorUnit(),
+                        ),
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),
                 )

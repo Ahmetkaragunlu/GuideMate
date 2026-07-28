@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.localCurrencySymbol
 import com.ahmetkaragunlu.guidemate.components.EditTextField
 
 @Composable
@@ -37,10 +38,10 @@ fun GuideTourPriceField(
         onValueChange = onValueChange,
         placeholderText = "1500",
         placeholderColor = colorResource(R.color.brand_color),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         leadingIcon = {
             Text(
-                text = "₺",
+                text = localCurrencySymbol(),
                 color = colorResource(R.color.brand_color),
             )
         },

@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.toLocalCurrency
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.screens.guide.notifications.model.GuideNotificationType
 import com.ahmetkaragunlu.guidemate.screens.guide.notifications.model.GuideNotificationUiModel
 import compose.icons.TablerIcons
@@ -144,7 +144,7 @@ internal fun notificationMessage(notification: GuideNotificationUiModel): String
         GuideNotificationType.WITHDRAWAL_COMPLETED ->
             stringResource(
                 R.string.guide_notification_withdrawal_completed,
-                (notification.amount ?: 0.0).toLocalCurrency(),
+                (notification.amountMinor ?: 0).toLocalCurrencyFromMinorUnit(),
             )
 
         GuideNotificationType.COMMENT_RECEIVED ->

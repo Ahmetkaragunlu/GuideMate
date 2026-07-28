@@ -17,7 +17,6 @@ import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -28,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import java.text.NumberFormat
-import java.util.Locale
+import com.ahmetkaragunlu.guidemate.screens.common.formatting.toLocalCurrencyFromMinorUnit
+import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,15 +38,6 @@ fun PriceRangeSelector(
     minPrice: Float = 0f,
     maxPrice: Float = 1000f,
 ) {
-    val currentLocale = Locale.getDefault()
-
-    val currencyFormatter =
-        remember(currentLocale) {
-            NumberFormat.getCurrencyInstance(currentLocale).apply {
-                maximumFractionDigits = 0
-            }
-        }
-
     Column(
         modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small)),
     ) {
@@ -56,7 +46,7 @@ fun PriceRangeSelector(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = currencyFormatter.format(range.start),
+                text = range.start.toMinorUnits().toLocalCurrencyFromMinorUnit(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color = colorResource(R.color.brand_color),
@@ -64,9 +54,12 @@ fun PriceRangeSelector(
 
             val endPriceText =
                 if (range.endInclusive >= maxPrice) {
-                    stringResource(R.string.price_plus, currencyFormatter.format(maxPrice))
+                    stringResource(
+                        R.string.price_plus,
+                        maxPrice.toMinorUnits().toLocalCurrencyFromMinorUnit(),
+                    )
                 } else {
-                    currencyFormatter.format(range.endInclusive)
+                    range.endInclusive.toMinorUnits().toLocalCurrencyFromMinorUnit()
                 }
 
             Text(
@@ -108,6 +101,8 @@ fun PriceRangeSelector(
         )
     }
 }
+
+private fun Float.toMinorUnits(): Long = (toDouble() * 100).roundToLong()
 
 @Composable
 fun CustomSliderThumb(

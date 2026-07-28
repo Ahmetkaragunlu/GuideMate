@@ -8,16 +8,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,7 +52,18 @@ fun GuideMyToursScreen(
 ) {
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val tours by viewModel.tours.collectAsStateWithLifecycle()
+    val operationMessageResId by viewModel.operationMessageResId.collectAsStateWithLifecycle()
     var tourIdPendingArchive by rememberSaveable { mutableStateOf<String?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val pendingMessageResId = operationMessageResId
+    val operationMessage = pendingMessageResId?.let { stringResource(it) }
+
+    LaunchedEffect(pendingMessageResId) {
+        if (pendingMessageResId != null && operationMessage != null) {
+            snackbarHostState.showSnackbar(operationMessage)
+            viewModel.onOperationMessageShown(pendingMessageResId)
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -109,6 +124,21 @@ fun GuideMyToursScreen(
                 )
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        bottom =
+                            if (selectedTab == GuideTourTab.ACTIVE) {
+                                24.dp
+                            } else {
+                                dimensionResource(R.dimen.spacing_large)
+                            },
+                    ),
+        )
 
         if (tourIdPendingArchive != null) {
             EditAlertDialog(

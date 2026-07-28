@@ -73,7 +73,7 @@ class GuideNotificationsViewModel
                             GuideNotificationUiModel(
                                 id = "notification-withdrawal-1",
                                 type = GuideNotificationType.WITHDRAWAL_COMPLETED,
-                                amount = 5_000.0,
+                                amountMinor = 500_000,
                                 occurredAtMillis = now - (2 * DAY_MILLIS),
                                 isRead = true,
                             ),
