@@ -8,7 +8,4 @@ enum class RoleType {
 
     @SerializedName("ROLE_GUIDE")
     ROLE_GUIDE,
-
-    @SerializedName("ROLE_ADMIN")
-    ROLE_ADMIN,
 }

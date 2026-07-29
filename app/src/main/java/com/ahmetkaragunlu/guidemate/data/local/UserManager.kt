@@ -20,7 +20,6 @@ class UserManager @Inject constructor(
     private companion object {
         const val ROLE_TOURIST = "ROLE_TOURIST"
         const val ROLE_GUIDE = "ROLE_GUIDE"
-        const val ROLE_ADMIN = "ROLE_ADMIN"
     }
 
     private val prefs: SharedPreferences =
@@ -69,10 +68,6 @@ class UserManager @Inject constructor(
             UserRole.GUIDE.name,
             -> UserRole.GUIDE
 
-            ROLE_ADMIN,
-            UserRole.ADMIN.name,
-            -> UserRole.ADMIN
-
             else -> null
         }
 
@@ -80,6 +75,5 @@ class UserManager @Inject constructor(
         when (this) {
             UserRole.TOURIST -> ROLE_TOURIST
             UserRole.GUIDE -> ROLE_GUIDE
-            UserRole.ADMIN -> ROLE_ADMIN
         }
 }

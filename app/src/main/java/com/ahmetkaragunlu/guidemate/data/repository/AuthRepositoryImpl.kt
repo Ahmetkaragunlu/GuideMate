@@ -48,13 +48,11 @@ class AuthRepositoryImpl @Inject constructor(
     private fun UserRole.toRoleType() = when (this) {
         UserRole.TOURIST -> RoleType.ROLE_TOURIST
         UserRole.GUIDE -> RoleType.ROLE_GUIDE
-        UserRole.ADMIN -> RoleType.ROLE_ADMIN
     }
 
     private fun RoleType.toUserRole() = when (this) {
         RoleType.ROLE_TOURIST -> UserRole.TOURIST
         RoleType.ROLE_GUIDE -> UserRole.GUIDE
-        RoleType.ROLE_ADMIN -> UserRole.ADMIN
     }
 
     private fun Response<ResponseBody>.toDataResult(): DataResult<String> {

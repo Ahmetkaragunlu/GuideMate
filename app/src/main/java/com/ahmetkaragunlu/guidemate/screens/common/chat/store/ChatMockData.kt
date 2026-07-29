@@ -15,7 +15,6 @@ internal fun mockCurrentUserId(role: UserRole?): String? =
     when (role) {
         UserRole.GUIDE -> MOCK_GUIDE_USER_ID
         UserRole.TOURIST -> MOCK_TOURIST_USER_ID
-        UserRole.ADMIN,
         null,
         -> null
     }
