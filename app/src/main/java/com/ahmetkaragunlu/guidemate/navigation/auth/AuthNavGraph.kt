@@ -6,31 +6,27 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.navigation.switchRoot
 import com.ahmetkaragunlu.guidemate.screens.auth.forgotpassword.ForgotPasswordScreen
 import com.ahmetkaragunlu.guidemate.screens.auth.onboarding.OnboardingScreen
-import com.ahmetkaragunlu.guidemate.screens.auth.roleselection.RoleSelectionScreen
 import com.ahmetkaragunlu.guidemate.screens.auth.signin.SignInScreen
 import com.ahmetkaragunlu.guidemate.screens.auth.signup.SignUpScreen
 
-fun NavGraphBuilder.authNavGraph(navController: NavController) {
+fun NavGraphBuilder.authNavGraph(
+    navController: NavController,
+    startDestination: AuthStartDestination,
+    onOnboardingCompleted: () -> Unit,
+) {
     navigation<RootDestination.Auth>(
-        startDestination = AuthDestination.SignIn,
+        startDestination = startDestination.toDestination(),
     ) {
         composable<AuthDestination.Onboarding> {
             OnboardingScreen(
                 onboardingCompleted = {
-                    navController.navigateTo(AuthDestination.RoleSelection)
-                },
-            )
-        }
-        composable<AuthDestination.RoleSelection> {
-            RoleSelectionScreen(
-                onNavigateToTouristGraph = {
-                    navController.switchRoot(
-                        targetDestination = RootDestination.Tourist,
-                        clearBackStackFrom = RootDestination.Auth,
-                    )
+                    onOnboardingCompleted()
+                    navController.navigate(AuthDestination.SignIn) {
+                        popUpTo(AuthDestination.Onboarding) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 },
             )
         }
@@ -42,20 +38,33 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
                 onNavigateToForgotPassword = {
                     navController.navigateTo(AuthDestination.ForgotPassword)
                 },
-                onNavigateToRoleSelection = {
-                    navController.navigateTo(AuthDestination.RoleSelection)
-                },
             )
         }
         composable<AuthDestination.SignUp> {
             SignUpScreen(
-                onNavigateToSignIn = { navController.navigateTo(AuthDestination.SignIn) },
+                onNavigateToSignIn = {
+                    navController.popBackStack(
+                        route = AuthDestination.SignIn,
+                        inclusive = false,
+                    )
+                },
             )
         }
         composable<AuthDestination.ForgotPassword> {
             ForgotPasswordScreen(
-                onNavigateToSignIn = { navController.navigateTo(AuthDestination.SignIn) },
+                onNavigateToSignIn = {
+                    navController.popBackStack(
+                        route = AuthDestination.SignIn,
+                        inclusive = false,
+                    )
+                },
             )
         }
     }
 }
+
+private fun AuthStartDestination.toDestination(): Any =
+    when (this) {
+        AuthStartDestination.ONBOARDING -> AuthDestination.Onboarding
+        AuthStartDestination.SIGN_IN -> AuthDestination.SignIn
+    }

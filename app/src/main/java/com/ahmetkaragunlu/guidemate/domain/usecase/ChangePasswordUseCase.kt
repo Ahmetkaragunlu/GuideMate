@@ -10,11 +10,9 @@ class ChangePasswordUseCase @Inject constructor(
     suspend operator fun invoke(
         currentPassword: String,
         newPassword: String,
-        confirmPassword: String,
-    ): DataResult<String> =
+    ): DataResult<Unit> =
         repository.changePassword(
             currentPassword = currentPassword,
             newPassword = newPassword,
-            confirmPassword = confirmPassword,
         )
 }

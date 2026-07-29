@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun EditAlertDialog(
     @StringRes title: Int,
     @StringRes text: Int,
+    textValue: String? = null,
     textFormatArguments: List<Any> = emptyList(),
     textModifier: Modifier = Modifier,
     compactText: Boolean = false,
@@ -39,10 +40,11 @@ fun EditAlertDialog(
             Text(
                 modifier = textModifier,
                 text =
-                    stringResource(
-                        id = text,
-                        formatArgs = textFormatArguments.toTypedArray(),
-                    ),
+                    textValue
+                        ?: stringResource(
+                            id = text,
+                            formatArgs = textFormatArguments.toTypedArray(),
+                        ),
                 style =
                     if (compactText) {
                         MaterialTheme.typography.bodySmall

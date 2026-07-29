@@ -7,14 +7,19 @@ data class AuthResponse(
     @SerializedName("accessToken") val accessToken: String?,
     @SerializedName("refreshToken") val refreshToken: String?,
     @SerializedName("message") val message: String?,
+    @SerializedName("userId") val userId: Long,
+    @SerializedName("email") val email: String,
+    @SerializedName("firstName") val firstName: String,
+    @SerializedName("lastName") val lastName: String,
     @SerializedName("roleSelected") val isRoleSelected: Boolean,
     @SerializedName("role") val role: RoleType?,
-    @SerializedName("firstName") val firstName: String?,
-    @SerializedName("lastName") val lastName: String?,
 )
 
-data class ErrorResponse(
-    @SerializedName("code") val code: Int,
-    @SerializedName("message") val message: String,
-    @SerializedName("timestamp") val timestamp: String?,
+data class CurrentUserResponse(
+    @SerializedName("userId") val userId: Long,
+    @SerializedName("email") val email: String,
+    @SerializedName("firstName") val firstName: String,
+    @SerializedName("lastName") val lastName: String,
+    @SerializedName("roleSelected") val isRoleSelected: Boolean,
+    @SerializedName("role") val role: RoleType?,
 )

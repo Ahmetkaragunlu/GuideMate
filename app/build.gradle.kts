@@ -26,9 +26,8 @@ android {
     release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      buildConfigField("String", "BASE_URL", "\"https://api.guidemate.com/api/v1/auth/\"")
     }
-    debug { buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/v1/auth/\"") }
+    debug {}
   }
 
   compileOptions {
@@ -63,6 +62,9 @@ dependencies {
   // ViewModel
   implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+  // Local preferences
+  implementation(libs.androidx.datastore.preferences)
+
   // DI
   implementation(libs.hilt.android)
   ksp(libs.hilt.android.compiler)
@@ -84,11 +86,10 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.okhttp.logging.interceptor)
 
-  // EncryptedSharedPreferences
-  implementation(libs.androidx.security.crypto)
-
   // Google Authentication
-  implementation(libs.play.services.auth)
+  implementation(libs.androidx.credentials)
+  implementation(libs.androidx.credentials.play.services.auth)
+  implementation(libs.google.id)
 
   // Google Places
   implementation(libs.places)

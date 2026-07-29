@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.common.changepassword
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.components.EditAlertDialog
 import com.ahmetkaragunlu.guidemate.components.EditButton
 import com.ahmetkaragunlu.guidemate.components.EditTextField
 import com.ahmetkaragunlu.guidemate.screens.common.changepassword.model.ChangePasswordFormState
@@ -53,11 +56,19 @@ fun ChangePasswordScreen(
     HandleChangePasswordMessages(
         screenState = screenState,
         onErrorConsumed = viewModel::clearError,
-        onSuccessConsumed = viewModel::clearSuccess,
     )
+
+    if (screenState.showSuccessDialog) {
+        BackHandler {}
+        ChangePasswordSuccessDialog(onConfirm = viewModel::confirmSuccess)
+    }
 
     ChangePasswordContent(
         formState = formState,
+        screenState = screenState,
+        isCurrentPasswordValid = viewModel.isCurrentPasswordValid(),
+        isNewPasswordValid = viewModel.isNewPasswordValid(),
+        isConfirmNewPasswordValid = viewModel.isConfirmNewPasswordValid(),
         onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
         onNewPasswordChange = viewModel::onNewPasswordChange,
         onConfirmNewPasswordChange = viewModel::onConfirmNewPasswordChange,
@@ -72,7 +83,6 @@ fun ChangePasswordScreen(
 private fun HandleChangePasswordMessages(
     screenState: ChangePasswordScreenState,
     onErrorConsumed: () -> Unit,
-    onSuccessConsumed: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -82,18 +92,15 @@ private fun HandleChangePasswordMessages(
             onErrorConsumed()
         }
     }
-
-    LaunchedEffect(screenState.successMessage) {
-        screenState.successMessage?.let { message ->
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            onSuccessConsumed()
-        }
-    }
 }
 
 @Composable
 private fun ChangePasswordContent(
     formState: ChangePasswordFormState,
+    screenState: ChangePasswordScreenState,
+    isCurrentPasswordValid: Boolean,
+    isNewPasswordValid: Boolean,
+    isConfirmNewPasswordValid: Boolean,
     onCurrentPasswordChange: (String) -> Unit,
     onNewPasswordChange: (String) -> Unit,
     onConfirmNewPasswordChange: (String) -> Unit,
@@ -113,6 +120,11 @@ private fun ChangePasswordContent(
     ) {
         ChangePasswordFieldsSection(
             formState = formState,
+            currentPasswordErrorMessage = screenState.currentPasswordErrorMessage,
+            newPasswordErrorMessage = screenState.newPasswordErrorMessage,
+            isCurrentPasswordValid = isCurrentPasswordValid,
+            isNewPasswordValid = isNewPasswordValid,
+            isConfirmNewPasswordValid = isConfirmNewPasswordValid,
             onCurrentPasswordChange = onCurrentPasswordChange,
             onNewPasswordChange = onNewPasswordChange,
             onConfirmNewPasswordChange = onConfirmNewPasswordChange,
@@ -139,6 +151,7 @@ private fun ChangePasswordContent(
             text = R.string.update_password_action,
             onClick = onSubmit,
             modifier = Modifier.align(Alignment.CenterHorizontally),
+            isLoading = screenState.isLoading,
         )
     }
 }
@@ -146,6 +159,11 @@ private fun ChangePasswordContent(
 @Composable
 private fun ChangePasswordFieldsSection(
     formState: ChangePasswordFormState,
+    currentPasswordErrorMessage: String?,
+    newPasswordErrorMessage: String?,
+    isCurrentPasswordValid: Boolean,
+    isNewPasswordValid: Boolean,
+    isConfirmNewPasswordValid: Boolean,
     onCurrentPasswordChange: (String) -> Unit,
     onNewPasswordChange: (String) -> Unit,
     onConfirmNewPasswordChange: (String) -> Unit,
@@ -164,13 +182,16 @@ private fun ChangePasswordFieldsSection(
             imeAction = ImeAction.Next,
             isPasswordVisible = formState.currentPasswordVisible,
             onTogglePasswordVisibility = onToggleCurrentPasswordVisibility,
-            isError = !formState.isCurrentPasswordValid && formState.currentPassword.isNotEmpty(),
+            isError =
+                (!isCurrentPasswordValid && formState.currentPassword.isNotEmpty()) ||
+                    currentPasswordErrorMessage != null,
             supportingText =
-                if (!formState.isCurrentPasswordValid && formState.currentPassword.isNotEmpty()) {
+                if (!isCurrentPasswordValid && formState.currentPassword.isNotEmpty()) {
                     R.string.password_error_message
                 } else {
                     null
                 },
+            supportingTextValue = currentPasswordErrorMessage,
         )
 
         PasswordInputField(
@@ -180,13 +201,16 @@ private fun ChangePasswordFieldsSection(
             imeAction = ImeAction.Next,
             isPasswordVisible = formState.newPasswordVisible,
             onTogglePasswordVisibility = onToggleNewPasswordVisibility,
-            isError = !formState.isNewPasswordValid && formState.newPassword.isNotEmpty(),
+            isError =
+                (!isNewPasswordValid && formState.newPassword.isNotEmpty()) ||
+                    newPasswordErrorMessage != null,
             supportingText =
-                if (!formState.isNewPasswordValid && formState.newPassword.isNotEmpty()) {
+                if (!isNewPasswordValid && formState.newPassword.isNotEmpty()) {
                     R.string.password_error_message
                 } else {
                     null
                 },
+            supportingTextValue = newPasswordErrorMessage,
         )
 
         PasswordInputField(
@@ -196,15 +220,33 @@ private fun ChangePasswordFieldsSection(
             imeAction = ImeAction.Done,
             isPasswordVisible = formState.confirmNewPasswordVisible,
             onTogglePasswordVisibility = onToggleConfirmNewPasswordVisibility,
-            isError = !formState.isConfirmNewPasswordValid && formState.confirmNewPassword.isNotEmpty(),
+            isError =
+                !isConfirmNewPasswordValid &&
+                    formState.confirmNewPassword.isNotEmpty(),
             supportingText =
-                if (!formState.isConfirmNewPasswordValid && formState.confirmNewPassword.isNotEmpty()) {
+                if (!isConfirmNewPasswordValid && formState.confirmNewPassword.isNotEmpty()) {
                     R.string.confirm_password_error_message
                 } else {
                     null
                 },
         )
     }
+}
+
+@Composable
+private fun ChangePasswordSuccessDialog(
+    onConfirm: () -> Unit,
+) {
+    EditAlertDialog(
+        title = R.string.password_changed_title,
+        text = R.string.password_changed_message,
+        onDismissRequest = {},
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(R.string.ok))
+            }
+        },
+    )
 }
 
 @Composable
@@ -217,6 +259,7 @@ private fun PasswordInputField(
     onTogglePasswordVisibility: () -> Unit,
     isError: Boolean,
     supportingText: Int?,
+    supportingTextValue: String? = null,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -257,6 +300,7 @@ private fun PasswordInputField(
             },
             isError = isError,
             supportingText = supportingText,
+            supportingTextValue = supportingTextValue,
             modifier = Modifier.fillMaxWidth(),
         )
     }

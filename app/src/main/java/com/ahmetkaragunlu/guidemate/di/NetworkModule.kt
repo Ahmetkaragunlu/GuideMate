@@ -4,6 +4,7 @@ import com.ahmetkaragunlu.guidemate.BuildConfig
 import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
 import com.ahmetkaragunlu.guidemate.data.remote.interceptor.AuthInterceptor
 import com.ahmetkaragunlu.guidemate.data.remote.interceptor.TokenAuthenticator
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,11 +25,15 @@ object NetworkModule {
         HttpLoggingInterceptor().apply {
             level =
                 if (BuildConfig.DEBUG) {
-                    HttpLoggingInterceptor.Level.BODY
+                    HttpLoggingInterceptor.Level.BASIC
                 } else {
                     HttpLoggingInterceptor.Level.NONE
                 }
         }
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = Gson()
 
     @Provides
     @Singleton
@@ -49,12 +54,15 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        gson: Gson,
+    ): Retrofit =
         Retrofit
             .Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(BuildConfig.GUIDEMATE_API_BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
     @Provides

@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.common
 
 import android.content.Context
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -18,4 +19,10 @@ constructor(
         @StringRes id: Int,
         vararg args: Any,
     ): String = context.getString(id, *args)
+
+    override fun getQuantityString(
+        @PluralsRes id: Int,
+        quantity: Int,
+        vararg args: Any,
+    ): String = context.resources.getQuantityString(id, quantity, *args)
 }

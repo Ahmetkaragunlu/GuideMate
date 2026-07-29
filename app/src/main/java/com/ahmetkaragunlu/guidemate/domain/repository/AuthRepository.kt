@@ -1,17 +1,19 @@
 package com.ahmetkaragunlu.guidemate.domain.repository
 
 import com.ahmetkaragunlu.guidemate.common.DataResult
-import com.ahmetkaragunlu.guidemate.domain.model.AuthResult
 import com.ahmetkaragunlu.guidemate.domain.model.UserRole
+import com.ahmetkaragunlu.guidemate.domain.model.UserState
 
 interface AuthRepository {
-    suspend fun login(email: String, password: String): DataResult<AuthResult>
-    suspend fun register(firstName: String, lastName: String, email: String, password: String): DataResult<String>
-    suspend fun googleLogin(idToken: String): DataResult<AuthResult>
-    suspend fun logout(): DataResult<String>
-    suspend fun refreshToken(): DataResult<AuthResult>
-    suspend fun selectRole(role: UserRole): DataResult<AuthResult>
-    suspend fun forgotPassword(email: String, firstName: String, lastName: String): DataResult<String>
-    suspend fun resetPassword(token: String, newPassword: String, confirmPassword: String): DataResult<String>
-    suspend fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String): DataResult<String>
+    suspend fun login(email: String, password: String): DataResult<UserState>
+    suspend fun register(firstName: String, lastName: String, email: String, password: String): DataResult<Unit>
+    suspend fun googleLogin(idToken: String): DataResult<UserState>
+    suspend fun logout(): DataResult<Unit>
+    suspend fun selectRole(role: UserRole): DataResult<UserState>
+    suspend fun currentUser(): DataResult<UserState>
+    suspend fun resendVerification(email: String): DataResult<Unit>
+    suspend fun forgotPassword(email: String): DataResult<Unit>
+    suspend fun changePassword(currentPassword: String, newPassword: String): DataResult<Unit>
+    fun hasStoredSession(): Boolean
+    suspend fun clearLocalSession()
 }

@@ -5,11 +5,8 @@ import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class ForgotPasswordUseCase @Inject constructor(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
 ) {
-    suspend operator fun invoke(
-        email: String,
-        firstName: String,
-        lastName: String
-    ): DataResult<String> = repository.forgotPassword(email, firstName, lastName)
+    suspend operator fun invoke(email: String): DataResult<Unit> =
+        repository.forgotPassword(email)
 }

@@ -2,15 +2,39 @@ package com.ahmetkaragunlu.guidemate.screens.auth.signup
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,7 +73,7 @@ fun SignUpScreen(
     val isFirstNameValid = viewModel.isValidFirstName()
     val isLastNameValid = viewModel.isValidLastName()
     val isEmailValid = viewModel.isValidEmail()
-    val isPasswordValid = viewModel.isValidPassWord()
+    val isPasswordValid = viewModel.isValidPassword()
     val isConfirmPasswordValid = viewModel.isValidConfirmPassword()
 
     LaunchedEffect(screenState.errorMessage) {
@@ -100,6 +124,10 @@ fun SignUpScreen(
             isEmailValid = isEmailValid,
             isPasswordValid = isPasswordValid,
             isConfirmPasswordValid = isConfirmPasswordValid,
+            firstNameErrorMessage = screenState.firstNameErrorMessage,
+            lastNameErrorMessage = screenState.lastNameErrorMessage,
+            emailErrorMessage = screenState.emailErrorMessage,
+            passwordErrorMessage = screenState.passwordErrorMessage,
             onFirstNameChange = viewModel::inputFirstNameChange,
             onLastNameChange = viewModel::onLastNameChange,
             onEmailChange = viewModel::onEmailChange,
@@ -121,7 +149,8 @@ fun SignUpScreen(
 
         EditButton(
             text = R.string.sign_up,
-            onClick = viewModel::onSignUpClick
+            onClick = viewModel::onSignUpClick,
+            isLoading = screenState.isLoading,
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -247,6 +276,10 @@ private fun SignUpFormSection(
     isEmailValid: Boolean,
     isPasswordValid: Boolean,
     isConfirmPasswordValid: Boolean,
+    firstNameErrorMessage: String?,
+    lastNameErrorMessage: String?,
+    emailErrorMessage: String?,
+    passwordErrorMessage: String?,
     onFirstNameChange: (String) -> Unit,
     onLastNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
@@ -268,26 +301,32 @@ private fun SignUpFormSection(
             onValueChange = onFirstNameChange,
             placeholder = R.string.name,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            isError = !isFirstNameValid && formState.firstName.isNotEmpty(),
+            isError =
+                (!isFirstNameValid && formState.firstName.isNotEmpty()) ||
+                    firstNameErrorMessage != null,
             supportingText =
                 if (!isFirstNameValid && formState.firstName.isNotEmpty()) {
                     R.string.name_error_message
                 } else {
                     null
                 },
+            supportingTextValue = firstNameErrorMessage,
         )
         EditTextField(
             value = formState.lastName,
             onValueChange = onLastNameChange,
             placeholder = R.string.last_name,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            isError = !isLastNameValid && formState.lastName.isNotEmpty(),
+            isError =
+                (!isLastNameValid && formState.lastName.isNotEmpty()) ||
+                    lastNameErrorMessage != null,
             supportingText =
                 if (!isLastNameValid && formState.lastName.isNotEmpty()) {
                     R.string.last_name_error_message
                 } else {
                     null
                 },
+            supportingTextValue = lastNameErrorMessage,
         )
         EditTextField(
             value = formState.email,
@@ -298,8 +337,11 @@ private fun SignUpFormSection(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next,
                 ),
-            isError = !isEmailValid && formState.email.isNotEmpty(),
+            isError =
+                (!isEmailValid && formState.email.isNotEmpty()) ||
+                    emailErrorMessage != null,
             supportingText = if (!isEmailValid && formState.email.isNotEmpty()) R.string.email_error_message else null,
+            supportingTextValue = emailErrorMessage,
         )
         EditTextField(
             value = formState.password,
@@ -311,7 +353,9 @@ private fun SignUpFormSection(
                     imeAction = ImeAction.Next,
                 ),
             visualTransformation = if (formState.passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-            isError = !isPasswordValid && formState.password.isNotEmpty(),
+            isError =
+                (!isPasswordValid && formState.password.isNotEmpty()) ||
+                    passwordErrorMessage != null,
             trailingIcon = {
                 Icon(
                     imageVector = if (formState.passwordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
@@ -326,6 +370,7 @@ private fun SignUpFormSection(
                 } else {
                     null
                 },
+            supportingTextValue = passwordErrorMessage,
         )
         EditTextField(
             value = formState.confirmPassword,

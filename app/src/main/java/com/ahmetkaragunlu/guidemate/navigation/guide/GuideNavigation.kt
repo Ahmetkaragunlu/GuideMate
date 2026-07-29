@@ -45,6 +45,7 @@ import compose.icons.tablericons.User
 @Composable
 fun GuideNavigation(
     routeNavController: NavController,
+    onLogoutClick: () -> Unit,
     homeViewModel: GuideHomeViewModel = hiltViewModel(),
     earningsViewModel: GuideEarningsViewModel = hiltViewModel(),
     notificationsViewModel: GuideNotificationsViewModel = hiltViewModel(),
@@ -84,7 +85,7 @@ fun GuideNavigation(
                     onBackClick = {
                         customBackAction?.invoke() ?: guideNavController.navigateUp()
                     },
-                    onLogoutClick = {},
+                    onLogoutClick = onLogoutClick,
                     unreadNotificationCount = notificationsUiState.unreadCount,
                     onNotificationClick = { showNotifications = true },
                 )

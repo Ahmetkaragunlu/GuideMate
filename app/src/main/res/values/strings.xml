@@ -26,13 +26,17 @@
     <string name="name_error_message">İsim en az 3 karakter olmalıdır</string>
     <string name="email_error_message">Geçersiz e-posta adresi</string>
     <string name="last_name_error_message">Soy isim en az 2 karakter olmalıdır</string>
-    <string name="password_error_message">Şifre en az 6 karakter olmalıdır</string>
+    <string name="password_error_message">Şifre en az 8 rakamdan oluşmalıdır</string>
     <string name="confirm_password_error_message">Şifreler eşleşmiyor</string>
     <string name="error_fix_fields">Lütfen hatalı alanları düzeltiniz.</string>
     <string name="error_fill_all_fields">Lütfen tüm alanları doldurunuz.</string>
     <string name="send_reset_link">Sıfırlama Bağlantısı Gönder</string>
+    <plurals name="password_reset_retry_wait">
+        <item quantity="one">%1$d saniye sonra tekrar deneyebilirsiniz.</item>
+        <item quantity="other">%1$d saniye sonra tekrar deneyebilirsiniz.</item>
+    </plurals>
     <string name="reset_password_title">Şifre Yenileme</string>
-    <string name="reset_password_description">E-posta adresinize bir sıfırlama bağlantısı göndereceğiz. Lütfen bilgilerinizi girin.</string>
+    <string name="reset_password_description">E-posta adresinize bir sıfırlama bağlantısı göndereceğiz. Lütfen e-posta adresinizi girin.</string>
     <string name="agree_terms_conditions">Şartları ve koşulları kabul ediyorum</string>
 
 
@@ -100,13 +104,46 @@
     <string name="error_unknown">Beklenmedik bir hata oluştu.</string>
     <string name="error_session_expired">Oturum süreniz doldu, lütfen tekrar giriş yapın.</string>
     <string name="error_generic_failure">İşlem başarısız oldu.</string>
-    <string name="logout_success">Başarıyla çıkış yapıldı.</string>
-    <string name="logout_offline">Çıkış yapıldı (Çevrimdışı mod).</string>
-
+    <string name="error_user_not_found">Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı.</string>
+    <string name="error_email_already_exists">Bu e-posta adresi zaten kullanılıyor.</string>
+    <string name="error_account_pending_verification">Giriş yapmadan önce e-posta adresinizi doğrulamanız gerekiyor.</string>
+    <string name="error_account_disabled">Hesabınız kullanıma kapatılmış. Destek ekibiyle iletişime geçin.</string>
+    <string name="error_invalid_credentials">E-posta adresi veya şifre hatalı.</string>
+    <string name="error_current_password_incorrect">Mevcut şifreniz hatalı.</string>
+    <string name="error_password_policy">Şifre en az 8 rakamdan oluşmalıdır.</string>
+    <string name="error_password_same_as_current">Yeni şifreniz mevcut şifrenizden farklı olmalıdır.</string>
+    <string name="error_passwords_do_not_match">Şifreler eşleşmiyor.</string>
+    <string name="error_role_already_selected">Kullanıcı türünüz daha önce seçilmiş.</string>
+    <string name="error_role_not_found">Seçtiğiniz kullanıcı türü bulunamadı.</string>
+    <string name="error_invalid_installation">Cihaz oturumu doğrulanamadı. Lütfen tekrar giriş yapın.</string>
+    <string name="error_invalid_token">Bağlantı geçersiz veya artık kullanılamıyor.</string>
+    <string name="error_token_already_used">Bu bağlantı daha önce kullanılmış.</string>
+    <string name="error_google_login_failed">Google ile giriş tamamlanamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_google_account_not_found">Bu Google hesabıyla eşleşen bir GuideMate hesabı bulunamadı. Önce normal kayıt oluşturun.</string>
+    <string name="error_google_account_mismatch">Google hesabınız kayıtlı e-posta adresinizle eşleşmiyor.</string>
+    <string name="error_forbidden">Bu işlem için yetkiniz bulunmuyor.</string>
+    <string name="error_validation_failed">Lütfen girdiğiniz bilgileri kontrol edin.</string>
+    <string name="error_malformed_request">İstek işlenemedi. Lütfen bilgilerinizi kontrol edip tekrar deneyin.</string>
+    <string name="error_data_conflict">Bilgiler güncellendiği için işlem tamamlanamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_rate_limited">Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.</string>
+    <plurals name="error_rate_limited_with_seconds">
+        <item quantity="one">Çok fazla deneme yaptınız. %1$d saniye sonra tekrar deneyin.</item>
+        <item quantity="other">Çok fazla deneme yaptınız. %1$d saniye sonra tekrar deneyin.</item>
+    </plurals>
+    <string name="error_email_delivery_failed">E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="error_field_required">Bu alan zorunludur.</string>
+    <string name="error_invalid_field_size">Girdiğiniz değer uygun uzunlukta değil.</string>
+    <string name="error_invalid_field_format">Girdiğiniz değer uygun formatta değil.</string>
+    <string name="error_invalid_field">Bu alanı kontrol edin.</string>
+    <string name="error_select_role">Devam etmek için bir kullanıcı türü seçin.</string>
     <string name="error_terms_required">Lütfen Kullanıcı Sözleşmesini okuyup onaylayın.</string>
     <string name="terms_dialog_title">Kullanıcı Sözleşmesi ve Gizlilik Politikası</string>
     <string name="success">Başarılı</string>
-    <string name="reset_password_link_sent">Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.</string>
+    <string name="reset_password_link_sent">Bu e-postaya uygun bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Lütfen gelen kutunuzu kontrol edin.</string>
+    <plurals name="login_retry_wait">
+        <item quantity="one">Tekrar giriş yapmak için %1$d saniye bekleyin.</item>
+        <item quantity="other">Tekrar giriş yapmak için %1$d saniye bekleyin.</item>
+    </plurals>
 
     <string name="tourist_home">Anasayfa</string>
     <string name="welcome_message">Hoş geldin, %1$s 👋</string>
@@ -293,7 +330,7 @@
     <string name="current_password">Mevcut Şifre</string>
     <string name="new_password">Yeni Şifre</string>
     <string name="new_password_repeat">Yeni Şifre Tekrar</string>
-    <string name="change_password_helper_text">Şifreniz en az 6 karakter uzunluğunda olmalıdır.</string>
+    <string name="change_password_helper_text">Şifreniz en az 8 rakamdan oluşmalıdır.</string>
     <string name="update_password_action">ŞİFREYİ GÜNCELLE</string>
     <string name="notification_settings">Bildirim Ayarları</string>
     <string name="legal_agreements">Yasal &amp; Sözleşmeler</string>
@@ -504,6 +541,16 @@
 
     <string name="verification_required_title">Doğrulama Gerekli</string>
     <string name="registration_success_message">Kaydınız başarıyla alındı! E-posta adresinize gönderilen doğrulama bağlantısına tıklayın.</string>
+    <string name="account_pending_verification_message">E-posta adresiniz henüz doğrulanmamış. Yeni bir doğrulama bağlantısı gönderebiliriz.</string>
+    <plurals name="verification_resend_wait">
+        <item quantity="one">Yeni bağlantı göndermek için %1$d saniye bekleyin.</item>
+        <item quantity="other">Yeni bağlantı göndermek için %1$d saniye bekleyin.</item>
+    </plurals>
+    <string name="resend_verification_email">Tekrar Gönder</string>
+    <string name="verification_email_sent">Doğrulama bağlantısı e-posta adresinize yeniden gönderildi.</string>
+    <string name="close">Kapat</string>
+    <string name="password_changed_title">Şifre Güncellendi</string>
+    <string name="password_changed_message">Şifreniz başarıyla güncellendi. Güvenliğiniz için yeni şifrenizle tekrar giriş yapın.</string>
 
 
     <string name="default_web_client_id">677861073392-4ni851g7ggkhb8ngk9418u346t4so9rd.apps.googleusercontent.com</string>

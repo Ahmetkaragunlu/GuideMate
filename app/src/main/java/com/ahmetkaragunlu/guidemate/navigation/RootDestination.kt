@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 object RootDestination {
     @Serializable data object Auth
 
+    @Serializable data object RoleSelection
+
     @Serializable data object Guide
 
     @Serializable data object Tourist

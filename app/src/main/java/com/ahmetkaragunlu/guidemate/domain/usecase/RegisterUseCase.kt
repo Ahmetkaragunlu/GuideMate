@@ -12,5 +12,5 @@ class RegisterUseCase @Inject constructor(
         lastName: String,
         email: String,
         password: String
-    ): DataResult<String> = repository.register(firstName, lastName, email, password)
+    ): DataResult<Unit> = repository.register(firstName, lastName, email, password)
 }

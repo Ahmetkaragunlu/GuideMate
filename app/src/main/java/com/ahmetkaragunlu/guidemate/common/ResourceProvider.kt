@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.common
 
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 
 interface ResourceProvider {
@@ -11,5 +12,10 @@ interface ResourceProvider {
         @StringRes id: Int,
         vararg args: Any,
     ): String
-}
 
+    fun getQuantityString(
+        @PluralsRes id: Int,
+        quantity: Int,
+        vararg args: Any,
+    ): String
+}

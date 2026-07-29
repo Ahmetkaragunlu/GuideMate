@@ -1,29 +1,38 @@
 package com.ahmetkaragunlu.guidemate.screens.auth.signin
 
-import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.AppError
+import com.ahmetkaragunlu.guidemate.common.BackendErrorCode
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.common.ResourceProvider
+import com.ahmetkaragunlu.guidemate.common.fieldMessage
 import com.ahmetkaragunlu.guidemate.common.toMessage
 import com.ahmetkaragunlu.guidemate.domain.usecase.GoogleLoginUseCase
 import com.ahmetkaragunlu.guidemate.domain.usecase.LoginUseCase
+import com.ahmetkaragunlu.guidemate.domain.usecase.ResendVerificationUseCase
+import com.ahmetkaragunlu.guidemate.domain.validation.EmailPolicy
+import com.ahmetkaragunlu.guidemate.domain.validation.NumericPasswordPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val googleLoginUseCase: GoogleLoginUseCase,
-    private val resourceProvider: ResourceProvider
+    private val resendVerificationUseCase: ResendVerificationUseCase,
+    private val emailPolicy: EmailPolicy,
+    private val passwordPolicy: NumericPasswordPolicy,
+    private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
-
     val webClientId: String
         get() = resourceProvider.getString(R.string.default_web_client_id)
 
@@ -33,75 +42,199 @@ class SignInViewModel @Inject constructor(
     private val _screenState = MutableStateFlow(SignInScreenState())
     val screenState: StateFlow<SignInScreenState> = _screenState.asStateFlow()
 
+    private var resendCooldownJob: Job? = null
+    private var loginCooldownJob: Job? = null
+
     fun onEmailChange(email: String) {
-        _formState.update { it.copy(email = email.trim()) }
+        _formState.update { it.copy(email = email) }
+        _screenState.update { it.copy(emailErrorMessage = null) }
     }
 
     fun onPasswordChange(password: String) {
-        _formState.update { it.copy(password = password.filter { !it.isWhitespace() }) }
+        _formState.update { it.copy(password = passwordPolicy.sanitize(password)) }
+        _screenState.update { it.copy(passwordErrorMessage = null) }
     }
 
     fun togglePasswordVisibility() {
         _formState.update { it.copy(passwordVisibility = !it.passwordVisibility) }
     }
 
-    fun isValidEmail() = Patterns.EMAIL_ADDRESS.matcher(_formState.value.email).matches()
+    fun isValidEmail(): Boolean = emailPolicy.isValid(_formState.value.email)
 
-    fun isValidPassword(): Boolean {
-        val password = _formState.value.password
-        return password.length >= 6 && password.all { it.isDigit() }
+    fun isValidPassword(): Boolean = passwordPolicy.isValid(_formState.value.password)
+
+    fun onSignInClick() {
+        if (
+            _screenState.value.isLoading ||
+                _screenState.value.loginRetryAfterSeconds > 0 ||
+                !validateForm()
+        ) {
+            return
+        }
+        authenticate(verificationEmail = emailPolicy.normalize(_formState.value.email)) {
+            loginUseCase(_formState.value.email, _formState.value.password)
+        }
     }
 
-    fun onSignInClick(onShowErrorToast: (Int) -> Unit) {
-        if (checkSignInErrors(onShowErrorToast)) loginUser()
+    fun onGoogleSignInStarted() {
+        _screenState.update { it.copy(isLoading = true) }
     }
 
-    private fun loginUser() {
-        viewModelScope.launch {
-            when (val result = loginUseCase(_formState.value.email, _formState.value.password)) {
-                is DataResult.Success -> {
-                    _screenState.update { it.copy(navigateToRoleSelection = true) }
-                }
+    fun onGoogleSignInCancelled() {
+        _screenState.update { it.copy(isLoading = false) }
+    }
 
-                is DataResult.Error -> {
-                    _screenState.update {
-                        it.copy(errorMessage = result.error.toMessage(resourceProvider))
-                    }
-                }
-            }
+    fun onGoogleSignInFailure() {
+        _screenState.update {
+            it.copy(
+                isLoading = false,
+                errorMessage = resourceProvider.getString(R.string.error_google_login_failed),
+            )
         }
     }
 
     fun onGoogleSignInSuccess(idToken: String) {
+        authenticate { googleLoginUseCase(idToken) }
+    }
+
+    fun resendVerificationEmail() {
+        val state = _screenState.value
+        val email = state.verificationEmail ?: return
+        if (state.isResendingVerification || state.resendCooldownSeconds > 0) return
+
         viewModelScope.launch {
-            when (val result = googleLoginUseCase(idToken)) {
+            _screenState.update { it.copy(isResendingVerification = true) }
+            when (val result = resendVerificationUseCase(email)) {
                 is DataResult.Success -> {
-                    _screenState.update { it.copy(navigateToRoleSelection = true) }
+                    _screenState.update {
+                        it.copy(
+                            isResendingVerification = false,
+                            infoMessage =
+                                resourceProvider.getString(R.string.verification_email_sent),
+                        )
+                    }
+                    startResendCooldown(DEFAULT_RESEND_COOLDOWN_SECONDS)
                 }
 
                 is DataResult.Error -> {
+                    val retryAfterSeconds =
+                        (result.error as? AppError.Backend)?.retryAfterSeconds
                     _screenState.update {
-                        it.copy(errorMessage = result.error.toMessage(resourceProvider))
+                        it.copy(
+                            isResendingVerification = false,
+                            errorMessage = result.error.toMessage(resourceProvider),
+                        )
                     }
+                    retryAfterSeconds?.let(::startResendCooldown)
                 }
             }
         }
     }
 
-    fun clearError() = _screenState.update { it.copy(errorMessage = null) }
+    fun dismissVerificationDialog() {
+        _screenState.update { it.copy(showVerificationDialog = false) }
+    }
 
-    fun resetNavigationState() = _screenState.update { it.copy(navigateToRoleSelection = false) }
+    fun clearError() {
+        _screenState.update { it.copy(errorMessage = null) }
+    }
 
-    private fun checkSignInErrors(onShowErrorToast: (Int) -> Unit): Boolean {
+    fun clearInfoMessage() {
+        _screenState.update { it.copy(infoMessage = null) }
+    }
+
+    private fun authenticate(
+        verificationEmail: String? = null,
+        request: suspend () -> DataResult<*>,
+    ) {
+        viewModelScope.launch {
+            _screenState.update { it.copy(isLoading = true) }
+            when (val result = request()) {
+                is DataResult.Success -> {
+                    _screenState.update { it.copy(isLoading = false) }
+                }
+
+                is DataResult.Error -> {
+                    handleAuthenticationError(result.error, verificationEmail)
+                }
+            }
+        }
+    }
+
+    private fun handleAuthenticationError(
+        error: AppError,
+        verificationEmail: String?,
+    ) {
+        val backendError = error as? AppError.Backend
+        if (
+            backendError?.code == BackendErrorCode.ACCOUNT_PENDING_VERIFICATION &&
+                !verificationEmail.isNullOrBlank()
+        ) {
+            _screenState.update {
+                it.copy(
+                    isLoading = false,
+                    showVerificationDialog = true,
+                    verificationEmail = verificationEmail,
+                )
+            }
+            return
+        }
+
+        backendError?.retryAfterSeconds?.let(::startLoginCooldown)
+        _screenState.update {
+            it.copy(
+                isLoading = false,
+                emailErrorMessage = error.fieldMessage(FIELD_EMAIL, resourceProvider),
+                passwordErrorMessage = error.fieldMessage(FIELD_PASSWORD, resourceProvider),
+                errorMessage = error.toMessage(resourceProvider),
+            )
+        }
+    }
+
+    private fun validateForm(): Boolean {
         val form = _formState.value
-        if ((!isValidEmail() && form.email.isNotEmpty()) || (!isValidPassword() && form.password.isNotEmpty())) {
-            onShowErrorToast(R.string.error_fix_fields)
+        if (form.email.isBlank() || form.password.isBlank()) {
+            _screenState.update {
+                it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields))
+            }
             return false
         }
-        if (form.email.isBlank() || form.password.isBlank()) {
-            onShowErrorToast(R.string.error_fill_all_fields)
+        if (!isValidEmail() || !isValidPassword()) {
+            _screenState.update {
+                it.copy(errorMessage = resourceProvider.getString(R.string.error_fix_fields))
+            }
             return false
         }
         return true
+    }
+
+    private fun startResendCooldown(seconds: Long) {
+        resendCooldownJob?.cancel()
+        resendCooldownJob =
+            viewModelScope.launch {
+                for (remaining in seconds downTo 1) {
+                    _screenState.update { it.copy(resendCooldownSeconds = remaining) }
+                    delay(1_000)
+                }
+                _screenState.update { it.copy(resendCooldownSeconds = 0) }
+            }
+    }
+
+    private fun startLoginCooldown(seconds: Long) {
+        loginCooldownJob?.cancel()
+        loginCooldownJob =
+            viewModelScope.launch {
+                for (remaining in seconds downTo 1) {
+                    _screenState.update { it.copy(loginRetryAfterSeconds = remaining) }
+                    delay(1_000)
+                }
+                _screenState.update { it.copy(loginRetryAfterSeconds = 0) }
+            }
+    }
+
+    private companion object {
+        const val FIELD_EMAIL = "email"
+        const val FIELD_PASSWORD = "password"
+        const val DEFAULT_RESEND_COOLDOWN_SECONDS = 60L
     }
 }

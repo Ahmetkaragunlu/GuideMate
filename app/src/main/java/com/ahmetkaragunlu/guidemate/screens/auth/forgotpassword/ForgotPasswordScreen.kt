@@ -1,7 +1,12 @@
 package com.ahmetkaragunlu.guidemate.screens.auth.forgotpassword
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -49,8 +55,7 @@ fun ForgotPasswordScreen(
         modifier = modifier,
         formState = formState,
         screenState = screenState,
-        onFirstNameChange = viewModel::onFirstNameChange,
-        onLastNameChange = viewModel::onLastNameChange,
+        isEmailValid = viewModel.isValidEmail(),
         onEmailChange = viewModel::onEmailChange,
         onSubmitClick = viewModel::onSubmitClick,
         onDismissSuccessDialog = {
@@ -65,8 +70,7 @@ private fun ForgotPasswordScreenContent(
     modifier: Modifier = Modifier,
     formState: ForgotPasswordFormState,
     screenState: ForgotPasswordScreenState,
-    onFirstNameChange: (String) -> Unit,
-    onLastNameChange: (String) -> Unit,
+    isEmailValid: Boolean,
     onEmailChange: (String) -> Unit,
     onSubmitClick: () -> Unit,
     onDismissSuccessDialog: () -> Unit,
@@ -103,30 +107,6 @@ private fun ForgotPasswordScreenContent(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
         EditTextField(
-            value = formState.firstName,
-            onValueChange = onFirstNameChange,
-            placeholder = R.string.name,
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
-                ),
-        )
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-        EditTextField(
-            value = formState.lastName,
-            onValueChange = onLastNameChange,
-            placeholder = R.string.last_name,
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
-                ),
-        )
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-        EditTextField(
             value = formState.email,
             onValueChange = onEmailChange,
             placeholder = R.string.email,
@@ -135,12 +115,39 @@ private fun ForgotPasswordScreenContent(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Done,
                 ),
+            isError =
+                (!isEmailValid && formState.email.isNotEmpty()) ||
+                    screenState.emailErrorMessage != null,
+            supportingText =
+                if (!isEmailValid && formState.email.isNotEmpty()) {
+                    R.string.email_error_message
+                } else {
+                    null
+                },
+            supportingTextValue = screenState.emailErrorMessage,
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
         EditButton(
             text = R.string.send_reset_link,
             onClick = onSubmitClick,
+            enabled = screenState.retryAfterSeconds == 0L,
+            isLoading = screenState.isLoading,
         )
+        if (screenState.retryAfterSeconds > 0) {
+            val seconds =
+                screenState.retryAfterSeconds.coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
+            Text(
+                text =
+                    pluralStringResource(
+                        R.plurals.password_reset_retry_wait,
+                        seconds,
+                        seconds,
+                    ),
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_small)),
+                color = colorResource(R.color.text_color),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }
 

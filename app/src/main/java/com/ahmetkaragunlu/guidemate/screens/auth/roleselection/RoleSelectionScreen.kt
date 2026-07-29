@@ -1,9 +1,11 @@
 package com.ahmetkaragunlu.guidemate.screens.auth.roleselection
 
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +24,12 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -34,12 +39,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.components.EditButton
+import com.ahmetkaragunlu.guidemate.domain.model.UserRole
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun RoleSelectionScreen(
     modifier: Modifier = Modifier,
-    onNavigateToTouristGraph: () -> Unit,
+    viewModel: RoleSelectionViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(screenState.errorMessage) {
+        screenState.errorMessage?.let { error ->
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            viewModel.clearError()
+        }
+    }
+
     Column(
         modifier =
             modifier
@@ -66,32 +84,41 @@ fun RoleSelectionScreen(
             icon = R.drawable.traveler_image,
             title = R.string.traveler,
             description = R.string.traveler_description,
+            selected = screenState.selectedRole == UserRole.TOURIST,
+            onClick = { viewModel.selectRole(UserRole.TOURIST) },
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
         RoleSelectionCard(
             icon = R.drawable.guide_image,
             title = R.string.local_guide,
             description = R.string.local_guide_description,
+            selected = screenState.selectedRole == UserRole.GUIDE,
+            onClick = { viewModel.selectRole(UserRole.GUIDE) },
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
         EditButton(
             text = R.string.next,
-            onClick = { onNavigateToTouristGraph() },
+            onClick = viewModel::confirmRoleSelection,
+            enabled = screenState.selectedRole != null,
+            isLoading = screenState.isLoading,
         )
     }
 }
 
 @Composable
-fun RoleSelectionCard(
+private fun RoleSelectionCard(
     @DrawableRes icon: Int,
     @StringRes title: Int,
     @StringRes description: Int,
+    selected: Boolean,
+    onClick: () -> Unit,
 ) {
     OutlinedCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+                .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+                .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         border = BorderStroke(width = 1.dp, color = Color(0XFFdfe2e9)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
@@ -128,7 +155,10 @@ fun RoleSelectionCard(
                     color = colorResource(R.color.text_color),
                 )
             }
-            RadioButton(selected = false, onClick = {})
+            RadioButton(
+                selected = selected,
+                onClick = onClick,
+            )
         }
     }
 }

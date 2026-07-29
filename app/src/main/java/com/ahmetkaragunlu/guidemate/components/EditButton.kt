@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -26,10 +28,11 @@ fun EditButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     enabled: Boolean = true,
+    isLoading: Boolean = false,
 ) {
     Button(
         onClick = { onClick() },
-        enabled = enabled,
+        enabled = enabled && !isLoading,
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
         modifier =
@@ -38,18 +41,26 @@ fun EditButton(
                 .fillMaxWidth()
                 .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
     ) {
-        icon?.let {
-            Icon(
-                imageVector = it,
-                contentDescription = null,
-                modifier =
-                    Modifier
-                        .padding(end = dimensionResource(R.dimen.spacing_tiny))
-                        .size(18.dp),
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                color = Color.White,
+                strokeWidth = 2.dp,
+            )
+        } else {
+            icon?.let {
+                Icon(
+                    imageVector = it,
+                    contentDescription = null,
+                    modifier =
+                        Modifier
+                            .padding(end = dimensionResource(R.dimen.spacing_tiny))
+                            .size(18.dp),
+                )
+            }
+            Text(
+                text = stringResource(text),
             )
         }
-        Text(
-            text = stringResource(text),
-        )
     }
 }

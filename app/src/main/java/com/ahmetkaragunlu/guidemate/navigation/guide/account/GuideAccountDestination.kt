@@ -1,7 +1,9 @@
 package com.ahmetkaragunlu.guidemate.navigation.guide.account
 
+import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
+@Keep
 @Serializable
 enum class GuideAccountStart {
     BANK_ACCOUNTS,

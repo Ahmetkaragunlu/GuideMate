@@ -1,208 +1,222 @@
 package com.ahmetkaragunlu.guidemate.data.repository
 
-import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.AppError
 import com.ahmetkaragunlu.guidemate.common.DataResult
-import com.ahmetkaragunlu.guidemate.common.ResourceProvider
+import com.ahmetkaragunlu.guidemate.common.isTerminalSessionError
+import com.ahmetkaragunlu.guidemate.data.local.AuthSessionManager
+import com.ahmetkaragunlu.guidemate.data.local.CredentialSessionManager
 import com.ahmetkaragunlu.guidemate.data.local.TokenManager
+import com.ahmetkaragunlu.guidemate.data.local.preferences.AppPreferencesDataSource
+import com.ahmetkaragunlu.guidemate.data.mapper.toDomain
+import com.ahmetkaragunlu.guidemate.data.mapper.toNetwork
 import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
-import com.ahmetkaragunlu.guidemate.data.remote.model.RoleType
+import com.ahmetkaragunlu.guidemate.data.remote.error.ApiErrorParser
+import com.ahmetkaragunlu.guidemate.data.remote.error.TokenRefreshException
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.ChangePasswordRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.ForgotPasswordRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.GoogleLoginRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.LoginRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.RefreshTokenRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.RegisterRequest
-import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResetPasswordRequest
+import com.ahmetkaragunlu.guidemate.data.remote.model.request.ResendVerificationRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.request.RoleSelectionRequest
 import com.ahmetkaragunlu.guidemate.data.remote.model.response.AuthResponse
-import com.ahmetkaragunlu.guidemate.data.remote.model.response.ErrorResponse
-import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
-import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
-import com.ahmetkaragunlu.guidemate.domain.model.AuthResult
 import com.ahmetkaragunlu.guidemate.domain.model.UserRole
-import com.google.gson.Gson
+import com.ahmetkaragunlu.guidemate.domain.model.UserState
+import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
+import com.ahmetkaragunlu.guidemate.domain.validation.EmailPolicy
+import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
-import java.io.IOException
-import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val tokenManager: TokenManager,
-    private val resourceProvider: ResourceProvider,
-    private val userRepository: UserRepository
+    private val preferences: AppPreferencesDataSource,
+    private val authSessionManager: AuthSessionManager,
+    private val credentialSessionManager: CredentialSessionManager,
+    private val apiErrorParser: ApiErrorParser,
+    private val emailPolicy: EmailPolicy,
 ) : AuthRepository {
-
-    // --- Mappers ---
-    private fun AuthResponse.toDomain() = AuthResult(
-        accessToken = accessToken,
-        refreshToken = refreshToken,
-        isRoleSelected = isRoleSelected,
-        role = role?.toUserRole(),
-        firstName = firstName,
-        lastName = lastName,
-    )
-
-    private fun UserRole.toRoleType() = when (this) {
-        UserRole.TOURIST -> RoleType.ROLE_TOURIST
-        UserRole.GUIDE -> RoleType.ROLE_GUIDE
-    }
-
-    private fun RoleType.toUserRole() = when (this) {
-        RoleType.ROLE_TOURIST -> UserRole.TOURIST
-        RoleType.ROLE_GUIDE -> UserRole.GUIDE
-    }
-
-    private fun Response<ResponseBody>.toDataResult(): DataResult<String> {
-        return if (isSuccessful) {
-            val bodyString = body()?.string()
-            if (!bodyString.isNullOrBlank()) DataResult.Success(bodyString)
-            else DataResult.Error(AppError.NoResponseFromServer)
-        } else {
-            val errorMsg = parseError(errorBody()?.string())
-            DataResult.Error(errorMsg?.let(AppError::Backend) ?: AppError.GenericFailure)
-        }
-    }
-
-    // --- Implementations ---
     override suspend fun register(
         firstName: String,
         lastName: String,
         email: String,
-        password: String
-    ): DataResult<String> = try {
-        api.register(RegisterRequest(firstName, lastName, email, password)).toDataResult()
-    } catch (e: Exception) {
-        handleException(e)
-    }
-
-    override suspend fun login(email: String, password: String): DataResult<AuthResult> = try {
-        handleAuthResponse(api.login(LoginRequest(email, password)))
-    } catch (e: Exception) {
-        handleException(e)
-    }
-
-    override suspend fun googleLogin(idToken: String): DataResult<AuthResult> = try {
-        handleAuthResponse(api.googleLogin(GoogleLoginRequest(idToken)))
-    } catch (e: Exception) {
-        handleException(e)
-    }
-
-    override suspend fun logout(): DataResult<String> {
-        return try {
-            val refreshToken = tokenManager.getRefreshToken()
-            if (!refreshToken.isNullOrEmpty()) {
-                val response = api.logout(RefreshTokenRequest(refreshToken))
-                clearLocalData()
-                return response.toDataResult()
-            }
-            clearLocalData()
-            DataResult.Success(resourceProvider.getString(R.string.logout_success))
-        } catch (e: Exception) {
-            clearLocalData()
-            DataResult.Success(resourceProvider.getString(R.string.logout_offline))
+        password: String,
+    ): DataResult<Unit> =
+        execute {
+            api
+                .register(
+                    RegisterRequest(
+                        firstName = firstName.trim(),
+                        lastName = lastName.trim(),
+                        email = emailPolicy.normalize(email),
+                        password = password,
+                    ),
+                ).toUnitResult()
         }
-    }
 
-    override suspend fun refreshToken(): DataResult<AuthResult> = try {
-        val token = tokenManager.getRefreshToken()
-            ?: return DataResult.Error(AppError.SessionExpired)
-        handleAuthResponse(api.refreshToken(RefreshTokenRequest(token)))
-    } catch (e: Exception) {
-        handleException(e)
-    }
-
-    override suspend fun selectRole(role: UserRole): DataResult<AuthResult> = try {
-        val response = api.selectRole(RoleSelectionRequest(role.toRoleType()))
-        if (response.isSuccessful && response.body() != null) {
-            val body = response.body()!!
-            body.role?.toUserRole()?.let(userRepository::saveUserRole)
-            DataResult.Success(body.toDomain())
-        } else {
-            val errorMsg = parseError(response.errorBody()?.string())
-            DataResult.Error(errorMsg?.let(AppError::Backend) ?: AppError.GenericFailure)
-        }
-    } catch (e: Exception) {
-        handleException(e)
-    }
-
-    override suspend fun forgotPassword(
+    override suspend fun login(
         email: String,
-        firstName: String,
-        lastName: String
-    ): DataResult<String> = try {
-        api.forgotPassword(ForgotPasswordRequest(email, firstName, lastName)).toDataResult()
-    } catch (e: Exception) {
-        handleException(e)
+        password: String,
+    ): DataResult<UserState> =
+        execute {
+            api
+                .login(
+                    request = LoginRequest(emailPolicy.normalize(email), password),
+                    installationId = preferences.getOrCreateInstallationId(),
+                ).toSessionResult(requireRefreshToken = true)
+        }
+
+    override suspend fun googleLogin(idToken: String): DataResult<UserState> =
+        execute {
+            api
+                .googleLogin(
+                    request = GoogleLoginRequest(idToken),
+                    installationId = preferences.getOrCreateInstallationId(),
+                ).toSessionResult(requireRefreshToken = true)
+        }
+
+    override suspend fun logout(): DataResult<Unit> {
+        val accessToken = tokenManager.getAccessToken()
+        val refreshToken = tokenManager.getRefreshToken()
+        val installationId =
+            runCatching {
+                preferences.getOrCreateInstallationId()
+            }.getOrNull()
+        authSessionManager.clearSession()
+        credentialSessionManager.clear()
+
+        if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank() || installationId == null) {
+            return DataResult.Success(Unit)
+        }
+
+        return try {
+            api
+                .logout(
+                    request = RefreshTokenRequest(refreshToken),
+                    installationId = installationId,
+                    authorization = "Bearer $accessToken",
+                ).toUnitResult()
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (_: Exception) {
+            DataResult.Success(Unit)
+        }
     }
 
-    override suspend fun resetPassword(
-        token: String,
-        newPassword: String,
-        confirmPassword: String
-    ): DataResult<String> = try {
-        api.resetPassword(ResetPasswordRequest(token, newPassword, confirmPassword)).toDataResult()
-    } catch (e: Exception) {
-        handleException(e)
-    }
+    override suspend fun selectRole(role: UserRole): DataResult<UserState> =
+        execute {
+            api
+                .selectRole(RoleSelectionRequest(role.toNetwork()))
+                .toSessionResult(requireRefreshToken = false)
+        }
+
+    override suspend fun currentUser(): DataResult<UserState> =
+        execute {
+            val response = api.currentUser()
+            if (response.isSuccessful) {
+                val user =
+                    response.body()?.toDomain()
+                        ?: return@execute DataResult.Error(AppError.NoResponseFromServer)
+                authSessionManager.saveUser(user)
+                DataResult.Success(user)
+            } else {
+                response.toErrorResult()
+            }
+        }
+
+    override suspend fun resendVerification(email: String): DataResult<Unit> =
+        execute {
+            api
+                .resendVerification(ResendVerificationRequest(emailPolicy.normalize(email)))
+                .toUnitResult()
+        }
+
+    override suspend fun forgotPassword(email: String): DataResult<Unit> =
+        execute {
+            api
+                .forgotPassword(ForgotPasswordRequest(emailPolicy.normalize(email)))
+                .toUnitResult()
+        }
 
     override suspend fun changePassword(
         currentPassword: String,
         newPassword: String,
-        confirmPassword: String
-    ): DataResult<String> = try {
-        api.changePassword(
-            ChangePasswordRequest(
-                currentPassword = currentPassword,
-                newPassword = newPassword,
-                confirmPassword = confirmPassword,
-            ),
-        ).toDataResult()
-    } catch (e: Exception) {
-        handleException(e)
+    ): DataResult<Unit> =
+        execute {
+            api
+                .changePassword(
+                    ChangePasswordRequest(
+                        currentPassword = currentPassword,
+                        newPassword = newPassword,
+                    ),
+                ).toUnitResult()
+        }
+
+    override fun hasStoredSession(): Boolean = authSessionManager.hasStoredSession()
+
+    override suspend fun clearLocalSession() {
+        authSessionManager.clearSession()
+        credentialSessionManager.clear()
     }
 
-    private fun clearLocalData() {
-        tokenManager.clearTokens()
-        userRepository.clearUser()
+    private suspend fun Response<AuthResponse>.toSessionResult(
+        requireRefreshToken: Boolean,
+    ): DataResult<UserState> {
+        if (!isSuccessful) return toErrorResult()
+
+        val response = body() ?: return DataResult.Error(AppError.NoResponseFromServer)
+        val accessToken = response.accessToken
+        if (accessToken.isNullOrBlank() || (requireRefreshToken && response.refreshToken.isNullOrBlank())) {
+            return DataResult.Error(AppError.NoResponseFromServer)
+        }
+
+        val result = response.toDomain()
+        authSessionManager.saveSession(
+            accessToken = accessToken,
+            refreshToken = response.refreshToken,
+            userState = result,
+        )
+        return DataResult.Success(result)
     }
 
-    private suspend fun handleAuthResponse(response: Response<AuthResponse>): DataResult<AuthResult> {
-        return if (response.isSuccessful && response.body() != null) {
-            val body = response.body()!!
-            body.accessToken?.let { tokenManager.saveAccessToken(it) }
-            body.refreshToken?.let { tokenManager.saveRefreshToken(it) }
-
-            val firstName = body.firstName.orEmpty().trim()
-            val lastName = body.lastName.orEmpty().trim()
-            userRepository.saveUser(
-                firstName = firstName.ifEmpty { null },
-                lastName = lastName.ifEmpty { null },
-                role = body.role?.toUserRole(),
-            )
-            DataResult.Success(body.toDomain())
+    private suspend fun Response<ResponseBody>.toUnitResult(): DataResult<Unit> =
+        if (isSuccessful) {
+            DataResult.Success(Unit)
         } else {
-            val errorMsg = parseError(response.errorBody()?.string())
-            DataResult.Error(errorMsg?.let(AppError::Backend) ?: AppError.GenericFailure)
+            toErrorResult()
         }
-    }
 
-    private fun <T> handleException(e: Exception): DataResult<T> = when (e) {
-        is IOException -> DataResult.Error(AppError.NoInternet, e)
-
-        is HttpException -> DataResult.Error(AppError.Server(e.code()), e)
-
-        else -> DataResult.Error(AppError.Unknown, e)
-    }
-
-    private fun parseError(json: String?): String? {
-        if (json.isNullOrEmpty()) return null
-        return try {
-            Gson().fromJson(json, ErrorResponse::class.java).message
-        } catch (e: Exception) {
-            null
+    private suspend fun <T> Response<*>.toErrorResult(): DataResult<T> {
+        val error = apiErrorParser.parse(this)
+        if (error.isTerminalSessionError()) {
+            authSessionManager.clearSession()
         }
+        return DataResult.Error(error)
     }
+
+    private suspend fun <T> execute(block: suspend () -> DataResult<T>): DataResult<T> =
+        try {
+            block()
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            when (exception) {
+                is TokenRefreshException -> DataResult.Error(exception.error, exception)
+                is ConnectException,
+                is SocketTimeoutException,
+                -> DataResult.Error(AppError.NoResponseFromServer, exception)
+                is UnknownHostException -> DataResult.Error(AppError.NoInternet, exception)
+                is IOException -> DataResult.Error(AppError.NoInternet, exception)
+                is HttpException -> DataResult.Error(AppError.Server(exception.code()), exception)
+                else -> DataResult.Error(AppError.Unknown, exception)
+            }
+        }
 }

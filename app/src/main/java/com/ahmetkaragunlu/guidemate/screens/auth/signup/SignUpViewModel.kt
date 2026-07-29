@@ -1,27 +1,30 @@
 package com.ahmetkaragunlu.guidemate.screens.auth.signup
 
-import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.common.ResourceProvider
+import com.ahmetkaragunlu.guidemate.common.fieldMessage
 import com.ahmetkaragunlu.guidemate.common.toMessage
 import com.ahmetkaragunlu.guidemate.domain.usecase.RegisterUseCase
+import com.ahmetkaragunlu.guidemate.domain.validation.EmailPolicy
+import com.ahmetkaragunlu.guidemate.domain.validation.NumericPasswordPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
-    private val resourceProvider: ResourceProvider
+    private val emailPolicy: EmailPolicy,
+    private val passwordPolicy: NumericPasswordPolicy,
+    private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
-
     private val _formState = MutableStateFlow(SignUpFormState())
     val formState: StateFlow<SignUpFormState> = _formState.asStateFlow()
 
@@ -30,24 +33,26 @@ class SignUpViewModel @Inject constructor(
 
     fun inputFirstNameChange(name: String) {
         _formState.update { it.copy(firstName = name) }
+        _screenState.update { it.copy(firstNameErrorMessage = null) }
     }
 
     fun onLastNameChange(lastName: String) {
         _formState.update { it.copy(lastName = lastName) }
+        _screenState.update { it.copy(lastNameErrorMessage = null) }
     }
 
     fun onEmailChange(email: String) {
         _formState.update { it.copy(email = email) }
+        _screenState.update { it.copy(emailErrorMessage = null) }
     }
 
     fun onPasswordChange(password: String) {
-        val clean = password.filter { !it.isWhitespace() }
-        _formState.update { it.copy(password = clean) }
+        _formState.update { it.copy(password = passwordPolicy.sanitize(password)) }
+        _screenState.update { it.copy(passwordErrorMessage = null) }
     }
 
     fun onConfirmPasswordChange(confirm: String) {
-        val clean = confirm.filter { !it.isWhitespace() }
-        _formState.update { it.copy(confirmPassword = clean) }
+        _formState.update { it.copy(confirmPassword = passwordPolicy.sanitize(confirm)) }
     }
 
     fun togglePasswordVisibility() {
@@ -72,44 +77,39 @@ class SignUpViewModel @Inject constructor(
 
     fun onTermsCheckboxClicked() {
         val current = _screenState.value
-        if (!current.isTermsAccepted) _screenState.update { it.copy(showTermsSheet = true) }
-        else _screenState.update { it.copy(isTermsAccepted = false) }
+        if (!current.isTermsAccepted) {
+            _screenState.update { it.copy(showTermsSheet = true) }
+        } else {
+            _screenState.update { it.copy(isTermsAccepted = false) }
+        }
     }
 
-    fun isValidFirstName() = _formState.value.firstName.trim().length >= 3 &&
-            _formState.value.firstName.matches(Regex("^[a-zA-ZğüşıöçĞÜŞİÖÇ]+(?: [a-zA-ZğüşıöçĞÜŞİÖÇ]+)*$"))
+    fun isValidFirstName(): Boolean {
+        val value = _formState.value.firstName.trim()
+        return value.length >= 3 && NAME_PATTERN.matches(value)
+    }
 
-    fun isValidLastName() = _formState.value.lastName.trim().length >= 2 &&
-            _formState.value.lastName.matches(Regex("^[a-zA-ZğüşıöçĞÜŞİÖÇ]+(?: [a-zA-ZğüşıöçĞÜŞİÖÇ]+)*$"))
+    fun isValidLastName(): Boolean {
+        val value = _formState.value.lastName.trim()
+        return value.length >= 2 && NAME_PATTERN.matches(value)
+    }
 
-    fun isValidPassWord() =
-        _formState.value.password.length >= 6 && _formState.value.password.all { it.isDigit() }
+    fun isValidPassword(): Boolean = passwordPolicy.isValid(_formState.value.password)
 
-    fun isValidConfirmPassword() = _formState.value.password == _formState.value.confirmPassword
-    fun isValidEmail() = Patterns.EMAIL_ADDRESS.matcher(_formState.value.email).matches()
+    fun isValidConfirmPassword(): Boolean =
+        _formState.value.password == _formState.value.confirmPassword
+
+    fun isValidEmail(): Boolean = emailPolicy.isValid(_formState.value.email)
 
     fun onSignUpClick() {
-        if (checkSignUpErrors()) {
-            if (!_screenState.value.isTermsAccepted) {
-                _screenState.update { it.copy(errorMessage = resourceProvider.getString(R.string.error_terms_required)) }
-                return
+        if (_screenState.value.isLoading || !validateForm()) return
+        if (!_screenState.value.isTermsAccepted) {
+            _screenState.update {
+                it.copy(errorMessage = resourceProvider.getString(R.string.error_terms_required))
             }
-            registerUser()
+            return
         }
-    }
-
-
-    private fun registerUser() {
-        viewModelScope.launch {
-            val form = _formState.value
-            when (val result =
-                registerUseCase(form.firstName, form.lastName, form.email, form.password)) {
-                is DataResult.Success -> _screenState.update { it.copy(isRegistrationSuccess = true) }
-                is DataResult.Error -> _screenState.update {
-                    it.copy(errorMessage = result.error.toMessage(resourceProvider))
-                }
-            }
-        }
+        registerUser()
     }
 
     fun clearError() {
@@ -120,24 +120,84 @@ class SignUpViewModel @Inject constructor(
         _screenState.update { it.copy(isRegistrationSuccess = false) }
     }
 
-    private fun checkSignUpErrors(): Boolean {
-        val form = _formState.value
-        val hasInputError = (!isValidFirstName() && form.firstName.isNotEmpty()) ||
-                (!isValidLastName() && form.lastName.isNotEmpty()) ||
-                (!isValidEmail() && form.email.isNotEmpty()) ||
-                (!isValidPassWord() && form.password.isNotEmpty()) ||
-                (!isValidConfirmPassword() && form.confirmPassword.isNotEmpty())
+    private fun registerUser() {
+        viewModelScope.launch {
+            _screenState.update { it.copy(isLoading = true) }
+            val form = _formState.value
+            when (
+                val result =
+                    registerUseCase(
+                        form.firstName,
+                        form.lastName,
+                        form.email,
+                        form.password,
+                    )
+            ) {
+                is DataResult.Success -> {
+                    _screenState.update {
+                        it.copy(
+                            isLoading = false,
+                            isRegistrationSuccess = true,
+                        )
+                    }
+                }
 
-        if (hasInputError) {
-            _screenState.update { it.copy(errorMessage = resourceProvider.getString(R.string.error_fix_fields)) }
+                is DataResult.Error -> {
+                    _screenState.update {
+                        it.copy(
+                            isLoading = false,
+                            firstNameErrorMessage =
+                                result.error.fieldMessage(FIELD_FIRST_NAME, resourceProvider),
+                            lastNameErrorMessage =
+                                result.error.fieldMessage(FIELD_LAST_NAME, resourceProvider),
+                            emailErrorMessage =
+                                result.error.fieldMessage(FIELD_EMAIL, resourceProvider),
+                            passwordErrorMessage =
+                                result.error.fieldMessage(FIELD_PASSWORD, resourceProvider),
+                            errorMessage = result.error.toMessage(resourceProvider),
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateForm(): Boolean {
+        val form = _formState.value
+        if (
+            form.firstName.isBlank() ||
+                form.lastName.isBlank() ||
+                form.email.isBlank() ||
+                form.password.isBlank() ||
+                form.confirmPassword.isBlank()
+        ) {
+            _screenState.update {
+                it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields))
+            }
             return false
         }
-        if (form.firstName.isBlank() || form.lastName.isBlank() || form.email.isBlank() ||
-            form.password.isBlank() || form.confirmPassword.isBlank()
-        ) {
-            _screenState.update { it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields)) }
+
+        val hasInputError =
+            !isValidFirstName() ||
+                !isValidLastName() ||
+                !isValidEmail() ||
+                !isValidPassword() ||
+                !isValidConfirmPassword()
+        if (hasInputError) {
+            _screenState.update {
+                it.copy(errorMessage = resourceProvider.getString(R.string.error_fix_fields))
+            }
             return false
         }
         return true
+    }
+
+    private companion object {
+        val NAME_PATTERN =
+            Regex("^[a-zA-ZğüşıöçĞÜŞİÖÇ]+(?: [a-zA-ZğüşıöçĞÜŞİÖÇ]+)*$")
+        const val FIELD_FIRST_NAME = "firstName"
+        const val FIELD_LAST_NAME = "lastName"
+        const val FIELD_EMAIL = "email"
+        const val FIELD_PASSWORD = "password"
     }
 }

@@ -11,6 +11,9 @@ sealed interface AppError {
     ) : AppError
 
     data class Backend(
-        val message: String,
+        val code: BackendErrorCode?,
+        val fallbackMessage: String?,
+        val fieldErrors: List<AppFieldError> = emptyList(),
+        val retryAfterSeconds: Long? = null,
     ) : AppError
 }

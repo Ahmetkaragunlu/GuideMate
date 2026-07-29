@@ -34,6 +34,7 @@ import compose.icons.tablericons.User
 @Composable
 fun TouristNavigation(
     routeNavController: NavController,
+    onLogoutClick: () -> Unit,
     homeViewModel: TouristHomeViewModel = hiltViewModel(),
     chatListViewModel: ChatListViewModel = hiltViewModel(),
 ) {
@@ -64,7 +65,7 @@ fun TouristNavigation(
                     ),
                 userName = userName,
                 onBackClick = touristNavController::navigateUp,
-                onLogoutClick = {},
+                onLogoutClick = onLogoutClick,
             )
         },
         bottomBar = {
@@ -96,6 +97,7 @@ fun TouristNavigation(
             touristNavGraph(
                 touristNavController = touristNavController,
                 routeNavController = routeNavController,
+                homeViewModel = homeViewModel,
                 chatListViewModel = chatListViewModel,
             )
         }

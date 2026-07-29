@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.DataResult
 import com.ahmetkaragunlu.guidemate.common.ResourceProvider
+import com.ahmetkaragunlu.guidemate.common.fieldMessage
 import com.ahmetkaragunlu.guidemate.common.toMessage
 import com.ahmetkaragunlu.guidemate.domain.usecase.ChangePasswordUseCase
+import com.ahmetkaragunlu.guidemate.domain.usecase.ClearSessionUseCase
+import com.ahmetkaragunlu.guidemate.domain.validation.NumericPasswordPolicy
 import com.ahmetkaragunlu.guidemate.screens.common.changepassword.model.ChangePasswordFormState
 import com.ahmetkaragunlu.guidemate.screens.common.changepassword.model.ChangePasswordScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,101 +21,145 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class ChangePasswordViewModel
-    @Inject
-    constructor(
-        private val changePasswordUseCase: ChangePasswordUseCase,
-        private val resourceProvider: ResourceProvider,
-    ) : ViewModel() {
-        private val _formState = MutableStateFlow(ChangePasswordFormState())
-        val formState: StateFlow<ChangePasswordFormState> = _formState.asStateFlow()
+class ChangePasswordViewModel @Inject constructor(
+    private val changePasswordUseCase: ChangePasswordUseCase,
+    private val clearSessionUseCase: ClearSessionUseCase,
+    private val passwordPolicy: NumericPasswordPolicy,
+    private val resourceProvider: ResourceProvider,
+) : ViewModel() {
+    private val _formState = MutableStateFlow(ChangePasswordFormState())
+    val formState: StateFlow<ChangePasswordFormState> = _formState.asStateFlow()
 
-        private val _screenState = MutableStateFlow(ChangePasswordScreenState())
-        val screenState: StateFlow<ChangePasswordScreenState> = _screenState.asStateFlow()
+    private val _screenState = MutableStateFlow(ChangePasswordScreenState())
+    val screenState: StateFlow<ChangePasswordScreenState> = _screenState.asStateFlow()
 
-        fun onCurrentPasswordChange(password: String) {
-            _formState.update { it.copy(currentPassword = password.filterNot(Char::isWhitespace)) }
+    fun onCurrentPasswordChange(password: String) {
+        _formState.update {
+            it.copy(currentPassword = passwordPolicy.sanitize(password))
+        }
+        _screenState.update { it.copy(currentPasswordErrorMessage = null) }
+    }
+
+    fun onNewPasswordChange(password: String) {
+        _formState.update {
+            it.copy(newPassword = passwordPolicy.sanitize(password))
+        }
+        _screenState.update { it.copy(newPasswordErrorMessage = null) }
+    }
+
+    fun onConfirmNewPasswordChange(password: String) {
+        _formState.update {
+            it.copy(confirmNewPassword = passwordPolicy.sanitize(password))
+        }
+    }
+
+    fun toggleCurrentPasswordVisibility() {
+        _formState.update { it.copy(currentPasswordVisible = !it.currentPasswordVisible) }
+    }
+
+    fun toggleNewPasswordVisibility() {
+        _formState.update { it.copy(newPasswordVisible = !it.newPasswordVisible) }
+    }
+
+    fun toggleConfirmNewPasswordVisibility() {
+        _formState.update {
+            it.copy(confirmNewPasswordVisible = !it.confirmNewPasswordVisible)
+        }
+    }
+
+    fun isCurrentPasswordValid(): Boolean =
+        passwordPolicy.isValid(_formState.value.currentPassword)
+
+    fun isNewPasswordValid(): Boolean =
+        passwordPolicy.isValid(_formState.value.newPassword)
+
+    fun isConfirmNewPasswordValid(): Boolean {
+        val form = _formState.value
+        return form.newPassword == form.confirmNewPassword
+    }
+
+    fun onChangePasswordClick() {
+        if (_screenState.value.isLoading || !validateForm()) return
+        submitChangePassword()
+    }
+
+    fun clearError() {
+        _screenState.update { it.copy(errorMessage = null) }
+    }
+
+    fun confirmSuccess() {
+        if (!_screenState.value.showSuccessDialog) return
+        _screenState.update { it.copy(showSuccessDialog = false) }
+        viewModelScope.launch {
+            clearSessionUseCase()
+        }
+    }
+
+    private fun validateForm(): Boolean {
+        val form = _formState.value
+        if (
+            form.currentPassword.isBlank() ||
+                form.newPassword.isBlank() ||
+                form.confirmNewPassword.isBlank()
+        ) {
+            _screenState.update {
+                it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields))
+            }
+            return false
         }
 
-        fun onNewPasswordChange(password: String) {
-            _formState.update { it.copy(newPassword = password.filterNot(Char::isWhitespace)) }
+        if (
+            !isCurrentPasswordValid() ||
+                !isNewPasswordValid() ||
+                !isConfirmNewPasswordValid()
+        ) {
+            _screenState.update {
+                it.copy(errorMessage = resourceProvider.getString(R.string.error_fix_fields))
+            }
+            return false
         }
+        return true
+    }
 
-        fun onConfirmNewPasswordChange(password: String) {
-            _formState.update { it.copy(confirmNewPassword = password.filterNot(Char::isWhitespace)) }
-        }
-
-        fun toggleCurrentPasswordVisibility() {
-            _formState.update { it.copy(currentPasswordVisible = !it.currentPasswordVisible) }
-        }
-
-        fun toggleNewPasswordVisibility() {
-            _formState.update { it.copy(newPasswordVisible = !it.newPasswordVisible) }
-        }
-
-        fun toggleConfirmNewPasswordVisibility() {
-            _formState.update { it.copy(confirmNewPasswordVisible = !it.confirmNewPasswordVisible) }
-        }
-
-        fun onChangePasswordClick() {
-            if (!canSubmit()) return
-            submitChangePassword()
-        }
-
-        fun clearError() {
-            _screenState.update { it.copy(errorMessage = null) }
-        }
-
-        fun clearSuccess() {
-            _screenState.update { it.copy(successMessage = null) }
-        }
-
-        private fun canSubmit(): Boolean {
+    private fun submitChangePassword() {
+        viewModelScope.launch {
+            _screenState.update { it.copy(isLoading = true) }
             val form = _formState.value
-            val hasInputError =
-                (!form.isCurrentPasswordValid && form.currentPassword.isNotEmpty()) ||
-                    (!form.isNewPasswordValid && form.newPassword.isNotEmpty()) ||
-                    (!form.isConfirmNewPasswordValid && form.confirmNewPassword.isNotEmpty())
-
-            if (hasInputError) {
-                _screenState.update {
-                    it.copy(errorMessage = resourceProvider.getString(R.string.error_fix_fields))
-                }
-                return false
-            }
-
-            if (form.currentPassword.isBlank() || form.newPassword.isBlank() || form.confirmNewPassword.isBlank()) {
-                _screenState.update {
-                    it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields))
-                }
-                return false
-            }
-
-            return true
-        }
-
-        private fun submitChangePassword() {
-            viewModelScope.launch {
-                val form = _formState.value
-                when (
-                    val result =
-                        changePasswordUseCase(
-                            currentPassword = form.currentPassword,
-                            newPassword = form.newPassword,
-                            confirmPassword = form.confirmNewPassword,
+            when (
+                val result =
+                    changePasswordUseCase(
+                        currentPassword = form.currentPassword,
+                        newPassword = form.newPassword,
+                    )
+            ) {
+                is DataResult.Success -> {
+                    _formState.value = ChangePasswordFormState()
+                    _screenState.update {
+                        it.copy(
+                            isLoading = false,
+                            showSuccessDialog = true,
                         )
-                ) {
-                    is DataResult.Success -> {
-                        _formState.value = ChangePasswordFormState()
-                        _screenState.update { it.copy(successMessage = result.data) }
                     }
+                }
 
-                    is DataResult.Error -> {
-                        _screenState.update {
-                            it.copy(errorMessage = result.error.toMessage(resourceProvider))
-                        }
+                is DataResult.Error -> {
+                    _screenState.update {
+                        it.copy(
+                            isLoading = false,
+                            currentPasswordErrorMessage =
+                                result.error.fieldMessage(FIELD_CURRENT_PASSWORD, resourceProvider),
+                            newPasswordErrorMessage =
+                                result.error.fieldMessage(FIELD_NEW_PASSWORD, resourceProvider),
+                            errorMessage = result.error.toMessage(resourceProvider),
+                        )
                     }
                 }
             }
         }
     }
+
+    private companion object {
+        const val FIELD_CURRENT_PASSWORD = "currentPassword"
+        const val FIELD_NEW_PASSWORD = "newPassword"
+    }
+}

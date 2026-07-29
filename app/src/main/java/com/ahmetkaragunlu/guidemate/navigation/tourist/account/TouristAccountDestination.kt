@@ -1,7 +1,9 @@
 package com.ahmetkaragunlu.guidemate.navigation.tourist.account
 
+import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
+@Keep
 @Serializable
 enum class TouristAccountStart {
     SAVED_CARDS,

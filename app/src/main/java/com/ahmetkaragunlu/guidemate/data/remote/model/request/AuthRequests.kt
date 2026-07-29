@@ -29,18 +29,13 @@ data class RoleSelectionRequest(
 
 data class ForgotPasswordRequest(
     @SerializedName("email") val email: String,
-    @SerializedName("firstName") val firstName: String,
-    @SerializedName("lastName") val lastName: String,
 )
 
-data class ResetPasswordRequest(
-    @SerializedName("token") val token: String,
-    @SerializedName("newPassword") val newPassword: String,
-    @SerializedName("confirmPassword") val confirmPassword: String,
+data class ResendVerificationRequest(
+    @SerializedName("email") val email: String,
 )
 
 data class ChangePasswordRequest(
     @SerializedName("currentPassword") val currentPassword: String,
     @SerializedName("newPassword") val newPassword: String,
-    @SerializedName("confirmPassword") val confirmPassword: String,
 )

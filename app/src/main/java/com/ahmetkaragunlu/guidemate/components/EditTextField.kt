@@ -25,6 +25,7 @@ fun EditTextField(
     @StringRes placeholder: Int? = null,
     placeholderText: String? = null,
     @StringRes supportingText: Int? = null,
+    supportingTextValue: String? = null,
     keyboardOptions: KeyboardOptions,
     modifier: Modifier = Modifier,
     readOnly: Boolean = false,
@@ -69,7 +70,28 @@ fun EditTextField(
                 }
             }
         },
-        supportingText = supportingText?.let { { Text(text = stringResource(it), color = MaterialTheme.colorScheme.error) } },
+        supportingText =
+            when {
+                supportingText != null -> {
+                    {
+                        Text(
+                            text = stringResource(supportingText),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+
+                !supportingTextValue.isNullOrBlank() -> {
+                    {
+                        Text(
+                            text = supportingTextValue,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+
+                else -> null
+            },
         keyboardOptions = keyboardOptions,
         visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,

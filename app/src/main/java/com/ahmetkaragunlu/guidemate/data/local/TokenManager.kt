@@ -1,71 +1,37 @@
 package com.ahmetkaragunlu.guidemate.data.local
 
-import android.content.Context
-import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
-import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TokenManager
-@Inject
-constructor(
-    @param:ApplicationContext private val context: Context,
+class TokenManager @Inject constructor(
+    private val secureStringStorage: SecureStringStorage,
 ) {
-    companion object {
-        private const val KEY_ACCESS_TOKEN = "access_token"
-        private const val KEY_REFRESH_TOKEN = "refresh_token"
-        private const val KEY_DEVICE_ID = "device_id"
+    fun saveTokens(
+        accessToken: String,
+        refreshToken: String?,
+    ) {
+        val values =
+            buildMap {
+                put(KEY_ACCESS_TOKEN, accessToken)
+                refreshToken?.let { put(KEY_REFRESH_TOKEN, it) }
+            }
+        secureStringStorage.putAll(values)
     }
 
-    private val lock = Any()
+    fun getAccessToken(): String? = secureStringStorage.get(KEY_ACCESS_TOKEN)
 
-    private val masterKey =
-        MasterKey
-            .Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+    fun getRefreshToken(): String? = secureStringStorage.get(KEY_REFRESH_TOKEN)
 
-    private val sharedPreferences =
-        EncryptedSharedPreferences.create(
-            context,
-            "guidemate_secure_prefs",
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-        )
-
-    fun saveAccessToken(token: String) {
-        sharedPreferences.edit { putString(KEY_ACCESS_TOKEN, token) }
-    }
-
-    fun getAccessToken(): String? = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
-
-
-    fun saveRefreshToken(token: String) {
-        sharedPreferences.edit { putString(KEY_REFRESH_TOKEN, token) }
-    }
-
-    fun getRefreshToken(): String? = sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
-
-    fun getDeviceId(): String {
-        synchronized(lock) {
-            val existingId = sharedPreferences.getString(KEY_DEVICE_ID, null)
-            if (existingId != null) return existingId
-
-            val newId = UUID.randomUUID().toString()
-            sharedPreferences.edit { putString(KEY_DEVICE_ID, newId) }
-            return newId
-        }
-    }
+    fun hasStoredSession(): Boolean =
+        !getAccessToken().isNullOrBlank() && !getRefreshToken().isNullOrBlank()
 
     fun clearTokens() {
-        sharedPreferences.edit {
-            remove(KEY_ACCESS_TOKEN)
-            remove(KEY_REFRESH_TOKEN)
-        }
+        secureStringStorage.remove(KEY_ACCESS_TOKEN, KEY_REFRESH_TOKEN)
+    }
+
+    private companion object {
+        const val KEY_ACCESS_TOKEN = "access_token"
+        const val KEY_REFRESH_TOKEN = "refresh_token"
     }
 }

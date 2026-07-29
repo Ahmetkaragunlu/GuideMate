@@ -17,6 +17,7 @@ import com.ahmetkaragunlu.guidemate.screens.common.chat.viewmodel.ChatListViewMo
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristExploreScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristFilterScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.TouristProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.TouristProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TouristTripsScreen
@@ -25,10 +26,12 @@ import com.ahmetkaragunlu.guidemate.screens.tourist.tours.TouristTourDetailScree
 internal fun NavGraphBuilder.touristNavGraph(
     touristNavController: NavController,
     routeNavController: NavController,
+    homeViewModel: TouristHomeViewModel,
     chatListViewModel: ChatListViewModel,
 ) {
     composable<TouristDestination.Home> {
         TouristHomeScreen(
+            viewModel = homeViewModel,
             onNavigateToTourDetail = { sessionId ->
                 touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
             },

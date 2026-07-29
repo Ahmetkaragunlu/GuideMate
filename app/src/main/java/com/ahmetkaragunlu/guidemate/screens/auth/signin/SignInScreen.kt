@@ -1,15 +1,20 @@
 package com.ahmetkaragunlu.guidemate.screens.auth.signin
 
-import android.content.Context
-import android.content.Intent
 import android.widget.Toast
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,8 +24,19 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -41,11 +58,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.components.EditAlertDialog
 import com.ahmetkaragunlu.guidemate.components.EditButton
 import com.ahmetkaragunlu.guidemate.components.EditTextField
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(
@@ -53,27 +69,12 @@ fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel(),
     onNavigateToSignUp: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
-    onNavigateToRoleSelection: () -> Unit,
 ) {
     val context = LocalContext.current
     val formState by viewModel.formState.collectAsStateWithLifecycle()
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
-
-    val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            account?.idToken?.let { token ->
-                viewModel.onGoogleSignInSuccess(token)
-            } ?: run {
-                Toast.makeText(context, R.string.error_generic_failure, Toast.LENGTH_LONG).show()
-            }
-        } catch (e: ApiException) {
-            Toast.makeText(context, e.message ?: "Google Sign-In failed", Toast.LENGTH_LONG).show()
-        }
-    }
+    val coroutineScope = rememberCoroutineScope()
+    val googleSignInClient = remember(context) { GoogleCredentialSignInClient.create(context) }
 
     LaunchedEffect(screenState.errorMessage) {
         screenState.errorMessage?.let { error ->
@@ -82,30 +83,44 @@ fun SignInScreen(
         }
     }
 
-    LaunchedEffect(screenState.navigateToRoleSelection) {
-        if (screenState.navigateToRoleSelection) {
-            onNavigateToRoleSelection()
-            viewModel.resetNavigationState()
+    LaunchedEffect(screenState.infoMessage) {
+        screenState.infoMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            viewModel.clearInfoMessage()
         }
+    }
+
+    if (screenState.showVerificationDialog) {
+        VerificationRequiredDialog(
+            isLoading = screenState.isResendingVerification,
+            cooldownSeconds = screenState.resendCooldownSeconds,
+            onResend = viewModel::resendVerificationEmail,
+            onDismiss = viewModel::dismissVerificationDialog,
+        )
     }
 
     SignInScreenContent(
         modifier = modifier,
         formState = formState,
+        screenState = screenState,
         isEmailValid = viewModel.isValidEmail(),
         isPasswordValid = viewModel.isValidPassword(),
-        webClientId = viewModel.webClientId,
-        context = context,
-        googleSignInLauncher = googleSignInLauncher,
+        onGoogleSignInClick = {
+            viewModel.onGoogleSignInStarted()
+            coroutineScope.launch {
+                when (val result = googleSignInClient.signIn(context, viewModel.webClientId)) {
+                    is GoogleSignInResult.Success ->
+                        viewModel.onGoogleSignInSuccess(result.idToken)
+                    GoogleSignInResult.Cancelled -> viewModel.onGoogleSignInCancelled()
+                    GoogleSignInResult.Failure -> viewModel.onGoogleSignInFailure()
+                }
+            }
+        },
         onEmailChange = viewModel::onEmailChange,
         onPasswordChange = viewModel::onPasswordChange,
         onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
         onNavigateToForgotPassword = onNavigateToForgotPassword,
-        onSignInClick = {
-            viewModel.onSignInClick { errorResId ->
-                Toast.makeText(context, errorResId, Toast.LENGTH_LONG).show()
-            }
-        },
+        onSignInClick = viewModel::onSignInClick,
         onNavigateToSignUp = onNavigateToSignUp,
     )
 }
@@ -114,11 +129,10 @@ fun SignInScreen(
 private fun SignInScreenContent(
     modifier: Modifier = Modifier,
     formState: SignInFormState,
+    screenState: SignInScreenState,
     isEmailValid: Boolean,
     isPasswordValid: Boolean,
-    webClientId: String,
-    context: Context,
-    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    onGoogleSignInClick: () -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onTogglePasswordVisibility: () -> Unit,
@@ -155,6 +169,10 @@ private fun SignInScreenContent(
             formState = formState,
             isEmailValid = isEmailValid,
             isPasswordValid = isPasswordValid,
+            emailErrorMessage = screenState.emailErrorMessage,
+            passwordErrorMessage = screenState.passwordErrorMessage,
+            isLoading = screenState.isLoading,
+            retryAfterSeconds = screenState.loginRetryAfterSeconds,
             onEmailChange = onEmailChange,
             onPasswordChange = onPasswordChange,
             onTogglePasswordVisibility = onTogglePasswordVisibility,
@@ -169,9 +187,8 @@ private fun SignInScreenContent(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
 
         GoogleSignInButton(
-            webClientId = webClientId,
-            context = context,
-            googleSignInLauncher = googleSignInLauncher,
+            enabled = !screenState.isLoading,
+            onClick = onGoogleSignInClick,
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -185,6 +202,10 @@ private fun SignInFormSection(
     formState: SignInFormState,
     isEmailValid: Boolean,
     isPasswordValid: Boolean,
+    emailErrorMessage: String?,
+    passwordErrorMessage: String?,
+    isLoading: Boolean,
+    retryAfterSeconds: Long,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onTogglePasswordVisibility: () -> Unit,
@@ -207,13 +228,14 @@ private fun SignInFormSection(
                 tint = Color.Gray,
             )
         },
-        isError = !isEmailValid && formState.email.isNotEmpty(),
+        isError = (!isEmailValid && formState.email.isNotEmpty()) || emailErrorMessage != null,
         supportingText =
             if (!isEmailValid && formState.email.isNotEmpty()) {
                 R.string.email_error_message
             } else {
                 null
             },
+        supportingTextValue = emailErrorMessage,
     )
 
     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -253,13 +275,14 @@ private fun SignInFormSection(
                 modifier = Modifier.clickable { onTogglePasswordVisibility() },
             )
         },
-        isError = !isPasswordValid && formState.password.isNotEmpty(),
+        isError = (!isPasswordValid && formState.password.isNotEmpty()) || passwordErrorMessage != null,
         supportingText =
             if (!isPasswordValid && formState.password.isNotEmpty()) {
                 R.string.password_error_message
             } else {
                 null
             },
+        supportingTextValue = passwordErrorMessage,
     )
 
     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
@@ -285,7 +308,23 @@ private fun SignInFormSection(
     EditButton(
         text = R.string.login,
         onClick = onSignInClick,
+        enabled = retryAfterSeconds == 0L,
+        isLoading = isLoading,
     )
+    if (retryAfterSeconds > 0) {
+        val seconds = retryAfterSeconds.toResourceQuantity()
+        Text(
+            text =
+                pluralStringResource(
+                    R.plurals.login_retry_wait,
+                    seconds,
+                    seconds,
+                ),
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_small)),
+            color = colorResource(R.color.text_color),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
 }
 
 @Composable
@@ -318,23 +357,12 @@ private fun OrContinueDivider() {
 
 @Composable
 private fun GoogleSignInButton(
-    webClientId: String,
-    context: Context,
-    googleSignInLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    enabled: Boolean,
+    onClick: () -> Unit,
 ) {
     Button(
-        onClick = {
-            val gso =
-                GoogleSignInOptions
-                    .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(webClientId)
-                    .requestEmail()
-                    .build()
-            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            googleSignInClient.signOut().addOnCompleteListener {
-                googleSignInLauncher.launch(googleSignInClient.signInIntent)
-            }
-        },
+        onClick = onClick,
+        enabled = enabled,
         colors =
             ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -360,6 +388,62 @@ private fun GoogleSignInButton(
         )
     }
 }
+
+@Composable
+private fun VerificationRequiredDialog(
+    isLoading: Boolean,
+    cooldownSeconds: Long,
+    onResend: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val canResend = !isLoading && cooldownSeconds == 0L
+    val cooldownText =
+        if (cooldownSeconds > 0) {
+            val seconds = cooldownSeconds.toResourceQuantity()
+            pluralStringResource(
+                R.plurals.verification_resend_wait,
+                seconds,
+                seconds,
+            )
+        } else {
+            null
+        }
+    EditAlertDialog(
+        title = R.string.verification_required_title,
+        text = R.string.account_pending_verification_message,
+        textValue = cooldownText,
+        onDismissRequest = {
+            if (!isLoading) onDismiss()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onResend,
+                enabled = canResend,
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        color = colorResource(R.color.brand_color),
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Text(stringResource(R.string.resend_verification_email))
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isLoading,
+            ) {
+                Text(stringResource(R.string.close))
+            }
+        },
+    )
+}
+
+private fun Long.toResourceQuantity(): Int =
+    coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
 
 @Composable
 private fun SignUpTextButton(onNavigateToSignUp: () -> Unit) {
