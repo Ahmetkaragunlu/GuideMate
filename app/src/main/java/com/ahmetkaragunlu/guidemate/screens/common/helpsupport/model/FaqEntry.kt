@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.helpsupport.model
+package com.ahmetkaragunlu.guidemate.screens.common.helpsupport.model
 
 import androidx.annotation.StringRes
 

@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.helpsupport.model
 
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.helpsupport.model.FaqEntry
 
 val faqEntries =
     listOf(

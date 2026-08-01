@@ -23,7 +23,6 @@ import com.ahmetkaragunlu.guidemate.screens.guide.notifications.viewmodel.GuideN
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.GuideProfileScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.GuideProfilePreviewScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.viewmodel.GuideTourPublishViewModel
 
 internal fun NavGraphBuilder.guideNavGraph(
     guideNavController: NavController,
@@ -31,7 +30,6 @@ internal fun NavGraphBuilder.guideNavGraph(
     homeViewModel: GuideHomeViewModel,
     earningsViewModel: GuideEarningsViewModel,
     notificationsViewModel: GuideNotificationsViewModel,
-    tourPublishViewModel: GuideTourPublishViewModel,
     chatListViewModel: ChatListViewModel,
     onBackActionChanged: ((() -> Unit)?) -> Unit,
 ) {
@@ -78,7 +76,6 @@ internal fun NavGraphBuilder.guideNavGraph(
 
     guideTourNavGraph(
         navController = guideNavController,
-        tourPublishViewModel = tourPublishViewModel,
         onBackActionChanged = onBackActionChanged,
     )
     guideFinanceNavGraph(

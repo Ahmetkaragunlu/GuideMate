@@ -6,10 +6,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.screens.common.changepassword.ChangePasswordScreen
+import com.ahmetkaragunlu.guidemate.screens.common.helpsupport.HelpSupportScreen
+import com.ahmetkaragunlu.guidemate.screens.common.legalagreements.LegalAgreementsScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.AboutScreen
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.bankaccounts.BankAccountsScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.helpsupport.HelpSupportScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements.LegalAgreementsScreen
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.helpsupport.model.guideFaqEntries
+import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements.model.guideLegalClauses
 import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.notificationsettings.NotificationSettingsScreen
 
 internal fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {
@@ -26,10 +28,17 @@ internal fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {
         NotificationSettingsScreen()
     }
     composable<GuideAccountDestination.LegalAgreements> {
-        LegalAgreementsScreen()
+        LegalAgreementsScreen(
+            titleResId = R.string.guide_legal_title,
+            introResId = R.string.guide_legal_intro,
+            legalClauses = guideLegalClauses,
+        )
     }
     composable<GuideAccountDestination.HelpSupport> {
-        HelpSupportScreen()
+        HelpSupportScreen(
+            introResId = R.string.guide_support_intro,
+            faqEntries = guideFaqEntries,
+        )
     }
 }
 

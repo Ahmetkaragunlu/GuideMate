@@ -57,11 +57,6 @@ class GuideTourPublishViewModel
                 initialValue = initialUiState(),
             )
 
-        fun resetDraft() {
-            draftState.value = initialUiState()
-            hasSubmittedCurrentDraft = false
-        }
-
         fun onTourDateSelected(date: LocalDate) {
             updateDraft {
                 val zoneId = timeZoneId.toZoneId()

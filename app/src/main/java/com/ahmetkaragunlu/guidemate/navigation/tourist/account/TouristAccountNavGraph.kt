@@ -9,8 +9,10 @@ import androidx.navigation.compose.composable
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.screens.common.changepassword.ChangePasswordScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.helpsupport.HelpSupportScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.legalagreements.LegalAgreementsScreen
+import com.ahmetkaragunlu.guidemate.screens.common.helpsupport.HelpSupportScreen
+import com.ahmetkaragunlu.guidemate.screens.common.legalagreements.LegalAgreementsScreen
+import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.helpsupport.model.faqEntries
+import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.legalagreements.model.legalClauses
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.notificationsettings.NotificationSettingsScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.AddSavedCardScreen
 import com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.savedcards.SavedCardsScreen
@@ -49,10 +51,17 @@ internal fun NavGraphBuilder.touristAccountNavGraph(accountNavController: NavCon
         NotificationSettingsScreen()
     }
     composable<TouristAccountDestination.LegalAgreements> {
-        LegalAgreementsScreen()
+        LegalAgreementsScreen(
+            titleResId = R.string.legal_title,
+            introResId = R.string.legal_intro,
+            legalClauses = legalClauses,
+        )
     }
     composable<TouristAccountDestination.HelpSupport> {
-        HelpSupportScreen()
+        HelpSupportScreen(
+            introResId = R.string.support_intro,
+            faqEntries = faqEntries,
+        )
     }
 }
 

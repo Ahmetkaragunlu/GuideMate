@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements.model
+package com.ahmetkaragunlu.guidemate.screens.common.legalagreements.model
 
 import androidx.annotation.StringRes
 

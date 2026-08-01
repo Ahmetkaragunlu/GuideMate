@@ -1,5 +1,6 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements
+package com.ahmetkaragunlu.guidemate.screens.common.legalagreements
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +20,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements.components.LegalClauseItem
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements.model.guideLegalClauses
+import com.ahmetkaragunlu.guidemate.screens.common.legalagreements.components.LegalClauseItem
+import com.ahmetkaragunlu.guidemate.screens.common.legalagreements.model.LegalClause
 
 @Composable
 fun LegalAgreementsScreen(
+    @StringRes titleResId: Int,
+    @StringRes introResId: Int,
+    legalClauses: List<LegalClause>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -34,25 +38,31 @@ fun LegalAgreementsScreen(
                 .padding(horizontal = 24.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        LegalHeader()
-        LegalClausesSection()
+        LegalHeader(
+            titleResId = titleResId,
+            introResId = introResId,
+        )
+        LegalClausesSection(legalClauses = legalClauses)
         LegalVersionFooter()
     }
 }
 
 @Composable
-private fun LegalHeader() {
+private fun LegalHeader(
+    @StringRes titleResId: Int,
+    @StringRes introResId: Int,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = stringResource(R.string.guide_legal_title),
+            text = stringResource(titleResId),
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleLarge,
         )
 
         Text(
-            text = stringResource(R.string.guide_legal_intro),
+            text = stringResource(introResId),
             color = colorResource(R.color.text_color),
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -60,11 +70,11 @@ private fun LegalHeader() {
 }
 
 @Composable
-private fun LegalClausesSection() {
+private fun LegalClausesSection(legalClauses: List<LegalClause>) {
     Column(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        guideLegalClauses.forEach { clause ->
+        legalClauses.forEach { clause ->
             LegalClauseItem(
                 titleResId = clause.titleResId,
                 descriptionResId = clause.descriptionResId,

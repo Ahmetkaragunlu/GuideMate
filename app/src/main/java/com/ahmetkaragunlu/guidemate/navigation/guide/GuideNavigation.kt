@@ -34,7 +34,6 @@ import com.ahmetkaragunlu.guidemate.screens.guide.earnings.viewmodel.GuideEarnin
 import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
 import com.ahmetkaragunlu.guidemate.screens.guide.notifications.GuideNotificationsBottomSheet
 import com.ahmetkaragunlu.guidemate.screens.guide.notifications.viewmodel.GuideNotificationsViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.tourpublish.viewmodel.GuideTourPublishViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CreditCard
 import compose.icons.tablericons.Home
@@ -49,7 +48,6 @@ fun GuideNavigation(
     homeViewModel: GuideHomeViewModel = hiltViewModel(),
     earningsViewModel: GuideEarningsViewModel = hiltViewModel(),
     notificationsViewModel: GuideNotificationsViewModel = hiltViewModel(),
-    tourPublishViewModel: GuideTourPublishViewModel = hiltViewModel(),
     chatListViewModel: ChatListViewModel = hiltViewModel(),
 ) {
     val guideNavController = rememberNavController()
@@ -122,7 +120,6 @@ fun GuideNavigation(
                     homeViewModel = homeViewModel,
                     earningsViewModel = earningsViewModel,
                     notificationsViewModel = notificationsViewModel,
-                    tourPublishViewModel = tourPublishViewModel,
                     chatListViewModel = chatListViewModel,
                     onBackActionChanged = { customBackAction = it },
                 )

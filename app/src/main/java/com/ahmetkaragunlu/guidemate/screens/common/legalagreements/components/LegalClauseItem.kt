@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.helpsupport.components
+package com.ahmetkaragunlu.guidemate.screens.common.legalagreements.components
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -10,25 +10,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 
 @Composable
-fun FaqItem(
+fun LegalClauseItem(
     @StringRes titleResId: Int,
     @StringRes descriptionResId: Int,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(
             text = stringResource(titleResId),
             color = Color.Unspecified,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
         )
 
         Text(

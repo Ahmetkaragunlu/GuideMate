@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.screens.guide.profile.account.helpsupport.components
+package com.ahmetkaragunlu.guidemate.screens.common.helpsupport.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

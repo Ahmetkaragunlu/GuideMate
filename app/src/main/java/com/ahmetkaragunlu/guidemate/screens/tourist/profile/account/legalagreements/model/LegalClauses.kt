@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.screens.tourist.profile.account.legalagreements.model
 
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.screens.common.legalagreements.model.LegalClause
 
 val legalClauses =
     listOf(
