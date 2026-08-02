@@ -1,10 +1,9 @@
 package com.ahmetkaragunlu.guidemate.screens.common.tab
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,12 +22,12 @@ fun <T : GuideMateTab> GuideMateTabRow(
 ) {
     val selectedIndex = tabs.indexOf(selectedTab)
 
-    TabRow(
+    SecondaryTabRow(
         selectedTabIndex = selectedIndex,
         containerColor = Color.Transparent,
-        indicator = { tabPositions ->
+        indicator = {
             TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
+                modifier = Modifier.tabIndicatorOffset(selectedIndex),
                 height = 2.dp,
                 color = colorResource(R.color.brand_color),
             )

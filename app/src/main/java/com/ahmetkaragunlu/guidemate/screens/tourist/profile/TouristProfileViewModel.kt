@@ -23,7 +23,7 @@ class TouristProfileViewModel
             combine(userRepository.userState, financeStore.state) { user, finance ->
                 ProfileUiState(
                     fullName = listOfNotNull(user.firstName, user.lastName).joinToString(" "),
-                    email = "ahmet@gmail.com",
+                    email = user.email.orEmpty(),
                     balanceMinor = finance.balanceMinor,
                 )
             }.stateIn(

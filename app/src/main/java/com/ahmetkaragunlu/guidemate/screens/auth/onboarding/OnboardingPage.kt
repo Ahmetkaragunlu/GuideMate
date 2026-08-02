@@ -5,9 +5,9 @@ import androidx.annotation.StringRes
 import com.ahmetkaragunlu.guidemate.R
 
 data class OnboardingPage(
-    @StringRes val title: Int,
-    @StringRes val description: Int,
-    @DrawableRes val image: Int,
+    @param:StringRes val title: Int,
+    @param:StringRes val description: Int,
+    @param:DrawableRes val image: Int,
 )
 
 val onboardingPages =
