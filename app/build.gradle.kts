@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.hilt)
   alias(libs.plugins.kotlin.ktfmt)
   alias(libs.plugins.secrets.gradle.plugin)
+  alias(libs.plugins.google.services)
 }
 
 android {
@@ -90,6 +91,10 @@ dependencies {
   implementation(libs.androidx.credentials)
   implementation(libs.androidx.credentials.play.services.auth)
   implementation(libs.google.id)
+
+  // Push notifications
+  implementation(platform(libs.firebase.bom))
+  implementation(libs.firebase.messaging)
 
   // Google Places
   implementation(libs.places)
