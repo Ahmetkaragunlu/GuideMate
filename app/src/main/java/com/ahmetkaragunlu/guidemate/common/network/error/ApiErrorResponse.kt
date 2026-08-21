@@ -6,7 +6,7 @@ data class ApiErrorResponse(
     @SerializedName("code") val code: String?,
     @SerializedName("message") val message: String?,
     @SerializedName("timestamp") val timestamp: String?,
-    @SerializedName("fieldErrors") val fieldErrors: List<ApiFieldErrorResponse> = emptyList(),
+    @SerializedName("fieldErrors") val fieldErrors: List<ApiFieldErrorResponse>?,
 )
 
 data class ApiFieldErrorResponse(

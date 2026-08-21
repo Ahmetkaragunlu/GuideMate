@@ -1683,8 +1683,8 @@ Hans, turist/rehber kimligi uretmez.
 
 | Ekran/aksiyon | Endpoint/DTO | Repository ve mapper | Canonical sonuc |
 | --- | --- | --- | --- |
-| Avatar secme | `POST /api/v1/media?purpose=GUIDE_AVATAR`, multipart -> `MediaUploadResponse` | `MediaRepository.uploadGuideAvatar`; response -> `MediaReference` | Donen `mediaAssetId` profile patch'e verilir; local URI kalici model olmaz |
-| Cover secme | `POST /api/v1/media?purpose=TOUR_COVER` | `MediaRepository.uploadTourCover` | Donen ID create/change request'e girer |
+| Avatar secme | `POST /api/v1/media?purpose=GUIDE_AVATAR`, multipart -> `MediaUploadResponse` | `MediaRepository.uploadImage(localUri, GUIDE_AVATAR)`; response -> `MediaAsset` | Donen `mediaAssetId` profile patch'e verilir; local URI kalici model olmaz |
+| Cover secme | `POST /api/v1/media?purpose=TOUR_COVER` | `MediaRepository.uploadImage(localUri, TOUR_COVER)` | Donen ID create/change request'e girer |
 | Goruntu okuma | `GET /api/v1/media/{mediaId}/content`, response `imageUrl` | Coil-backed ortak `GuideMateImage` | Local content/file URI ve HTTP/HTTPS tek noktada; fallback tasarimi korunur |
 | Kullanilmayan draft silme | `DELETE /api/v1/media/{mediaId}` | `MediaRepository.deleteUnreferenced` | Yalniz backend izin verirse silinir; `MEDIA_IN_USE` gorunur hata olur |
 | Kendi guide profili | `GET/PATCH /api/v1/guides/me/profile` | `GuideProfileRepository`; DTO -> domain -> Guide UI mapper | About, preview ve guide profil tek canonical Flow'dan beslenir |
@@ -1694,10 +1694,9 @@ Hans, turist/rehber kimligi uretmez.
 Medya icin ayri status polling endpoint'i yoktur. Upload response icindeki
 `status` ve sonraki profile/tour response icindeki media reference otoritedir.
 
-Dogrulanmis uyumsuzluk: Android `ImageSourcePicker` ve metinleri 10 MB kabul
-ediyor; backend multipart ve media validator 5 MB sinirindadir. Entegrasyonda
-Android siniri ve gorunen metin 5 MB'a indirilecek. JPEG, PNG ve WebP backend
-dogrulamasina uygun tutulacak.
+Kapatilan uyumsuzluk: Android `ImageSourcePicker`, multipart adapter ve gorunen
+metin backend ile ayni 5 MB sinirina indirildi. JPEG, PNG ve WebP dosya imzasi
+yerelde kontrol edilir; backend dogrulamasi otorite olmaya devam eder.
 
 ### Guide Tur, Dashboard ve Earnings Eslemesi
 
@@ -1968,26 +1967,25 @@ kaynaklarini yeniden sorgular veya realtime event ile invalidate eder.
 
 Adim 6'da kod yazilirken atlanmayacak somut farklar:
 
-1. Auth disindaki feature'larda Retrofit API, DTO, repository ve mapper yok;
+1. Auth ve medya disindaki feature'larda Retrofit API, DTO, repository ve mapper yok;
    somut MVP store'lar ViewModel'lere enjekte ediliyor.
-2. Remote image icin Coil, payment icin WebView, realtime chat icin STOMP ve
-   push icin FCM/Firebase Installation runtime entegrasyonu yok.
-3. Android media 10 MB limiti backend 5 MB sozlesmesiyle uyumsuz.
-4. Guide detail/edit route'lari backendin ihtiyac duydugu `tourId`yi tasimiyor.
-5. Guide edit tek local mutation yapiyor; content change request ile session
+2. Payment icin WebView, realtime chat icin STOMP ve push icin FCM/Firebase
+   Installation runtime entegrasyonu yok.
+3. Guide detail/edit route'lari backendin ihtiyac duydugu `tourId`yi tasimiyor.
+4. Guide edit tek local mutation yapiyor; content change request ile session
    update sonucunu ayirmiyor.
-6. Trips detail public `sessionId` route'unu kullaniyor; reservation snapshot
+5. Trips detail public `sessionId` route'unu kullaniyor; reservation snapshot
    icin `reservationId` destination'i yok.
-7. Native saved-card formu ve `SandboxCardCatalog` backend/provider
+6. Native saved-card formu ve `SandboxCardCatalog` backend/provider
    sozlesmesinde karsiliksiz.
-8. Payment quote/currency selector, hosted WebView, polling/recovery ve
+7. Payment quote/currency selector, hosted WebView, polling/recovery ve
    refund/manual-review state'leri gercek backend'e bagli degil.
-9. Explore filter sonuc/pagination, guide search ve backend popular/top akisi
+8. Explore filter sonuc/pagination, guide search ve backend popular/top akisi
    tamamlanmamis.
-10. Notification device/FID, FCM receive, semantic routing ve iki rolde ortak
+9. Notification device/FID, FCM receive, semantic routing ve iki rolde ortak
     unread state gercek kaynaga bagli degil.
-11. Chat REST/STOMP reconnect/resync ve FCM chat target'i yerine MVP store var.
-12. Hardcoded/demo user, guide, avatar, email, actor ve mock kimlikler ilgili
+10. Chat REST/STOMP reconnect/resync ve FCM chat target'i yerine MVP store var.
+11. Hardcoded/demo user, guide, avatar, email, actor ve mock kimlikler ilgili
     repository canonical oldugunda kontrollu temizlenmeli.
 
 ### Mock Temizleme Esigi
@@ -2685,8 +2683,8 @@ Guncel durumlar:
 | Faz | Durum | Acik takip |
 | --- | --- | --- |
 | Faz 0 - Feature-first refactor | `TAMAMLANDI` | Format, compile, unit test, lint ve debug APK kapilari gecti |
-| Faz 1 - Ortak teknik temel ve auth | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
-| Faz 2 - Medya | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
+| Faz 1 - Ortak teknik temel ve auth | `TAMAMLANDI` | Auth/OpenAPI uyumu, ortak pagination, hata parsing, LAN ve kalite kapilari dogrulandi |
+| Faz 2 - Medya | `KISMEN TAMAMLANDI` | Medya altyapisi ve loader tamam; avatar Faz 3, tour cover Faz 4 E2E baglantisini bekliyor |
 | Faz 3 - Guide profile ve public guide | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
 | Faz 4 - Tour ve guide tour yonetimi | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
 | Faz 5 - Tourist discovery ve public tour | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
@@ -2720,7 +2718,8 @@ Capraz-faz takip kaydi su formatta tutulur:
 
 | Kayit | Kaynak faz | Hedef faz | Bagimli is | Kapanis kaniti | Durum |
 | --- | --- | --- | --- | --- | --- |
-| Olusturulacak | Belirlenecek | Belirlenecek | Somut eksik veya yeniden dogrulama | Test, contract veya E2E kaniti | `BEKLIYOR` |
+| MEDIA-PROFILE-01 | Faz 2 | Faz 3 | Avatar local URI upload sonucu `mediaAssetId` ile profile patch'e baglanacak; hata durumunda eski avatar korunacak | Guide avatar degisikliginin own/public profile'da iki cihazdan canonical URL ile gorunmesi | `BEKLIYOR` |
+| MEDIA-TOUR-01 | Faz 2 | Faz 4 | Cover local URI once upload edilecek; create/change request yalniz `mediaAssetId` tasiyacak ve terk edilen draft kontrollu silinecek | Publish/edit sonrasi guide ve tourist tour gorunumlerinin ayni canonical cover URL'yi gostermesi | `BEKLIYOR` |
 
 Bu tablo, faz uygulamalari sirasinda gercek bir bagimlilik ortaya ciktiginda
 somut kayitlarla guncellenir. Yalniz olasi bir ihtimal icin hayali borc veya
@@ -2773,6 +2772,8 @@ Kapanis kaniti:
 
 ### Faz 1 - Ortak Teknik Temel ve Mevcut Auth
 
+Durum: `TAMAMLANDI` (2026-08-21).
+
 Amac yeni auth yazmak degil, calisan gercek auth dikey dilimini hedef
 feature-first yapida korumak ve sonraki repository'lerin kullanacagi ortak
 teknik omurgayi sabitlemektir.
@@ -2797,7 +2798,41 @@ Kapi:
 - Bu fazda kaldirilacak runtime auth mock'u yoktur; mevcut gercek altyapi
   korunur.
 
+Kapanis kaniti:
+
+- Retrofit/OkHttp/Gson composition'i ust seviye `di/NetworkModule.kt`, auth API
+  provider'i feature `auth/di`, hata/result modelleri `common` sahipliginde
+  dogrulandi; gereksiz yeni repository veya use-case katmani eklenmedi.
+- Auth API, `AuthResponse` ve `CurrentUserResponse`; canli OpenAPI'deki
+  `userId`, `email`, `firstName`, `lastName`, `roleSelected` ve `role`
+  sozlesmesiyle birebir eslesti.
+- Uygulama acilisinda cached kullanici sonrasinda `GET /api/v1/auth/me` ile
+  canonical kullanici yenilemesi, terminal refresh hatasinda session temizligi
+  ve gecici ag/sunucu hatasinda cached oturumun korunmasi dogrulandi.
+- Backend ortak `PageResponse<T>` sekline karsilik gelen
+  `common/network/model/ApiPageResponse.kt` eklendi; feature DTO'lari ortak
+  pakete tasinmadi.
+- Backend bos validation listesinde `fieldErrors` alanini JSON'dan
+  cikardiginda Android parser'in `Unknown` hataya dusme riski giderildi.
+  Eksik alan ve dolu validation listesi icin kalici `ApiErrorParserTest`
+  senaryolari eklendi.
+- Canli local backend PostgreSQL'e baglandi, 13 Flyway migration'i dogruladi ve
+  OpenAPI dokumani LAN adresinden alindi. Zararsiz gecersiz login istegi
+  yapilandirilmis `401 INVALID_CREDENTIALS` govdesi dondurdu.
+- Android ve backend'in Git disi local base URL degerleri Mac'in guncel
+  `192.168.68.102` LAN adresinde esitlendi; emulatorden `8080` port erisimi
+  basarili oldu. Kaynak koda IP, token veya secret yazilmadi.
+- `./gradlew ktfmtCheck compileDebugKotlin testDebugUnitTest lintDebug
+  assembleDebug` basarili.
+- `bash mvnw -q test` basarili; Testcontainers PostgreSQL 18.6 uzerinde Flyway
+  `V1-V13`, auth lifecycle, guvenlik ve OpenAPI kontrolleri gecti.
+- Guncel debug APK emulatore yuklendi ve launcher cold start basarili oldu.
+- Faz 1'e ait acik capraz-faz kaydi bulunmuyor; sonraki business repository
+  entegrasyonlari Faz 2 ve devaminda kendi sozlesmeleriyle eklenecek.
+
 ### Faz 2 - Medya
+
+Durum: `KISMEN TAMAMLANDI` (2026-08-21).
 
 Medya profil ve turdan once tamamlanir; cunku avatar ve cover kalici backend
 referansi olmadan profil/tur mutation'lari canonical hale gelemez.
@@ -2822,6 +2857,38 @@ Mock temizleme kapisi:
   runtime canonical medya yerine gecemez.
 - Upload/read/delete, process retry ve `MEDIA_IN_USE` hata davranisi
   dogrulanmadan local media kodu kaldirilmaz.
+
+Uygulananlar ve kapanis kaniti:
+
+- `media` feature'i altinda `MediaApi`, DTO/mapper, `MediaRepository` ve gercek
+  implementation eklendi. Yeni use-case veya gecici store uretilmedi.
+- `MediaPartFactory` Android dosya erisim sinirini repository'den ayirdi;
+  `ContentResolverMediaPartFactory` local `content://`/`file://` verisini
+  bellege topluca almadan OkHttp multipart body'sine aktarir.
+- Kamera/galeri secimi ve multipart hazirligi ayni dosya imzasi kontrolunu
+  kullanir. Android siniri backend ile ayni 5 MB; desteklenen formatlar JPEG,
+  PNG ve WebP'dir.
+- Coil Compose `3.4.0` eklendi. Ortak `GuideMateImage` local URI ve HTTP/HTTPS
+  kaynaklari mevcut drawable placeholder/error/fallback tasarimini koruyarak
+  tek noktadan yukler.
+- Coil backend'in owner-only draft medyasini okuyabilsin diye mevcut OkHttp
+  istemcisini kullanir. Authorization ve refresh davranisi yalniz yapilandirilmis
+  GuideMate backend origin'inde calisir; baska hostlara token tasinmaz ve URL
+  query'sine token eklenmez.
+- Backend media hata kodlari merkezi Android hata sozlesmesine eklendi;
+  `MEDIA_IN_USE`, format, boyut, bulunamama, storage ve purpose hatalari
+  yerellestirilmis kullanici mesajlarina map edilir.
+- Media mapper, repository upload/local validation/delete error, dosya imzasi,
+  backend-origin siniri ve refresh hata tasima davranisi birim testleriyle
+  dogrulandi.
+- `./gradlew ktfmtCheck compileDebugKotlin testDebugUnitTest lintDebug
+  assembleDebug` basarili. Backend `bash mvnw -q test` PostgreSQL 18.6,
+  Flyway `V1-V13`, media validator/storage/access/cleanup ve OpenAPI/security
+  testleriyle basarili.
+- Calisan emulator bulunmadigi icin bu calismada launcher ve gercek cihaz
+  media E2E smoke testi yapilmadi. Avatar mutation'i `MEDIA-PROFILE-01`, tour
+  cover mutation'i `MEDIA-TOUR-01` kayitlariyla hedef fazlara baglandi; bu iki
+  kayit kapanmadan Faz 2 `TAMAMLANDI` yapilmayacak.
 
 ### Faz 3 - Guide Profil ve Public Guide Projection
 
@@ -3649,6 +3716,35 @@ tamamlarsa iki fazin kaniti birbirine referans verir.
 
 Kanitsiz `calisiyor`, `backend'e hazir` veya `tamamlandi` ifadesi
 kullanilmayacaktir.
+
+### Proje Sonrasi Mulakat ve Kod Anlatim Standardi
+
+Proje tamamlandiktan sonra DI, interface, repository, DTO, mapper, ViewModel,
+API, state yonetimi, navigation ve benzeri mimari konular; kullanicinin bu
+kavramlari onceden bildigi varsayilmadan anlatilacaktir. Yalnizca "SOLID'e
+uygun" veya "profesyonel" gibi soyut ifadeler kullanilmayacak, gercek GuideMate
+akisi ve mevcut kod uzerinden neden-sonuc iliskisi kurulacaktir.
+
+Her konu su sirayla ele alinacaktir:
+
+1. Kullanicinin uygulamada yaptigi islem basit bir GuideMate senaryosuyla
+   anlatilir.
+2. Akisin basladigi ekran ve kullanici aksiyonu gosterilir.
+3. Kodun `Screen -> ViewModel -> Repository -> API -> Backend` ve donus yolu
+   gercek dosya, sinif ve fonksiyonlar uzerinden adim adim takip edilir.
+4. Her sinifin ve parametrenin ne ise yaradigi, nereden geldigi, nereye gittigi
+   ve neden gerekli oldugu temel seviyede aciklanir.
+5. Ilgili gercek kod parcasi gosterilir ve satirlar sade dille yorumlanir.
+6. Kod kaldirilirsa veya yanlis katmana tasinirsa kullanici akisi ve mimaride
+   neyin bozulacagi somut bir ornekle aciklanir.
+7. Gerekiyorsa alternatif yaklasim ve mevcut tercihin neden GuideMate icin
+   uygun oldugu, overengineering siniri dahil, belirtilir.
+8. Konu sonunda mulakatta kullanilabilecek bir veya iki cumlelik net cevap
+   hazirlanir.
+
+Bu anlatimlarda teknik terimler ilk kullanimda tanimlanacak; aciklama bilen bir
+gelistiriciye kisaltma yapilarak degil, konuya ilk kez bakan birinin veri ve kod
+akisini takip edebilecegi seviyede verilecektir.
 
 ### GuideMate Android Final Tamamlanma Tanimi
 

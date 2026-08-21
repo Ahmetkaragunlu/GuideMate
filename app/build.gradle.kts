@@ -87,6 +87,10 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.okhttp.logging.interceptor)
 
+  // Image loading
+  implementation(libs.coil.compose)
+  implementation(libs.coil.network.okhttp)
+
   // Google Authentication
   implementation(libs.androidx.credentials)
   implementation(libs.androidx.credentials.play.services.auth)

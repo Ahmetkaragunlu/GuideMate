@@ -28,7 +28,7 @@ class ApiErrorParser @Inject constructor(
             code = BackendErrorCode.from(errorResponse.code),
             fallbackMessage = errorResponse.message,
             fieldErrors =
-                errorResponse.fieldErrors.map {
+                errorResponse.fieldErrors.orEmpty().map {
                     AppFieldError(
                         field = it.field,
                         code = it.code,

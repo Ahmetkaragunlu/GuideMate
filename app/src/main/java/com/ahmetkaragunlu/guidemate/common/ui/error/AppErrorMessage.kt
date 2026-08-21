@@ -12,6 +12,9 @@ fun AppError.toMessage(resourceProvider: ResourceProvider): String =
         AppError.GenericFailure -> resourceProvider.getString(R.string.error_generic_failure)
         AppError.SessionExpired -> resourceProvider.getString(R.string.error_session_expired)
         AppError.NoInternet -> resourceProvider.getString(R.string.error_no_internet)
+        AppError.InvalidImageType -> resourceProvider.getString(R.string.error_image_invalid_type)
+        AppError.ImageTooLarge -> resourceProvider.getString(R.string.error_image_too_large)
+        AppError.ImageUnavailable -> resourceProvider.getString(R.string.error_image_source_unavailable)
         AppError.Unknown -> resourceProvider.getString(R.string.error_unknown)
         is AppError.Server -> resourceProvider.getString(R.string.error_server, code)
         is AppError.Backend -> code.toMessage(resourceProvider, retryAfterSeconds)
@@ -79,6 +82,15 @@ private fun BackendErrorCode?.toMessage(
             } ?: resourceProvider.getString(R.string.error_rate_limited)
         BackendErrorCode.EMAIL_DELIVERY_FAILED ->
             resourceProvider.getString(R.string.error_email_delivery_failed)
+        BackendErrorCode.MEDIA_NOT_FOUND -> resourceProvider.getString(R.string.error_media_not_found)
+        BackendErrorCode.MEDIA_INVALID_TYPE ->
+            resourceProvider.getString(R.string.error_image_invalid_type)
+        BackendErrorCode.MEDIA_TOO_LARGE -> resourceProvider.getString(R.string.error_image_too_large)
+        BackendErrorCode.MEDIA_STORAGE_FAILED ->
+            resourceProvider.getString(R.string.error_media_storage_failed)
+        BackendErrorCode.MEDIA_IN_USE -> resourceProvider.getString(R.string.error_media_in_use)
+        BackendErrorCode.MEDIA_PURPOSE_MISMATCH ->
+            resourceProvider.getString(R.string.error_media_purpose_mismatch)
         BackendErrorCode.INTERNAL_SERVER_ERROR -> resourceProvider.getString(R.string.error_generic_failure)
         null -> resourceProvider.getString(R.string.error_generic_failure)
     }

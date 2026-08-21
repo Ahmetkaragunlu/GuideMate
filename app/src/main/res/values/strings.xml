@@ -293,8 +293,13 @@
     <string name="error_tour_step1_invalid">Konumu, gelecekteki tur tarihini, başlangıç saatini ve tur süresini kontrol edin.</string>
     <string name="error_tour_step2_invalid">Kategori, en az bir hizmet dili, pozitif ücret ve kapasite gereklidir.</string>
     <string name="error_tour_step3_invalid">Tur adı, kapak fotoğrafı, açıklama ve buluşma noktası alanlarını doldurun.</string>
-    <string name="error_image_too_large">Fotoğraf en fazla 10 MB olabilir.</string>
+    <string name="error_image_too_large">Fotoğraf en fazla 5 MB olabilir.</string>
+    <string name="error_image_invalid_type">Yalnız JPG, PNG veya WebP formatında fotoğraf seçebilirsiniz.</string>
     <string name="error_image_source_unavailable">Fotoğraf kaynağı açılamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_media_not_found">Fotoğraf bulunamadı veya artık kullanılamıyor.</string>
+    <string name="error_media_storage_failed">Fotoğraf şu anda kaydedilemiyor. Lütfen tekrar deneyin.</string>
+    <string name="error_media_in_use">Kullanımda olan fotoğraf silinemez.</string>
+    <string name="error_media_purpose_mismatch">Bu fotoğraf seçilen alan için kullanılamıyor.</string>
     <string name="error_session_creation">Tarih, saat, süre, fiyat ve kapasiteyi kontrol edin. Başka bir turunuzla saat çakışması da olabilir.</string>
     <string name="tab_guides">Rehberler</string>
     <string name="search_tours">Tur Ara</string>
@@ -368,7 +373,7 @@
     <string name="guide_tour_publish_step3_photos_label">Tur Fotoğrafı</string>
     <string name="guide_tour_publish_step3_photos_title">Kapak fotoğrafı</string>
     <string name="guide_tour_publish_step3_photos_placeholder">Kapak fotoğrafı seçmek için dokunun</string>
-    <string name="guide_tour_publish_step3_photos_meta">JPG/PNG • Max 10 MB</string>
+    <string name="guide_tour_publish_step3_photos_meta">JPG/PNG/WebP • Max 5 MB</string>
     <string name="tour_cover_photo_source_title">Kapak fotoğrafı ekle</string>
     <string name="profile_photo_source_title">Profil fotoğrafı ekle</string>
     <string name="choose_from_gallery">Galeriden seç</string>

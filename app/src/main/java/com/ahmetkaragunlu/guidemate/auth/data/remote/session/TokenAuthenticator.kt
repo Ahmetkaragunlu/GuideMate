@@ -5,14 +5,15 @@ import com.ahmetkaragunlu.guidemate.auth.domain.session.isTerminalSessionError
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.AuthSessionManager
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.TokenManager
 import com.ahmetkaragunlu.guidemate.auth.data.remote.api.AuthApi
+import com.ahmetkaragunlu.guidemate.common.network.ApiBaseUrl
 import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
 import com.ahmetkaragunlu.guidemate.common.storage.installation.InstallationIdDataSource
-import com.ahmetkaragunlu.guidemate.auth.data.remote.session.TokenRefreshException
 import com.ahmetkaragunlu.guidemate.auth.data.remote.model.request.RefreshTokenRequest
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import okhttp3.Authenticator
+import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
@@ -27,6 +28,7 @@ class TokenAuthenticator @Inject constructor(
     private val authSessionManager: AuthSessionManager,
     private val authApiProvider: Provider<AuthApi>,
     private val apiErrorParser: ApiErrorParser,
+    @param:ApiBaseUrl private val apiBaseUrl: HttpUrl,
 ) : Authenticator {
     override fun authenticate(
         route: Route?,
@@ -35,6 +37,7 @@ class TokenAuthenticator @Inject constructor(
         val path = response.request.url.encodedPath
         if (
             response.code != 401 ||
+                !AuthEndpointPolicy.isBackendRequest(response.request.url, apiBaseUrl) ||
                 AuthEndpointPolicy.isRefreshRequest(path) ||
                 !AuthEndpointPolicy.requiresAccessToken(path) ||
                 responseCount(response) > MAX_RETRY_COUNT

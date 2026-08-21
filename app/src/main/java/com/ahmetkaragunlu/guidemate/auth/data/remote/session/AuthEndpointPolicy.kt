@@ -1,5 +1,7 @@
 package com.ahmetkaragunlu.guidemate.auth.data.remote.session
 
+import okhttp3.HttpUrl
+
 internal object AuthEndpointPolicy {
     private val publicPaths =
         setOf(
@@ -19,4 +21,12 @@ internal object AuthEndpointPolicy {
 
     fun isRefreshRequest(path: String): Boolean =
         path == "/api/v1/auth/refresh-token"
+
+    fun isBackendRequest(
+        requestUrl: HttpUrl,
+        apiBaseUrl: HttpUrl,
+    ): Boolean =
+        requestUrl.scheme == apiBaseUrl.scheme &&
+            requestUrl.host == apiBaseUrl.host &&
+            requestUrl.port == apiBaseUrl.port
 }

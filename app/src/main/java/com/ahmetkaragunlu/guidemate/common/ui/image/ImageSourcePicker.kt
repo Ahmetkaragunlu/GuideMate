@@ -36,9 +36,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.image.MAX_IMAGE_UPLOAD_BYTES
+import com.ahmetkaragunlu.guidemate.common.image.detectSupportedImageMimeType
+import com.ahmetkaragunlu.guidemate.common.image.readImageSignature
 import java.io.File
 
-private const val MAX_IMAGE_BYTES = 10L * 1024 * 1024
 private const val CAMERA_IMAGE_DIRECTORY = "selected_images"
 
 @Composable
@@ -54,13 +56,14 @@ fun ImageSourcePicker(
     var pendingCameraFilePath by rememberSaveable { mutableStateOf<String?>(null) }
 
     val handleSelectedImage: (Uri) -> Boolean = { uri ->
-        val isValid = context.isImageWithinSizeLimit(uri)
-        if (isValid) {
+        val validationError = context.validateSelectedImage(uri)
+        if (validationError == null) {
             onImageSelected(uri.toString())
+            true
         } else {
-            onError(R.string.error_image_too_large)
+            onError(validationError)
+            false
         }
-        isValid
     }
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -181,9 +184,24 @@ private fun Context.createPendingCameraImage(): PendingCameraImage {
     return PendingCameraImage(uri = imageUri, file = imageFile)
 }
 
-private fun Context.isImageWithinSizeLimit(uri: Uri): Boolean =
+@StringRes
+private fun Context.validateSelectedImage(uri: Uri): Int? =
     runCatching {
-            contentResolver.openAssetFileDescriptor(uri, "r")?.use { descriptor ->
-                descriptor.length < 0 || descriptor.length <= MAX_IMAGE_BYTES
-            } ?: false
-        }.getOrDefault(false)
+            val sizeBytes =
+                contentResolver.openAssetFileDescriptor(uri, "r")?.use { descriptor ->
+                    descriptor.length
+                } ?: return@runCatching R.string.error_image_source_unavailable
+            if (sizeBytes > MAX_IMAGE_UPLOAD_BYTES) {
+                return@runCatching R.string.error_image_too_large
+            }
+
+            val signature =
+                contentResolver.openInputStream(uri)?.use { input ->
+                    input.readImageSignature()
+                } ?: return@runCatching R.string.error_image_source_unavailable
+            if (detectSupportedImageMimeType(signature) == null) {
+                R.string.error_image_invalid_type
+            } else {
+                null
+            }
+        }.getOrDefault(R.string.error_image_source_unavailable)

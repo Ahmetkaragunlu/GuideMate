@@ -10,8 +10,8 @@ import com.ahmetkaragunlu.guidemate.auth.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.auth.data.mapper.toNetwork
 import com.ahmetkaragunlu.guidemate.auth.data.remote.api.AuthApi
 import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
+import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
 import com.ahmetkaragunlu.guidemate.common.storage.installation.InstallationIdDataSource
-import com.ahmetkaragunlu.guidemate.auth.data.remote.session.TokenRefreshException
 import com.ahmetkaragunlu.guidemate.auth.data.remote.model.request.ChangePasswordRequest
 import com.ahmetkaragunlu.guidemate.auth.data.remote.model.request.ForgotPasswordRequest
 import com.ahmetkaragunlu.guidemate.auth.data.remote.model.request.GoogleLoginRequest
@@ -25,14 +25,9 @@ import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.AuthRepository
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.EmailPolicy
-import java.io.IOException
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import okhttp3.ResponseBody
-import retrofit2.HttpException
 import retrofit2.Response
 
 class AuthRepositoryImpl @Inject constructor(
@@ -42,6 +37,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val authSessionManager: AuthSessionManager,
     private val credentialSessionManager: CredentialSessionManager,
     private val apiErrorParser: ApiErrorParser,
+    private val networkExceptionMapper: NetworkExceptionMapper,
     private val emailPolicy: EmailPolicy,
 ) : AuthRepository {
     override suspend fun register(
@@ -208,15 +204,6 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            when (exception) {
-                is TokenRefreshException -> DataResult.Error(exception.error, exception)
-                is ConnectException,
-                is SocketTimeoutException,
-                -> DataResult.Error(AppError.NoResponseFromServer, exception)
-                is UnknownHostException -> DataResult.Error(AppError.NoInternet, exception)
-                is IOException -> DataResult.Error(AppError.NoInternet, exception)
-                is HttpException -> DataResult.Error(AppError.Server(exception.code()), exception)
-                else -> DataResult.Error(AppError.Unknown, exception)
-            }
+            DataResult.Error(networkExceptionMapper.map(exception), exception)
         }
 }
