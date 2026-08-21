@@ -13,7 +13,7 @@ import com.ahmetkaragunlu.guidemate.profile.presentation.account.helpsupport.Hel
 import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements.LegalAgreementsScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.account.helpsupport.model.faqEntries
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.account.legalagreements.model.legalClauses
-import com.ahmetkaragunlu.guidemate.notification.presentation.tourist.settings.NotificationSettingsScreen
+import com.ahmetkaragunlu.guidemate.notification.presentation.tourist.settings.TouristNotificationSettingsScreen
 import com.ahmetkaragunlu.guidemate.payment.presentation.savedpaymentmethod.AddSavedCardScreen
 import com.ahmetkaragunlu.guidemate.payment.presentation.savedpaymentmethod.SavedCardsScreen
 
@@ -48,7 +48,7 @@ internal fun NavGraphBuilder.touristAccountNavGraph(accountNavController: NavCon
         ChangePasswordScreen()
     }
     composable<TouristAccountDestination.NotificationSettings> {
-        NotificationSettingsScreen()
+        TouristNotificationSettingsScreen()
     }
     composable<TouristAccountDestination.LegalAgreements> {
         LegalAgreementsScreen(

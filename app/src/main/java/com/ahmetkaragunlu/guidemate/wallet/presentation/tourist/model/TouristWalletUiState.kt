@@ -2,7 +2,7 @@ package com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model
 
 import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.MoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.SavedPaymentCardUiModel
-import com.ahmetkaragunlu.guidemate.payment.presentation.model.toMoneyActionMethodUi
+import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.toMoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionUiModel
 
 data class TouristWalletUiState(

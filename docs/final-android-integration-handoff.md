@@ -745,8 +745,8 @@ bulundugu icin kalici repository yerine kullanilamaz.
 | `TourCatalogStore` | yayinlama, duzenleme, rehber turlari, guide/tourist detay, turist home/checkout/trips/profil | tour/profile/reservation repository projection'lari |
 | `TouristReservationStore` | geziler, snapshot, iptal, yorum | reservation ve review repository |
 | `TouristPaymentStore` | checkout status/success, wallet top-up | payment repository ve hosted checkout status |
-| `TouristFinanceStore` | turist bakiye, kartlar, hareketler | wallet ve payment-method repository |
-| `GuideFinanceStore` | banka hesabi, bakiye, withdrawal, hareketler | bank-account, withdrawal, wallet/earning repository |
+| `TouristWalletStore` | turist bakiye, kartlar, hareketler | wallet ve payment-method repository |
+| `GuideWalletStore` | banka hesabi, bakiye, withdrawal, hareketler | bank-account, withdrawal, wallet/earning repository |
 | `GuidePerformanceStore` | dashboard istatistikleri, seviye, profil | guide dashboard/public-profile repository |
 | `ChatStore` | sohbet listesi, mesaj, unread | REST + STOMP tabanli chat repository |
 | `GuideProfileSharedStore` | rehber hakkinda, dil ve profil resmi | guide profile/media repository |
@@ -905,7 +905,7 @@ bridge eklenmeyecek, SSL hatasi bypass edilmeyecek ve POST callback icin yalniz
 
 ### Guide Finance, Earnings ve Wallet
 
-- `GuideFinanceStore` mock bakiye, banka hesabi, wallet hareketi ve withdrawal
+- `GuideWalletStore` mock bakiye, banka hesabi, wallet hareketi ve withdrawal
   uretir.
 - Withdrawal local bakiye kontrolu yapip local `PENDING` hareket ekler.
 - Available balance local pending withdrawal toplamina gore turetilir.
@@ -1238,7 +1238,7 @@ Android'de kaldirilacak gecici odeme yapilari:
 - Local bakiye artirma/azaltma, local kontenjan kesinlestirme ve local refund
   basarisi.
 - Gercek repository baglandiktan sonra `TouristPaymentStore`,
-  `TouristFinanceStore` ve `GuideFinanceStore` kalici kaynak olarak kalmaz.
+  `TouristWalletStore` ve `GuideWalletStore` kalici kaynak olarak kalmaz.
 
 ### Ortak Veri Anayasasi - Kesin Son Karar
 
@@ -1631,8 +1631,8 @@ olusturulacaktir. Bos veya gelecege donuk repository acilmayacaktir.
 | `ReviewRepository` | Reservation review ve public tour reviews | Review form, detail yorumlari, puan refresh | Local review mutation/listeleri |
 | `PaymentRepository` | Quote, checkout, payment status/cancel | Tour checkout, top-up, payment status/WebView | `TouristPaymentStore` |
 | `SavedPaymentMethodRepository` | `/payment-methods/cards` | Kayitli kart listesi/default/delete | Sandbox kart listesi ve algilama |
-| `WalletRepository` | `/api/v1/wallet` | Tourist wallet ve iki rolde transaction UI | `TouristFinanceStore`un wallet kismi |
-| `GuideFinanceRepository` | Earnings, bank account, withdrawal | Guide wallet/earnings/bank/withdrawal | `GuideFinanceStore` |
+| `WalletRepository` | `/api/v1/wallet` | Tourist wallet ve iki rolde transaction UI | `TouristWalletStore`un wallet kismi |
+| `GuideFinanceRepository` | Earnings, bank account, withdrawal | Guide wallet/earnings/bank/withdrawal | `GuideWalletStore` |
 | `ChatRepository` | Chat REST + STOMP | Ortak chat list/detail, badge | `ChatStore` |
 | `NotificationRepository` | Notification REST + device/FCM | Guide panel, iki rol preferences/badge/deep link | Guide notification mocklari |
 
@@ -1657,8 +1657,8 @@ baslangic tuketicileridir:
 | Reservations/reviews | `screens/tourist/trips/TouristTripsViewModel.kt`, `screens/tourist/reservations/store/TouristReservationStore.kt` | Reservation snapshot, cancel/refund/review ve reservation route |
 | Checkout/payment | `screens/tourist/booking/checkout/TourCheckoutViewModel.kt`, `screens/tourist/payment/PaymentStatusViewModel.kt`, `screens/tourist/payment/store/TouristPaymentStore.kt` | Quote, hosted WebView, polling ve typed terminal state |
 | Saved cards | `screens/tourist/profile/account/savedcards/viewmodel/TouristSavedCardsViewModel.kt`, `AddSavedCardViewModel.kt`, `sandbox/SandboxCardCatalog.kt` | Provider metadata listesi; native form/sandbox algilama temizligi |
-| Tourist wallet | `screens/tourist/wallet/TouristWalletViewModel.kt`, `wallet/transactions/TouristWalletTransactionsViewModel.kt`, `finance/store/TouristFinanceStore.kt` | Wallet/transaction canonical repository |
-| Guide finance | `screens/guide/wallet/GuideMyWalletViewModel.kt`, `screens/guide/earnings/viewmodel/GuideEarningsViewModel.kt`, `screens/guide/finance/store/GuideFinanceStore.kt` | Earnings/monthly/bank/withdrawal repository |
+| Tourist wallet | `wallet/presentation/tourist/TouristWalletViewModel.kt`, `wallet/presentation/tourist/transactions/TouristWalletTransactionsViewModel.kt`, `wallet/data/mock/tourist/TouristWalletStore.kt` | Wallet/transaction canonical repository |
+| Guide finance | `wallet/presentation/guide/GuideMyWalletViewModel.kt`, `wallet/presentation/guide/earnings/GuideEarningsViewModel.kt`, `wallet/data/mock/guide/GuideWalletStore.kt` | Earnings/monthly/bank/withdrawal repository |
 | Chat | `screens/common/chat/viewmodel/ChatListViewModel.kt`, `ChatDetailViewModel.kt`, `store/ChatStore.kt` | Ortak REST + STOMP repository ve unread Flow |
 | Notification | `screens/guide/notifications/viewmodel/GuideNotificationsViewModel.kt`, iki rol notification settings ViewModel'i | REST preferences/history, FID/FCM ve semantic routing |
 | Navigation | `navigation/guide/tours/GuideTourDestination.kt`, `navigation/tourist/TouristDestination.kt` | Guide `tourId+sessionId` ve tourist reservation-detail kimlik ayrimi |
@@ -2127,13 +2127,13 @@ com.ahmetkaragunlu.guidemate/
   reservation/
   review/
   payment/
-  finance/
+  wallet/
   chat/
   notification/
 ```
 
 `tour`, `reservation`, `review`, `payment`, `chat`, `notification`, `media` ve
-`profile` isimleri backend bounded-context adlariyla uyumludur. `finance`,
+`profile` isimleri backend bounded-context adlariyla uyumludur. `wallet`,
 Android'deki wallet, guide earnings, banka hesabi ve para cekme ekranlarini tek
 uyumlu kullanici yeteneginde toplar. `home` ile `discovery` ise birden fazla
 repository projection'ini birlestiren presentation feature'laridir; kendi
@@ -2315,8 +2315,8 @@ feature/
 | `home` | Guide/tourist ana sayfa projection'larini UI'da birlestirme | `HomeRepository` acilmaz; sahip feature repository Flow'lari kullanilir |
 | `reservation` | Reservation snapshot, trips, reservation detail/cancel ve tour checkout baslatma | Public tour detayiyla ayni renderer kullanabilir; kaynak ve kimlik `reservationId`dir |
 | `review` | Review list/submit contract'i, form ve eligibility sunumu | Satin alma/rezervasyon yetkisini localde uydurmaz |
-| `payment` | Quote, hosted checkout/WebView, payment state, provider kayitli kart metadata'si | Wallet bakiyesi ve withdrawal finance'a aittir; ham kart formu kalici hedef degildir |
-| `finance` | Tourist/guide wallet, transactions, earnings, bank account ve withdrawal | Para otoritesi backend'dir; ortak money action UI bu feature'in `presentation/components` alanidir |
+| `payment` | Quote, hosted checkout/WebView, payment state, provider kayitli kart metadata'si | Wallet bakiyesi ve withdrawal wallet'a aittir; ham kart formu kalici hedef degildir |
+| `wallet` | Tourist/guide wallet, transactions, earnings, bank account ve withdrawal | Para otoritesi backend'dir; ortak money action UI bu feature'in `presentation/components` alanidir |
 | `chat` | Conversation/message modelleri, REST/STOMP repository, ortak chat list/detail ve unread | Guide/tourist icin ayri mesaj veri kaynagi olusturulmaz |
 | `notification` | Notification REST, preferences, FCM device/receiver, semantic target ve guide paneli | Tourist history ekrani urun karari olmadan eklenmez; iki rol ortak unread/preferences kaynagini kullanir |
 
@@ -2364,9 +2364,9 @@ gelmez; DTO/domain/UI ayrimi yukaridaki katman kuralina gore yapilir.
 | `screens/tourist/reviews` ve review mutation modelleri | `review/domain|presentation` | Review repository Adim 6'da eklenecek |
 | `screens/tourist/payment` | `payment/presentation` ve gecici `payment/data/mock` | Hosted WebView/status entegrasyonu burada |
 | Tourist `profile/account/savedcards` ve kart metadata modelleri | `payment/presentation/savedpaymentmethod` ve gecici `payment/data/mock` | Native ham kart formu Adim 6'da kaldirilir |
-| `screens/common/moneyaction` | `finance/presentation/components` | Yalniz money akislarinda gercek ortak UI |
-| `screens/guide/earnings`, `wallet`, `finance`, guide `bankaccounts` | `finance/presentation/guide`, `finance/data/mock` | Earnings/bank/withdrawal tek feature |
-| `screens/tourist/finance`, `wallet` | `finance/presentation/tourist`, `finance/data/mock` | Wallet/transaction; kart metadata payment'a ayrilir |
+| `screens/common/moneyaction` | `wallet/presentation/components` | Yalniz money akislarinda gercek ortak UI |
+| `screens/guide/earnings`, `wallet`, `finance`, guide `bankaccounts` | `wallet/presentation/guide`, `wallet/data/mock` | Earnings/bank/withdrawal tek feature |
+| `screens/tourist/finance`, `wallet` | `wallet/presentation/tourist`, `wallet/data/mock` | Wallet/transaction; kart metadata payment'a ayrilir |
 | `screens/common/chat` | `chat/domain`, `chat/data/mock`, `chat/presentation/list|detail|components` | Tek guide-tourist sohbet kaynagi; feature icinde `common` acilmaz |
 | `screens/guide/notifications`, iki rol notification settings | `notification/presentation/guide|tourist|settings|components` | FCM/REST sonradan ayni feature'a baglanir |
 
@@ -2391,8 +2391,8 @@ dagitilmayacaktir:
 5. Location/language picker `common/location`; currency/date genel formatter
    `common/ui/formatting`; tour'a ozel tarih etiketi `tour/presentation/components`
    altindadir.
-6. Money action bottom sheet `finance/presentation/components` altindadir. Kart
-   provider metadata modeli `payment`, banka hesabi modeli `finance` sahibi
+6. Money action bottom sheet `wallet/presentation/components` altindadir. Kart
+   provider metadata modeli `payment`, banka hesabi modeli `wallet` sahibi
    olarak kalir; ortak bottom sheet yalniz UI projection'i alir.
 7. Help/legal ekranlari `profile/presentation/account` altindadir;
    role-specific FAQ/clause listeleri gerekliyse yalniz veri listesi olarak
@@ -2429,14 +2429,14 @@ Ek kurallar:
   kucuk presentation renderer'i uzerinden tek yonlu olur. Baska feature'in
   ekran ViewModel'i, role-specific UiState'i veya internal component'i
   kullanilmaz.
-- `home` guide tarafinda tour/profile/finance/notification; tourist tarafinda
+- `home` guide tarafinda tour/profile/wallet/notification; tourist tarafinda
   tour/profile repository Flow'larini birlestirebilir. Bunun icin ayri
   `HomeRepository` acilmaz.
 - `discovery`, tour ve public profile repository'lerini kullanir; arama
   sonucunu kendi local mock listesiyle ikinci kaynak yapmaz.
 - `reservation`, public tour/session kimligini kullanir ve payment akisini
   callback/domain contract ile baslatir. `payment`, reservation UI'sini bilmez.
-- `finance`, saved payment method secimi icin payment domain projection'ini
+- `wallet`, saved payment method secimi icin payment domain projection'ini
   kullanabilir; payment wallet bakiyesini sahiplenmez.
 - Notification semantic hedefi ham route string tasimaz. Notification target'i
   feature tarafinda typed anlami tasir, merkezi `navigation` bunu destination'a
@@ -2459,8 +2459,8 @@ ekranlar bos birakilmayacaktir. Gecici hedefleri ile final sahipleri sunlardir:
 | `GuideProfileSharedStore`, `GuidePerformanceStore` | `profile/data/mock` | `GuideProfileRepository` |
 | `TouristReservationStore` | `reservation/data/mock` | `ReservationRepository` |
 | `TouristPaymentStore` | `payment/data/mock` | `PaymentRepository` |
-| `TouristFinanceStore` | Gecici olarak `finance/data/mock` | Wallet kismi `WalletRepository`, kart kismi `SavedPaymentMethodRepository` |
-| `GuideFinanceStore` | `finance/data/mock` | `GuideFinanceRepository` |
+| `TouristWalletStore` | Gecici olarak `wallet/data/mock` | Wallet kismi `WalletRepository`, kart kismi `SavedPaymentMethodRepository` |
+| `GuideWalletStore` | `wallet/data/mock` | `GuideFinanceRepository` |
 | `ChatStore` ve `ChatMockData` | `chat/data/mock` | `ChatRepository` REST + STOMP |
 | Guide notification mock state | `notification/data/mock` veya ViewModel fixture'i | `NotificationRepository` + FCM |
 
@@ -2532,7 +2532,7 @@ tutma sirasidir:
 5. `media`, `profile` ve `tour` sahiplikleri tasinir. Ortak tour/profile
    modelleri once hedefe alinip guide/tourist importlari ayni dilimde
    guncellenir; kopya model birakilmaz.
-6. `reservation`, `review`, `payment` ve `finance` tasinir. Kart metadata,
+6. `reservation`, `review`, `payment` ve `wallet` tasinir. Kart metadata,
    wallet ve bank account sinirlari yukaridaki matrise gore ayrilir; mock
    davranisi korunur.
 7. `chat` ve `notification` ortak role akisiyla birlikte tasinir.
@@ -2554,7 +2554,7 @@ biriktirilmez.
 - Unit test package'i urettigi sinifin yeni package'ini birebir izler.
 - `CurrencyFormatterTest` `common/ui/formatting`; guide level testleri `profile`;
   tour lifecycle/mapper/store testleri `tour`; IBAN ve wallet testleri
-  `finance`; reservation/review testleri ilgili feature altina tasinir.
+  `wallet`; reservation/review testleri ilgili feature altina tasinir.
 - Mock store testleri store kaldirilana kadar korunur. Gercek repository
   entegrasyonunda bunlar repository/mapper/ViewModel testleriyle degistirilir;
   ayni davranisi iki kez test eden eski mock testi tutulmaz.
@@ -2630,6 +2630,9 @@ Bir faz asagidakilerin tamami saglanmadan tamamlandi sayilmaz:
   Android tarafinda uydurulmaz.
 - Repository interface'i presentation'in somut data adapter'ini bilmesini
   engeller; feature data paketi baska feature'in data paketine baglanmaz.
+- Bu fazda gercek repository akisina gecirilen feature'in `data` katmani,
+  `presentation` model, mapper veya component'ini import etmez. Fazi henuz
+  gelmeyen gecici mock feature'lar yalniz kendi fazlarina kadar istisnadir.
 - Hata sonucu merkezi `DataResult/AppError` sozlesmesine map edilir; ham backend
   mesaji veya HTTP kodu ViewModel'da yorumlanmaz.
 - Liste ekraninda loading, empty, retry, refresh ve gerekiyorsa append-loading
@@ -2731,7 +2734,7 @@ Backend baglantisi ile binlerce package/import tasimasi ayni degisiklikte
 karistirilmayacaktir. Once Adim 5'teki fiziksel refactor uygulanir:
 
 - Kokte `auth`, `media`, `profile`, `tour`, `discovery`, `home`,
-  `reservation`, `review`, `payment`, `finance`, `chat`, `notification`,
+  `reservation`, `review`, `payment`, `wallet`, `chat`, `notification`,
   `common`, `navigation` ve `di` sahiplikleri kurulur.
 - Mevcut navigation hiyerarsisi merkezi kalir; route ve back-stack davranisi
   degismez.
@@ -2962,7 +2965,7 @@ Yapilacaklar:
 
 Mock temizleme kapisi:
 
-- `TouristFinanceStore`un wallet/transaction kismi gercek `WalletRepository`
+- `TouristWalletStore`un wallet/transaction kismi gercek `WalletRepository`
   akisina gecince kaldirilir.
 - `SandboxCardCatalog`, kart numarasindan banka/marka tahmini, native ham kart
   formu ve bunlara ait runtime state tamamen kaldirilir.
@@ -3019,7 +3022,7 @@ Yapilacaklar:
 
 Mock temizleme kapisi:
 
-- `GuideFinanceStore`, wallet/earnings/bank/withdrawal ekranlarinin tamami
+- `GuideWalletStore`, wallet/earnings/bank/withdrawal ekranlarinin tamami
   gercek repository'ye gectigi ayni fazda kaldirilir.
 - Manuel bakiye azaltma, sabit earning history ve her hesaba ait ayri sahte
   bakiye kaldirilir.
@@ -3089,7 +3092,7 @@ Mock temizleme kapisi:
 Feature'lar birbirinin repository implementation'ini veya data paketini
 import etmez. Gerekli cross-feature akislari su sinirla kurulur:
 
-- `home`, guide icin tour/profile/finance/notification; tourist icin
+- `home`, guide icin tour/profile/wallet/notification; tourist icin
   tour/profile repository Flow'larini presentation seviyesinde birlestirir.
 - `discovery`, public tour ve public profile repository interface'lerini
   kullanir; kendine ikinci kalici veri kaynagi acmaz.
@@ -3097,7 +3100,7 @@ import etmez. Gerekli cross-feature akislari su sinirla kurulur:
   provider detayini bilmez.
 - `payment`, checkout sonucunda donen reservation ID/state'i domain sonucu
   olarak tasir; reservation ekran veya ViewModel'ini import etmez.
-- `finance`, provider saved method metadata'sini gerekiyorsa dar payment domain
+- `wallet`, provider saved method metadata'sini gerekiyorsa dar payment domain
   projection'iyle kullanir; payment data paketine baglanmaz.
 - `chat` ve `notification`, current user kimligini auth `UserRepository`
   sozlesmesinden okur; sabit role/user ID uretmez.
@@ -3117,10 +3120,10 @@ paylasilan canonical Flow'u veya STOMP/FCM invalidation olayi kullanilir.
 | `TourCatalogStore`, tour mock/timeline | Guide private + tourist public tour | Guide parcasi Faz 4, kalan tum store Faz 5 |
 | `TouristReservationStore` | Trips/detail/cancel snapshot | Faz 6 |
 | Local review list/mutation | Reviews/detail/performance refresh | Faz 7 |
-| `TouristFinanceStore` wallet kismi | Wallet balance/transactions | Faz 8 |
+| `TouristWalletStore` wallet kismi | Wallet balance/transactions | Faz 8 |
 | `SandboxCardCatalog`, native Add Card state | Provider saved methods | Faz 8 |
 | `TouristPaymentStore` | Quote/WebView/polling/payment result | Faz 9 |
-| `GuideFinanceStore` | Earnings/bank/withdrawal | Faz 10 |
+| `GuideWalletStore` | Earnings/bank/withdrawal | Faz 10 |
 | `ChatStore`, `ChatMockData`, mock viewer identity | Chat REST/STOMP | Faz 11 |
 | Guide notification mocklari/manual unread | Notification REST/FCM | Faz 12 |
 
@@ -3265,6 +3268,8 @@ taranir:
 
 - Presentation paketi Retrofit API, DTO, repository implementation veya MVP
   store import etmez.
+- Feature `data` katmani `presentation` model, mapper veya component'ini import
+  etmez.
 - Feature `data` paketi baska feature'in `data` paketini import etmez.
 - Feature domain katmani Android UI, Retrofit, provider SDK veya navigation
   tipini bilmez.
@@ -3582,8 +3587,8 @@ yazilmaz.
 Adim 6 tamamlandiktan sonra su runtime kalintilar bulunmamalidir:
 
 - `TourCatalogStore`, `GuideProfileSharedStore`, `GuidePerformanceStore`.
-- `TouristReservationStore`, `TouristPaymentStore`, `TouristFinanceStore`.
-- `GuideFinanceStore`, `ChatStore`, `ChatMockData` ve guide notification
+- `TouristReservationStore`, `TouristPaymentStore`, `TouristWalletStore`.
+- `GuideWalletStore`, `ChatStore`, `ChatMockData` ve guide notification
   mocklari.
 - `SandboxCardCatalog`, native Add Card raw-card formu ve mock verification
   timer/fonksiyonlari.

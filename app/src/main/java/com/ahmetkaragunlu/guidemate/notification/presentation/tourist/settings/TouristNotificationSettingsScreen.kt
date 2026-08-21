@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.notification.presentation.guide.settings
+package com.ahmetkaragunlu.guidemate.notification.presentation.tourist.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,32 +29,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 
 @Composable
-fun NotificationSettingsScreen(
+fun TouristNotificationSettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: GuideNotificationSettingsViewModel = hiltViewModel(),
+    viewModel: TouristNotificationSettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    NotificationSettingsContent(
+    TouristNotificationSettingsContent(
         modifier = modifier,
         uiState = uiState,
-        onUpcomingTourRemindersChanged = viewModel::onUpcomingTourRemindersChanged,
-        onTouristMessagesChanged = viewModel::onTouristMessagesChanged,
+        onUpcomingReminderChanged = viewModel::onUpcomingReminderChanged,
+        onGuideMessagesChanged = viewModel::onGuideMessagesChanged,
         onReservationUpdatesChanged = viewModel::onReservationUpdatesChanged,
-        onPaymentsAndEarningsChanged = viewModel::onPaymentsAndEarningsChanged,
-        onNewReviewsChanged = viewModel::onNewReviewsChanged,
+        onReviewRequestsChanged = viewModel::onReviewRequestsChanged,
     )
 }
 
 @Composable
-private fun NotificationSettingsContent(
+private fun TouristNotificationSettingsContent(
     modifier: Modifier = Modifier,
-    uiState: GuideNotificationSettingsUiState,
-    onUpcomingTourRemindersChanged: (Boolean) -> Unit,
-    onTouristMessagesChanged: (Boolean) -> Unit,
+    uiState: TouristNotificationSettingsUiState,
+    onUpcomingReminderChanged: (Boolean) -> Unit,
+    onGuideMessagesChanged: (Boolean) -> Unit,
     onReservationUpdatesChanged: (Boolean) -> Unit,
-    onPaymentsAndEarningsChanged: (Boolean) -> Unit,
-    onNewReviewsChanged: (Boolean) -> Unit,
+    onReviewRequestsChanged: (Boolean) -> Unit,
 ) {
     Column(
         modifier =
@@ -62,23 +60,23 @@ private fun NotificationSettingsContent(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
     ) {
-        SectionTitle(title = stringResource(id = R.string.guide_notification_tours_and_reservations))
+        SectionTitle(title = stringResource(id = R.string.notification_tours_and_reservations))
 
         SettingsSwitchRow(
-            title = stringResource(id = R.string.guide_upcoming_tour_reminders),
-            subtitle = stringResource(id = R.string.guide_upcoming_tour_reminders_desc),
-            isChecked = uiState.upcomingTourReminders,
-            onCheckedChange = onUpcomingTourRemindersChanged,
+            title = stringResource(id = R.string.upcoming_tour_reminders),
+            subtitle = stringResource(id = R.string.upcoming_tour_reminders_desc),
+            isChecked = uiState.upcomingReminder,
+            onCheckedChange = onUpcomingReminderChanged,
         )
         SettingsSwitchRow(
-            title = stringResource(id = R.string.guide_tourist_messages),
-            subtitle = stringResource(id = R.string.guide_tourist_messages_desc),
-            isChecked = uiState.touristMessages,
-            onCheckedChange = onTouristMessagesChanged,
+            title = stringResource(id = R.string.guide_messages),
+            subtitle = stringResource(id = R.string.guide_messages_desc),
+            isChecked = uiState.guideMessages,
+            onCheckedChange = onGuideMessagesChanged,
         )
         SettingsSwitchRow(
-            title = stringResource(id = R.string.guide_reservation_updates),
-            subtitle = stringResource(id = R.string.guide_reservation_updates_desc),
+            title = stringResource(id = R.string.reservation_updates),
+            subtitle = stringResource(id = R.string.reservation_updates_desc),
             isChecked = uiState.reservationUpdates,
             onCheckedChange = onReservationUpdatesChanged,
         )
@@ -89,23 +87,17 @@ private fun NotificationSettingsContent(
             modifier = Modifier.padding(vertical = 12.dp),
         )
 
-        SectionTitle(title = stringResource(id = R.string.guide_account_and_interaction))
+        SectionTitle(title = stringResource(id = R.string.account_and_interaction))
 
         SettingsSwitchRow(
-            title = stringResource(id = R.string.guide_payments_and_earnings),
-            subtitle = stringResource(id = R.string.guide_payments_and_earnings_desc),
-            isChecked = uiState.paymentsAndEarnings,
-            onCheckedChange = onPaymentsAndEarningsChanged,
+            title = stringResource(id = R.string.review_requests),
+            subtitle = stringResource(id = R.string.review_requests_desc),
+            isChecked = uiState.reviewRequests,
+            onCheckedChange = onReviewRequestsChanged,
         )
         SettingsSwitchRow(
-            title = stringResource(id = R.string.guide_new_reviews),
-            subtitle = stringResource(id = R.string.guide_new_reviews_desc),
-            isChecked = uiState.newReviews,
-            onCheckedChange = onNewReviewsChanged,
-        )
-        SettingsSwitchRow(
-            title = stringResource(id = R.string.guide_security_alerts),
-            subtitle = stringResource(id = R.string.guide_security_alerts_desc),
+            title = stringResource(id = R.string.security_alerts),
+            subtitle = stringResource(id = R.string.security_alerts_desc),
             isChecked = uiState.securityAlerts,
             onCheckedChange = {},
             enabled = false,

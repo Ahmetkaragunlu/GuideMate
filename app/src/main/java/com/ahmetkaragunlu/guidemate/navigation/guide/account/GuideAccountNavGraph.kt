@@ -12,7 +12,7 @@ import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.about.Abo
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.BankAccountsScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.helpsupport.model.guideFaqEntries
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.legalagreements.model.guideLegalClauses
-import com.ahmetkaragunlu.guidemate.notification.presentation.guide.settings.NotificationSettingsScreen
+import com.ahmetkaragunlu.guidemate.notification.presentation.guide.settings.GuideNotificationSettingsScreen
 
 internal fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {
     composable<GuideAccountDestination.BankAccounts> {
@@ -25,7 +25,7 @@ internal fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {
         ChangePasswordScreen()
     }
     composable<GuideAccountDestination.NotificationSettings> {
-        NotificationSettingsScreen()
+        GuideNotificationSettingsScreen()
     }
     composable<GuideAccountDestination.LegalAgreements> {
         LegalAgreementsScreen(

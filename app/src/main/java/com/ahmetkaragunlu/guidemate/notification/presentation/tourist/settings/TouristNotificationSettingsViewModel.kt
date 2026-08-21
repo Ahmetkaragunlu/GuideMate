@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class NotificationSettingsViewModel @Inject constructor() : ViewModel() {
+class TouristNotificationSettingsViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NotificationSettingsUiState())
-    val uiState: StateFlow<NotificationSettingsUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(TouristNotificationSettingsUiState())
+    val uiState: StateFlow<TouristNotificationSettingsUiState> = _uiState.asStateFlow()
 
     fun onUpcomingReminderChanged(enabled: Boolean) {
         _uiState.update { it.copy(upcomingReminder = enabled) }

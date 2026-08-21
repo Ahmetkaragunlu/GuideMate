@@ -1,8 +1,5 @@
 package com.ahmetkaragunlu.guidemate.payment.presentation.model
 
-import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.MoneyActionMethodType
-import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.MoneyActionMethodUi
-
 data class SavedPaymentCardUiModel(
     val cardId: String,
     val bankName: String,
@@ -29,11 +26,3 @@ data class SavedPaymentCardUiModel(
                 cardFamily?.takeIf(String::isNotBlank),
             ).joinToString(separator = " ")
 }
-
-fun SavedPaymentCardUiModel.toMoneyActionMethodUi(): MoneyActionMethodUi =
-    MoneyActionMethodUi(
-        id = cardId,
-        title = displayName,
-        subtitle = maskedCardNumber,
-        type = MoneyActionMethodType.CARD,
-    )

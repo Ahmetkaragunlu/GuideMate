@@ -2,8 +2,8 @@ package com.ahmetkaragunlu.guidemate.wallet.presentation.guide
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.guide.model.toMoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.wallet.data.mock.guide.GuideWalletStore
+import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.toMoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.model.GuideWalletUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
