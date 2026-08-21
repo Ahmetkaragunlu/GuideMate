@@ -8,12 +8,12 @@ import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristDestination
 import com.ahmetkaragunlu.guidemate.navigation.tourist.account.TouristAccountStart
-import com.ahmetkaragunlu.guidemate.screens.tourist.booking.checkout.TourCheckoutScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.payment.PaymentStatusScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.payment.PaymentSuccessScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.payment.model.PaymentPurpose
-import com.ahmetkaragunlu.guidemate.screens.tourist.wallet.TouristWalletScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.wallet.transactions.TouristWalletTransactionsScreen
+import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.TourCheckoutScreen
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.PaymentStatusScreen
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.PaymentSuccessScreen
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentPurpose
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.TouristWalletScreen
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.transactions.TouristWalletTransactionsScreen
 
 internal fun NavGraphBuilder.touristPaymentNavGraph(
     touristNavController: NavController,

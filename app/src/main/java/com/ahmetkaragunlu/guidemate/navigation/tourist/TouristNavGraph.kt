@@ -4,24 +4,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.ahmetkaragunlu.guidemate.domain.model.UserRole
+import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.tourist.account.TouristAccountStart
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.touristPaymentNavGraph
-import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatDetailScreen
-import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatListScreen
-import com.ahmetkaragunlu.guidemate.screens.common.chat.viewmodel.ChatListViewModel
-import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristExploreScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.explore.TouristFilterScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.home.TouristHomeViewModel
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.TouristProfileScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.profile.model.TouristProfileMenuTarget
-import com.ahmetkaragunlu.guidemate.screens.tourist.trips.TouristTripsScreen
-import com.ahmetkaragunlu.guidemate.screens.tourist.tours.TouristTourDetailScreen
+import com.ahmetkaragunlu.guidemate.chat.presentation.ChatDetailScreen
+import com.ahmetkaragunlu.guidemate.chat.presentation.ChatListScreen
+import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
+import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristExploreScreen
+import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristFilterScreen
+import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeScreen
+import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
+import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.TouristProfileScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.TouristProfileMenuTarget
+import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.TouristTripsScreen
+import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.detail.TouristTourDetailScreen
 
 internal fun NavGraphBuilder.touristNavGraph(
     touristNavController: NavController,

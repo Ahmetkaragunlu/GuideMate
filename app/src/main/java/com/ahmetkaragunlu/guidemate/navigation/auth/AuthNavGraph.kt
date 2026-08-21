@@ -6,10 +6,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.screens.auth.forgotpassword.ForgotPasswordScreen
-import com.ahmetkaragunlu.guidemate.screens.auth.onboarding.OnboardingScreen
-import com.ahmetkaragunlu.guidemate.screens.auth.signin.SignInScreen
-import com.ahmetkaragunlu.guidemate.screens.auth.signup.SignUpScreen
+import com.ahmetkaragunlu.guidemate.auth.presentation.forgotpassword.ForgotPasswordScreen
+import com.ahmetkaragunlu.guidemate.auth.presentation.onboarding.OnboardingScreen
+import com.ahmetkaragunlu.guidemate.auth.presentation.signin.SignInScreen
+import com.ahmetkaragunlu.guidemate.auth.presentation.signup.SignUpScreen
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavController,

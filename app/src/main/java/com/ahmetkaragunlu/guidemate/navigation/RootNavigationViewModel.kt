@@ -2,12 +2,12 @@ package com.ahmetkaragunlu.guidemate.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.common.DataResult
-import com.ahmetkaragunlu.guidemate.domain.model.UserRole
-import com.ahmetkaragunlu.guidemate.domain.model.UserState
-import com.ahmetkaragunlu.guidemate.domain.repository.AuthRepository
-import com.ahmetkaragunlu.guidemate.domain.repository.OnboardingRepository
-import com.ahmetkaragunlu.guidemate.domain.repository.UserRepository
+import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
+import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
+import com.ahmetkaragunlu.guidemate.auth.domain.repository.AuthRepository
+import com.ahmetkaragunlu.guidemate.auth.domain.repository.OnboardingRepository
+import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.navigation.auth.AuthStartDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

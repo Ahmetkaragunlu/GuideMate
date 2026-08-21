@@ -24,7 +24,7 @@ import com.ahmetkaragunlu.guidemate.navigation.guide.GuideNavigation
 import com.ahmetkaragunlu.guidemate.navigation.guide.account.GuideAccountNavigation
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristNavigation
 import com.ahmetkaragunlu.guidemate.navigation.tourist.account.TouristAccountNavigation
-import com.ahmetkaragunlu.guidemate.screens.auth.roleselection.RoleSelectionScreen
+import com.ahmetkaragunlu.guidemate.auth.presentation.roleselection.RoleSelectionScreen
 
 @Composable
 fun GuideMateNavigation(

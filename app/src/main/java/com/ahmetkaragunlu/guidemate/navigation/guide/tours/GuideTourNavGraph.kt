@@ -4,10 +4,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.GUIDE_MY_TOURS_SELECTED_TAB_RESULT
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.GuideMyToursScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.detail.GuideTourDetailScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.tours.edit.GuideTourEditScreen
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.GUIDE_MY_TOURS_SELECTED_TAB_RESULT
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.GuideMyToursScreen
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.detail.GuideTourDetailScreen
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.GuideTourEditScreen
 
 internal fun NavGraphBuilder.guideTourNavGraph(
     navController: NavController,

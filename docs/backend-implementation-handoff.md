@@ -499,7 +499,7 @@ Tam kart numarasi ve CVV hicbir zaman tutulmaz veya loglanmaz. Android'e
 provider tokeni dondurulmaz; yalniz internal `savedPaymentMethodId` ve maskeli
 metadata dondurulur.
 
-#### `payment_fx_quotes` (ertelenen coklu tahsilat dilimi)
+#### `payment_fx_quotes`
 
 - `id UUID PK`
 - `user_id BIGINT FK users`
@@ -517,9 +517,8 @@ Quote, checkout'tan once backend tarafindan olusturulan kisa omurlu ve
 kullaniciya bagli bir snapshot'tir. Android kur, charge tutari veya expiry
 uretmez. Ayni quote yalniz ayni kullanici, amac, canonical tutar ve secilen para
 birimi icin kullanilir; suresi gecmis ya da farkli intent ile kullanilan quote
-reddedilir. Bu tablo ve ilgili kod mevcut USD-only akisa simdi eklenmez;
-`Ertelenmis Coklu Tahsilat Para Birimi Dikey Dilimi` uygulanirken yeni Flyway
-migration'i ile eklenir.
+reddedilir. Tablo ve ilgili canonical-charge snapshot alanlari `V13` migration'i
+ile eklenmistir.
 
 #### `payments`
 
@@ -757,19 +756,21 @@ Guvenlik uyarilari kullanici tarafindan kapatilamaz. Bu nedenle tabloda
 `security_alerts_enabled` tutulmaz; GET response'u Android'in kilitli satiri icin
 read-only `securityAlertsEnabled=true` dondurur ve PATCH bu alani kabul etmez.
 
-#### `device_tokens`
+#### `device_registrations`
 
 - `id UUID PK`
 - `user_id BIGINT FK users`
 - `installation_id UUID`
-- `fcm_token TEXT UNIQUE`
+- `firebase_installation_id VARCHAR(128) UNIQUE`
 - `platform VARCHAR`: `ANDROID`
 - `active BOOLEAN`
 - `last_seen_at TIMESTAMPTZ`
 - `created_at`, `updated_at`
 
-Logout/account switch eski token iliskisini pasif hale getirir. FCM credential
-yalniz backend secret/environment'ta bulunur.
+`installation_id` GuideMate kurulum kimligidir; FCM teslimati icin kullanilan
+Firebase Installation ID (FID) ayri alanda tutulur. Logout/account switch eski
+kurulum iliskisini pasif hale getirir. FID response'a veya log'a yazilmaz. FCM
+credential yalniz backend secret/environment'ta bulunur.
 
 ## Olusturulmayacak Tablolar
 
@@ -813,7 +814,7 @@ yalniz backend secret/environment'ta bulunur.
 - `wallets 1:N withdrawals`
 - `bank_accounts 1:N withdrawals`
 - `guide + tourist 1:1 chat_conversation`, conversation `1:N messages`
-- `users 1:N notifications/device_tokens`
+- `users 1:N notifications/device_registrations`
 
 ### Normalize Iliski Otoritesi
 
@@ -849,7 +850,7 @@ yalniz backend secret/environment'ta bulunur.
 - Idempotency key kullanici + operation scope'unda unique olur.
 - Provider payment, refund ve event kimlikleri tekrar edemez.
 - Kullanici basina tek default saved card ve rehber basina tek default banka
-  hesabi partial unique index ile korunur.
+  hesabi `default_guard` + unique constraint ile korunur.
 - Onemli indexler: session `(tour_id)`, `(status, starts_at)`; tour
   `(guide_id, approval_status)`; reservation `(session_id, status)`,
   `(tourist_id, created_at)`; review unique `(reservation_id)` ve
@@ -980,6 +981,14 @@ Tur arama item'i en az `tourId`, `sessionId`, baslik, kategori kodu, sehir/ulke,
 `reviewCount` ve public rehber ozetini tasir. Android yuklenen sayfayi tekrar
 lokal filtreleyerek backend sonucunu degistirmez.
 
+Rehberin kendi tur karti response'u `capacity` alaninda toplam kapasiteyi,
+`bookedCount` alaninda dolu katilimci sayisini tasir. `averageRating` ve
+`reviewCount` tur bazli; nullable `netEarningsMinor` session bazlidir. Session
+kazancina `PENDING` ve `AVAILABLE` dahil, `REVERSED` harictir; iptal edilen veya
+henuz kazanc olusmayan session icin `netEarningsMinor=null` dondurulur. Kart
+sayfasindaki tur puanlari tour ID listesiyle, kazanc session ID listesiyle toplu
+sorgulanir; kart basina ayri sorgu/N+1 olusturulmaz.
+
 `GET /api/v1/guides/me/dashboard` rehberi JWT principal'dan bulur ve tek bir
 current-guide projection'i dondurur:
 
@@ -1021,8 +1030,8 @@ gordugu rehber ozeti ve ileride en iyi rehberler listesini besler.
 - Tur aliminda Android toplam fiyat gondermez. Yalniz `sessionId` ve
   `participantCount` gonderir; backend guncel kisi basi fiyatla toplam tutari
   guvenli minor-unit aritmetigiyle hesaplar.
-- Wallet top-up intent'i yalniz pozitif canonical USD miktari tasir;
-  ertelenen coklu tahsilat quote istegi buna secilen `chargeCurrencyCode` degerini
+- Wallet top-up intent'i yalniz pozitif canonical USD miktari tasir; coklu
+  tahsilat quote istegi buna secilen `chargeCurrencyCode` degerini
   ekler, kur veya hesaplanmis charge tutari eklemez. Withdrawal istegi yalniz
   `bankAccountId` ve pozitif miktar tasir. Withdrawal guncel available balance'i
   asamaz ve tutar transaction icinde rezerve edilir.
@@ -1159,13 +1168,11 @@ kurallari sonrasinda olusur.
 
 ## Iyzico Sandbox ve Checkout Form
 
-### Ertelenmis Coklu Tahsilat Para Birimi Karari
+### Coklu Tahsilat Para Birimi Uygulamasi
 
-Bu karar mevcut calisan USD Checkout Form akisini simdi degistirmez. Uygulamanin
-kalan backend ve Android akislari tamamlandiktan sonra, final Android odeme
-entegrasyonundan once tek bir dikey dilim olarak uygulanir. Eski USD-only kod
-parca parca gevsetilmez; migration, contract, provider, iade, Android ve test
-birlikte tamamlanir.
+Backend dikey dilimi tamamlanmistir. Canonical USD ile provider tahsilat parasi
+ayri tutulur; final Android odeme entegrasyonu bu kesinlesmis quote ve checkout
+sozlesmesini tuketecektir.
 
 Canonical para ile tahsilat parasi ayridir:
 
@@ -1189,9 +1196,9 @@ Para birimi secimi ve quote sozlesmesi:
   birimleri arasindan kullaniciya secim yaptirir. Liste ekranlara dagitilmis
   hardcoded sabitlerden degil backend config/provider capability sonucundan
   gelir.
-- Iyzico Checkout Form dokumaninda su an yer alan `TRY`, `USD`, `EUR`, `GBP`,
-  `NOK`, `CHF` aday listedir; production/Sandbox hesabinda gercekten etkin olan
-  alt kume implementasyon basinda yeniden dogrulanir ve config ile yonetilir.
+- Iyzico Checkout Form dokumanindaki `TRY`, `USD`, `EUR`, `GBP`, `NOK`, `CHF`
+  provider adaylaridir. GuideMate local/Sandbox varsayilani config-backed
+  `USD`, `TRY`, `EUR`, `GBP` alt kumesidir; Android listeyi backend'den alir.
 - Backend kullanici profil ulkesi veya Android'in bolge tercihini yalniz
   varsayilan secim onerisi icin kullanabilir. GPS, IP/VPN veya kart numarasindan
   cikarim tahsilat para biriminin otoritesi olmaz; kullanici secimi degistirebilir.
@@ -1211,29 +1218,28 @@ Para birimi secimi ve quote sozlesmesi:
 
 Backend uygulama kapsami:
 
-- FX saglayicisi dar bir `ExchangeRateProvider` adapter sinirinin arkasinda
-  tutulur. Saglayici secilmeden once API key, ucret, rate limit, guncellenme
-  sikligi, timeout/fallback ve kullanim kosullari kullaniciya bildirilir; sahte
-  production kuru eklenmez.
-- Yeni Flyway migration'i `payment_fx_quotes` tablosunu ve `payments`/`refunds`
-  icindeki canonical ile charge snapshot alanlarini ekler. Uygulanmis mevcut
-  migration degistirilmez.
-- `GET /api/v1/payments/checkout/currencies`,
+- Tamamlandi: FX saglayicisi dar `ExchangeRateProvider` adapter sinirinin
+  arkasindaki Frankfurter ECB referans kurudur. API key ve ucret gerektirmez;
+  timeout'lar config ile sinirlidir ve sabit/sahte kur fallback'i yoktur.
+- Tamamlandi: `V13__add_multi_currency_payment_quotes.sql`,
+  `payment_fx_quotes` tablosunu ve `payments`/`refunds` canonical-charge snapshot
+  alanlarini ekler; eski hosted USD kayitlari geriye uyumlu backfill edilir.
+- Tamamlandi: `GET /api/v1/payments/checkout/currencies`,
   `POST /api/v1/payments/checkout/tour/quote` ve
-  `POST /api/v1/payments/checkout/wallet-top-up/quote` sozlesmeleri eklenir.
-  Mevcut initialize endpoint'leri aktif coklu tahsilat akisinda yalniz gecerli
-  `quoteId` kabul eder.
-- Initialize provider'a quote'taki `chargeAmountMinor/chargeCurrencyCode`
+  `POST /api/v1/payments/checkout/wallet-top-up/quote` sozlesmeleri eklenmistir.
+  Hosted initialize endpoint'leri yalniz gecerli `quoteId` kabul eder.
+- Tamamlandi: initialize provider'a quote'taki `chargeAmountMinor/chargeCurrencyCode`
   degerlerini yollar. Retrieve, callback, webhook ve reconciliation provider
   payment kimliginin yaninda tahsil edilen tutar ile para birimini de payment
   snapshot'ina karsi dogrular.
-- Idempotency ayni key ile farkli quote, canonical tutar, charge tutari veya para
+- Tamamlandi: idempotency ayni key ile farkli quote, canonical tutar, charge tutari veya para
   birimi kullanilmasini `IDEMPOTENCY_CONFLICT` olarak reddeder.
-- Provider iadesi orijinal tahsilat para birimiyle ve payment'ta saklanan charge
-  snapshot'ina gore yapilir; internal ledger reversal canonical USD kalir.
-  Partial refund yuvarlamasi merkezi ve deterministik olur, hem canonical hem
-  charge toplaminda asil odemeyi asamaz ve duplicate istekte ikinci iade uretmez.
-- OpenAPI, DTO, mapper, domain, repository, service, provider adapter,
+- Tamamlandi: mevcut urun politikasindaki tam provider iadesi orijinal tahsilat
+  para birimiyle ve payment'ta saklanan kalan charge snapshot'ina gore yapilir;
+  internal ledger reversal canonical USD kalir. Urunde partial refund davranisi
+  olmadigi icin kullanilmayan partial endpoint/politika eklenmez; ileride urun
+  kapsamina girerse canonical-charge dagitimi ve cumulative cap birlikte yazilir.
+- Tamamlandi: OpenAPI, DTO, domain, repository, service, provider adapter,
   reconciliation, refund, config ve error mapping birlikte guncellenir. Bu
   geciste tamamen bosa dusen USD-only property, validator, helper ve mock para
   birimi kodlari davranis korunarak silinir.
@@ -1534,8 +1540,8 @@ Onerilen REST endpoint'leri:
 - `POST /api/v1/notifications/{id}/read`
 - `POST /api/v1/notifications/read-all`
 - `GET/PATCH /api/v1/notifications/preferences`
-- `POST /api/v1/devices/fcm-token`
-- `DELETE /api/v1/devices/fcm-token/{installationId}`
+- `POST /api/v1/devices/fcm-registration`
+- `DELETE /api/v1/devices/fcm-registration/{installationId}`
 
 `GET /api/v1/notifications/preferences` su alanlari tek ve stabil sozlesmeyle
 dondurur: `upcomingTourRemindersEnabled`, `chatMessagesEnabled`,
@@ -1564,8 +1570,12 @@ yazmaz; WebSocket ile ortak mesaj gonderme application service'ini kullanir.
 ### WebSocket/STOMP
 
 - Spring WebSocket/STOMP kullanilir.
-- CONNECT sirasinda JWT dogrulanir.
-- Client yalniz katilimcisi oldugu conversation kanalina subscribe olabilir.
+- Handshake endpoint'i `/ws`; CONNECT native `Authorization: Bearer <JWT>`
+  header'i ile dogrulanir.
+- Mesaj gonderimi `/app/chats/{chatId}/messages` destination'ina yapilir.
+- Client yalniz `/user/queue/chat-messages` ve
+  `/user/queue/chat-errors` private destination'larina subscribe olabilir;
+  public conversation topic'i yoktur.
 - Backend mesaji once PostgreSQL'e kaydeder, sonra aktif aliciya publish eder.
 - `clientMessageId` duplicate send'i engeller.
 - STOMP send payload'i da REST ile ayni bosluk ve 2.000 karakter sinirindan
@@ -1662,6 +1672,7 @@ gercek `UserState.userId` ve `role` kullanilir.
 - `GET /api/v1/wallet`
 - `GET /api/v1/wallet/transactions`
 - `GET /api/v1/guide/earnings?year=...`
+- `GET /api/v1/guide/earnings/monthly?year=...`
 - `GET/POST/DELETE /api/v1/guide/bank-accounts`
 - `POST /api/v1/guide/bank-accounts/{id}/default`
 - `GET/POST /api/v1/guide/withdrawals`
@@ -1674,7 +1685,7 @@ surumde `page`, `size`, `sort` kullanabilir.
 
 - Owned mutation request'leri `userId`/`guideId` kabul etmez.
 - Canonical domain para response/request'i `amountMinor`,
-  `currencyCode=USD` kullanir. Coklu tahsilat diliminde payment quote/provider
+  `currencyCode=USD` kullanir. Coklu tahsilat payment quote/provider
   alanlari ayrica `chargeAmountMinor`, `chargeCurrencyCode` ve gerekli FX
   snapshot alanlarini tasir; canonical ile charge alanlari ayni isimle
   birbirinin yerine kullanilmaz.
@@ -1713,14 +1724,12 @@ Mevcut auth hata sistemine yeni domain kodlari eklenir. En az:
 - `REVIEW_ALREADY_EXISTS`
 - `PAYMENT_INITIALIZATION_FAILED`
 - `PAYMENT_VERIFICATION_FAILED`
-- `PAYMENT_TIMEOUT`
 - `CARD_INSUFFICIENT_FUNDS`
 - `PAYMENT_METHOD_DECLINED`
 - `PAYMENT_CURRENCY_NOT_SUPPORTED`
 - `PAYMENT_CURRENCY_CARD_NOT_SUPPORTED`
 - `FX_QUOTE_UNAVAILABLE`
 - `FX_QUOTE_EXPIRED`
-- `REFUND_PROCESSING`
 - `REFUND_FAILED`
 - `REFUND_AMOUNT_EXCEEDED`
 - `INSUFFICIENT_WALLET_BALANCE`
@@ -1943,62 +1952,84 @@ runtime'i bu kontrolun parcasidir.
 
 ### Faz 6 - Bildirim ve Mesajlasma
 
-- Notification history/read/preferences/device token
-- FCM
-- Chat REST ve PostgreSQL
-- WebSocket/STOMP
-- Unread badge ve REST resync
+- Tamamlandi: `V9` notification, `V10` chat ve `V11` FID migration'lari
+- Tamamlandi: notification history/read/preferences ve FID kaydi
+- Tamamlandi: commit-sonrasi FCM ve lifecycle notification baglantilari
+- Tamamlandi: Chat REST, PostgreSQL ve cursor/read/unread sozlesmeleri
+- Tamamlandi: JWT korumali private WebSocket/STOMP teslimati
+- Android unread badge, REST resync, FCM ve STOMP tuketimi final Android
+  entegrasyonunda bu sozlesmeye baglanir
 
 ### Faz 7 - Scheduler, Seed ve Demo Verisi
 
-- Timeout/completion/reconciliation/reminder job'lari
-- Production migrationina girmeyen local demo seed
-- Iki farkli telefon/kullanici ile gercek LAN akisi
+- Tamamlandi: bounded reservation timeout, session completion, payment
+  reconciliation, refund recovery, guide earning availability, FCM retry,
+  upcoming tour reminder, stale FID ve media cleanup job'lari
+- Tamamlandi: restart sonrasinda kaybolmayan attempt/timestamp/deduplication
+  state'i ve gec verified payment icin capacity re-check veya tek tam iade
+- Tamamlandi: production migrationina girmeyen, varsayilan kapali ve yalniz
+  `local` profilde idempotent guide/tourist hesaplari olusturan demo seed
+- Faz tamamlandiginda test profili, Flyway `V1-V12`, tum Maven testleri, OpenAPI
+  ve local PostgreSQL `V12` + Hibernate validate + uygulama baslangiciyla
+  dogrulandi. Final backend kontrolunde test profili PostgreSQL 18
+  Testcontainers'a tasindi ve H2 kaldirildi
+- Iki farkli telefon/kullanici ile gercek LAN UI akisi, Android FID/REST/STOMP
+  entegrasyonu tamamlandiginda yapilacak final E2E kontroludur
 
-### Ertelenmis Dikey Dilim - Coklu Tahsilat Para Birimi
+### Tamamlanan Dikey Dilim - Coklu Tahsilat Para Birimi
 
-- Mevcut USD-only iyzico akisi korunarak uygulamanin kalan backend/Android
-  ozelliklerinden sonra ele alinir; final Android odeme entegrasyonu ve final
-  backend dogrulamasindan once tamamlanir.
-- FX saglayicisi ve iyzico hesap para birimi yetkileri icin dis bagimlilik kapisi
-  yeniden acilir; credential, ucret, limit ve Sandbox kapsam sonucu netlestirilir.
-- Yeni Flyway migration, quote/domain/repository/service/provider/API/error
-  sozlesmesi, refund/reconciliation ve Android entegrasyon maddeleri bu belgedeki
-  `Ertelenmis Coklu Tahsilat Para Birimi Karari`na gore tek dikey dilimde yazilir.
-- Dikey dilim tamamlanmadan mevcut `currency_code=USD` constraint'i gevsetilmez,
-  eski kod yarim coklu-para davranisina cevrilmez ve Android'de mock kur eklenmez.
+- Tamamlandi: `V13`, FX quote domain/repository/service, Frankfurter ECB adapter'i,
+  currency-options ve tur/wallet quote API'leri, quote-bound hosted initialize,
+  dinamik `TR/EN` Checkout Form locale, charge snapshot dogrulamasi ve ayni charge
+  currency'de provider iadesi uygulanmistir.
+- Canonical platform/wallet/tur/kazanc/withdrawal parasi USD kalmistir; yalniz
+  hosted provider tahsilati config ile etkin `USD/TRY/EUR/GBP` arasindan secilir.
+- Dikey dilim tamamlandiginda tum Maven testleri, OpenAPI, Frankfurter gercek
+  endpoint'i ve local PostgreSQL `V13` + Hibernate validate + uygulama baslangici
+  dogrulanmistir. Final backend kontrolunde temiz PostgreSQL 18 Testcontainers
+  `V1-V13` migration ve kalici regression paketi de basariyla calistirilmistir.
+- Android para birimi secimi/quote UI'i ile her etkin para birimindeki iyzico
+  Sandbox E2E, final Android odeme entegrasyonunda yapilacaktir.
 
 ### Faz 8 - Final Backend Dogrulamasi
 
-- Tum migration'lar temiz DB'de calisir
-- Flyway migration, JPA repository, PostgreSQL `JSONB`, partial index,
-  `TIMESTAMPTZ` ve pessimistic locking/concurrency integration testleri gercek
-  PostgreSQL baslatan Testcontainers ile calistirilir.
-- H2 yalniz gercekten deger saglayan hizli ve PostgreSQL'e ozel olmayan testlerde
-  kalabilir; migration, repository veya concurrency dogrulamasinda canonical
-  veritabani kabul edilmez. Final testlerde ek deger saglamiyorsa kaldirilir.
-- Testcontainers test-scope bagimliligidir; uygulamanin runtime mimarisine veya
-  Android akisina ek servis getirmez.
-- Swagger/Postman contract audit
-- Auth/role/ownership audit
-- Media upload/GET/delete yetkisi, MIME/boyut/path traversal, public/draft
-  erisimi ve orphan cleanup dogrulamasi
-- Guide search sahiplik/public-profile filtresi, pagination ve dashboard
-  sayaclarinin tam veri setiyle tutarlilik dogrulamasi
-- Iyzico sandbox success/failure/3DS/timeout/duplicate/delayed webhook
-- Coklu tahsilat dilimi etkinlestirildiyse tum enabled charge currency'lerde
-  quote/amount/currency/retrieve/refund/rounding/idempotency dogrulamasi
-- Hold suresi bittikten sonraki verified success icin kapasite varsa confirm;
-  kapasite yoksa tek full refund ve belirsizlikte `MANUAL_REVIEW` dogrulamasi
-- Capacity race ve idempotency audit
-- Wallet satin aliminda payment/reservation/ledger atomikligi; wallet iadesinde
-  refund/ledger atomikligi ve duplicate idempotency dogrulamasi
-- Cancel/refund/earning/wallet consistency
-- Chat reconnect/unread/FCM audit
-- Notification target semantics
-- Hassas log ve secret taramasi
-- Projenin tamamlanmasi sonrasinda unit/controller/security/PostgreSQL
-  integration testleri
+- Teknik backend dogrulamasi tamamlandi: Colima/Docker Homebrew servisi ve
+  PostgreSQL 18 Testcontainers test-scope altyapisi kuruldu. Maven testleri
+  komuta ozel `DOCKER_HOST` eklemeden calisir; uygulamanin runtime mimarisine veya
+  Android akisina yeni servis eklenmez.
+- H2, PostgreSQL'e ozel `JSONB`, `TIMESTAMPTZ`, constraint, pessimistic lock ve
+  concurrency davranislarinda ek deger saglamadigi icin kaldirildi. Temiz
+  PostgreSQL 18.6 uzerinde `V1-V13` Flyway migration'lari ve Hibernate validate
+  basariyla calisti.
+- 36 test sinifindaki 72 kalici test; repository/sema, capacity ve wallet race,
+  idempotency, atomik wallet purchase rollback, wallet iptal-iade-ledger-earning,
+  gec odeme capacity re-check/tek iade, auth lifecycle, role/ownership, medya
+  MIME/boyut/path traversal/public-draft/orphan cleanup, guide projection,
+  chat/FCM/STOMP ve OpenAPI sozlesmelerini dogruladi.
+- Payment quote, amount/currency mismatch, merkezi yuvarlama, duplicate provider
+  event/refund ve reconciliation sinirlari kalici testlerle korundu. Phase 5'teki
+  iyzico Sandbox success/failure/3DS, signed webhook, duplicate callback ve kayitli
+  kart provider E2E sonuclari gecerlidir.
+- Android para birimi secimi/quote UI'i bulunmadigi icin her etkin charge currency
+  ile iyzico Sandbox E2E, Android odeme entegrasyonundaki final cihaz testinde
+  yapilir. Bu, backend contract veya implementasyon eksigi degildir.
+- Swagger/OpenAPI canli local profilde HTTP 200, 70 path ve JWT bearer semasiyla;
+  local PostgreSQL 18.3 ise Flyway `V13`, Hibernate validate, Firebase credential
+  ve STOMP broker baslangiciyla dogrulandi.
+- Tracked gercek secret, gecici konsol logu, hassas veri logu, TODO/FIXME veya
+  production degeri olmayan gecici test bulunmadi. Local secret ve Firebase
+  credential dosyalari Git disinda kalir.
+- Spring Boot 3.5.x OSS patch hatti, PostgreSQL driver, Flyway 12, springdoc 2.x,
+  JJWT, Google API client, Lombok ve Testcontainers uyumlu patch surumlerine
+  alindi; uyumsuz major surumlere gecilmedi.
+- Altin Kural kapsamindaki paket/katman, SOLID, bagimlilik, isimlendirme,
+  okunabilirlik ve gercek kod tekrari incelemesi tamamlanmistir. Arama/siralama
+  politikalari domain paketlerine alinmis; tekrar eden version, tur konumu, rol ve
+  iade bildirimi kurallari merkezilestirilmis; iade payload'indaki `tourId`
+  tutarsizligi giderilmis; kullanilmayan hata kodlari/entity setter'lari
+  temizlenmis ve email config'i constructor injection'a alinmistir. Tek
+  sorumlulugu koruyan buyuk servisler sirf bolmek icin parcalanmamis, spekulatif
+  katman eklenmemistir.
 
 ## Android Entegrasyon Kontrol Listesi
 
@@ -2115,14 +2146,14 @@ fixed viewer role ve demo kimlikleri silinir.
   saklamaz veya loglamaz. Bu degerler yalniz backend sandbox profile'indadir.
 - Tur satin almada Android `sessionId`, `participantCount` ve gerekli
   idempotency bilgisini; wallet top-up'ta canonical USD tutarini; withdrawal'da
-  yalniz `bankAccountId`, tutar ve idempotency bilgisini gonderir. Coklu tahsilat
-  dilimi etkinlestiginde kartli checkout oncesi quote istegine secilen
+  yalniz `bankAccountId`, tutar ve idempotency bilgisini gonderir. Kartli checkout
+  oncesi quote istegine secilen
   `chargeCurrencyCode`, initialize istegine yalniz `quoteId` eklenir. Android
   hesaplanmis toplam, kur, charge tutari, bakiye, kontenjan veya basari bayragi
   gondermez.
 - Backend Android'e internal `paymentId`, hosted iyzico URL'si ve canonical
   payment state dondurur.
-- Coklu tahsilat dilimi uygulanirken wallet top-up ve kartla tur checkout
+- Android odeme entegrasyonunda wallet top-up ve kartla tur checkout
   onaylarina backend-backed para birimi secimi eklenir. Android backend'in
   currency-options ve quote response'unu kullanir; bolgeyi yalniz varsayilan
   secim onerisi yapar ve kullanicinin secimini degistirmesine izin verir.
@@ -2142,7 +2173,9 @@ fixed viewer role ve demo kimlikleri silinir.
 - Android tek tek `guide_earnings` durumlarindan cekilebilir bakiye veya cekilen
   tutar turetmez. Backend'in wallet balance projection'ini ve withdrawal
   durumlarini gosterir; kazanc DTO'su yalniz `PENDING`, `AVAILABLE`, `REVERSED`
-  durumlarini tasir.
+  durumlarini tasir. Aylik kazanc response'u `year`, `month`,
+  `netEarningsMinor`, `currencyCode` tasir ve yeniden eskiye siralanir; Android
+  tekil kazanc sayfalarini indirip ay toplamlarini yeniden hesaplamaz.
 - Iyzico hosted URL Custom Tab/WebView icin guvenli secilen mekanizmayla acilir.
 - GuideMate odeme oncesi ve sonuc ekranlari mevcut tasarim diliyle, Android
   resource'larindan gelen dinamik secili uygulama diliyle gosterilir.
@@ -2150,6 +2183,12 @@ fixed viewer role ve demo kimlikleri silinir.
   diline gore backend tarafindan `tr` veya `en` olarak initialize istegine
   eklenir ve mevcut hardcoded `Locale.EN` kaldirilir.
 - Callback'ten Android'e donus payment ID ile status polling/refresh yapar.
+- Iyzico callback'i HTTP POST oldugu icin Android yalniz
+  `shouldOverrideUrlLoading` kullanmaz. WebView yasam dongusu callback'lerinden
+  sonra canonical payment sonucu backend'den sorgulanir. Callback JSON govdesi
+  tek basina basari sayilmaz; SSL hatasi atlanmaz ve JavaScript bridge eklenmez.
+  Backend callback JSON + CF Retrieve akisi idempotent kalir; ayni callback/event
+  ikinci payment, reservation veya wallet hareketi olusturmaz.
 - Android payment `SUCCEEDED` + reservation `CONFIRMED` sonucunda normal basari
   gosterir. Payment `SUCCEEDED` + reservation `EXPIRED` + refund
   `REQUESTED/PROCESSING` sonucunda yerellestirilmis "iadeniz baslatildi";
@@ -2162,23 +2201,31 @@ fixed viewer role ve demo kimlikleri silinir.
 - Native kart numarasi/SKT/CVV formu kaldirilir; GuideMate tasarim kabugu,
   provider akisina gecis butonu ve yerellestirilmis durum ekranlari korunur.
 - Sandbox card detector ve ham karttan Visa/banka bulma kodu kaldirilir.
-- Saved card ekranlari yalniz merchant API listeleme/silme ve maskeli metadata
-  destegi yazili olarak dogrulanirsa provider-backed internal id ile korunur;
-  aksi durumda Android entegrasyonunda kaldirilir.
+- Iyzico Card Storage destegi yazili olarak onaylanmis ve backend API'si
+  tamamlanmistir. Saved card ekranlari provider-backed internal ID ve yalniz
+  maskeli metadata kullanir; ham kart numarasi, SKT veya CVV Android/backend'e
+  gelmez.
 - Balance, wallet history, earnings, refunds ve withdrawals repository'den gelir.
 - Backend ve iyzico kaynakli stabil hata kodlari localized Android metinlerine
   map edilir; provider'in teknik/raw hata mesaji kullaniciya gosterilmez.
 
 ### Mesaj ve Bildirim
 
+- Kullanici kaynakli bildirimler backend `actorDisplayName` degerini kullanir;
+  sistem bildirimlerinde bu alan `null` olur. Android aktor adi icin ek kullanici
+  sorgusu atmaz. Wallet hareketlerindeki `referenceTitle`, turla baglantili
+  `TOUR_PURCHASE`, `REFUND`, `GUIDE_EARNING`, `EARNING_REVERSAL` kayitlarinda
+  backend'in rezervasyon satin alma snapshot'indan gelir; `TOP_UP` ve
+  `WITHDRAWAL` icin `null` kalir ve genel metin Android resource'larindan gelir.
+
 - Faz 6 backend calismasinda yalniz Firebase bootstrap konfigurasyonu icin sinirli
   Android istisnasi vardir: Git disinda tutulan `app/google-services.json`,
   Google Services Gradle plugin'i, Firebase BoM/Messaging bagimliligi ve manifest
   `POST_NOTIFICATIONS` izin bildirimi hazirlanir. Android Kotlin/Java servis,
-  token register/refresh, notification channel/runtime permission davranisi,
-  repository, UI ve navigation entegrasyonu backend tamamlandiktan sonraki
-  Android calismasinda yazilir. STOMP istemci bagimliligi backend WebSocket
-  sozlesmesi kesinlesmeden secilmez.
+  Firebase Installation ID (FID) register/refresh, notification channel/runtime
+  permission davranisi, repository, UI ve navigation entegrasyonu backend
+  tamamlandiktan sonraki Android calismasinda yazilir. STOMP istemci bagimliligi
+  backend WebSocket sozlesmesi kesinlesmeden secilmez.
 - Backend REST, WebSocket/STOMP ve FCM sozlesmeleri tamamlandiktan sonra Android'e
   Firebase Messaging ve backend protokoluyle uyumlu, bakimi devam eden bir
   STOMP/WebSocket istemci bagimliligi eklenir. Bu bagimliliklar backend
@@ -2198,7 +2245,14 @@ fixed viewer role ve demo kimlikleri silinir.
 - Android'deki 2.000 karakter siniri korunur. Backend'den
   `MESSAGE_TOO_LONG` veya `body` field validation donerse mevcut tasarima
   uygun localized mesaj gosterilir.
-- FCM token register/logout/account switch baglantisi tamamlanir.
+- Firebase Messaging FID tabanli teslimat modu etkinlestirilir; SDK'nin verdigi
+  FID, GuideMate `installationId` ile birlikte
+  `/api/v1/devices/fcm-registration` endpoint'ine kaydedilir. Logout/account
+  switch ayni GuideMate `installationId` uzerinden kaydi pasiflestirir.
+- Android manifest'te
+  `firebase_messaging_installation_id_enabled=true` metadata'si tanimlanir ve
+  legacy `onNewToken` yerine `FirebaseMessagingService.onRegistered(fid)`
+  callback'i backend FID kaydini yenilemek icin kullanilir.
 - Android 13 permission ve notification channel eklenir.
 - Semantic notification type/ids type-safe navigation target'ina map edilir.
 - Topbar, bottom bar ve recent activity manuel sayac tutmaz.
@@ -2241,7 +2295,7 @@ Backend su kosullar birlikte saglanmadan tamamlanmis sayilmaz:
 - Iptal, iade, kazanc ve withdrawal history tutarlidir.
 - Callback/webhook/reconciliation provider gecikmesine dayanir; hold sonrasi
   basarili odeme kapasite asimina yol acmaz ve iade sonucu izlenebilir.
-- Coklu tahsilat dilimi etkinse canonical USD ile provider charge tutari/para
+- Canonical USD ile provider charge tutari/para
   birimi birbirine karistirilmaz; quote, retrieve, iade ve Android sozlesmesi
   birlikte dogrulanmistir.
 - Chat REST/WebSocket/FCM ve notification unread kaynaklari hazirdir.

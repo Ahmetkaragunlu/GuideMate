@@ -1,0 +1,86 @@
+package com.ahmetkaragunlu.guidemate.wallet.domain.iban
+
+import javax.inject.Inject
+
+class TurkishBankCatalog
+    @Inject
+    constructor() {
+        fun bankName(bankCode: String?): String? = bankCode?.let(banksByCode::get)
+
+        private companion object {
+            // TCMB Odeme Sistemleri Katilimcilari listesi, 25.07.2026.
+            val banksByCode =
+                mapOf(
+                    "00215" to "Adil Katılım Bankası",
+                    "00046" to "Akbank",
+                    "00143" to "Aktif Yatırım Bankası",
+                    "00203" to "Albaraka Türk Katılım Bankası",
+                    "00124" to "Alternatifbank",
+                    "00135" to "Anadolubank",
+                    "00091" to "Arap Türk Bankası",
+                    "00161" to "Aytemiz Yatırım Bankası",
+                    "00129" to "Bank of America Yatırım Bank",
+                    "00149" to "Bank of China Turkey",
+                    "00142" to "BankPozitif",
+                    "00029" to "Birleşik Fon Bankası",
+                    "00125" to "Burgan Bank",
+                    "00092" to "Citibank",
+                    "00158" to "Colendi Bank",
+                    "00151" to "D Yatırım Bankası",
+                    "00134" to "DenizBank",
+                    "00152" to "Destek Yatırım Bankası",
+                    "00115" to "Deutsche Bank",
+                    "00138" to "Diler Yatırım Bankası",
+                    "00214" to "Dünya Katılım Bankası",
+                    "00157" to "Enpara Bank",
+                    "00103" to "Fibabanka",
+                    "00159" to "FUPS Bank",
+                    "00150" to "Golden Global Yatırım Bankası",
+                    "00139" to "GSD Yatırım Bankası",
+                    "00212" to "Hayat Finans Katılım Bankası",
+                    "00156" to "Hedef Yatırım Bankası",
+                    "00123" to "HSBC",
+                    "00109" to "ICBC Turkey Bank",
+                    "00099" to "ING",
+                    "00148" to "Intesa Sanpaolo",
+                    "00004" to "İller Bankası",
+                    "00132" to "Takasbank",
+                    "00098" to "JPMorgan Chase Bank",
+                    "00205" to "Kuveyt Türk Katılım Bankası",
+                    "00806" to "Merkezi Kayıt Kuruluşu",
+                    "00153" to "Misyon Yatırım Bankası",
+                    "00147" to "MUFG Bank Turkey",
+                    "00141" to "Nurol Yatırım Bankası",
+                    "00146" to "Odea Bank",
+                    "00116" to "Pasha Yatırım Bankası",
+                    "00807" to "PTT",
+                    "00137" to "Rabobank",
+                    "00122" to "Société Générale",
+                    "00121" to "Standard Chartered Yatırım Bankası",
+                    "00059" to "Şekerbank",
+                    "00032" to "Türk Ekonomi Bankası",
+                    "00016" to "Türk Eximbank",
+                    "00062" to "Garanti BBVA",
+                    "00012" to "Halkbank",
+                    "00064" to "Türkiye İş Bankası",
+                    "00017" to "Türkiye Kalkınma ve Yatırım Bankası",
+                    "00014" to "Türkiye Sınai Kalkınma Bankası",
+                    "00015" to "VakıfBank",
+                    "00001" to "Türkiye Cumhuriyet Merkez Bankası",
+                    "00010" to "Ziraat Bankası",
+                    "00154" to "Tera Yatırım Bankası",
+                    "00213" to "T.O.M. Katılım Bankası",
+                    "00096" to "Turkish Bank",
+                    "00108" to "Turkland Bank",
+                    "00060" to "Türk Ticaret Bankası",
+                    "00211" to "Türkiye Emlak Katılım Bankası",
+                    "00206" to "Türkiye Finans Katılım Bankası",
+                    "00210" to "Vakıf Katılım Bankası",
+                    "00067" to "Yapı Kredi",
+                    "00160" to "Ziraat Dinamik Banka",
+                    "00209" to "Ziraat Katılım Bankası",
+                    "00155" to "Q Yatırım Bankası",
+                    "00111" to "QNB",
+                )
+        }
+    }

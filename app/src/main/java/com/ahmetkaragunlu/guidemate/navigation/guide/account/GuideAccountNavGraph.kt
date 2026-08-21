@@ -5,14 +5,14 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.screens.common.changepassword.ChangePasswordScreen
-import com.ahmetkaragunlu.guidemate.screens.common.helpsupport.HelpSupportScreen
-import com.ahmetkaragunlu.guidemate.screens.common.legalagreements.LegalAgreementsScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.about.AboutScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.bankaccounts.BankAccountsScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.helpsupport.model.guideFaqEntries
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.legalagreements.model.guideLegalClauses
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.account.notificationsettings.NotificationSettingsScreen
+import com.ahmetkaragunlu.guidemate.auth.presentation.changepassword.ChangePasswordScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.account.helpsupport.HelpSupportScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements.LegalAgreementsScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.about.AboutScreen
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.BankAccountsScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.helpsupport.model.guideFaqEntries
+import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.legalagreements.model.guideLegalClauses
+import com.ahmetkaragunlu.guidemate.notification.presentation.guide.settings.NotificationSettingsScreen
 
 internal fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {
     composable<GuideAccountDestination.BankAccounts> {

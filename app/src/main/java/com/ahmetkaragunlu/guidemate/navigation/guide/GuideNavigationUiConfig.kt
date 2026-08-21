@@ -4,10 +4,10 @@ import androidx.annotation.StringRes
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.AppTopBarConfig
+import com.ahmetkaragunlu.guidemate.navigation.components.AppTopBarConfig
 import com.ahmetkaragunlu.guidemate.navigation.NavigationUiConfig
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
-import com.ahmetkaragunlu.guidemate.navigation.guide.finance.GuideFinanceDestination
+import com.ahmetkaragunlu.guidemate.navigation.guide.wallet.GuideWalletDestination
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
 
 internal fun NavDestination?.guideNavigationUiConfig(): NavigationUiConfig =
@@ -57,15 +57,15 @@ internal fun NavDestination?.guideNavigationUiConfig(): NavigationUiConfig =
             publishNavigationUiConfig(R.string.guide_tour_publish_topbar_step3_title)
         hasRoute<GuideTourDestination.PublishStep4>() ->
             publishNavigationUiConfig(R.string.guide_tour_publish_topbar_step4_title)
-        hasRoute<GuideFinanceDestination.Wallet>() ->
+        hasRoute<GuideWalletDestination.Wallet>() ->
             guideNavigationUiConfig(titleResId = R.string.guide_wallet)
-        hasRoute<GuideFinanceDestination.Earnings>() ->
+        hasRoute<GuideWalletDestination.Earnings>() ->
             guideNavigationUiConfig(
                 titleResId = R.string.guide_earnings,
                 showBackButton = true,
                 showBottomBar = false,
             )
-        hasRoute<GuideFinanceDestination.WalletTransactions>() ->
+        hasRoute<GuideWalletDestination.WalletTransactions>() ->
             guideNavigationUiConfig(
                 titleResId = R.string.wallet_transaction_history,
                 showBackButton = true,

@@ -1,0 +1,44 @@
+package com.ahmetkaragunlu.guidemate.tour.presentation.detail.model
+
+import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.ahmetkaragunlu.guidemate.R
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Rocket
+
+enum class TourDetailMode(
+    @param:StringRes val primaryActionTextResId: Int?,
+    val primaryActionIcon: ImageVector? = null,
+    val showPreviewBanner: Boolean = false,
+    val showGuideInfo: Boolean = false,
+) {
+    PREVIEW(
+        primaryActionTextResId = R.string.send_for_review,
+        primaryActionIcon = TablerIcons.Rocket,
+        showPreviewBanner = true,
+        showGuideInfo = true,
+    ),
+    GUIDE_ACTIVE(primaryActionTextResId = R.string.cancel_tour),
+    GUIDE_PAST(primaryActionTextResId = R.string.republish_tour),
+    GUIDE_REVIEW(primaryActionTextResId = null),
+    TOURIST_BOOKABLE(
+        primaryActionTextResId = R.string.book_tour,
+        showGuideInfo = true,
+    ),
+    TOURIST_BOOKED(
+        primaryActionTextResId = null,
+        showGuideInfo = true,
+    ),
+    TOURIST_UNAVAILABLE(
+        primaryActionTextResId = null,
+        showGuideInfo = true,
+    ),
+    TOURIST_REVIEWABLE(
+        primaryActionTextResId = R.string.review_tour,
+        showGuideInfo = true,
+    ),
+    TOURIST_PAST(
+        primaryActionTextResId = null,
+        showGuideInfo = true,
+    ),
+}

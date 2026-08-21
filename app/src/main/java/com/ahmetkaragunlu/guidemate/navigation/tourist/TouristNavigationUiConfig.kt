@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.AppTopBarConfig
+import com.ahmetkaragunlu.guidemate.navigation.components.AppTopBarConfig
 import com.ahmetkaragunlu.guidemate.navigation.NavigationUiConfig
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination

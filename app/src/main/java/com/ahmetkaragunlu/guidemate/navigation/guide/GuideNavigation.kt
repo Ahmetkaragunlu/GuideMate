@@ -21,19 +21,19 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.components.AppBottomBar
-import com.ahmetkaragunlu.guidemate.components.AppTopBar
-import com.ahmetkaragunlu.guidemate.components.BottomBarItem
-import com.ahmetkaragunlu.guidemate.domain.model.UserRole
+import com.ahmetkaragunlu.guidemate.navigation.components.AppBottomBar
+import com.ahmetkaragunlu.guidemate.navigation.components.AppTopBar
+import com.ahmetkaragunlu.guidemate.navigation.components.BottomBarItem
+import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
-import com.ahmetkaragunlu.guidemate.navigation.guide.finance.GuideFinanceDestination
+import com.ahmetkaragunlu.guidemate.navigation.guide.wallet.GuideWalletDestination
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
-import com.ahmetkaragunlu.guidemate.screens.common.chat.viewmodel.ChatListViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.earnings.viewmodel.GuideEarningsViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.notifications.GuideNotificationsBottomSheet
-import com.ahmetkaragunlu.guidemate.screens.guide.notifications.viewmodel.GuideNotificationsViewModel
+import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.GuideEarningsViewModel
+import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeViewModel
+import com.ahmetkaragunlu.guidemate.notification.presentation.guide.GuideNotificationsBottomSheet
+import com.ahmetkaragunlu.guidemate.notification.presentation.guide.viewmodel.GuideNotificationsViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.CreditCard
 import compose.icons.tablericons.Home
@@ -175,7 +175,7 @@ private fun NavDestination?.guideBottomBarDestination(): GuideBottomBarDestinati
     when {
         this == null || hasRoute<GuideDestination.Home>() -> GuideBottomBarDestination.HOME
         hasRoute<GuideTourDestination.MyTours>() -> GuideBottomBarDestination.TOURS
-        hasRoute<GuideFinanceDestination.Wallet>() -> GuideBottomBarDestination.WALLET
+        hasRoute<GuideWalletDestination.Wallet>() -> GuideBottomBarDestination.WALLET
         hasRoute<GuideDestination.Chat>() -> GuideBottomBarDestination.CHAT
         hasRoute<GuideDestination.Profile>() -> GuideBottomBarDestination.PROFILE
         else -> null
@@ -185,7 +185,7 @@ private fun GuideBottomBarDestination.toRoute(): Any =
     when (this) {
         GuideBottomBarDestination.HOME -> GuideDestination.Home
         GuideBottomBarDestination.TOURS -> GuideTourDestination.MyTours
-        GuideBottomBarDestination.WALLET -> GuideFinanceDestination.Wallet
+        GuideBottomBarDestination.WALLET -> GuideWalletDestination.Wallet
         GuideBottomBarDestination.CHAT -> GuideDestination.Chat
         GuideBottomBarDestination.PROFILE -> GuideDestination.Profile
     }

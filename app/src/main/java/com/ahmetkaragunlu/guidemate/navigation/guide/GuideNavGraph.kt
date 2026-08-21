@@ -5,24 +5,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.ahmetkaragunlu.guidemate.domain.model.UserRole
+import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.guide.account.GuideAccountStart
-import com.ahmetkaragunlu.guidemate.navigation.guide.finance.GuideFinanceDestination
-import com.ahmetkaragunlu.guidemate.navigation.guide.finance.guideFinanceNavGraph
+import com.ahmetkaragunlu.guidemate.navigation.guide.wallet.GuideWalletDestination
+import com.ahmetkaragunlu.guidemate.navigation.guide.wallet.guideWalletNavGraph
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.guideTourNavGraph
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
-import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatDetailScreen
-import com.ahmetkaragunlu.guidemate.screens.common.chat.ChatListScreen
-import com.ahmetkaragunlu.guidemate.screens.common.chat.viewmodel.ChatListViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.earnings.viewmodel.GuideEarningsViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.home.GuideHomeViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.notifications.viewmodel.GuideNotificationsViewModel
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.GuideProfileScreen
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.model.GuideProfileMenuTarget
-import com.ahmetkaragunlu.guidemate.screens.guide.profile.preview.GuideProfilePreviewScreen
+import com.ahmetkaragunlu.guidemate.chat.presentation.ChatDetailScreen
+import com.ahmetkaragunlu.guidemate.chat.presentation.ChatListScreen
+import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.GuideEarningsViewModel
+import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeScreen
+import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeViewModel
+import com.ahmetkaragunlu.guidemate.notification.presentation.guide.viewmodel.GuideNotificationsViewModel
+import com.ahmetkaragunlu.guidemate.profile.presentation.guide.GuideProfileScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideProfileMenuTarget
+import com.ahmetkaragunlu.guidemate.profile.presentation.guide.preview.GuideProfilePreviewScreen
 
 internal fun NavGraphBuilder.guideNavGraph(
     guideNavController: NavController,
@@ -42,7 +42,7 @@ internal fun NavGraphBuilder.guideNavGraph(
             currentMonthEarning = earningsUiState.currentMonth,
             recentNotifications = notificationsUiState.recentNotifications,
             onNavigateToEarnings = {
-                guideNavController.navigateTo(GuideFinanceDestination.Earnings)
+                guideNavController.navigateTo(GuideWalletDestination.Earnings)
             },
         )
     }
@@ -78,7 +78,7 @@ internal fun NavGraphBuilder.guideNavGraph(
         navController = guideNavController,
         onBackActionChanged = onBackActionChanged,
     )
-    guideFinanceNavGraph(
+    guideWalletNavGraph(
         navController = guideNavController,
         earningsViewModel = earningsViewModel,
     )

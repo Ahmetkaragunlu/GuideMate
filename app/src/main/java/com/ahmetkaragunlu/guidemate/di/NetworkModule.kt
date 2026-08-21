@@ -1,9 +1,8 @@
 package com.ahmetkaragunlu.guidemate.di
 
 import com.ahmetkaragunlu.guidemate.BuildConfig
-import com.ahmetkaragunlu.guidemate.data.remote.api.AuthApi
-import com.ahmetkaragunlu.guidemate.data.remote.interceptor.AuthInterceptor
-import com.ahmetkaragunlu.guidemate.data.remote.interceptor.TokenAuthenticator
+import com.ahmetkaragunlu.guidemate.auth.data.remote.session.AuthInterceptor
+import com.ahmetkaragunlu.guidemate.auth.data.remote.session.TokenAuthenticator
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -65,7 +64,4 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
-    @Provides
-    @Singleton
-    fun provideAuthApi(retrofit: Retrofit): AuthApi = retrofit.create(AuthApi::class.java)
 }
