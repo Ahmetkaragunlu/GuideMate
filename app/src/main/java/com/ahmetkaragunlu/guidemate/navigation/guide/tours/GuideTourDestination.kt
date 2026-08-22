@@ -7,11 +7,13 @@ object GuideTourDestination {
 
     @Serializable
     data class Detail(
+        val tourId: String,
         val sessionId: String,
     )
 
     @Serializable
     data class Edit(
+        val tourId: String,
         val sessionId: String,
     )
 

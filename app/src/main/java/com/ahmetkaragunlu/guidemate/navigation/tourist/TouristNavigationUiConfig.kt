@@ -38,6 +38,12 @@ internal fun NavDestination?.touristNavigationUiConfig(): NavigationUiConfig =
                 showBackButton = true,
                 showBottomBar = false,
             )
+        hasRoute<TouristDestination.GuideProfile>() ->
+            touristNavigationUiConfig(
+                titleResId = R.string.public_guide_profile,
+                showBackButton = true,
+                showBottomBar = false,
+            )
         hasRoute<ChatDestination.Detail>() ->
             touristNavigationUiConfig(
                 titleResId = R.string.tourist_chat,

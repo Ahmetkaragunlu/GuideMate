@@ -1,23 +1,31 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditAlertDialog
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.common.ui.image.ImageSourcePicker
 import com.ahmetkaragunlu.guidemate.common.location.presentation.components.LanguageSelectionBottomSheet
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.category.GuideTourCategorySelectionBottomSheet
@@ -38,11 +46,27 @@ fun GuideTourEditScreen(
     var showPhotoSourceSheet by rememberSaveable { mutableStateOf(false) }
     var showCategoryPicker by rememberSaveable { mutableStateOf(false) }
     var showLanguagePicker by rememberSaveable { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
     val requestExit = {
-        if (uiState.hasUnsavedChanges) {
+        if (uiState.isSaving) {
+            Unit
+        } else if (uiState.hasUnsavedChanges) {
             showDiscardDialog = true
         } else {
             onNavigateBack()
+        }
+    }
+
+    LaunchedEffect(uiState.userMessage) {
+        uiState.userMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.onUserMessageShown()
+        }
+    }
+    LaunchedEffect(uiState.savedTargetTab) {
+        uiState.savedTargetTab?.let { tab ->
+            viewModel.onSavedHandled()
+            onSaved(tab)
         }
     }
 
@@ -52,29 +76,42 @@ fun GuideTourEditScreen(
         onDispose { onBackActionChanged(null) }
     }
 
-    GuideTourEditContent(
-        uiState = uiState,
-        onTitleChange = viewModel::onTitleChange,
-        onDescriptionChange = viewModel::onDescriptionChange,
-        onCategoryClick = { showCategoryPicker = true },
-        onDateSelected = viewModel::onTourDateSelected,
-        onStartTimeSelected = viewModel::onStartTimeSelected,
-        onMeetingPointChange = viewModel::onMeetingPointChange,
-        onDurationChange = viewModel::onDurationChange,
-        onPriceChange = viewModel::onPriceChange,
-        onCapacityChange = viewModel::onCapacityChange,
-        onRemoveLanguage = viewModel::removeLanguage,
-        onAddLanguage = { showLanguagePicker = true },
-        onChangePhotos = { showPhotoSourceSheet = true },
-        onSave = {
-            if (uiState.requiresReviewConfirmation) {
-                showReviewConfirmationDialog = true
-            } else {
-                viewModel.saveChanges()?.let(onSaved)
-            }
-        },
-        modifier = modifier,
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        GuideMateContentState(
+            state = uiState.loadState,
+            onRetry = viewModel::refresh,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            GuideTourEditContent(
+                uiState = uiState,
+                onTitleChange = viewModel::onTitleChange,
+                onDescriptionChange = viewModel::onDescriptionChange,
+                onCategoryClick = { showCategoryPicker = true },
+                onDateSelected = viewModel::onTourDateSelected,
+                onStartTimeSelected = viewModel::onStartTimeSelected,
+                onMeetingPointChange = viewModel::onMeetingPointChange,
+                onDurationChange = viewModel::onDurationChange,
+                onPriceChange = viewModel::onPriceChange,
+                onCapacityChange = viewModel::onCapacityChange,
+                onRemoveLanguage = viewModel::removeLanguage,
+                onAddLanguage = { showLanguagePicker = true },
+                onChangePhotos = { showPhotoSourceSheet = true },
+                onSave = {
+                    if (uiState.requiresReviewConfirmation) {
+                        showReviewConfirmationDialog = true
+                    } else {
+                        viewModel.saveChanges()
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        )
+    }
 
     ImageSourcePicker(
         isVisible = showPhotoSourceSheet,
@@ -150,7 +187,7 @@ fun GuideTourEditScreen(
                 TextButton(
                     onClick = {
                         showReviewConfirmationDialog = false
-                        viewModel.saveChanges()?.let(onSaved)
+                        viewModel.saveChanges()
                     },
                     colors =
                         ButtonDefaults.textButtonColors(

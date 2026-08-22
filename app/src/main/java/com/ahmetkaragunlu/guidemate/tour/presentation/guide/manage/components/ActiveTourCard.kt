@@ -47,6 +47,7 @@ fun ActiveTourCard(
     onEdit: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isToggleEnabled: Boolean = true,
 ) {
     TourBaseCard(
         imageResId = tour.imageResId,
@@ -109,7 +110,7 @@ fun ActiveTourCard(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Switch(
                             checked = tour.isBookingOpen,
-                            onCheckedChange = onToggleLive,
+                            onCheckedChange = onToggleLive.takeIf { isToggleEnabled },
                             colors =
                                 SwitchDefaults.colors(
                                     checkedThumbColor = MaterialTheme.colorScheme.onPrimary,

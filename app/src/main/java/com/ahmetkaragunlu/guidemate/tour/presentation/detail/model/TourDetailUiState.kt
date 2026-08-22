@@ -11,7 +11,7 @@ data class TourDetailUiState(
     @param:DrawableRes val imageResId: Int = R.drawable.example,
     val imageUrl: String? = null,
     val rating: Double? = null,
-    val reviewCount: Int = 0,
+    val reviewCount: Long = 0,
     val date: String = "",
     val durationMinutes: Int = 0,
     val location: String = "",

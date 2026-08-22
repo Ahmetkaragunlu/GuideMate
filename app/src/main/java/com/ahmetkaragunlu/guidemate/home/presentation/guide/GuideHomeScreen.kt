@@ -40,8 +40,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
-import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.model.GuideStatistic
 import com.ahmetkaragunlu.guidemate.notification.presentation.guide.components.notificationIcon
@@ -54,9 +55,9 @@ import compose.icons.tablericons.ArrowRight
 @Composable
 fun GuideHomeScreen(
     uiState: GuideHomeUiState,
-    currentMonthEarning: MonthlyEarningUiModel,
     recentNotifications: List<GuideNotificationUiModel>,
     onNavigateToEarnings: () -> Unit,
+    onRetryPerformance: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -67,38 +68,47 @@ fun GuideHomeScreen(
                 .padding(dimensionResource(R.dimen.spacing_medium)),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = dimensionResource(R.dimen.spacing_medium)),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
+        GuideMateContentState(
+            state = uiState.dashboardLoadState,
+            onRetry = onRetryPerformance,
+            modifier = Modifier.fillMaxWidth().height(168.dp),
         ) {
-            uiState.dashboardStats.forEach { stat ->
-                GuideStatCard(
-                    stat = stat,
-                    modifier =
-                        Modifier
-                            .weight(1f)
-                            .height(152.dp),
-                )
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = dimensionResource(R.dimen.spacing_medium)),
+                horizontalArrangement =
+                    Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
+            ) {
+                uiState.dashboardStats.forEach { stat ->
+                    GuideStatCard(
+                        stat = stat,
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .height(152.dp),
+                    )
+                }
             }
         }
-        MonthlyEarningsCard(
-            earning = currentMonthEarning,
-            onClick = onNavigateToEarnings,
-        )
-        Text(
-            text = stringResource(R.string.tour_status),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.text_color),
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
-        )
-        TourStatusCard(
-            pendingCount = uiState.pendingCount,
-            activeCount = uiState.activeCount,
-        )
+        if (uiState.dashboardLoadState == ContentLoadState.CONTENT) {
+            MonthlyEarningsCard(
+                amountMinor = uiState.currentMonthEarningsMinor,
+                onClick = onNavigateToEarnings,
+            )
+            Text(
+                text = stringResource(R.string.tour_status),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.text_color),
+                modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
+            )
+            TourStatusCard(
+                pendingCount = uiState.pendingCount,
+                activeCount = uiState.activeCount,
+            )
+        }
         Text(
             text = stringResource(R.string.recent_activities),
             style = MaterialTheme.typography.titleMedium,
@@ -159,7 +169,7 @@ private fun GuideStatCard(
 
 @Composable
 private fun MonthlyEarningsCard(
-    earning: MonthlyEarningUiModel,
+    amountMinor: Long,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -184,7 +194,7 @@ private fun MonthlyEarningsCard(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = earning.amountMinor.toPlatformCurrencyFromMinorUnit(),
+                text = amountMinor.toPlatformCurrencyFromMinorUnit(),
                 color = Color(0xFF888ded),
                 fontWeight = FontWeight.Bold,
             )
@@ -201,8 +211,8 @@ private fun MonthlyEarningsCard(
 @Composable
 private fun TourStatusCard(
     modifier: Modifier = Modifier,
-    pendingCount: Int,
-    activeCount: Int,
+    pendingCount: Long,
+    activeCount: Long,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().height(IntrinsicSize.Max),
@@ -227,7 +237,7 @@ private fun TourStatusCard(
 
 @Composable
 private fun StatusItemCard(
-    count: Int,
+    count: Long,
     label: String,
     indicatorColor: Color,
     modifier: Modifier = Modifier,

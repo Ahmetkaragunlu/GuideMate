@@ -19,14 +19,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PhotoCamera
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -48,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 import com.ahmetkaragunlu.guidemate.common.ui.image.ImageSourcePicker
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.profile.presentation.level.GuideLevelInfoBottomSheet
 import com.ahmetkaragunlu.guidemate.profile.presentation.level.model.GuideLevelViewerType
 import com.ahmetkaragunlu.guidemate.profile.presentation.level.model.titleResId
@@ -68,81 +70,94 @@ fun GuideProfileScreen(
     val context = LocalContext.current
     val resources = LocalResources.current
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-    ) {
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+    LaunchedEffect(profileState.userMessage) {
+        profileState.userMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            viewModel.onUserMessageShown()
+        }
+    }
 
-        val profileImageResId = profileState.profileImageResId
-        Box(contentAlignment = Alignment.BottomEnd) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(Color.LightGray)
-                        .clickable { showPhotoSourceSheet = true },
-                contentAlignment = Alignment.Center,
-            ) {
-                if (profileImageResId != null) {
+    GuideMateContentState(
+        state = profileState.loadState,
+        onRetry = viewModel::refreshProfile,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
+        ) {
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+
+            Box(contentAlignment = Alignment.BottomEnd) {
+                Box(
+                    modifier =
+                        Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color.LightGray)
+                            .clickable(enabled = !profileState.isAvatarUpdating) {
+                                showPhotoSourceSheet = true
+                            },
+                    contentAlignment = Alignment.Center,
+                ) {
                     GuideMateImage(
-                        fallbackImageResId = profileImageResId,
+                        fallbackImageResId = profileState.profileImageResId,
                         imageUrl = profileState.displayProfileImageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize(),
                     )
-                } else {
-                    Icon(
-                        Icons.Rounded.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(48.dp),
-                    )
+                }
+
+                Surface(
+                    onClick = { showPhotoSourceSheet = true },
+                    enabled = !profileState.isAvatarUpdating,
+                    modifier =
+                        Modifier
+                            .size(32.dp)
+                            .offset(x = 4.dp, y = 4.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    shadowElevation = 4.dp,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        if (profileState.isAvatarUpdating) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = colorResource(R.color.brand_color),
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Icon(
+                                Icons.Rounded.PhotoCamera,
+                                contentDescription = null,
+                                tint = colorResource(R.color.brand_color),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
                 }
             }
 
-            Surface(
-                onClick = { showPhotoSourceSheet = true },
-                modifier =
-                    Modifier
-                        .size(32.dp)
-                        .offset(x = 4.dp, y = 4.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.onPrimary,
-                shadowElevation = 4.dp,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Rounded.PhotoCamera,
-                        contentDescription = null,
-                        tint = colorResource(R.color.brand_color),
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = profileState.displayName,
+                    color = colorResource(R.color.brand_color),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
+                Text(
+                    text = profileState.title,
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = profileState.displayName,
-                color = colorResource(R.color.brand_color),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
-            Text(
-                text = profileState.title,
-                color = Color.Gray,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
 
         Surface(
             onClick = onNavigateToProfilePreview,
@@ -171,24 +186,25 @@ fun GuideProfileScreen(
             }
         }
 
-        ProfileStatsRow(
-            guideLevel = stringResource(profileState.guideLevel.titleResId),
-            rating = profileState.rating,
-            tourCount = profileState.tourCount,
-            onGuideLevelInfoClick = { showGuideLevelInfoBottomSheet = true },
-        )
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+            ProfileStatsRow(
+                guideLevel = stringResource(profileState.guideLevel.titleResId),
+                rating = profileState.rating,
+                tourCount = profileState.tourCount,
+                onGuideLevelInfoClick = { showGuideLevelInfoBottomSheet = true },
+            )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            guideProfileMenuOptions.forEachIndexed { index, item ->
-                CommonProfileMenuItem(
-                    icon = item.icon,
-                    title = stringResource(id = item.titleResId),
-                    onClick = { onNavigateToAccount(item.target) },
-                )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                guideProfileMenuOptions.forEachIndexed { index, item ->
+                    CommonProfileMenuItem(
+                        icon = item.icon,
+                        title = stringResource(id = item.titleResId),
+                        onClick = { onNavigateToAccount(item.target) },
+                    )
 
-                if (index < guideProfileMenuOptions.lastIndex) {
-                    HorizontalDivider(color = Color(0xFFF0F0F0), thickness = 1.dp)
+                    if (index < guideProfileMenuOptions.lastIndex) {
+                        HorizontalDivider(color = Color(0xFFF0F0F0), thickness = 1.dp)
+                    }
                 }
             }
         }

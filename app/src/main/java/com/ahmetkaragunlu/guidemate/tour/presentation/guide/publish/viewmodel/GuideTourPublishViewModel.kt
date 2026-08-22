@@ -4,29 +4,29 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.isValidCurrencyInput
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyMinorUnitsOrNull
-import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
-import com.ahmetkaragunlu.guidemate.profile.domain.model.MOCK_CURRENT_GUIDE_ID
 import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.common.location.model.LocationOption
+import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.isValidCurrencyInput
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyMinorUnitsOrNull
+import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
+import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
+import com.ahmetkaragunlu.guidemate.media.domain.repository.MediaRepository
+import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
-import com.ahmetkaragunlu.guidemate.tour.domain.model.Tour
-import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
-import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSession
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
-import com.ahmetkaragunlu.guidemate.tour.data.mock.TourCatalogStore
-import com.ahmetkaragunlu.guidemate.profile.data.mock.shared.GuideProfileStateProvider
+import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.CreateGuideTourInput
+import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourContentInput
+import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
+import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.toTourLanguage
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.model.GuideTourPublishStep
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.model.GuideTourPublishUiState
-import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.toTourLanguage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,28 +34,40 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class GuideTourPublishViewModel
     @Inject
     constructor(
-        private val tourStore: TourCatalogStore,
-        guideProfileStateProvider: GuideProfileStateProvider,
+        private val repository: GuideTourRepository,
+        private val mediaRepository: MediaRepository,
+        private val profileRepository: GuideProfileRepository,
+        private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
-        private val draftState = MutableStateFlow(initialUiState())
-        private var hasSubmittedCurrentDraft = false
+        private val draftState = MutableStateFlow(GuideTourPublishUiState())
         val uiState: StateFlow<GuideTourPublishUiState> =
-            combine(draftState, guideProfileStateProvider.profileState()) { draft, profile ->
+            combine(draftState, profileRepository.ownProfile) { draft, profile ->
                 draft.copy(
-                    guideName = profile.displayName,
-                    guideImageResId = profile.profileImageResId ?: R.drawable.unnamed,
-                    guideImageUrl = profile.displayProfileImageUrl,
+                    guideName = profile?.displayName.orEmpty(),
+                    guideImageResId = R.drawable.unnamed,
+                    guideImageUrl = profile?.avatar?.imageUrl,
                 )
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = initialUiState(),
+                initialValue =
+                    draftState.value.copy(
+                        guideName = profileRepository.cachedOwnProfile?.displayName.orEmpty(),
+                        guideImageUrl = profileRepository.cachedOwnProfile?.avatar?.imageUrl,
+                    ),
             )
+
+        init {
+            if (profileRepository.cachedOwnProfile == null) {
+                viewModelScope.launch { profileRepository.refreshOwnProfile() }
+            }
+        }
 
         fun onTourDateSelected(date: LocalDate) {
             updateDraft {
@@ -69,13 +81,10 @@ class GuideTourPublishViewModel
             }
         }
 
-        fun onStartTimeSelected(time: LocalTime) {
-            updateDraft { copy(startTime = time) }
-        }
+        fun onStartTimeSelected(time: LocalTime) = updateDraft { copy(startTime = time) }
 
-        fun onDurationSelected(durationMinutes: Int) {
+        fun onDurationSelected(durationMinutes: Int) =
             updateDraft { copy(durationMinutes = durationMinutes) }
-        }
 
         fun onLocationSelected(location: LocationOption) {
             updateDraft {
@@ -84,22 +93,16 @@ class GuideTourPublishViewModel
                     country = location.country.displayName,
                     cityPlaceId = location.city.placeId,
                     city = location.city.displayName,
+                    timeZoneId = ZoneId.systemDefault().id,
                 )
             }
         }
 
         fun onLanguagesSelected(languages: List<LanguageOption>) {
-            updateDraft {
-                copy(
-                    spokenLanguages =
-                        languages.map(LanguageOption::toTourLanguage),
-                )
-            }
+            updateDraft { copy(spokenLanguages = languages.map(LanguageOption::toTourLanguage)) }
         }
 
-        fun onCategorySelected(category: TourCategory) {
-            updateDraft { copy(category = category) }
-        }
+        fun onCategorySelected(category: TourCategory) = updateDraft { copy(category = category) }
 
         fun onRemoveLanguageClick(code: String) {
             updateDraft {
@@ -112,32 +115,22 @@ class GuideTourPublishViewModel
         }
 
         fun onPriceChange(input: String) {
-            if (input.isValidCurrencyInput()) {
-                updateDraft { copy(price = input) }
-            }
+            if (input.isValidCurrencyInput()) updateDraft { copy(price = input) }
         }
 
         fun onCapacityChange(input: String) {
-            if (input.all(Char::isDigit)) {
-                updateDraft { copy(capacity = input) }
-            }
+            if (input.all(Char::isDigit)) updateDraft { copy(capacity = input) }
         }
 
-        fun onTourNameChange(value: String) {
-            updateDraft { copy(tourName = value) }
-        }
+        fun onTourNameChange(value: String) = updateDraft { copy(tourName = value) }
 
-        fun onTourDescriptionChange(value: String) {
+        fun onTourDescriptionChange(value: String) =
             updateDraft { copy(tourDescription = value) }
-        }
 
-        fun onCoverImageSelected(uri: String) {
+        fun onCoverImageSelected(uri: String) =
             updateDraft { copy(selectedCoverImageUri = uri) }
-        }
 
-        fun onMeetingPointChange(value: String) {
-            updateDraft { copy(meetingPoint = value) }
-        }
+        fun onMeetingPointChange(value: String) = updateDraft { copy(meetingPoint = value) }
 
         fun validateStep1(): Boolean =
             validateStep(
@@ -160,72 +153,53 @@ class GuideTourPublishViewModel
                 errorResId = R.string.error_tour_step3_invalid,
             )
 
-        fun onPublishClick(): Boolean {
-            if (hasSubmittedCurrentDraft) return false
+        fun onPublishClick() {
             val form = draftState.value
-            if (!form.isStep1Valid()) {
-                return showValidationError(
-                    R.string.error_tour_step1_invalid,
-                    GuideTourPublishStep.PREVIEW,
-                )
-            }
-            if (!form.isStep2Valid()) {
-                return showValidationError(
-                    R.string.error_tour_step2_invalid,
-                    GuideTourPublishStep.PREVIEW,
-                )
-            }
-            if (!form.isStep3Valid()) {
-                return showValidationError(
-                    R.string.error_tour_step3_invalid,
-                    GuideTourPublishStep.PREVIEW,
-                )
+            if (form.isPublishing || form.publishSucceeded) return
+            val inputWithoutCover = form.toCreateInputOrNull(coverMediaId = null)
+            val imageUri = form.selectedCoverImageUri
+            if (inputWithoutCover == null || imageUri == null) {
+                showValidationError(R.string.error_tour_schedule_invalid, GuideTourPublishStep.PREVIEW)
+                return
             }
 
-            val startsAt = form.toStartInstant()
-            val duration = form.durationMinutes
-            val priceMinor = form.price.toCurrencyMinorUnitsOrNull()
-            val capacity = form.capacity.toIntOrNull()
-            val category =
-                form.category
-                    ?: return showValidationError(
-                        R.string.error_tour_step2_invalid,
-                        GuideTourPublishStep.PREVIEW,
-                    )
-            if (
-                startsAt == null ||
-                    !startsAt.isAfter(Instant.now()) ||
-                    duration == null ||
-                    duration <= 0 ||
-                    priceMinor == null ||
-                    priceMinor <= 0 ||
-                    capacity == null ||
-                    capacity <= 0
-            ) {
-                return showValidationError(
-                    R.string.error_tour_schedule_invalid,
-                    GuideTourPublishStep.PREVIEW,
+            draftState.update {
+                it.copy(
+                    isPublishing = true,
+                    submissionErrorMessage = null,
+                    validationErrorStep = null,
+                    validationErrorResId = null,
                 )
             }
-            val submission =
-                form.toApprovalSubmission(
-                    tourId = UUID.randomUUID().toString(),
-                    sessionId = UUID.randomUUID().toString(),
-                    startsAt = startsAt,
-                    durationMinutes = duration,
-                    priceMinor = priceMinor,
-                    capacity = capacity,
-                    category = category,
-                )
-            return if (tourStore.submitForReview(tour = submission.tour, session = submission.session)) {
-                hasSubmittedCurrentDraft = true
-                true
-            } else {
-                showValidationError(
-                    R.string.error_session_creation,
-                    GuideTourPublishStep.PREVIEW,
-                )
+            viewModelScope.launch {
+                when (val upload = mediaRepository.uploadImage(imageUri, MediaPurpose.TOUR_COVER)) {
+                    is DataResult.Error -> finishWithError(upload.error.toMessage(resourceProvider))
+                    is DataResult.Success -> {
+                        val input =
+                            draftState.value.toCreateInputOrNull(upload.data.mediaAssetId)
+                        if (input == null) {
+                            mediaRepository.deleteUnreferenced(upload.data.mediaAssetId)
+                            finishWithError(resourceProvider.getString(R.string.error_tour_schedule_invalid))
+                            return@launch
+                        }
+                        when (val result = repository.createTour(input)) {
+                            is DataResult.Success -> {
+                                draftState.update {
+                                    it.copy(isPublishing = false, publishSucceeded = true)
+                                }
+                            }
+                            is DataResult.Error -> {
+                                mediaRepository.deleteUnreferenced(upload.data.mediaAssetId)
+                                finishWithError(result.error.toMessage(resourceProvider))
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        fun onPublishSucceededHandled() {
+            draftState.update { it.copy(publishSucceeded = false) }
         }
 
         private fun validateStep(
@@ -243,12 +217,13 @@ class GuideTourPublishViewModel
             step: GuideTourPublishStep,
         ): Boolean {
             draftState.update {
-                it.copy(
-                    validationErrorStep = step,
-                    validationErrorResId = messageResId,
-                )
+                it.copy(validationErrorStep = step, validationErrorResId = messageResId)
             }
             return false
+        }
+
+        private fun finishWithError(message: String) {
+            draftState.update { it.copy(isPublishing = false, submissionErrorMessage = message) }
         }
 
         private fun updateDraft(transform: GuideTourPublishUiState.() -> GuideTourPublishUiState) {
@@ -256,121 +231,69 @@ class GuideTourPublishViewModel
                 state.transform().copy(
                     validationErrorStep = null,
                     validationErrorResId = null,
+                    submissionErrorMessage = null,
                 )
             }
         }
-
-        private fun GuideTourPublishUiState.isStep1Valid(): Boolean =
-            countryCode.isNotBlank() &&
-                country.isNotBlank() &&
-                cityPlaceId.isNotBlank() &&
-                city.isNotBlank() &&
-                toStartInstant()?.isAfter(Instant.now()) == true &&
-                durationMinutes?.let { it > 0 } == true
-
-        private fun GuideTourPublishUiState.isStep2Valid(): Boolean =
-            category != null &&
-                spokenLanguages.isNotEmpty() &&
-                price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } == true &&
-                capacity.toIntOrNull()?.let { it > 0 } == true
-
-        private fun GuideTourPublishUiState.isStep3Valid(): Boolean =
-            tourName.isNotBlank() &&
-                selectedCoverImageUri != null &&
-                tourDescription.isNotBlank() &&
-                meetingPoint.isNotBlank()
-
-        private fun GuideTourPublishUiState.toStartInstant(): Instant? {
-            val date = tourDate ?: return null
-            val time = startTime ?: return null
-            return runCatching { date.atTime(time).atZone(timeZoneId.toZoneId()).toInstant() }.getOrNull()
-        }
-
-        private fun GuideTourPublishUiState.toApprovalSubmission(
-            tourId: String,
-            sessionId: String,
-            startsAt: Instant,
-            durationMinutes: Int,
-            priceMinor: Long,
-            capacity: Int,
-            category: TourCategory,
-        ): TourApprovalSubmission =
-            TourApprovalSubmission(
-                tour =
-                    Tour(
-                        id = tourId,
-                        guide =
-                            GuidePublicSummary(
-                                id = MOCK_CURRENT_GUIDE_ID,
-                                displayName = guideName,
-                                profileImageResId = guideImageResId,
-                                profileImageUrl = guideImageUrl,
-                            ),
-                        title = tourName.trim(),
-                        description = tourDescription.trim(),
-                        countryCode = countryCode,
-                        country = country.trim(),
-                        cityPlaceId = cityPlaceId,
-                        city = city.trim(),
-                        timeZoneId = timeZoneId,
-                        category = category,
-                        languages = spokenLanguages,
-                        coverImageResId = previewImageResId,
-                        coverImageUrl = selectedCoverImageUri,
-                        approvalStatus = TourApprovalStatus.PENDING_REVIEW,
-                    ),
-                session =
-                    TourSession(
-                        id = sessionId,
-                        tourId = tourId,
-                        meetingPoint = meetingPoint.trim(),
-                        startsAt = startsAt,
-                        durationMinutes = durationMinutes,
-                        priceMinor = priceMinor,
-                        capacity = capacity,
-                        bookedCount = 0,
-                        status = TourSessionStatus.CLOSED,
-                    ),
-            )
-
-        private fun String.toZoneId(): ZoneId =
-            runCatching { ZoneId.of(this) }.getOrDefault(ZoneId.systemDefault())
-
-        private companion object {
-            // Mock data (MVP)
-            fun initialUiState(): GuideTourPublishUiState =
-                GuideTourPublishUiState(
-                    countryCode = "TR",
-                    country = "Türkiye",
-                    cityPlaceId = "mock-istanbul",
-                    city = "İstanbul",
-                    timeZoneId = "Europe/Istanbul",
-                    tourDate = LocalDate.of(2027, 5, 24),
-                    startTime = LocalTime.of(9, 0),
-                    durationMinutes = 180,
-                    category = TourCategory.CULTURE,
-                    spokenLanguages =
-                        listOf(
-                            TourLanguage(
-                                code = "tr",
-                                flagEmoji = "🇹🇷",
-                                displayName = "Türkçe",
-                                shortCode = "TR",
-                            ),
-                            TourLanguage(
-                                code = "en",
-                                flagEmoji = "🇬🇧",
-                                displayName = "İngilizce",
-                                shortCode = "ENG",
-                            ),
-                        ),
-                    capacity = "12",
-                    previewImageResId = R.drawable.example,
-                )
-        }
     }
 
-private data class TourApprovalSubmission(
-    val tour: Tour,
-    val session: TourSession,
-)
+private fun GuideTourPublishUiState.isStep1Valid(): Boolean =
+    countryCode.isNotBlank() &&
+        country.isNotBlank() &&
+        cityPlaceId.isNotBlank() &&
+        city.isNotBlank() &&
+        timeZoneId.isNotBlank() &&
+        toStartInstant()?.isAfter(Instant.now()) == true &&
+        durationMinutes?.let { it > 0 } == true
+
+private fun GuideTourPublishUiState.isStep2Valid(): Boolean =
+    category != null &&
+        spokenLanguages.isNotEmpty() &&
+        price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } == true &&
+        capacity.toIntOrNull()?.let { it > 0 } == true
+
+private fun GuideTourPublishUiState.isStep3Valid(): Boolean =
+    tourName.isNotBlank() &&
+        selectedCoverImageUri != null &&
+        tourDescription.isNotBlank() &&
+        meetingPoint.isNotBlank()
+
+private fun GuideTourPublishUiState.toCreateInputOrNull(coverMediaId: String?): CreateGuideTourInput? {
+    if (!isStep1Valid() || !isStep2Valid() || !isStep3Valid()) return null
+    val selectedCategory = category ?: return null
+    val startsAt = toStartInstant() ?: return null
+    val duration = durationMinutes ?: return null
+    val amount = price.toCurrencyMinorUnitsOrNull() ?: return null
+    val participantCapacity = capacity.toIntOrNull() ?: return null
+    return CreateGuideTourInput(
+        content =
+            TourContentInput(
+                title = tourName.trim(),
+                description = tourDescription.trim(),
+                countryCode = countryCode,
+                cityPlaceId = cityPlaceId,
+                cityName = city,
+                timeZoneId = timeZoneId,
+                category = selectedCategory,
+                languageCodes = spokenLanguages.map { it.code },
+                coverMediaId = coverMediaId.orEmpty(),
+            ),
+        session =
+            TourSessionInput(
+                meetingPoint = meetingPoint.trim(),
+                startsAt = startsAt,
+                durationMinutes = duration,
+                priceMinor = amount,
+                capacity = participantCapacity,
+            ),
+    )
+}
+
+private fun GuideTourPublishUiState.toStartInstant(): Instant? {
+    val date = tourDate ?: return null
+    val time = startTime ?: return null
+    return runCatching { date.atTime(time).atZone(timeZoneId.toZoneId()).toInstant() }.getOrNull()
+}
+
+private fun String.toZoneId(): ZoneId =
+    runCatching { ZoneId.of(this) }.getOrDefault(ZoneId.systemDefault())

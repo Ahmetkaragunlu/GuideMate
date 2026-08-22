@@ -3,6 +3,8 @@ package com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.model
 import com.ahmetkaragunlu.guidemate.common.location.model.CityOption
 import com.ahmetkaragunlu.guidemate.common.location.model.CountryOption
 import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideResultUiModel
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 
 data class ExploreUiState(
@@ -15,4 +17,9 @@ data class ExploreUiState(
     val selectedLanguages: List<LanguageOption> = emptyList(),
     val toursSearchQuery: String = "",
     val guidesSearchQuery: String = "",
+    val guideResults: List<GuideResultUiModel> = emptyList(),
+    val guideResultsLoadState: ContentLoadState = ContentLoadState.LOADING,
+    val isLoadingMoreGuides: Boolean = false,
+    val guideAppendFailed: Boolean = false,
+    val canLoadMoreGuides: Boolean = false,
 )

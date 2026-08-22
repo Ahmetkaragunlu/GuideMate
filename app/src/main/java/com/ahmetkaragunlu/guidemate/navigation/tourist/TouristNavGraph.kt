@@ -4,6 +4,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
@@ -19,6 +20,7 @@ import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristFilter
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeScreen
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.TouristProfileScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.publicprofile.GuidePublicProfileScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.TouristProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.TouristTripsScreen
 import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.detail.TouristTourDetailScreen
@@ -35,12 +37,18 @@ internal fun NavGraphBuilder.touristNavGraph(
             onNavigateToTourDetail = { sessionId ->
                 touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
             },
+            onNavigateToGuideProfile = { guideId ->
+                touristNavController.navigateTo(TouristDestination.GuideProfile(guideId))
+            },
         )
     }
     composable<TouristDestination.Explore> {
         TouristExploreScreen(
             onNavigateToFilter = {
                 touristNavController.navigateTo(TouristDestination.Filter)
+            },
+            onNavigateToGuideProfile = { guideId ->
+                touristNavController.navigateTo(TouristDestination.GuideProfile(guideId))
             },
         )
     }
@@ -84,6 +92,10 @@ internal fun NavGraphBuilder.touristNavGraph(
                 touristNavController.navigateTo(TouristPaymentDestination.Checkout(sessionId))
             },
         )
+    }
+    composable<TouristDestination.GuideProfile> { backStackEntry ->
+        val destination = backStackEntry.toRoute<TouristDestination.GuideProfile>()
+        GuidePublicProfileScreen(guideId = destination.guideId)
     }
 
     touristPaymentNavGraph(

@@ -1,36 +1,50 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.mapper
 
+import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
-import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
-import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.effectiveStatus
+import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
+import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourCardUiModel
 import java.time.Instant
+import java.util.Locale
 
-fun TourWithSession.toGuideTourCardUiModel(
+fun GuideTourCard.toGuideTourCardUiModel(
     now: Instant = Instant.now(),
-): GuideTourCardUiModel =
-    GuideTourCardUiModel(
-        id = session.id,
-        tourId = tour.id,
-        title = tour.title,
-        date = session.startsAt.formatTourDateTime(tour.timeZoneId),
-        location = listOf(tour.city, tour.country).filter(String::isNotBlank).joinToString(", "),
-        imageResId = tour.coverImageResId,
-        imageUrl = tour.coverImageUrl,
-        participantCount = session.bookedCount,
-        capacity = session.capacity,
-        languagesFlag = tour.languages.joinToString(separator = "") { it.flagEmoji },
-        languagesText = tour.languages.joinToString(separator = ", ") { it.shortCode },
-        category = tour.category,
-        priceMinor = session.priceMinor,
-        rating = tour.averageRating,
-        reviewCount = tour.reviewCount.takeIf { it > 0 },
-        approvalStatus = tour.approvalStatus,
-        sessionStatus = session.effectiveStatus(now),
-        rejectionReason = tour.rejectionReason,
-        canArchive =
-            tour.approvalStatus == TourApprovalStatus.REJECTED &&
-                tour.publishedAt == null,
-        earningsMinor = session.earningsMinor,
+): GuideTourCardUiModel {
+    val locale = Locale.getDefault()
+    val country = LocaleSelectionCatalog.country(countryCode, locale)?.displayName ?: countryCode
+    val languages = languageCodes.mapNotNull { LocaleSelectionCatalog.language(it, locale) }
+    val effectiveStatus =
+        if (
+            sessionStatus != TourSessionStatus.CANCELLED &&
+                sessionStatus != TourSessionStatus.COMPLETED &&
+                !startsAt.plusSeconds(durationMinutes * 60L).isAfter(now)
+        ) {
+            TourSessionStatus.COMPLETED
+        } else {
+            sessionStatus
+        }
+    return GuideTourCardUiModel(
+        id = sessionId,
+        tourId = tourId,
+        title = title,
+        date = startsAt.formatTourDateTime(timeZoneId),
+        location = listOf(cityName, country).filter(String::isNotBlank).joinToString(", "),
+        imageResId = R.drawable.example,
+        imageUrl = cover?.imageUrl,
+        participantCount = bookedCount,
+        capacity = capacity,
+        languagesFlag = languages.joinToString(separator = "") { it.flagEmoji },
+        languagesText = languages.joinToString(separator = ", ") { it.shortCode },
+        category = category,
+        priceMinor = priceMinor,
+        rating = averageRating.takeIf { reviewCount > 0 },
+        reviewCount = reviewCount.takeIf { it > 0 },
+        approvalStatus = approvalStatus,
+        sessionStatus = effectiveStatus,
+        rejectionReason = rejectionReason,
+        canArchive = canArchive,
+        earningsMinor = netEarningsMinor,
     )
+}

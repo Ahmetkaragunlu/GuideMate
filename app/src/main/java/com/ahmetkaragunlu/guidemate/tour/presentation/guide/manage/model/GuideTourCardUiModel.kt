@@ -20,7 +20,7 @@ data class GuideTourCardUiModel(
     val category: TourCategory,
     val priceMinor: Long,
     val rating: Double?,
-    val reviewCount: Int?,
+    val reviewCount: Long?,
     val approvalStatus: TourApprovalStatus,
     val sessionStatus: TourSessionStatus,
     val rejectionReason: String? = null,

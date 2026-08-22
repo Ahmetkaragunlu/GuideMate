@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
@@ -23,19 +24,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.tour.presentation.components.PopularTourCard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.presentation.category.TourCategoryUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.category.TourCategoryCard
-import com.ahmetkaragunlu.guidemate.home.presentation.tourist.components.BestGuideCard
-import com.ahmetkaragunlu.guidemate.home.presentation.tourist.model.BestGuideUiModel
+import com.ahmetkaragunlu.guidemate.profile.presentation.components.GuideResultCard
+import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideResultUiModel
 
 @Composable
 fun TouristHomeScreen(
     modifier: Modifier = Modifier,
     viewModel: TouristHomeViewModel = hiltViewModel(),
     onNavigateToTourDetail: (String) -> Unit = {},
+    onNavigateToGuideProfile: (Long) -> Unit = {},
 ) {
     val categories = viewModel.categories
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -56,7 +60,12 @@ fun TouristHomeScreen(
             tours = uiState.popularTours,
             onTourClick = onNavigateToTourDetail,
         )
-        bestGuidesSection(guides = uiState.bestGuides)
+        bestGuidesSection(
+            guides = uiState.bestGuides,
+            loadState = uiState.bestGuidesLoadState,
+            onRetry = viewModel::refreshBestGuides,
+            onGuideClick = onNavigateToGuideProfile,
+        )
     }
 }
 
@@ -127,7 +136,12 @@ private fun LazyListScope.popularToursSection(
     }
 }
 
-private fun LazyListScope.bestGuidesSection(guides: List<BestGuideUiModel>) {
+private fun LazyListScope.bestGuidesSection(
+    guides: List<GuideResultUiModel>,
+    loadState: ContentLoadState,
+    onRetry: () -> Unit,
+    onGuideClick: (Long) -> Unit,
+) {
     item {
         Text(
             text = stringResource(id = R.string.best_guides_in_region),
@@ -140,8 +154,38 @@ private fun LazyListScope.bestGuidesSection(guides: List<BestGuideUiModel>) {
         )
     }
 
-    items(guides, key = { it.id }) { guide ->
-        BestGuideCard(guide = guide)
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
+    when (loadState) {
+        ContentLoadState.CONTENT -> {
+            if (guides.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(R.string.guide_search_empty),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(dimensionResource(R.dimen.spacing_medium)),
+                    )
+                }
+            } else {
+                items(guides, key = { it.guideId }) { guide ->
+                    GuideResultCard(
+                        guide = guide,
+                        onClick = { onGuideClick(guide.guideId) },
+                    )
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
+                }
+            }
+        }
+        ContentLoadState.LOADING,
+        ContentLoadState.ERROR,
+        -> {
+            item {
+                GuideMateContentState(
+                    state = loadState,
+                    onRetry = onRetry,
+                    modifier = Modifier.fillMaxWidth().height(180.dp),
+                ) {}
+            }
+        }
     }
 }

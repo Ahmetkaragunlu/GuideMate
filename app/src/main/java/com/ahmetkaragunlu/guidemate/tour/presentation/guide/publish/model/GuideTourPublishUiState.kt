@@ -31,6 +31,9 @@ data class GuideTourPublishUiState(
     val guideImageUrl: String? = null,
     val validationErrorStep: GuideTourPublishStep? = null,
     @param:StringRes val validationErrorResId: Int? = null,
+    val isPublishing: Boolean = false,
+    val submissionErrorMessage: String? = null,
+    val publishSucceeded: Boolean = false,
 ) {
     val locationDisplay: String
         get() = listOf(country, city).filter { it.isNotBlank() }.joinToString(", ")

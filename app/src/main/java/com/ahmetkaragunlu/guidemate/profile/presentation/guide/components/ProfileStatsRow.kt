@@ -44,7 +44,7 @@ import compose.icons.tablericons.Flag
 fun ProfileStatsRow(
     guideLevel: String,
     rating: Double,
-    tourCount: Int,
+    tourCount: Long,
     onGuideLevelInfoClick: () -> Unit,
 ) {
     Row(

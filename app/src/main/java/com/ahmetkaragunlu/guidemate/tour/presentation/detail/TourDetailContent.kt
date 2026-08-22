@@ -33,6 +33,8 @@ fun TourDetailContent(
     onPrimaryAction: () -> Unit,
     modifier: Modifier = Modifier,
     topContent: (@Composable () -> Unit)? = null,
+    isPrimaryActionLoading: Boolean = false,
+    isPrimaryActionEnabled: Boolean = true,
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(TourDetailTab.DETAILS) }
 
@@ -73,6 +75,8 @@ fun TourDetailContent(
                 text = actionTextResId,
                 onClick = onPrimaryAction,
                 icon = mode.primaryActionIcon,
+                enabled = isPrimaryActionEnabled,
+                isLoading = isPrimaryActionLoading,
                 modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_extra_large)),
             )
         }

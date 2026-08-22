@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -34,6 +35,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.components.Gu
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditUiState
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
 
 @Composable
 fun GuideTourEditContent(
@@ -115,7 +117,12 @@ fun GuideTourEditContent(
                 onRemoveLanguage = onRemoveLanguage,
                 onAddLanguage = onAddLanguage,
             )
-            val today = LocalDate.now()
+            val tourZone =
+                remember(uiState.timeZoneId) {
+                    runCatching { ZoneId.of(uiState.timeZoneId) }
+                        .getOrDefault(ZoneId.systemDefault())
+                }
+            val today = LocalDate.now(tourZone)
             EditDatePickerField(
                 labelResId = R.string.guide_tour_publish_step1_date_label,
                 placeholderResId = R.string.select_tour_date,
@@ -137,11 +144,11 @@ fun GuideTourEditContent(
                 labelResId = R.string.guide_tour_publish_step1_time_label,
                 placeholderResId = R.string.select_tour_time,
                 selectedTime = uiState.startTime,
-                initialTime = LocalTime.now(),
+                initialTime = LocalTime.now(tourZone),
                 onTimeSelected = onStartTimeSelected,
                 enabled = !uiState.hasBookings,
                 isTimeSelectable = { selectedTime ->
-                    uiState.tourDate != today || selectedTime.isAfter(LocalTime.now())
+                    uiState.tourDate != today || selectedTime.isAfter(LocalTime.now(tourZone))
                 },
                 leadingIcon = { Text(text = "🕘") },
                 modifier = Modifier.fillMaxWidth(),
@@ -199,6 +206,7 @@ fun GuideTourEditContent(
                         R.string.save_changes
                     },
                 onClick = onSave,
+                isLoading = uiState.isSaving,
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
         }

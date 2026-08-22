@@ -46,6 +46,7 @@ fun AddTourSessionBottomSheet(
     onCapacityChange: (String) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    isSubmitting: Boolean = false,
 ) {
     val tourZoneId =
         remember(formState.timeZoneId) {
@@ -127,6 +128,7 @@ fun AddTourSessionBottomSheet(
                     text = R.string.republish_tour,
                     onClick = onConfirm,
                     enabled = formState.canSubmit,
+                    isLoading = isSubmitting,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
             }

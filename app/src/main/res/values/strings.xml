@@ -159,6 +159,7 @@
     <string name="chat_input_placeholder">Mesaj yazın...</string>
     <string name="chat_empty_history">Henüz sohbet geçmişiniz yok.</string>
     <string name="guide_profile">Hesabım</string>
+    <string name="public_guide_profile">Rehber Profili</string>
     <string name="guide_wallet">Cüzdan</string>
 
 
@@ -249,6 +250,9 @@
     <string name="tab_tours">Turlar</string>
     <string name="tab_active">Aktif</string>
     <string name="tab_review">İncelemede</string>
+    <string name="guide_tours_empty_active">Henüz aktif bir turunuz yok.</string>
+    <string name="guide_tours_empty_review">İncelemede olan bir turunuz yok.</string>
+    <string name="guide_tours_empty_past">Henüz geçmiş bir turunuz yok.</string>
     <string name="pending_review">Onay Bekliyor</string>
     <string name="rejected">Reddedildi</string>
     <string name="rejection_reason_format">Gerekçe: %1$s</string>
@@ -262,6 +266,8 @@
     <string name="unsaved_tour_changes_message">Yaptığınız değişiklikler kaybolacak. Düzenlemeden çıkmak istiyor musunuz?</string>
     <string name="tour_edit_review_confirmation_title">Değişiklikleri Onaya Gönder</string>
     <string name="tour_edit_review_confirmation_message">Bu değişiklikler yeniden incelenecek ve onaylanana kadar tur yeni rezervasyonlara kapatılacaktır. Devam etmek istiyor musunuz?</string>
+    <string name="error_tour_edit_no_changes">Kaydedilecek bir değişiklik bulunmuyor.</string>
+    <string name="tour_edit_partial_success">Tur bilgileri onaya gönderildi ancak oturum değişiklikleri kaydedilemedi: %1$s</string>
     <string name="resubmit_for_review_confirmation_title">Turu Onaya Gönder</string>
     <string name="resubmit_for_review_confirmation_message">Yaptığınız düzenlemeler yeniden incelenmek üzere gönderilecektir. Devam etmek istiyor musunuz?</string>
     <string name="archive_tour_draft">Taslağı Sil</string>
@@ -274,6 +280,26 @@
     <string name="tour_operation_capacity_full">Kontenjan dolu olduğu için tur yeni rezervasyonlara açılamaz.</string>
     <string name="tour_operation_status_not_manageable">Turun mevcut durumu bu işlem için uygun değil.</string>
     <string name="tour_operation_not_archivable">Bu tur İncelemede listesinden kaldırılamıyor.</string>
+    <string name="error_invalid_language_code">Seçilen dillerden biri desteklenmiyor.</string>
+    <string name="error_tour_not_found">Tur bulunamadı. Listeyi yenileyip tekrar deneyin.</string>
+    <string name="error_tour_not_approved">Bu işlem için turun önce onaylanması gerekiyor.</string>
+    <string name="error_tour_change_pending">Bu tur için zaten incelemede olan bir değişiklik var.</string>
+    <string name="error_tour_location_locked">Yayınlanmış turun ülke ve şehir bilgisi değiştirilemez.</string>
+    <string name="error_tour_not_archivable">Bu tur şu anda silinemez.</string>
+    <string name="error_tour_review_not_found">Tur inceleme kaydı bulunamadı.</string>
+    <string name="error_tour_review_state_invalid">Turun inceleme durumu bu işlem için uygun değil.</string>
+    <string name="error_invalid_category_code">Seçilen kategori desteklenmiyor.</string>
+    <string name="error_invalid_country_code">Seçilen ülke bilgisi geçersiz.</string>
+    <string name="error_invalid_time_zone">Turun saat dilimi bilgisi geçersiz.</string>
+    <string name="error_session_not_found">Tur oturumu bulunamadı. Listeyi yenileyip tekrar deneyin.</string>
+    <string name="error_session_not_bookable">Bu tur oturumu şu anda rezervasyona uygun değil.</string>
+    <string name="error_session_already_started">Başlamış veya süresi geçmiş tur değiştirilemez.</string>
+    <string name="error_session_has_reservations">Mevcut rezervasyonlar nedeniyle bu değişiklik yapılamıyor.</string>
+    <string name="error_capacity_not_available">Turun boş kontenjanı kalmadı.</string>
+    <string name="error_capacity_below_booked_count">Kontenjan mevcut katılımcı sayısından düşük olamaz.</string>
+    <string name="error_session_status_not_manageable">Turun mevcut durumu bu işlem için uygun değil.</string>
+    <string name="error_schedule_conflict">Seçilen tarih ve saatte başka bir turunuz bulunuyor.</string>
+    <string name="error_concurrent_update">Tur başka bir işlemle güncellendi. Verileri yenileyip tekrar deneyin.</string>
     <string name="cancel_tour_title">Turu İptal Et</string>
     <string name="cancel_tour_warning">Bu işlem geri alınamaz. Mevcut rezervasyonlar iptal edilecek ve turistlere tam iade süreci başlatılacaktır.</string>
     <string name="cancel_tour_no_booking_warning">Bu seans iptal edilerek Geçmiş bölümüne taşınacaktır.</string>
@@ -318,6 +344,12 @@
     <string name="selection_no_results">Sonuç bulunamadı.</string>
     <string name="selection_city_error">Şehirler yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.</string>
     <string name="selection_retry">Tekrar Dene</string>
+    <string name="common_loading">Yükleniyor</string>
+    <string name="common_retry">Tekrar Dene</string>
+    <string name="guide_search_empty">Henüz uygun bir rehber bulunamadı.</string>
+    <string name="guide_profile_not_found">Rehber profili bulunamadı.</string>
+    <string name="guide_profile_update_success">Profiliniz güncellendi.</string>
+    <string name="guide_profile_complete_about_first">Profil fotoğrafınızı eklemeden önce Hakkımda bölümündeki unvan ve biyografinizi kaydedin.</string>
     <string name="selection_done">Tamam</string>
     <string name="selection_powered_by_google">Powered by Google</string>
     <string name="price_range">Fiyat Aralığı</string>

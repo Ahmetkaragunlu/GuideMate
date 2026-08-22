@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.navigation.guide.tours
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -80,20 +81,22 @@ internal fun NavGraphBuilder.guideTourPublishNavGraph(
         composable<GuideTourDestination.PublishStep4> { backStackEntry ->
             val viewModel = backStackEntry.guideTourPublishViewModel(navController)
             val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+            LaunchedEffect(uiState.value.publishSucceeded) {
+                if (uiState.value.publishSucceeded) {
+                    viewModel.onPublishSucceededHandled()
+                    navController
+                        .getBackStackEntry(GuideTourDestination.MyTours)
+                        .savedStateHandle[GUIDE_MY_TOURS_SELECTED_TAB_RESULT] =
+                        GuideTourTab.REVIEW.name
+                    navController.popBackStack(
+                        route = GuideTourDestination.MyTours,
+                        inclusive = false,
+                    )
+                }
+            }
             GuideTourPublishStep4PreviewPublishScreen(
                 uiState = uiState.value,
-                onPublish = {
-                    if (viewModel.onPublishClick()) {
-                        navController
-                            .getBackStackEntry(GuideTourDestination.MyTours)
-                            .savedStateHandle[GUIDE_MY_TOURS_SELECTED_TAB_RESULT] =
-                            GuideTourTab.REVIEW.name
-                        navController.popBackStack(
-                            route = GuideTourDestination.MyTours,
-                            inclusive = false,
-                        )
-                    }
-                },
+                onPublish = viewModel::onPublishClick,
             )
         }
     }

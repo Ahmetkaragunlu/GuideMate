@@ -2,7 +2,6 @@ package com.ahmetkaragunlu.guidemate.tour.data.mock
 
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
-import com.ahmetkaragunlu.guidemate.profile.domain.model.MOCK_CURRENT_GUIDE_ID
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.Tour
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
@@ -12,6 +11,8 @@ import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourCatalogState
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
 import java.time.Instant
+
+internal const val MOCK_CURRENT_GUIDE_ID = "guide-current"
 
 internal fun createMockTourCatalogState(): TourCatalogState {
     val languagesTrEn =

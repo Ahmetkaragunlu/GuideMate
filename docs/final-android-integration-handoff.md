@@ -2684,9 +2684,9 @@ Guncel durumlar:
 | --- | --- | --- |
 | Faz 0 - Feature-first refactor | `TAMAMLANDI` | Format, compile, unit test, lint ve debug APK kapilari gecti |
 | Faz 1 - Ortak teknik temel ve auth | `TAMAMLANDI` | Auth/OpenAPI uyumu, ortak pagination, hata parsing, LAN ve kalite kapilari dogrulandi |
-| Faz 2 - Medya | `KISMEN TAMAMLANDI` | Medya altyapisi ve loader tamam; avatar Faz 3, tour cover Faz 4 E2E baglantisini bekliyor |
-| Faz 3 - Guide profile ve public guide | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
-| Faz 4 - Tour ve guide tour yonetimi | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
+| Faz 2 - Medya | `KISMEN TAMAMLANDI` | Medya altyapisi, loader, avatar ve guide tour cover kod baglantisi tamam; avatar/tour cover cihaz E2E kaniti ile tourist canonical cover Faz 5 baglantisini bekliyor |
+| Faz 3 - Guide profile ve public guide | `KISMEN TAMAMLANDI` | Repository, own/public profile, avatar patch, guide search/top ve otomatik kalite kapilari tamam; calisan backend ile cihaz E2E kaniti bekleniyor |
+| Faz 4 - Tour ve guide tour yonetimi | `KISMEN TAMAMLANDI` | Repository, guide list/detail/publish/edit/lifecycle/dashboard, cover media, mock mutation temizligi ve kalite kapilari tamam; calisan backend ile authenticated cihaz E2E kaniti bekleniyor |
 | Faz 5 - Tourist discovery ve public tour | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
 | Faz 6 - Reservation ve trips | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
 | Faz 7 - Review | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
@@ -2718,8 +2718,8 @@ Capraz-faz takip kaydi su formatta tutulur:
 
 | Kayit | Kaynak faz | Hedef faz | Bagimli is | Kapanis kaniti | Durum |
 | --- | --- | --- | --- | --- | --- |
-| MEDIA-PROFILE-01 | Faz 2 | Faz 3 | Avatar local URI upload sonucu `mediaAssetId` ile profile patch'e baglanacak; hata durumunda eski avatar korunacak | Guide avatar degisikliginin own/public profile'da iki cihazdan canonical URL ile gorunmesi | `BEKLIYOR` |
-| MEDIA-TOUR-01 | Faz 2 | Faz 4 | Cover local URI once upload edilecek; create/change request yalniz `mediaAssetId` tasiyacak ve terk edilen draft kontrollu silinecek | Publish/edit sonrasi guide ve tourist tour gorunumlerinin ayni canonical cover URL'yi gostermesi | `BEKLIYOR` |
+| MEDIA-PROFILE-01 | Faz 2 | Faz 3 | Avatar local URI upload sonucu `mediaAssetId` ile profile patch'e baglandi; patch hatasinda yeni sahipsiz medya temizlenip eski avatar korunuyor | Guide avatar degisikliginin own/public profile'da iki cihazdan canonical URL ile gorunmesi | `KOD TAMAMLANDI - E2E BEKLIYOR` |
+| MEDIA-TOUR-01 | Faz 2 | Faz 4 | Cover local URI once upload ediliyor; create/change request yalniz `mediaAssetId` tasiyor ve basarisiz request'in sahipsiz yeni medyasi kontrollu siliniyor | Publish/edit sonrasi guide ve tourist tour gorunumlerinin ayni canonical cover URL'yi gostermesi | `KOD TAMAMLANDI - BACKEND E2E VE FAZ 5 BEKLIYOR` |
 
 Bu tablo, faz uygulamalari sirasinda gercek bir bagimlilik ortaya ciktiginda
 somut kayitlarla guncellenir. Yalniz olasi bir ihtimal icin hayali borc veya
@@ -2892,6 +2892,8 @@ Uygulananlar ve kapanis kaniti:
 
 ### Faz 3 - Guide Profil ve Public Guide Projection
 
+Durum: `KISMEN TAMAMLANDI` (2026-08-22).
+
 Yapilacaklar:
 
 - `GuideProfileRepository` own profile, public profile, guide search ve top
@@ -2912,7 +2914,77 @@ Mock temizleme kapisi:
 - Profil preview icin ayri mutable veri kaynagi tutulmaz.
 - Compose preview verileri immutable fixture olarak kalabilir.
 
+Uygulama sonucu:
+
+- `GuideProfileRepository`; own profile, public profile, guide search ve top
+  endpoint'lerini tek interface arkasinda topladi. DTO-domain-presentation
+  mapper sinirlari korundu; repository Hilt ile singleton olarak baglandi.
+- Guide profil, Hakkimda, rehber onizleme, dashboard performans kartlari ve tur
+  yayinlama rehber ozeti ayni canonical own-profile Flow'undan besleniyor.
+- Avatar local URI'si once Faz 2 `MediaRepository` ile upload ediliyor; donen
+  `mediaAssetId` profile patch'e veriliyor. Patch basarisizsa yeni sahipsiz
+  medya temizleniyor ve eski avatar ekranda korunuyor.
+- Tourist home en iyi rehberler ve Explore rehber arama sonuclari backend
+  projection'larindan uretiliyor. Arama debounce, pagination, empty, ilk istek
+  retry ve mevcut listeyi koruyan append-retry davranislarini aldi.
+- Typed `TouristDestination.GuideProfile(guideId)` ile turist public guide
+  profiline gidebiliyor; guide onizleme ve public ekran ayni ortak profil
+  renderer'ini kullaniyor.
+- `GuideProfileSharedStore`, `GuideProfileStateProvider`,
+  `GuidePerformanceStore`, Android seviye hesaplayicisi ve sahte best-guide
+  listesi kaldirildi. Level ve performans backend projection'i otoritesinde.
+- Ortak content loading/retry renderer'i eklendi. Ilk yuklemede brand loading,
+  hatada tiklanabilir retry; cache varsa refresh sirasinda mevcut icerik
+  korunuyor. Yapay loading gecikmesi eklenmedi.
+- Profile mapper ve repository cache/account-isolation testleri eklendi.
+  `./gradlew ktfmtCheck compileDebugKotlin testDebugUnitTest lintDebug
+  assembleDebug` basarili.
+- Debug APK bagli emulatore basariyla kuruldu; launcher acilisi tamamlandi ve
+  fatal runtime hatasi gorulmedi. Ancak backend `192.168.68.102:8080` bu
+  dogrulama aninda calismadigi icin authenticated own/about/avatar/public/
+  search/top E2E akislari ve ikinci cihaz canonical URL kaniti calistirilamadi.
+  Bunlar dogrulanmadan Faz 3 ve `MEDIA-PROFILE-01` `TAMAMLANDI` sayilmayacak.
+
 ### Faz 4 - Ortak Tour Domain ve Guide Tour Yonetimi
+
+Durum: `KISMEN TAMAMLANDI` (2026-08-22).
+
+Uygulama sonucu:
+
+- Backend guide tour endpoint'leriyle birebir `GuideTourApi`, request/response
+  DTO'lari, domain mapper'lari, `GuideTourRepository`/implementation ve Hilt
+  baglantisi kuruldu. UUID kimlikler, optimistic version, lifecycle, toplam
+  capacity, booked count, rating/review, session kazanci, cancellation ve
+  canonical medya alanlari korunuyor.
+- Turlarim ACTIVE/REVIEW/PAST sekmeleri backend pagination ve siralamasini
+  kullaniyor. Ilk yukleme, retry, bos liste, append loading/retry ve mutation
+  hatalari mevcut ortak UI kuraliyla gorunur durumda.
+- Detail ve edit typed route'lari `tourId + sessionId` tasiyor. Detail cancel ve
+  yeni session islemleri backend sonucunu bekliyor; iptal istegi retry boyunca
+  ayni idempotency key'i koruyor.
+- Edit content change request ile session update'i ayiriyor. Content basarili,
+  session basarisiz olursa tam basari navigasyonu yapilmiyor; kullaniciya kismi
+  basari mesaji gosteriliyor ve yalniz kalan session degisikligi retry ediliyor.
+- Publish ve edit cover secimi once Faz 2 `MediaRepository` ile yukleniyor;
+  backend'e local URI yerine `mediaAssetId` gidiyor. Create/change basarisizsa
+  yeni sahipsiz medya temizleniyor.
+- Guide home aktif/onay bekleyen/tamamlanan/katilimci/puan/aylik kazanc
+  alanlarini tek backend dashboard projection'indan aliyor; liste boyutu veya
+  local aggregate kullanmiyor.
+- `TourCatalogStore` guide mutation/private projection otoritesi kaldirildi.
+  Store yalniz Faz 5'e kadar tourist public mock okumasi icin dar state kaynagi
+  olarak korundu; eski operation modelleri ve operation testleri silindi.
+- Tour/session backend hata kodlari ortak `AppError` mesaj sozlesmesine eklendi.
+  Mapper ve repository contract testleri version, pagination, capacity,
+  earnings, media ve canonical Instant aktarimini dogruluyor.
+- `./gradlew ktfmtCheck :app:compileDebugKotlin :app:testDebugUnitTest
+  :app:lintDebug :app:assembleDebug` basarili. Debug APK emulatore kuruldu,
+  launcher acildi ve fatal runtime hatasi gorulmedi.
+- Backend `192.168.68.102:8080` dogrulama aninda calismadigi icin authenticated
+  list/detail/publish/edit/open-close/cancel/archive/dashboard ve canonical
+  remote cover E2E akislari calistirilamadi. Bunlar ve Faz 5 tourist canonical
+  cover kaniti tamamlanmadan Faz 4 ile `MEDIA-TOUR-01` `TAMAMLANDI`
+  sayilmayacak.
 
 Yapilacaklar:
 
@@ -3682,6 +3754,33 @@ olarak kalamaz.
 - Mevcut renk, typography, icon boyutu, padding, card, bottom sheet, dialog,
   topbar, bottom bar ve tek-scaffold davranisi bilincli tasarim karari olmadan
   degismez.
+- Ilk kez acilan ve henuz gosterecek canonical verisi bulunmayan tam ekran
+  backend istekleri ortak GuideMate load-state component'ini kullanir. Loading
+  durumunda ekran merkezinde brand color donen daire ve altinda `Yukleniyor`,
+  hata durumunda ayni alanda brand color donmeyen sabit daire ve altinda
+  `Tekrar Dene` gosterilir. Daire ve metin birlikte erisilebilir retry
+  hedefidir; tekrar dokunuldugunda ViewModel yeni istegi baslatir ve gorunum
+  yeniden loading'e doner. Ayni anda yinelenen istek engellenir.
+- Ortak tam ekran load-state; buton ici progress, bottom sheet aramasi, image
+  placeholder'i, sayfa sonu pagination veya payment status gibi kendi akisina
+  ozel durumlarin yerine zorla kullanilmaz. Bu kullanimlar kendi boyut ve urun
+  davranislarini korur.
+- Progress rengi bulundugu yuzeyin kontrastina gore secilir. Notr ekran
+  zeminindeki ortak loading brand color kullanir; brand color butonun icindeki
+  progress ise gorunurluk icin kontrast content rengi kullanir. Tek renk kurali
+  butun yuzeylere zorlanmaz.
+- Ekranda daha once alinmis kullanilabilir veri varsa tam ekran loading ile
+  icerik kapatilmaz; mevcut veri gosterilir ve yenileme/hata uygun non-blocking
+  bildirimle yonetilir. Tam ekran retry yalniz gosterecek veri bulunmadiginda
+  kullanilir.
+- Faz 0-2'deki tam ekran loading/error kullanimlari, ilgili feature gercek
+  repository'ye baglanirken bu ortak component acisindan taranir. Ayni sorunu
+  cozen yerel kopyalar kaldirilir; root navigation loading yalniz davranis ve
+  gorunum uyumluysa ortak loading kolunu kullanir. City picker, auth butonlari
+  ve payment status gibi farkli kullanimlar oldugu gibi kalir.
+- Faz 3 ve sonraki tum repository entegrasyonlarinda yukaridaki ortak tam ekran
+  loading/retry sozlesmesi varsayilan kabul kriteridir; yeni feature'a ozel
+  kopya ancak gercekten farkli bir urun davranisi varsa eklenir.
 - Loading/empty/error/retry eklenirken layout ziplama, ust uste scaffold veya
   geri tusu dongusu olusmaz.
 - Guide ve tourist bagimsiz bottom-bar history'si korunur.

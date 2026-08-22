@@ -19,4 +19,9 @@ object TouristDestination {
     data class TourDetail(
         val sessionId: String,
     )
+
+    @Serializable
+    data class GuideProfile(
+        val guideId: Long,
+    )
 }

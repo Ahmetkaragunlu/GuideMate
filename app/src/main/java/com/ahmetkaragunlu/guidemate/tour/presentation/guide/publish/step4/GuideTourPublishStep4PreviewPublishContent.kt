@@ -1,6 +1,8 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.step4
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -33,6 +35,15 @@ fun GuideTourPublishStep4PreviewPublishContent(
             GuideTourPublishValidationMessage(
                 errorResId = uiState.validationErrorFor(GuideTourPublishStep.PREVIEW),
             )
+            uiState.submissionErrorMessage?.let { message ->
+                Text(
+                    text = message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         },
+        isPrimaryActionLoading = uiState.isPublishing,
+        isPrimaryActionEnabled = !uiState.publishSucceeded,
     )
 }

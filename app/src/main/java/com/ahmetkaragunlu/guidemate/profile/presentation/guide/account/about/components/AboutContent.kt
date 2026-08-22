@@ -41,7 +41,7 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditTextField
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.about.model.GuideAboutUiState
-import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideSpokenLanguageUi
+import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideSpokenLanguageUi
 
 @Composable
 fun AboutContent(
@@ -98,6 +98,7 @@ fun AboutContent(
             EditButton(
                 text = R.string.about_save_action,
                 onClick = onSaveClick,
+                isLoading = uiState.isSaving,
                 modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_extra_large)),
             )
         }

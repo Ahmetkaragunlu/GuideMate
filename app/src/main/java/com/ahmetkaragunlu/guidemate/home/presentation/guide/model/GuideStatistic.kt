@@ -2,7 +2,7 @@ package com.ahmetkaragunlu.guidemate.home.presentation.guide.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.profile.domain.model.performance.GuidePerformanceSummary
+import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Flag
 import compose.icons.tablericons.Friends
@@ -14,7 +14,7 @@ data class GuideStatistic(
     val description: Int,
 )
 
-fun GuidePerformanceSummary.toDashboardStatistics(): List<GuideStatistic> =
+fun GuideDashboard.toDashboardStatistics(): List<GuideStatistic> =
     listOf(
         GuideStatistic(
             icon = TablerIcons.Flag,

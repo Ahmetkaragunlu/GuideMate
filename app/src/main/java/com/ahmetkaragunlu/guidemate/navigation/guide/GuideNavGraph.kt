@@ -35,15 +35,14 @@ internal fun NavGraphBuilder.guideNavGraph(
 ) {
     composable<GuideDestination.Home> {
         val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
-        val earningsUiState by earningsViewModel.uiState.collectAsStateWithLifecycle()
         val notificationsUiState by notificationsViewModel.uiState.collectAsStateWithLifecycle()
         GuideHomeScreen(
             uiState = homeUiState,
-            currentMonthEarning = earningsUiState.currentMonth,
             recentNotifications = notificationsUiState.recentNotifications,
             onNavigateToEarnings = {
                 guideNavController.navigateTo(GuideWalletDestination.Earnings)
             },
+            onRetryPerformance = homeViewModel::refreshDashboard,
         )
     }
     composable<GuideDestination.Chat> {

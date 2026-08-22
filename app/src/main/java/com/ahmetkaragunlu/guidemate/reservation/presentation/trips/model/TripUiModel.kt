@@ -19,7 +19,7 @@ data class TripUiModel(
     val languagesText: String,
     val priceMinor: Long,
     val rating: Double? = null,
-    val reviewCount: Int? = null,
+    val reviewCount: Long? = null,
     val startsAt: Instant,
     val sessionStatus: TourDetailStatus? = null,
     val cancellationReason: String? = null,

@@ -5,4 +5,5 @@ data class GuideTourDetailActionUiState(
     val cancellationReason: String = "",
     val isNewSessionSheetVisible: Boolean = false,
     val newSessionForm: NewTourSessionFormState = NewTourSessionFormState(),
+    val isSubmitting: Boolean = false,
 )

@@ -18,11 +18,11 @@ internal fun NavGraphBuilder.guideTourNavGraph(
             onNavigateToTourPublish = {
                 navController.navigateTo(GuideTourPublishGraph)
             },
-            onNavigateToTourDetail = { sessionId ->
-                navController.navigateTo(GuideTourDestination.Detail(sessionId))
+            onNavigateToTourDetail = { tourId, sessionId ->
+                navController.navigateTo(GuideTourDestination.Detail(tourId, sessionId))
             },
-            onNavigateToTourEdit = { sessionId ->
-                navController.navigateTo(GuideTourDestination.Edit(sessionId))
+            onNavigateToTourEdit = { tourId, sessionId ->
+                navController.navigateTo(GuideTourDestination.Edit(tourId, sessionId))
             },
         )
     }
