@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.model.WalletTransactionStatus
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.model.WalletTransactionType
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.model.WalletTransactionUiModel
@@ -49,6 +49,9 @@ fun WalletTransactionItem(transaction: WalletTransactionUiModel) {
             WalletTransactionType.TOUR_INCOME -> transaction.referenceTitle.orEmpty()
             WalletTransactionType.WITHDRAWAL ->
                 stringResource(R.string.wallet_transaction_withdrawal_title)
+            WalletTransactionType.EARNING_REVERSAL ->
+                transaction.referenceTitle
+                    ?: stringResource(R.string.wallet_transaction_reversal_title)
         }
 
     Row(
@@ -103,7 +106,10 @@ fun WalletTransactionItem(transaction: WalletTransactionUiModel) {
             }
         }
         Text(
-            text = "$amountPrefix${transaction.amountMinor.toPlatformCurrencyFromMinorUnit()}",
+            text =
+                "$amountPrefix${
+                    transaction.amountMinor.toCurrencyFromMinorUnit(transaction.currencyCode)
+                }",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = amountColor,

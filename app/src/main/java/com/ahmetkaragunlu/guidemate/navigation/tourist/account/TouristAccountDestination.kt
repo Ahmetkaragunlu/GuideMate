@@ -16,8 +16,6 @@ enum class TouristAccountStart {
 object TouristAccountDestination {
     @Serializable data object SavedCards
 
-    @Serializable data object AddSavedCard
-
     @Serializable data object ChangePassword
 
     @Serializable data object NotificationSettings

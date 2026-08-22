@@ -2,7 +2,7 @@ package com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.transactions.mo
 
 import androidx.annotation.StringRes
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionType
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletTransactionType
 
 enum class TouristWalletTransactionFilter(
     @param:StringRes val titleResId: Int,

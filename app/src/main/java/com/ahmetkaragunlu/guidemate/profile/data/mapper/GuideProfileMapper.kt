@@ -2,11 +2,10 @@ package com.ahmetkaragunlu.guidemate.profile.data.mapper
 
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
-import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
+import com.ahmetkaragunlu.guidemate.media.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuidePerformanceResponseDto
 import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideProfileResponseDto
 import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideSearchItemResponseDto
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
 import com.ahmetkaragunlu.guidemate.profile.data.remote.model.UpdateGuideProfileRequestDto
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfile
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfileUpdate
@@ -67,10 +66,4 @@ private fun GuidePerformanceResponseDto.toDomain(): GuidePerformanceSummary =
         averageRating = averageRating,
         reviewCount = reviewCount,
         level = GuideLevelTier.valueOf(level),
-    )
-
-private fun MediaReferenceResponseDto.toDomain(): MediaReference =
-    MediaReference(
-        mediaAssetId = mediaAssetId,
-        imageUrl = imageUrl,
     )

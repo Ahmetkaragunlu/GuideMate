@@ -48,6 +48,7 @@ import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.model.Explore
 fun TouristFilterScreen(
     modifier: Modifier = Modifier,
     viewModel: TouristExploreViewModel = hiltViewModel(),
+    onApplyFilters: () -> Unit = {},
 ) {
     val categories = viewModel.categories
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -63,13 +64,16 @@ fun TouristFilterScreen(
         onLanguageClick = { activePicker = TouristFilterPicker.LANGUAGE },
         onPriceRangeChange = viewModel::updatePriceRange,
         onClearFilters = viewModel::clearFilters,
-        onApplyFilters = { },
+        onApplyFilters = {
+            viewModel.applyFilters()
+            onApplyFilters()
+        },
         modifier = modifier,
     )
 
     CountrySelectionBottomSheet(
         isVisible = activePicker == TouristFilterPicker.COUNTRY,
-        selectedCountryCode = uiState.selectedCountry?.code,
+        selectedCountryCode = uiState.draftFilters.selectedCountry?.code,
         onDismissRequest = { activePicker = null },
         onCountrySelected = { country ->
             viewModel.updateSelectedCountry(country)
@@ -77,7 +81,7 @@ fun TouristFilterScreen(
         },
     )
 
-    uiState.selectedCountry?.let { country ->
+    uiState.draftFilters.selectedCountry?.let { country ->
         CitySelectionBottomSheet(
             isVisible = activePicker == TouristFilterPicker.CITY,
             country = country,
@@ -91,7 +95,8 @@ fun TouristFilterScreen(
 
     LanguageSelectionBottomSheet(
         isVisible = activePicker == TouristFilterPicker.LANGUAGE,
-        selectedLanguageCodes = uiState.selectedLanguages.mapTo(mutableSetOf()) { it.code },
+        selectedLanguageCodes =
+            uiState.draftFilters.selectedLanguages.mapTo(mutableSetOf()) { it.code },
         onDismissRequest = { activePicker = null },
         onLanguagesSelected = { languages ->
             viewModel.updateSelectedLanguages(languages)
@@ -114,6 +119,7 @@ fun TouristFilterContent(
     onApplyFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val filters = uiState.draftFilters
     Column(
         modifier =
             modifier
@@ -123,14 +129,14 @@ fun TouristFilterContent(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
         EditDropdown(
-            value = uiState.selectedCountry?.displayName.orEmpty(),
+            value = filters.selectedCountry?.displayName.orEmpty(),
             placeholder = R.string.select_country,
             onClick = onCountryClick,
         )
         EditDropdown(
-            value = uiState.selectedCity?.displayName.orEmpty(),
+            value = filters.selectedCity?.displayName.orEmpty(),
             placeholder = R.string.select_city,
-            enabled = uiState.selectedCountry != null,
+            enabled = filters.selectedCountry != null,
             onClick = onCityClick,
         )
 
@@ -151,7 +157,7 @@ fun TouristFilterContent(
             items(categories) { category ->
                 TourCategoryCard(
                     category = category,
-                    isSelected = category.category == uiState.selectedCategory,
+                    isSelected = category.category == filters.selectedCategory,
                     onClick = { onCategorySelected(category.category) },
                 )
             }
@@ -169,7 +175,7 @@ fun TouristFilterContent(
         )
 
         RatingBar(
-            rating = uiState.selectedRating,
+            rating = filters.selectedRating,
             onRatingChanged = onRatingChanged,
             modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
@@ -182,7 +188,7 @@ fun TouristFilterContent(
         )
 
         EditDropdown(
-            value = uiState.selectedLanguages.joinToString { it.displayName },
+            value = filters.selectedLanguages.joinToString { it.displayName },
             placeholder = R.string.language,
             onClick = onLanguageClick,
         )
@@ -195,7 +201,7 @@ fun TouristFilterContent(
         )
 
         PriceRangeSelector(
-            range = uiState.priceRange,
+            range = filters.priceRange,
             onRangeChange = onPriceRangeChange,
             minPrice = 0f,
             maxPrice = 1000f,

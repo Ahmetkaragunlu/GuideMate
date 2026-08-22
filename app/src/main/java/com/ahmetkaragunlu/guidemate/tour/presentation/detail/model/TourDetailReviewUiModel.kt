@@ -8,4 +8,5 @@ data class TourDetailReviewUiModel(
     val comment: String,
     val rating: Int,
     @param:DrawableRes val reviewerImageResId: Int,
+    val reviewerImageUrl: String? = null,
 )

@@ -22,14 +22,16 @@ class GuideWalletStoreTest {
         val created =
             store.addPendingWithdrawal(
                 amountMinor = 500_000,
+                availableBalanceMinor = 2_000_000,
+                currencyCode = "USD",
                 bankAccountId = "guide-bank-account-2",
             )
 
         assertTrue(created)
         assertEquals(
             "guide-bank-account-2",
-            store.state.value.recentTransactions.first().bankAccountId,
+            store.state.value.pendingWithdrawals.first().bankAccountId,
         )
-        assertEquals(1_500_000L, store.state.value.availableWithdrawalBalanceMinor)
+        assertEquals(500_000L, store.state.value.pendingWithdrawalMinor)
     }
 }

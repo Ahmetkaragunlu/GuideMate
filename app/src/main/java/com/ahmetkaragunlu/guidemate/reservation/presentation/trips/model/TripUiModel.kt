@@ -6,7 +6,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailSta
 import java.time.Instant
 
 data class TripUiModel(
-    val id: String,
+    val reservationId: String,
     val tourSessionId: String,
     val title: String,
     val date: String,
@@ -17,7 +17,7 @@ data class TripUiModel(
     val category: TourCategory,
     val languagesFlag: String,
     val languagesText: String,
-    val priceMinor: Long,
+    val totalPriceMinor: Long,
     val rating: Double? = null,
     val reviewCount: Long? = null,
     val startsAt: Instant,

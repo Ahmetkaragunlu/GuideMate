@@ -1,13 +1,9 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.mapper
 
+import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
-import com.ahmetkaragunlu.guidemate.tour.domain.model.Tour
-import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
-import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
-import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSession
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
+import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -16,63 +12,43 @@ class PopularTourMapperTest {
     @Test
     fun `popular card uses canonical tour session and guide values`() {
         val item =
-            TourWithSession(
-                tour =
-                    Tour(
-                        id = "tour-1",
-                        guide =
-                            GuidePublicSummary(
-                                id = "guide-1",
-                                displayName = "Ahmet Yılmaz",
-                                profileImageResId = 11,
-                                profileImageUrl = "content://guide-avatar",
-                            ),
-                        title = "Ayasofya Tarih Turu",
-                        description = "Tur açıklaması",
-                        country = "Türkiye",
-                        city = "İstanbul",
-                        timeZoneId = "Europe/Istanbul",
-                        category = TourCategory.CULTURE,
-                        languages =
-                            listOf(
-                                TourLanguage(
-                                    code = "tr",
-                                    flagEmoji = "🇹🇷",
-                                    displayName = "Türkçe",
-                                    shortCode = "TR",
-                                ),
-                            ),
-                        coverImageResId = 22,
-                        coverImageUrl = "content://tour-cover",
-                        approvalStatus = TourApprovalStatus.APPROVED,
-                        averageRating = 4.9,
-                        reviewCount = 120,
-                    ),
-                session =
-                    TourSession(
-                        id = "session-1",
-                        tourId = "tour-1",
-                        meetingPoint = "Ayasofya Meydanı",
-                        startsAt = Instant.parse("2027-05-24T06:00:00Z"),
-                        durationMinutes = 180,
-                        priceMinor = 150_000,
-                        capacity = 12,
-                        bookedCount = 4,
-                        status = TourSessionStatus.OPEN_FOR_BOOKING,
+            TourSearchItem(
+                tourId = "tour-1",
+                sessionId = "session-1",
+                title = "Ayasofya Tarih Turu",
+                category = TourCategory.CULTURE,
+                cityName = "İstanbul",
+                countryCode = "TR",
+                cityPlaceId = "istanbul",
+                startsAt = Instant.parse("2027-05-24T06:00:00Z"),
+                timeZoneId = "Europe/Istanbul",
+                durationMinutes = 180,
+                priceMinor = 150_000,
+                currencyCode = "USD",
+                availableCapacity = 8,
+                languageCodes = emptyList(),
+                cover = MediaReference("media-1", "content://tour-cover"),
+                averageRating = 4.9,
+                reviewCount = 120,
+                guide =
+                    GuidePublicSummary(
+                        id = "guide-1",
+                        displayName = "Ahmet Yılmaz",
+                        profileImageResId = 11,
+                        profileImageUrl = "content://guide-avatar",
                     ),
             )
 
         val card = item.toPopularTourCardUiModel()
 
-        assertEquals(item.session.id, card.id)
-        assertEquals(item.tour.title, card.title)
-        assertEquals(item.tour.coverImageResId, card.imageResId)
-        assertEquals(item.tour.coverImageUrl, card.imageUrl)
-        assertEquals(item.session.priceMinor, card.priceMinor)
-        assertEquals("🇹🇷", card.languagesFlag)
-        assertEquals("TR", card.languagesText)
-        assertEquals(item.tour.guide.displayName, card.guideName)
-        assertEquals(item.tour.guide.profileImageResId, card.guideImageResId)
-        assertEquals(item.tour.guide.profileImageUrl, card.guideImageUrl)
+        assertEquals(item.sessionId, card.id)
+        assertEquals(item.title, card.title)
+        assertEquals(item.cover.imageUrl, card.imageUrl)
+        assertEquals(item.priceMinor, card.priceMinor)
+        assertEquals("", card.languagesFlag)
+        assertEquals("", card.languagesText)
+        assertEquals(item.guide.displayName, card.guideName)
+        assertEquals(item.guide.profileImageResId, card.guideImageResId)
+        assertEquals(item.guide.profileImageUrl, card.guideImageUrl)
     }
 }

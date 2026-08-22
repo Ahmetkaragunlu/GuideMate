@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,13 +30,19 @@ fun TouristWalletScreen(
         if (showTopUpSheet) viewModel.resetSelectedCardToDefault()
     }
 
-    TouristWalletContent(
-        uiState = uiState,
-        onAddMoneyClick = { showTopUpSheet = true },
-        onManageCardsClick = onNavigateToSavedCards,
-        onViewAllTransactionsClick = onNavigateToTransactions,
+    GuideMateContentState(
+        state = uiState.loadState,
+        onRetry = viewModel::refresh,
         modifier = modifier,
-    )
+    ) {
+        TouristWalletContent(
+            uiState = uiState,
+            onAddMoneyClick = { showTopUpSheet = true },
+            onManageCardsClick = onNavigateToSavedCards,
+            onViewAllTransactionsClick = onNavigateToTransactions,
+            modifier = modifier,
+        )
+    }
 
     if (showTopUpSheet) {
         AddMoneyBottomSheet(

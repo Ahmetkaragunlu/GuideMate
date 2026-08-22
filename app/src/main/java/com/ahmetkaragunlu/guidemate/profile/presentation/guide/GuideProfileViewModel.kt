@@ -16,13 +16,11 @@ import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideProfileUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideSpokenLanguageUi
-import com.ahmetkaragunlu.guidemate.tour.data.mock.MOCK_CURRENT_GUIDE_ID
-import com.ahmetkaragunlu.guidemate.tour.data.mock.TourCatalogStore
-import com.ahmetkaragunlu.guidemate.tour.data.mock.refreshAtSessionTransitions
+import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
+import com.ahmetkaragunlu.guidemate.tour.domain.repository.TourDiscoveryRepository
 import com.ahmetkaragunlu.guidemate.tour.presentation.mapper.toPopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.Instant
 import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -40,7 +38,7 @@ class GuideProfileViewModel
         private val profileRepository: GuideProfileRepository,
         private val mediaRepository: MediaRepository,
         private val resourceProvider: ResourceProvider,
-        tourCatalogStore: TourCatalogStore,
+        private val tourRepository: TourDiscoveryRepository,
     ) : ViewModel() {
         private val loadState =
             MutableStateFlow(
@@ -53,27 +51,23 @@ class GuideProfileViewModel
         private val selectedProfileImageUri = MutableStateFlow<String?>(null)
         private val isAvatarUpdating = MutableStateFlow(false)
         private val userMessage = MutableStateFlow<String?>(null)
+        private val popularTours = MutableStateFlow<List<TourSearchItem>>(emptyList())
         private var refreshJob: Job? = null
 
         val profileState: StateFlow<GuideProfileUiState> =
             combine(
                 profileRepository.ownProfile,
-                tourCatalogStore.state.refreshAtSessionTransitions(),
+                popularTours,
                 selectedProfileImageUri,
                 isAvatarUpdating,
                 combine(loadState, userMessage, ::Pair),
-            ) { profile, catalog, selectedImageUri, avatarUpdating, request ->
+            ) { profile, tours, selectedImageUri, avatarUpdating, request ->
                 profile.toUiState(
                     loadState = request.first,
                     selectedProfileImageUri = selectedImageUri,
                     isAvatarUpdating = avatarUpdating,
                     userMessage = request.second,
-                    popularTours =
-                        catalog
-                            .bookableTourItemsForGuideAt(
-                                guideId = MOCK_CURRENT_GUIDE_ID,
-                                now = Instant.now(),
-                            ).map { it.toPopularTourCardUiModel() },
+                    popularTours = tours.map { it.toPopularTourCardUiModel() },
                 )
             }.stateIn(
                 scope = viewModelScope,
@@ -85,6 +79,7 @@ class GuideProfileViewModel
             )
 
         init {
+            profileRepository.cachedOwnProfile?.guideId?.let(::refreshPopularTours)
             refreshProfile()
         }
 
@@ -95,7 +90,10 @@ class GuideProfileViewModel
                     val hasCachedProfile = profileRepository.cachedOwnProfile != null
                     if (!hasCachedProfile) loadState.value = ContentLoadState.LOADING
                     when (val result = profileRepository.refreshOwnProfile()) {
-                        is DataResult.Success -> loadState.value = ContentLoadState.CONTENT
+                        is DataResult.Success -> {
+                            loadState.value = ContentLoadState.CONTENT
+                            refreshPopularTours(result.data.guideId)
+                        }
                         is DataResult.Error -> {
                             if (hasCachedProfile) {
                                 userMessage.value = result.error.toMessage(resourceProvider)
@@ -105,6 +103,18 @@ class GuideProfileViewModel
                         }
                     }
                 }
+        }
+
+        private fun refreshPopularTours(guideId: Long) {
+            viewModelScope.launch {
+                when (val result = tourRepository.getPopularTours(page = 0, size = 20)) {
+                    is DataResult.Success -> {
+                        popularTours.value =
+                            result.data.items.filter { it.guide.id == guideId.toString() }
+                    }
+                    is DataResult.Error -> Unit
+                }
+            }
         }
 
         fun onProfileImageSelected(uri: String) {

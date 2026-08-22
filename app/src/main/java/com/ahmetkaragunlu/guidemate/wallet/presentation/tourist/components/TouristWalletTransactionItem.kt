@@ -19,10 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionStatus
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionType
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionUiModel
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletTransactionStatus
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletTransactionType
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletTransactionUiModel
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -53,7 +53,9 @@ fun TouristWalletTransactionItem(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
             ) {
                 Text(
-                    text = transaction.title,
+                    text =
+                        transaction.referenceTitle
+                            ?: stringResource(transaction.type.titleResId),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -75,7 +77,11 @@ fun TouristWalletTransactionItem(
                 text =
                     buildString {
                         if (isIncoming) append("+")
-                        append(transaction.amountMinor.toPlatformCurrencyFromMinorUnit())
+                        append(
+                            transaction.amountMinor.toCurrencyFromMinorUnit(
+                                transaction.currencyCode,
+                            ),
+                        )
                     },
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
@@ -97,4 +103,13 @@ private val TouristWalletTransactionStatus.titleResId: Int
             TouristWalletTransactionStatus.COMPLETED -> R.string.payment_status_completed
             TouristWalletTransactionStatus.FAILED -> R.string.payment_status_failed
             TouristWalletTransactionStatus.REFUNDED -> R.string.payment_status_refunded
+        }
+
+private val TouristWalletTransactionType.titleResId: Int
+    get() =
+        when (this) {
+            TouristWalletTransactionType.TOP_UP -> R.string.wallet_transaction_top_up_title
+            TouristWalletTransactionType.TOUR_PURCHASE ->
+                R.string.wallet_transaction_tour_purchase_title
+            TouristWalletTransactionType.REFUND -> R.string.wallet_transaction_refund_title
         }

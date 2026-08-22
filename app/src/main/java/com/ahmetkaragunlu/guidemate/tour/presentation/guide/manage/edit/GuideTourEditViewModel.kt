@@ -19,7 +19,7 @@ import com.ahmetkaragunlu.guidemate.media.domain.repository.MediaRepository
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
-import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourDetails
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.SubmitTourChangeInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourContentInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
@@ -251,7 +251,7 @@ class GuideTourEditViewModel
             _uiState.update { it.copy(userMessage = null) }
         }
 
-        private fun setInitialState(details: GuideTourDetails) {
+        private fun setInitialState(details: TourDetails) {
             val session = details.session(route.sessionId)
             if (session == null) {
                 _uiState.update {

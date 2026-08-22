@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.components.MonthlyEarningItem
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.components.WalletCard
@@ -67,7 +67,8 @@ internal fun GuideMyWalletContent(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
         WalletCard(
-            formattedBalance = uiState.availableBalanceMinor.toPlatformCurrencyFromMinorUnit(),
+            formattedBalance =
+                uiState.availableBalanceMinor.toCurrencyFromMinorUnit(uiState.currencyCode),
             maskedIban = uiState.defaultMethod?.subtitle
                 ?: stringResource(R.string.default_masked_iban),
         )

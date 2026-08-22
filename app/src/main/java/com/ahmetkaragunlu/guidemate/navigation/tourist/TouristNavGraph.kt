@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.navigation.tourist
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -16,6 +17,7 @@ import com.ahmetkaragunlu.guidemate.chat.presentation.ChatDetailScreen
 import com.ahmetkaragunlu.guidemate.chat.presentation.ChatListScreen
 import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristExploreScreen
+import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristExploreViewModel
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristFilterScreen
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeScreen
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
@@ -23,6 +25,7 @@ import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.TouristProfileS
 import com.ahmetkaragunlu.guidemate.profile.presentation.publicprofile.GuidePublicProfileScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.TouristProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.TouristTripsScreen
+import com.ahmetkaragunlu.guidemate.reservation.presentation.detail.TouristReservationDetailScreen
 import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.detail.TouristTourDetailScreen
 
 internal fun NavGraphBuilder.touristNavGraph(
@@ -42,10 +45,14 @@ internal fun NavGraphBuilder.touristNavGraph(
             },
         )
     }
-    composable<TouristDestination.Explore> {
+    composable<TouristDestination.Explore> { backStackEntry ->
         TouristExploreScreen(
+            viewModel = hiltViewModel(backStackEntry),
             onNavigateToFilter = {
                 touristNavController.navigateTo(TouristDestination.Filter)
+            },
+            onNavigateToTourDetail = { sessionId ->
+                touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
             },
             onNavigateToGuideProfile = { guideId ->
                 touristNavController.navigateTo(TouristDestination.GuideProfile(guideId))
@@ -54,8 +61,10 @@ internal fun NavGraphBuilder.touristNavGraph(
     }
     composable<TouristDestination.Trips> {
         TouristTripsScreen(
-            onNavigateToTourDetail = { sessionId ->
-                touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
+            onNavigateToReservationDetail = { reservationId ->
+                touristNavController.navigateTo(
+                    TouristDestination.ReservationDetail(reservationId),
+                )
             },
         )
     }
@@ -81,7 +90,11 @@ internal fun NavGraphBuilder.touristNavGraph(
         )
     }
     composable<TouristDestination.Filter> {
-        TouristFilterScreen()
+        val exploreBackStackEntry = checkNotNull(touristNavController.previousBackStackEntry)
+        TouristFilterScreen(
+            viewModel = hiltViewModel<TouristExploreViewModel>(exploreBackStackEntry),
+            onApplyFilters = touristNavController::navigateUp,
+        )
     }
     composable<ChatDestination.Detail> {
         ChatDetailScreen(viewerRole = UserRole.TOURIST)
@@ -93,9 +106,17 @@ internal fun NavGraphBuilder.touristNavGraph(
             },
         )
     }
+    composable<TouristDestination.ReservationDetail> {
+        TouristReservationDetailScreen()
+    }
     composable<TouristDestination.GuideProfile> { backStackEntry ->
         val destination = backStackEntry.toRoute<TouristDestination.GuideProfile>()
-        GuidePublicProfileScreen(guideId = destination.guideId)
+        GuidePublicProfileScreen(
+            guideId = destination.guideId,
+            onTourClick = { sessionId ->
+                touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
+            },
+        )
     }
 
     touristPaymentNavGraph(

@@ -1,10 +1,12 @@
 package com.ahmetkaragunlu.guidemate.tour.domain.model
 
+import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourBookingAvailability
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.resolveBookingAvailability
+import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
+import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
-import com.ahmetkaragunlu.guidemate.tour.data.mock.TourCatalogStore
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -15,17 +17,30 @@ class TourBookingAvailabilityTest {
 
     @Before
     fun setUp() {
-        val sourceTour =
-            checkNotNull(
-                TourCatalogStore().state.value.findBySessionId("session-kapadokya-active"),
-            )
         availableTour =
-            sourceTour.copy(
-                tour = sourceTour.tour.copy(approvalStatus = TourApprovalStatus.APPROVED),
+            TourWithSession(
+                tour =
+                    Tour(
+                        id = "tour-1",
+                        guide = GuidePublicSummary("guide-1", "Test Guide", 0),
+                        title = "Test Tour",
+                        description = "Test description",
+                        country = "Türkiye",
+                        city = "İstanbul",
+                        timeZoneId = "Europe/Istanbul",
+                        category = TourCategory.CULTURE,
+                        languages = emptyList(),
+                        coverImageResId = 0,
+                        approvalStatus = TourApprovalStatus.APPROVED,
+                    ),
                 session =
-                    sourceTour.session.copy(
+                    TourSession(
+                        id = "session-1",
+                        tourId = "tour-1",
+                        meetingPoint = "Meeting point",
                         startsAt = NOW.plusSeconds(3_600),
                         durationMinutes = 120,
+                        priceMinor = 10_000,
                         capacity = 10,
                         bookedCount = 2,
                         status = TourSessionStatus.OPEN_FOR_BOOKING,

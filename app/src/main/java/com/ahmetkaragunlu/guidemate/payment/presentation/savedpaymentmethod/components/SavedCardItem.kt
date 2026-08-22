@@ -88,9 +88,9 @@ fun SavedCardItem(
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    PaymentCardAssociationLabel(
-                        association = card.cardAssociation,
-                    )
+                    card.cardAssociation?.let { association ->
+                        PaymentCardAssociationLabel(association = association)
+                    }
                     IconButton(onClick = onDeleteClick) {
                         Icon(
                             imageVector = TablerIcons.Trash,
@@ -107,21 +107,27 @@ fun SavedCardItem(
                 fontWeight = FontWeight.Bold,
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
-            ) {
-                SavedCardInfoItem(
-                    label = stringResource(R.string.card_holder),
-                    value = card.cardHolderName,
-                    modifier = Modifier.weight(1f),
-                )
+            if (card.cardHolderName != null || card.expiryDate != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
+                    card.cardHolderName?.let { cardHolderName ->
+                        SavedCardInfoItem(
+                            label = stringResource(R.string.card_holder),
+                            value = cardHolderName,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
 
-                SavedCardInfoItem(
-                    label = stringResource(R.string.expiry_date),
-                    value = card.expiryDate,
-                    modifier = Modifier.weight(0.6f),
-                )
+                    card.expiryDate?.let { expiryDate ->
+                        SavedCardInfoItem(
+                            label = stringResource(R.string.expiry_date),
+                            value = expiryDate,
+                            modifier = Modifier.weight(0.6f),
+                        )
+                    }
+                }
             }
 
             if (!card.isDefault) {

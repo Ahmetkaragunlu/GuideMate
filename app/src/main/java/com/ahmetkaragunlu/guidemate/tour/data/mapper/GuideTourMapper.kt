@@ -4,8 +4,7 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
-import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
+import com.ahmetkaragunlu.guidemate.media.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CreateGuideTourRequestDto
@@ -20,11 +19,9 @@ import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionResponseDt
 import com.ahmetkaragunlu.guidemate.tour.data.remote.model.UpdateTourSessionRequestDto
 import com.ahmetkaragunlu.guidemate.tour.domain.model.Tour
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
-import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
-import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
-import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.TourReviewSubmission
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.CreateGuideTourInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.SubmitTourChangeInput
@@ -76,12 +73,12 @@ fun GuideTourCardResponseDto.toDomain(): GuideTourCard =
         canArchive = canArchive,
     )
 
-fun TourDetailResponseDto.toDomain(): GuideTourDetails {
+fun TourDetailResponseDto.toDomain(): TourDetails {
     val locale = Locale.getDefault()
     val country =
         LocaleSelectionCatalog.country(countryCode, locale)?.displayName
             ?: countryCode
-    return GuideTourDetails(
+    return TourDetails(
         tour =
             Tour(
                 id = tourId,
@@ -198,19 +195,3 @@ private fun TourContentInput.toDto(): TourContentRequestDto =
         languageCodes = languageCodes,
         coverMediaId = coverMediaId,
     )
-
-private fun MediaReferenceResponseDto.toDomain(): MediaReference =
-    MediaReference(mediaAssetId = mediaAssetId, imageUrl = imageUrl)
-
-private fun String.toTourCategory(): TourCategory =
-    TourCategory.entries.first { category -> category.code.equals(this, ignoreCase = true) }
-
-private fun String.toTourLanguage(locale: Locale): TourLanguage {
-    val language = LocaleSelectionCatalog.language(this, locale)
-    return TourLanguage(
-        code = this,
-        flagEmoji = language?.flagEmoji ?: "🌐",
-        displayName = language?.displayName ?: uppercase(Locale.ROOT),
-        shortCode = language?.shortCode ?: uppercase(Locale.ROOT),
-    )
-}

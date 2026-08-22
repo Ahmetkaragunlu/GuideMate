@@ -29,7 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.SavedPaymentCardUiModel
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentMethod
@@ -52,7 +52,9 @@ internal fun CheckoutPaymentMethodSection(
             subtitle =
                 stringResource(
                     R.string.wallet_balance_format,
-                    uiState.walletBalanceMinor.toPlatformCurrencyFromMinorUnit(),
+                    uiState.walletBalanceMinor.toCurrencyFromMinorUnit(
+                        uiState.walletCurrencyCode,
+                    ),
                 ),
             icon = Icons.Default.Wallet,
             selected = uiState.selectedMethod == PaymentMethod.WALLET,

@@ -5,7 +5,7 @@ entegrasyonunu yonetecek tek calisma dosyasidir. Her entegrasyon/refactor
 adimindan once bu dosya yeniden okunur ve yalniz tamamlanmis denetimlerin
 dogruladigi kararlar uygulanir.
 
-Son guncelleme: 2026-08-21
+Son guncelleme: 2026-08-23
 
 Projeler:
 
@@ -37,6 +37,11 @@ Projeler:
 - UI tasarimi, mevcut navigasyon davranisi ve kullanici akisi bilincli urun
   karari olmadan degistirilmez. Refactor tasarimi veya runtime davranisini
   sessizce degistiremez.
+- Yeni bir ekran, destination veya kullaniciya gorunen yeni akis kodlanmadan
+  once kullaniciya acikca bildirilir. Amaci, neden mevcut ekranla
+  karsilanamadigi, yeniden kullanacagi ortak tasarim, route/back-stack ve
+  topbar/bottom bar davranisi anlatilir; kullanici onayi olmadan sessizce
+  eklenmez.
 - Yeni kod feature-first hedef yapida dogru feature ve katmanda bulunur.
   Presentation, domain, data, network, storage ve navigation sorumluluklari
   birbirine karistirilmaz.
@@ -1830,11 +1835,14 @@ hosted checkout sirasinda kaydedilir. Bu nedenle mevcut native
 `AddSavedCardScreen`, ham kart formu ve `SandboxCardCatalog` gercek endpoint'e
 map edilemez ve entegrasyonda kaldirilacaktir.
 
-Kayitli Kartlar ekranindaki ekleme aksiyonu ham kart formu acmayacak. Kullanici
-kartin guvenli odeme sirasinda kaydedilecegi konusunda uygulama tasarimina uygun
-bir aciklama gorecek. Sirf kart kaydetmek icin sahte/0 tutarli top-up
-olusturulmayacak. Provider daha sonra gercek standalone tokenization
-desteklerse once backend/OpenAPI sozlesmesi eklenmeden Android formu yazilmaz.
+Faz 8'de Kayitli Kartlar ekranindaki FAB gecici olarak kartin guvenli odeme
+sirasinda kaydedilecegini aciklayan bottom sheet'i acar. Faz 9 hosted odeme
+akisi tamamlandiginda bagimsiz kart ekleme sozlesmesi bulunmadigi icin bu FAB ve
+gecici bilgilendirme bottom sheet'i kaldirilir. Kart yalniz tur satin alma veya
+wallet top-up sirasindaki hosted iyzico ekraninda kaydedilebilir. Sirf kart
+kaydetmek icin sahte/0 tutarli top-up olusturulmaz. Provider daha sonra gercek
+standalone tokenization desteklerse once backend/OpenAPI sozlesmesi eklenmeden
+Android formu veya yeni ekleme aksiyonu yazilmaz.
 
 IBAN icin `TurkishBankCatalog` yalniz hizli on gosterim olarak kalabilir;
 backend banka/IBAN sonucunun otoritesidir. Kart bankasi icin Android sandbox
@@ -2684,13 +2692,13 @@ Guncel durumlar:
 | --- | --- | --- |
 | Faz 0 - Feature-first refactor | `TAMAMLANDI` | Format, compile, unit test, lint ve debug APK kapilari gecti |
 | Faz 1 - Ortak teknik temel ve auth | `TAMAMLANDI` | Auth/OpenAPI uyumu, ortak pagination, hata parsing, LAN ve kalite kapilari dogrulandi |
-| Faz 2 - Medya | `KISMEN TAMAMLANDI` | Medya altyapisi, loader, avatar ve guide tour cover kod baglantisi tamam; avatar/tour cover cihaz E2E kaniti ile tourist canonical cover Faz 5 baglantisini bekliyor |
+| Faz 2 - Medya | `KISMEN TAMAMLANDI` | Medya altyapisi, loader, avatar ve guide/tourist canonical cover kod baglantisi tamam; cihaz E2E kaniti bekleniyor |
 | Faz 3 - Guide profile ve public guide | `KISMEN TAMAMLANDI` | Repository, own/public profile, avatar patch, guide search/top ve otomatik kalite kapilari tamam; calisan backend ile cihaz E2E kaniti bekleniyor |
 | Faz 4 - Tour ve guide tour yonetimi | `KISMEN TAMAMLANDI` | Repository, guide list/detail/publish/edit/lifecycle/dashboard, cover media, mock mutation temizligi ve kalite kapilari tamam; calisan backend ile authenticated cihaz E2E kaniti bekleniyor |
-| Faz 5 - Tourist discovery ve public tour | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
-| Faz 6 - Reservation ve trips | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
-| Faz 7 - Review | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
-| Faz 8 - Wallet ve saved payment method | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
+| Faz 5 - Tourist discovery ve public tour | `KISMEN TAMAMLANDI` | Repository, home/popular, gercek tour search/filter/pagination, public session detail, read-only yorumlar, public profil turlari, checkout session yenilemesi, mock katalog temizligi ve otomatik kalite kapilari tamam; calisan backend ve cihaz E2E kaniti bekleniyor |
+| Faz 6 - Reservation ve trips | `KISMEN TAMAMLANDI` | Repository, upcoming/past pagination, reservation snapshot detail, typed reservation route, idempotent cancellation, refund sonucu ve mock temizligi tamam; backend/cihaz E2E ile Faz 9 payment baglantisi bekleniyor |
+| Faz 7 - Review | `KISMEN TAMAMLANDI` | Submit repository/DTO, reservation eligibility UI, mevcut review bottom sheet, canonical reservation/review ve local tourist projection refresh tamam; cihaz E2E ile Faz 12 remote guide invalidation bekleniyor |
+| Faz 8 - Wallet ve saved payment method | `KISMEN TAMAMLANDI` | Iki rolde canonical wallet/history ve turist saved-method list/default/delete kodu tamam; proje sonu cihaz E2E ile Faz 9 hosted kart kaydetme kaniti bekleniyor |
 | Faz 9 - Payment, hosted checkout ve top-up | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
 | Faz 10 - Guide finance | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
 | Faz 11 - Chat | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
@@ -2719,7 +2727,10 @@ Capraz-faz takip kaydi su formatta tutulur:
 | Kayit | Kaynak faz | Hedef faz | Bagimli is | Kapanis kaniti | Durum |
 | --- | --- | --- | --- | --- | --- |
 | MEDIA-PROFILE-01 | Faz 2 | Faz 3 | Avatar local URI upload sonucu `mediaAssetId` ile profile patch'e baglandi; patch hatasinda yeni sahipsiz medya temizlenip eski avatar korunuyor | Guide avatar degisikliginin own/public profile'da iki cihazdan canonical URL ile gorunmesi | `KOD TAMAMLANDI - E2E BEKLIYOR` |
-| MEDIA-TOUR-01 | Faz 2 | Faz 4 | Cover local URI once upload ediliyor; create/change request yalniz `mediaAssetId` tasiyor ve basarisiz request'in sahipsiz yeni medyasi kontrollu siliniyor | Publish/edit sonrasi guide ve tourist tour gorunumlerinin ayni canonical cover URL'yi gostermesi | `KOD TAMAMLANDI - BACKEND E2E VE FAZ 5 BEKLIYOR` |
+| MEDIA-TOUR-01 | Faz 2 | Faz 4 ve 5 | Cover local URI once upload ediliyor; create/change request yalniz `mediaAssetId` tasiyor ve basarisiz request'in sahipsiz yeni medyasi kontrollu siliniyor | Publish/edit sonrasi guide ve tourist tour gorunumlerinin ayni canonical cover URL'yi gostermesi | `KOD TAMAMLANDI - BACKEND/CIHAZ E2E BEKLIYOR` |
+| RESERVATION-PAYMENT-01 | Faz 6 | Faz 9 | Trips/detail/cancel canonical reservation repository'sine gecti; yeni satin alimin reservation olusturmasi ve devam eden refund/payment durumunun yeniden sorgulanmasi hosted payment akisina bagli | Basarili payment sonrasi reservation'in backend listesinde gorunmesi; cancel/refund sonrasi reservation, payment ve wallet state'lerinin birlikte yenilenmesi | `FAZ 9 BEKLIYOR` |
+| REVIEW-NOTIFICATION-01 | Faz 7 | Faz 12 | Review submit ayni turist oturumundaki reservation, tour, popular/search ve public guide projection'larini dar review change akisi ile yeniliyor; baska cihazdaki acik guide dashboard/profile backend notification event'inin FCM invalidation'ini bekliyor | Turist yorumu sonrasi guide cihazinda bildirim ve canonical dashboard/profile puaninin uygulamayi yeniden baslatmadan yenilenmesi | `FAZ 12 BEKLIYOR` |
+| WALLET-PAYMENT-01 | Faz 8 | Faz 9 | Saved-method list/default/delete provider metadata repository'sine gecti; yeni kart ekleme native form yerine hosted iyzico akisi tarafindan yapilacak | Hosted checkout'ta kart kaydetme sonrasi kartin saved-method listesinde gorunmesi ve wallet/checkout ekranlarinin canonical listeyi yenilemesi | `FAZ 9 BEKLIYOR` |
 
 Bu tablo, faz uygulamalari sirasinda gercek bir bagimlilik ortaya ciktiginda
 somut kayitlarla guncellenir. Yalniz olasi bir ihtimal icin hayali borc veya
@@ -2971,9 +2982,9 @@ Uygulama sonucu:
 - Guide home aktif/onay bekleyen/tamamlanan/katilimci/puan/aylik kazanc
   alanlarini tek backend dashboard projection'indan aliyor; liste boyutu veya
   local aggregate kullanmiyor.
-- `TourCatalogStore` guide mutation/private projection otoritesi kaldirildi.
-  Store yalniz Faz 5'e kadar tourist public mock okumasi icin dar state kaynagi
-  olarak korundu; eski operation modelleri ve operation testleri silindi.
+- `TourCatalogStore` guide mutation/private projection otoritesi Faz 4'te
+  kaldirildi; Faz 5 ile kalan public tourist mock okumasi da silindi. Eski
+  operation modelleri ve operation testleri bulunmuyor.
 - Tour/session backend hata kodlari ortak `AppError` mesaj sozlesmesine eklendi.
   Mapper ve repository contract testleri version, pagination, capacity,
   earnings, media ve canonical Instant aktarimini dogruluyor.
@@ -3015,14 +3026,57 @@ Mock temizleme kapisi:
 
 ### Faz 5 - Tourist Discovery, Public Tour ve Home
 
+Durum: `KISMEN TAMAMLANDI` (2026-08-22).
+
+Uygulama sonucu:
+
+- `TourDiscoveryApi`, response DTO'lari, ortak tour/session domain mapper'lari,
+  `TourDiscoveryRepository`/implementation ve Hilt baglantisi eklendi. Popular,
+  typed search, public tour detail ve kesin `sessionId` detail sozlesmeleri
+  birbirine zorlanmadan korunuyor.
+- Tourist home popular kartlari, Explore tur sonuclari, public rehber
+  profilindeki popular turlar ve public tour detail ayni backend tour/session
+  kaynagindan kendi presentation mapper'lariyla uretiliyor. Guide search/top
+  Faz 3 `GuideProfileRepository` uzerinde kaldi; ikinci `HomeRepository` veya
+  discovery store acilmadi.
+- Explore metin, kategori, ulke, sehir place ID, dil, minimum puan, minimum/
+  maksimum fiyat, siralama ve pagination degerlerini typed query ile backend'e
+  gonderiyor. Mevcut UI ve canli backend sozlesmesinde tarih filtresi
+  bulunmadigi icin hayali parametre veya bos tarih kontrolu eklenmedi.
+- Filter ekranindaki draft secimler yalniz `Uygula` ile canonical sorguya
+  geciyor. Bos sonuc, ilk yukleme hata/retry, append loading/retry ve
+  `LazyColumn` pagination ayrildi; aramayi ve filtreleri temizleme sonuc
+  listesini gercekten yeniliyor.
+- Arama karti guncel backend `availableCapacity` degerini gosteriyor; typed
+  `sessionId` ile detaya gidiyor. Detail session endpoint'ini, checkout ise
+  ayni session'i yeniden cagiriyor; buton gorunurlugu ve Android on kontrolu
+  guncel status/capacity uzerinden uretiliyor. Asil kapasite yarisi Faz 9
+  checkout backend mutation'inda tekrar dogrulanacak.
+- Public yorum GET endpoint'i `ReviewRepository` ile read-only baglandi ve
+  yorum avatar URL'leri ortak `GuideMateImage` uzerinden gosteriliyor. Review
+  eligibility/submit mutation'i planlandigi gibi Faz 7'de kaldi.
+- `TourCatalogStore`, `TourCatalogMockData`, timeline ve `TourCatalogState`
+  tamamen silindi. Faz 6 ile `TouristReservationStore` da kaldirildi; public
+  detail artik rezervasyon fixture fallback'i kullanmiyor.
+- Search/filter DTO ve repository parametreleri, public detail/session ayrimi,
+  public review metadata'si, booking availability ve reservation snapshot
+  davranisi odakli birim testlerle dogrulandi.
+- `./gradlew ktfmtCheck :app:compileDebugKotlin :app:testDebugUnitTest
+  :app:lintDebug :app:assembleDebug` basarili. Mac LAN adresi local Android
+  ayariyla `192.168.68.102` olarak uyumlu; ancak backend calismadigi ve bagli
+  cihaz bulunmadigi icin popular/search/filter/detail/remote cover/checkout
+  E2E akislari bu calismada kosulamadi. Bu kanit gelmeden Faz 5 ve
+  `MEDIA-TOUR-01` `TAMAMLANDI` sayilmayacak.
+
 Yapilacaklar:
 
 - `TourDiscoveryRepository`; popular, search, public tour detail ve public
   session endpoint'lerini kapsar.
 - Tourist popular kart, explore sonucu ve detail ayni backend Tour/Session
   kaynagindan farkli UI mapper'lariyla uretilir.
-- Explore query; metin, kategori, ulke/sehir, dil, tarih, fiyat ve pagination
-  parametrelerini typed request mapper ile gonderir.
+- Explore query; canli backend ve mevcut UI sozlesmesindeki metin, kategori,
+  ulke/sehir, dil, puan, fiyat, siralama ve pagination parametrelerini typed
+  request mapper ile gonderir.
 - Guide search/top Faz 3 profile repository'sinden, tour search/popular bu
   repository'den gelir; `discovery` ikinci veri kaynagi olusturmaz.
 - Tourist home, tour ve profile projection'larini UI seviyesinde birlestirir;
@@ -3040,6 +3094,42 @@ Mock temizleme kapisi:
   tamamlanmis sayilmaz.
 
 ### Faz 6 - Reservation ve Trips
+
+Durum: `KISMEN TAMAMLANDI` (2026-08-23).
+
+Uygulama sonucu:
+
+- `ReservationApi`, response/request DTO'lari, snapshot/cancellation mapper'i,
+  `ReservationRepository`/implementation ve Hilt baglantisi eklendi. Liste,
+  detay ve iptal islemleri canli backend endpoint'leriyle birebir eslesti.
+- Upcoming/past listeleri backend `ReservationTripStatus` siniflandirmasi ve
+  siralamasini kullanarak ayri sayfalanir. Ilk yukleme, bos durum, retry,
+  append loading ve append retry mevcut ortak UI durumlariyla baglandi.
+- Reservation domain modeli; version, participant count, unit/total amount,
+  currency, lifecycle, cancellation actor/reason/time, refund eligibility,
+  policy snapshot, satin alma snapshot'i ve review bilgisini koruyor.
+- Trips kartlari ve satin alinmis gezi detayi ayni reservation snapshot'undan
+  uretiliyor. Public discovery `TourDetail(sessionId)` olarak kalirken Trips
+  yeni type-safe `ReservationDetail(reservationId)` destination'ini kullaniyor.
+- Rezervasyon detayi mevcut ortak `TourDetailContent` tasarimini tekrar
+  yazmadan kullaniyor; toplam kapasite yerine satin alinan katilimci sayisini,
+  snapshot fiyat/icerik ve cancellation/refund eligibility bilgisini gosteriyor.
+- Turist iptali current reservation version ve tekrar kullanilan
+  `Idempotency-Key` ile backend'e gonderiliyor. UI yalniz canonical response'u
+  refetch ediyor; kontenjan, para veya reservation state'ini local olarak
+  degistirmiyor. Full/no refund ve anlik refund sonucu ayri mesajlarla sunuluyor.
+- `TouristReservationStore`, runtime reservation fixture'lari, local cancel ve
+  local review mutation'i kaldirildi. Checkout Faz 9 tamamlanana kadar yeni
+  reservation mock'u olusturmuyor.
+- Reservation, idempotency ve refund backend hata kodlari ortak `AppError`
+  cevirisine eklendi. JDK 21 ile `./gradlew ktfmtCheck
+  :app:compileDebugKotlin :app:compileDebugUnitTestKotlin :app:lintDebug
+  :app:assembleDebug` basarili. Kapsamli testler kullanici karariyla tum fazlar
+  ve son tasarim/kod taramasi tamamlandiktan sonra calistirilacak.
+- Calisan backend ve bagli cihaz bulunmadigi icin upcoming/past/detail/cancel
+  E2E akislari kosulamadi. Yeni satin alimin canonical reservation'a donusmesi
+  ve devam eden payment/refund refresh'i `RESERVATION-PAYMENT-01` ile Faz 9'a
+  baglidir; bu kanitlar gelmeden Faz 6 `TAMAMLANDI` sayilmayacak.
 
 Yapilacaklar:
 
@@ -3065,6 +3155,41 @@ Mock temizleme kapisi:
 
 ### Faz 7 - Review
 
+Durum: `KISMEN TAMAMLANDI` (2026-08-23).
+
+Uygulama sonucu:
+
+- Mevcut `ReviewApi` ve `ReviewRepository`, public yorum listesinin yaninda
+  `POST /api/v1/reservations/{reservationId}/reviews` sozlesmesini de kapsiyor.
+  Puan, istege bagli yorum ve backend `ReviewResponse` DTO-domain sinirinda
+  map ediliyor; nullable yorum bos metin olarak presentation'a aktariliyor.
+- Tamamlanmis, kullaniciya ait ve daha once degerlendirilmemis reservation
+  detayi mevcut `TourReviewBottomSheet` tasarimini acar. Yeni ekran veya route
+  eklenmedi. Diger lifecycle durumlarinda ya da mevcut review varsa aksiyon
+  gosterilmez; son yetki kontrolu backend'dedir.
+- Puan 1-5 araliginda zorunlu, yorum en fazla 2000 karakter ve istege baglidir.
+  Submit sirasinda cift tiklama ve bottom sheet kapatma engellenir; backend ve
+  network hatalari ortak `AppError` sozlesmesiyle yerellestirilmis metne doner.
+- Basarili response reservation detail'i canonical backend response'uyla
+  yeniden okur, review notice'ini ve public yorum listesini yeniler. Ayni
+  turist graph'inda hayatta kalan home popular/best-guide, Explore tour/guide,
+  public guide profile ve public tour detail ViewModel'lari review feature'ina
+  ait dar change Flow'u ile backend projection'larini yeniden cagirir; local
+  ortalama veya `+1` sayaci uretilmez.
+- Reservation response icindeki own review ile submit response ayni
+  `SubmittedReview` domain modelini kullanir. Reservation data katmani review
+  presentation'ina baglanmaz; public `TourReview` modeli reviewer metadata'si
+  tasiyan ayri projection olarak korunur.
+- Backend yeni review icin guide notification event'i uretir. Baska cihazda
+  acik guide dashboard/profile'in anlik invalidation'i
+  `REVIEW-NOTIFICATION-01` ile Faz 12 FCM entegrasyonuna baglidir; ekran yeniden
+  acildiginda mevcut repository zaten canonical projection'i okur.
+- JDK 21 ile `ktfmtCheck`, ana/test kaynak derlemesi, `lintDebug` ve
+  `assembleDebug` kapilari gecti. Test task'lari kullanici karariyla tum fazlar
+  ve final tasarim/kod denetimi sonrasina ertelendi.
+  Calisan completed reservation/backend/cihaz E2E kaniti bulunmadigi icin Faz 7
+  henuz `TAMAMLANDI` sayilmaz.
+
 Yapilacaklar:
 
 - `ReviewRepository`, tur yorum listesi ve reservation uzerinden tek review
@@ -3085,6 +3210,8 @@ Mock temizleme kapisi:
   faz tamamlanmis sayilmaz.
 
 ### Faz 8 - Wallet ve Kayitli Odeme Yontemleri Temeli
+
+Durum: `KISMEN TAMAMLANDI` (2026-08-23).
 
 Payment checkout'tan once kullanicinin canonical wallet bakiyesi ve provider
 tarafindan donen guvenli kayitli kart metadata'si baglanir.
@@ -3111,11 +3238,68 @@ Mock temizleme kapisi:
 - Provider checkout icindeki kart kaydetme tercihi ve backend
   `SavedPaymentMethodResponse` disinda kart kaydi otoritesi kalmaz.
 
+Faz 8 dis gereksinim ve dogrulama kapisi:
+
+- Kullanici tarafindan yeni hesap, API anahtari veya panel ayari gerekmez.
+- Faz sonunda format, derleme, lint ve temel akisin eski native ham kart formuna
+  donmedigi kontrol edilir. Kapsamli manuel/cihaz E2E dogrulamasi kullanici
+  karariyla proje sonu test turuna ertelenir.
+- Iki rolde canonical wallet balance ve sayfali transaction history; kayitli
+  kart listesi, default degistirme ve silme senaryolari proje sonu test turunda
+  dogrulanir.
+- Hosted kart kaydetme Faz 9 ile kapanir. Bu nedenle Faz 8 kayitli kart dolu
+  senaryosu Faz 9 tamamlandiktan sonra yeniden kontrol edilir.
+
+Uygulama sonucu:
+
+- Ortak `WalletRepository`, iki rolde canonical bakiye ile sayfali wallet
+  hareketlerini backend'den okuyor. Domain modelleri ve role ozel UI mapper'lari
+  ayrildi; backend `referenceTitle`, islem tipi ve currency code dogrudan
+  sozlesmeden map ediliyor.
+- Turist wallet, profil ozeti ve checkout; ayni wallet ve saved-payment-method
+  repository kaynaklarini kullaniyor. Rehber wallet ve tum hareketler ekranlari
+  canonical wallet kaynagina gecti; `GuideWalletStore` yalniz Faz 10'da
+  baglanacak banka hesabi ve pending withdrawal gecici davranisina daraltildi.
+- `SavedPaymentMethodRepository`, provider metadata listesini, varsayilan kart
+  degistirmeyi ve silmeyi backend otoritesiyle yapiyor. Mutation sonrasi ortak
+  change akisi wallet ve checkout kart secimlerini yeniden okuyor.
+- Native kart numarasi/SKT/CVV formu, `SandboxCardCatalog`, bunlarin runtime
+  state'i, route'u ve testleri kaldirildi. Kayitli Kartlar ekraninin tasarimi ve
+  FAB'i korundu; FAB mevcut guvenlik bilgilendirmesini gosteriyor ve hosted kart
+  olusturma Faz 9'a ait.
+- Wallet ve saved-method ekranlari ortak loading/error/retry sinirini kullaniyor;
+  kart mutation hatalari merkezi `AppError` metinleriyle kullaniciya
+  gosteriliyor. Yeni ekran veya yeni navigation akisi eklenmedi.
+- JDK 21 ile `ktfmtCheck`, ana/test kaynak derlemesi, `lintDebug` ve
+  `assembleDebug` kapilari gecti. Kapsamli test task'lari kullanici karariyla
+  tum fazlar ve final tasarim/kod denetimi sonrasina ertelendi.
+- Faz 8 kod kapilari gectikten sonra kod kapsami kapanir. Kapsamli manuel cihaz
+  testi proje sonuna, hosted kart ekleme kaniti `WALLET-PAYMENT-01` ile Faz 9'a
+  aittir; bu nedenle faz henuz `TAMAMLANDI` sayilmaz.
+
 ### Faz 9 - Payment, Hosted Checkout ve Top-Up
 
 Dis on kosullar koddan once kontrol edilir: iyzico Sandbox erisimi, backend
 payment secret'lari, guncel Quick Tunnel/callback-webhook adresi ve test
 senaryolari. Provider secret'i veya tunnel adresi Android'e yazilmaz.
+
+Kod yazilmadan once Faz 9 kullanici akisi kapsamli olarak yeniden ele alinir.
+Para birimi/quote baslangici, hosted WebView, dogrulama ve recovery durumu ile
+basarili, basarisiz, iptal, iade ve `MANUAL_REVIEW` sonuc ekranlarinin mevcut
+tasarimla iliskisi kullaniciya aciklanir. Eklenecek veya davranisi degisecek
+her ekran; amaci, navigation/back davranisi ve ortak tasarim kullanimi ile
+birlikte onceden bildirilir ve karar kesinlesmeden uygulama kodu yazilmaz.
+
+Yerellestirme sozlesmesi:
+
+- GuideMate'e ait baslik, aciklama, hata, buton ve sonuc metinleri Android
+  string resource'larindan gelir; provider metinleri Android'de elle
+  cevrilmez.
+- Android'in secili uygulama dili provider'in destekledigi `tr` veya `en` ise
+  backend initialize istegine aynen aktarilir.
+- Secili uygulama dili provider tarafindan desteklenmiyorsa hosted ekran icin
+  guvenli varsayilan `en` kullanilir. GuideMate'in kendi ekranlari secili
+  uygulama dilini kullanmaya devam eder.
 
 Yapilacaklar:
 
@@ -3134,6 +3318,10 @@ Yapilacaklar:
   transaction ile dogrulanir.
 - Tour checkout basarisinda payment, reservation/trips, public session
   capacity ve wallet yontemiyse wallet kaynaklari yenilenir.
+- Kayitli Kartlar ekrani yalniz provider-backed kartlari listeleme, varsayilan
+  yapma ve silme amaciyla kalir. Faz 8'deki gecici FAB ve bilgilendirme bottom
+  sheet'i kaldirilir; kart kaydi yalniz tur satin alma veya wallet top-up hosted
+  iyzico akisi icindeki provider secenegiyle yapilir.
 
 Mock temizleme kapisi:
 
@@ -3143,6 +3331,49 @@ Mock temizleme kapisi:
   sorgulanmadan payment entegrasyonu tamamlanmis sayilmaz.
 - Hosted form saglanmadan Android ham kart verisi alan alternatif akisa
   dusmez.
+
+Faz 9 dis gereksinimleri:
+
+- Iyzico Sandbox hesabi ve backend'de Git disinda tutulan gecerli Sandbox
+  credential'lari hazir olmalidir.
+- E2E odeme oncesinde guncel HTTPS Quick Tunnel acilir; callback/webhook adresi
+  backend secret yapisinda ve iyzico panelinde ayni adresle guncellenir.
+- Iyzico Sandbox test kartlari kullanilir. Provider secret'i, test karti veya
+  tunnel adresi Android kaynak koduna yazilmaz.
+- Bu gereksinimler faz basinda birlikte kontrol edilir; kullanicinin panelde
+  yapmasi gereken bir adim varsa kod yazilmadan once acikca bildirilir.
+
+Faz 9 E2E kontrol listesi:
+
+- Kartla tur satin alma ve wallet ile tur satin alma ayri ayri denenir.
+- Wallet top-up, yenilenmis balance ve transaction history ile dogrulanir.
+- Desteklenen charge currency secenekleri, backend quote'u, kur/tutar snapshot'i
+  ve suresi dolan quote'un yenilenmesi kontrol edilir.
+- Hosted iyzico ekraninda kart kaydetme secenegi ve kaydedilen kartin Faz 8
+  listesine provider metadata'siyle yansimasi kontrol edilir.
+- Basarili, basarisiz, kullanici iptali, timeout, devam eden refund ve
+  `MANUAL_REVIEW` durumlari ayri UI sonuclariyla denenir.
+- Uygulama odeme sirasinda kapatilarak terminal olmayan payment'in yeniden
+  acilista backend ID ile recover edilmesi dogrulanir.
+- Ayni aksiyona cift tiklama/retry durumunda idempotency sayesinde iki payment
+  veya iki reservation olusmadigi kontrol edilir.
+- Odeme sirasinda kontenjan dolmasi ya da session'in kapanmasi halinde fazla
+  rezervasyon olusmadigi; gerekli refund/review sonucunun gorundugu kontrol
+  edilir.
+- Basarili tur aliminda reservation'in Trips listesine gelmesi, public session
+  kapasitesinin azalmasi ve wallet kullanildiysa wallet/transaction
+  projection'larinin yenilenmesi dogrulanir.
+- Baslangic, WebView, dogrulama/recovery ve tum sonuc ekranlarinin navigation,
+  geri tusu, loading/error/retry ve mevcut GuideMate tasarimiyla uyumu kontrol
+  edilir.
+- GuideMate metinleri uygulama dilinde, hosted ekran `tr`/`en` secimiyle ve
+  desteklenmeyen uygulama dilinde guvenli `en` fallback ile denenir.
+- Callback HTML/JSON veya WebView kapanisinin tek basina basari gostermedigi;
+  sonuc ekraninin yalniz canonical backend status'una dayandigi dogrulanir.
+- Ham kart, CVV, provider token ve secret'in Android DTO, state veya loglarina
+  girmedigi kontrol edilir.
+- Faz sonunda her madde `GECTI`, `KALDI` veya gerekcesiyle `ERTELENDI` olarak
+  bu belgede kaydedilir.
 
 ### Faz 10 - Guide Finance, Earnings, Banka Hesabi ve Withdrawal
 
@@ -3166,6 +3397,28 @@ Mock temizleme kapisi:
 - Manuel bakiye azaltma, sabit earning history ve her hesaba ait ayri sahte
   bakiye kaldirilir.
 - Banka adini Android tahmini para islemi otoritesi olarak kullanmaz.
+
+Faz 10 dis gereksinim ve E2E kontrol listesi:
+
+- Mevcut MVP `SIMULATED` payout karari nedeniyle iyzico Marketplace/Mass Payout
+  yetkisi veya gercek banka transferi gerekmez.
+- Rehber wallet bakiyesi, earning history ve aylik projection backend'den
+  dogrulanir; Android'in history sayfalarini indirip aylik toplami kendisinin
+  hesaplamadigi kontrol edilir.
+- Banka hesabi ekleme, IBAN format/on gosterim, backend banka dogrulamasi,
+  default hesap degistirme ve silme davranislari denenir.
+- Gecerli tutarda para cekme talebi, yetersiz bakiye, minimum/maksimum limit,
+  cift tiklama/idempotency ve ayni bakiyeye eszamanli talep senaryolari
+  kontrol edilir.
+- Withdrawal `PENDING` sonucu, wallet reserve/balance, transaction history ve
+  withdrawal history birlikte yenilenir; basarisiz/reversed durumlar ayri
+  gorunur.
+- Hesap secimi bottom sheet'inde yapilan tek seferlik secimin default banka
+  hesabini istemeden degistirmedigi kontrol edilir.
+- Rehber ekranlarindaki kazanc, wallet ve cekim tutarlarinin backend currency
+  code ve minor unit degerleriyle tutarli oldugu dogrulanir.
+- Faz sonunda her madde `GECTI`, `KALDI` veya gerekcesiyle `ERTELENDI` olarak
+  bu belgede kaydedilir.
 
 ### Faz 11 - Chat REST ve STOMP
 

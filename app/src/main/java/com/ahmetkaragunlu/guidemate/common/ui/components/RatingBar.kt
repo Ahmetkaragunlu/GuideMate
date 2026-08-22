@@ -21,6 +21,7 @@ fun RatingBar(
     onRatingChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
     maxStars: Int = 5,
+    enabled: Boolean = true,
 ) {
     Row(
         modifier = modifier,
@@ -35,7 +36,7 @@ fun RatingBar(
                 modifier =
                     Modifier
                         .size(40.dp)
-                        .clickable { onRatingChanged(starIndex) },
+                        .clickable(enabled = enabled) { onRatingChanged(starIndex) },
             )
         }
     }

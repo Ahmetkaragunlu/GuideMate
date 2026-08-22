@@ -58,6 +58,8 @@ fun TouristHomeScreen(
         )
         popularToursSection(
             tours = uiState.popularTours,
+            loadState = uiState.popularToursLoadState,
+            onRetry = viewModel::refreshPopularTours,
             onTourClick = onNavigateToTourDetail,
         )
         bestGuidesSection(
@@ -107,6 +109,8 @@ private fun LazyListScope.categoriesSection(
 
 private fun LazyListScope.popularToursSection(
     tours: List<PopularTourCardUiModel>,
+    loadState: ContentLoadState,
+    onRetry: () -> Unit,
     onTourClick: (String) -> Unit,
 ) {
     item {
@@ -121,15 +125,30 @@ private fun LazyListScope.popularToursSection(
                 modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
             )
 
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-                contentPadding = PaddingValues(horizontal = 4.dp),
+            GuideMateContentState(
+                state = loadState,
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxWidth().height(270.dp),
             ) {
-                items(tours, key = { it.id }) { tour ->
-                    PopularTourCard(
-                        tour = tour,
-                        onClick = { onTourClick(tour.id) },
+                if (tours.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.tour_search_empty_title),
+                        color = androidx.compose.ui.res.colorResource(R.color.text_color),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.spacing_medium)),
                     )
+                } else {
+                    LazyRow(
+                        horizontalArrangement =
+                            Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
+                        contentPadding = PaddingValues(horizontal = 4.dp),
+                    ) {
+                        items(tours, key = { it.id }) { tour ->
+                            PopularTourCard(
+                                tour = tour,
+                                onClick = { onTourClick(tour.id) },
+                            )
+                        }
+                    }
                 }
             }
         }

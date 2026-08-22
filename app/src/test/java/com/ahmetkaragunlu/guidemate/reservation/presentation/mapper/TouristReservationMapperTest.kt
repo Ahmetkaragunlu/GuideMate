@@ -1,92 +1,50 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.mapper
 
-import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
-import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
-import com.ahmetkaragunlu.guidemate.tour.data.mock.TourCatalogStore
+import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationActor
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
-import com.ahmetkaragunlu.guidemate.reservation.data.mock.TouristReservationStore
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
+import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
+import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
 import java.time.Instant
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 
 class TouristReservationMapperTest {
-    private lateinit var tourCatalogStore: TourCatalogStore
-    private lateinit var reservationStore: TouristReservationStore
-
-    @Before
-    fun setUp() {
-        tourCatalogStore = TourCatalogStore()
-        reservationStore = TouristReservationStore(tourCatalogStore)
-    }
-
     @Test
     fun `trip card and detail use the same reservation snapshot`() {
-        val reservation = reservationStore.reservations.value.first()
-        val currentTour = currentTour(reservation.tourSessionId)
+        val reservation = reservation()
 
-        val trip = reservation.toTripUiModel(currentTour, REVIEW_NOW)
-        val detail = reservation.toTourDetailUiState(currentTour, REVIEW_NOW)
+        val trip = reservation.toTripUiModel()
+        val detail = reservation.toTourDetailUiState()
 
         assertEquals(trip.title, detail.title)
         assertEquals(trip.date, detail.date)
         assertEquals(trip.location, detail.location)
-        assertEquals(trip.imageResId, detail.imageResId)
         assertEquals(trip.imageUrl, detail.imageUrl)
         assertEquals(trip.category, detail.category)
-        assertEquals(trip.languagesFlag, detail.languagesFlag)
         assertEquals(trip.languagesText, detail.languagesText)
-        assertEquals(trip.priceMinor, detail.priceMinor)
-        assertEquals(trip.rating, detail.rating)
-        assertEquals(trip.reviewCount, detail.reviewCount)
+        assertEquals(reservation.unitPriceMinor, detail.priceMinor)
+        assertEquals(reservation.totalPriceMinor, trip.totalPriceMinor)
+        assertEquals(reservation.participantCount, detail.reservedParticipantCount)
     }
 
     @Test
-    fun `reservation snapshot is unchanged by later tour edits`() {
-        val reservation = reservationStore.reservations.value.first()
-        val currentTour = currentTour(reservation.tourSessionId)
-        val editedTour =
-            currentTour.copy(
-                tour = currentTour.tour.copy(title = "Güncellenmiş Başlık"),
-                session = currentTour.session.copy(priceMinor = 999_999),
+    fun `cancelled reservation remains distinct from completed trip`() {
+        val reservation =
+            reservation().copy(
+                status = TouristReservationStatus.CANCELLED,
+                cancellationActor = ReservationCancellationActor.GUIDE,
+                cancellationReason = "Olumsuz hava koşulları",
+                refundEligibility = ReservationRefundEligibility.FULL_REFUND,
             )
 
-        val detail = reservation.toTourDetailUiState(editedTour, REVIEW_NOW)
-
-        assertEquals(reservation.snapshot.title, detail.title)
-        assertEquals(reservation.snapshot.unitPriceMinor, detail.priceMinor)
-    }
-
-    @Test
-    fun `reservation detail remains available when current tour is unavailable`() {
-        val reservation = reservationStore.reservations.value.first()
-
-        val detail = reservation.toTourDetailUiState(currentTour = null, now = REVIEW_NOW)
-
-        assertEquals(reservation.snapshot.tourId, detail.tourId)
-        assertEquals(reservation.snapshot.title, detail.title)
-        assertEquals(reservation.snapshot.description, detail.description)
-        assertEquals(reservation.snapshot.meetingPoint, detail.meetingPoint)
-        assertEquals(reservation.snapshot.unitPriceMinor, detail.priceMinor)
-    }
-
-    @Test
-    fun `guide cancellation moves reservation to past and exposes cancellation`() {
-        val reservation = reservationStore.reservations.value.first()
-        val currentTour = currentTour(reservation.tourSessionId)
-        val cancelledTour =
-            currentTour.copy(
-                session =
-                    currentTour.session.copy(
-                        status = TourSessionStatus.CANCELLED,
-                        cancellationReason = "Olumsuz hava koşulları",
-                    ),
-            )
-
-        val trip = reservation.toTripUiModel(cancelledTour, REVIEW_NOW)
+        val trip = reservation.toTripUiModel()
 
         assertTrue(trip.isPast)
         assertEquals(TourDetailStatus.CANCELLED, trip.sessionStatus)
@@ -94,32 +52,53 @@ class TouristReservationMapperTest {
     }
 
     @Test
-    fun `tourist cancellation changes only reservation state and moves trip to past`() {
-        val reservation = reservationStore.reservations.value.first()
-        val currentTour = currentTour(reservation.tourSessionId)
-        val originalSessionStatus = currentTour.session.status
+    fun `completed reservation maps to past without changing snapshot`() {
+        val reservation = reservation().copy(status = TouristReservationStatus.COMPLETED)
 
-        assertTrue(reservationStore.cancelReservation(reservation.id))
-        assertFalse(reservationStore.cancelReservation(reservation.id))
+        val detail = reservation.toTourDetailUiState()
 
-        val cancelledReservation =
-            checkNotNull(
-                reservationStore.reservations.value.firstOrNull {
-                    it.id == reservation.id
-                },
-            )
-        val trip = cancelledReservation.toTripUiModel(currentTour, REVIEW_NOW)
-
-        assertEquals(TouristReservationStatus.CANCELLED, cancelledReservation.status)
-        assertEquals(TourDetailStatus.CANCELLED, trip.sessionStatus)
-        assertTrue(trip.isPast)
-        assertEquals(originalSessionStatus, currentTour.session.status)
+        assertEquals(TourDetailStatus.COMPLETED, detail.sessionStatus)
+        assertEquals(reservation.snapshot.title, detail.title)
+        assertEquals(reservation.snapshot.meetingPoint, detail.meetingPoint)
     }
 
-    private fun currentTour(sessionId: String): TourWithSession =
-        checkNotNull(tourCatalogStore.state.value.findBySessionId(sessionId))
-
-    private companion object {
-        val REVIEW_NOW: Instant = Instant.parse("2026-07-26T12:00:00Z")
-    }
+    private fun reservation(): TouristReservation =
+        TouristReservation(
+            id = "reservation-1",
+            tourSessionId = "session-1",
+            version = 2,
+            participantCount = 2,
+            unitPriceMinor = 10_000,
+            totalPriceMinor = 20_000,
+            currencyCode = "USD",
+            status = TouristReservationStatus.CONFIRMED,
+            cancellationPolicyCode = "STANDARD_48_HOURS",
+            cancellationPolicyVersion = 1,
+            snapshot =
+                TouristReservationSnapshot(
+                    tourId = "tour-1",
+                    guide =
+                        GuidePublicSummary(
+                            id = "10",
+                            displayName = "Ahmet Yılmaz",
+                            profileImageResId = R.drawable.unnamed,
+                        ),
+                    title = "Kapadokya Turu",
+                    description = "Tur açıklaması",
+                    countryCode = "TR",
+                    country = "Türkiye",
+                    cityPlaceId = "city-1",
+                    city = "Nevşehir",
+                    timeZoneId = "Europe/Istanbul",
+                    category = TourCategory.CULTURE,
+                    languages = listOf(TourLanguage("tr", "🇹🇷", "Türkçe", "TR")),
+                    coverImageResId = R.drawable.example,
+                    coverMediaId = null,
+                    coverImageUrl = null,
+                    startsAt = Instant.parse("2027-05-24T06:00:00Z"),
+                    durationMinutes = 180,
+                    meetingPoint = "Göreme merkez",
+                    unitPriceMinor = 10_000,
+                ),
+        )
 }

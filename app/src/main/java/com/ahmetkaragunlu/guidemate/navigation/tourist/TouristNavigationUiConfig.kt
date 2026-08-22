@@ -31,8 +31,15 @@ internal fun NavDestination?.touristNavigationUiConfig(): NavigationUiConfig =
             touristNavigationUiConfig(
                 titleResId = R.string.filter,
                 showBackButton = true,
+                showBottomBar = false,
             )
         hasRoute<TouristDestination.TourDetail>() ->
+            touristNavigationUiConfig(
+                titleResId = R.string.tour_details,
+                showBackButton = true,
+                showBottomBar = false,
+            )
+        hasRoute<TouristDestination.ReservationDetail>() ->
             touristNavigationUiConfig(
                 titleResId = R.string.tour_details,
                 showBackButton = true,

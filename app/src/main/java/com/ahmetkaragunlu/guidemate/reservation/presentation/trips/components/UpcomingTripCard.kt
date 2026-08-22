@@ -130,7 +130,7 @@ fun UpcomingTripCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = trip.priceMinor.toPlatformCurrencyFromMinorUnit(),
+                    text = trip.totalPriceMinor.toPlatformCurrencyFromMinorUnit(),
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),
                 )

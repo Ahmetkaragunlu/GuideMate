@@ -31,12 +31,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditTextField
+import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.model.ExploreTab
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateTabRow
 import com.ahmetkaragunlu.guidemate.profile.presentation.components.GuideResultCard
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideResultUiModel
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.tour.presentation.components.TourSearchResultCard
+import com.ahmetkaragunlu.guidemate.tour.presentation.model.TourSearchResultUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.AdjustmentsHorizontal
 
@@ -45,6 +48,7 @@ fun TouristExploreScreen(
     modifier: Modifier = Modifier,
     viewModel: TouristExploreViewModel = hiltViewModel(),
     onNavigateToFilter: () -> Unit,
+    onNavigateToTourDetail: (String) -> Unit = {},
     onNavigateToGuideProfile: (Long) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -70,6 +74,16 @@ fun TouristExploreScreen(
                     searchQuery = uiState.toursSearchQuery,
                     onSearchQueryChange = viewModel::updateToursSearchQuery,
                     onNavigateToFilter = onNavigateToFilter,
+                    tours = uiState.tourResults,
+                    resultCount = uiState.tourResultCount,
+                    loadState = uiState.tourResultsLoadState,
+                    isLoadingMore = uiState.isLoadingMoreTours,
+                    appendFailed = uiState.tourAppendFailed,
+                    canLoadMore = uiState.canLoadMoreTours,
+                    onRetry = viewModel::refreshTours,
+                    onLoadMore = viewModel::loadMoreTours,
+                    onClearFilters = viewModel::clearSearchAndFilters,
+                    onTourClick = onNavigateToTourDetail,
                 )
 
             ExploreTab.GUIDES ->
@@ -84,6 +98,7 @@ fun TouristExploreScreen(
                     loadState = uiState.guideResultsLoadState,
                     isLoadingMore = uiState.isLoadingMoreGuides,
                     appendFailed = uiState.guideAppendFailed,
+                    canLoadMore = uiState.canLoadMoreGuides,
                     onRetry = viewModel::refreshGuides,
                     onLoadMore = viewModel::loadMoreGuides,
                     onGuideClick = onNavigateToGuideProfile,
@@ -98,6 +113,16 @@ private fun ToursContent(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onNavigateToFilter: () -> Unit,
+    tours: List<TourSearchResultUiModel>,
+    resultCount: Long,
+    loadState: ContentLoadState,
+    isLoadingMore: Boolean,
+    appendFailed: Boolean,
+    canLoadMore: Boolean,
+    onRetry: () -> Unit,
+    onLoadMore: () -> Unit,
+    onClearFilters: () -> Unit,
+    onTourClick: (String) -> Unit,
 ) {
     Column(
         modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium)),
@@ -131,6 +156,93 @@ private fun ToursContent(
             },
             modifier = Modifier.fillMaxWidth(),
         )
+
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+        GuideMateContentState(
+            state = loadState,
+            onRetry = onRetry,
+            modifier = Modifier.fillMaxWidth().weight(1f),
+        ) {
+            if (tours.isEmpty()) {
+                TourSearchEmptyState(onClearFilters = onClearFilters)
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement =
+                        androidx.compose.foundation.layout.Arrangement.spacedBy(
+                            dimensionResource(R.dimen.spacing_medium),
+                        ),
+                ) {
+                    item {
+                        Text(
+                            text =
+                                androidx.compose.ui.res.stringResource(
+                                    R.string.tour_search_result_count,
+                                    resultCount,
+                                ),
+                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                            color = colorResource(R.color.text_color),
+                        )
+                    }
+                    items(tours, key = { it.sessionId }) { tour ->
+                        TourSearchResultCard(
+                            tour = tour,
+                            onClick = { onTourClick(tour.sessionId) },
+                        )
+                    }
+                    when {
+                        isLoadingMore ->
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = colorResource(R.color.brand_color),
+                                    )
+                                }
+                            }
+                        appendFailed ->
+                            item {
+                                GuideMateContentState(
+                                    state = ContentLoadState.ERROR,
+                                    onRetry = onLoadMore,
+                                    modifier = Modifier.fillMaxWidth().height(112.dp),
+                                ) {}
+                            }
+                        canLoadMore ->
+                            item {
+                                androidx.compose.runtime.LaunchedEffect(tours.size) {
+                                    onLoadMore()
+                                }
+                            }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TourSearchEmptyState(onClearFilters: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement =
+            androidx.compose.foundation.layout.Arrangement.spacedBy(
+                dimensionResource(R.dimen.spacing_medium),
+                alignment = Alignment.CenterVertically,
+            ),
+    ) {
+        Text(
+            text = androidx.compose.ui.res.stringResource(R.string.tour_search_empty_title),
+            color = colorResource(R.color.text_color),
+        )
+        EditButton(
+            text = R.string.tour_search_clear_filters,
+            onClick = onClearFilters,
+            modifier = Modifier.fillMaxWidth(0.7f),
+        )
     }
 }
 
@@ -143,6 +255,7 @@ private fun GuidesContent(
     loadState: ContentLoadState,
     isLoadingMore: Boolean,
     appendFailed: Boolean,
+    canLoadMore: Boolean,
     onRetry: () -> Unit,
     onLoadMore: () -> Unit,
     onGuideClick: (Long) -> Unit,
@@ -213,7 +326,7 @@ private fun GuidesContent(
                                 modifier = Modifier.fillMaxWidth().height(112.dp),
                             ) {}
                         }
-                    } else {
+                    } else if (canLoadMore) {
                         item {
                             androidx.compose.runtime.LaunchedEffect(guides.size) {
                                 onLoadMore()

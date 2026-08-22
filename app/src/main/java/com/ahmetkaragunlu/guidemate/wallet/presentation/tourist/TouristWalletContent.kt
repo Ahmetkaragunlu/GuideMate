@@ -31,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.components.TouristBalanceCard
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.components.TouristWalletTransactionItem
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletUiState
@@ -67,7 +67,8 @@ internal fun TouristWalletContent(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
             ) {
                 TouristBalanceCard(
-                    balance = uiState.balanceMinor.toPlatformCurrencyFromMinorUnit(),
+                    balance =
+                        uiState.balanceMinor.toCurrencyFromMinorUnit(uiState.currencyCode),
                     onAddMoneyClick = onAddMoneyClick,
                 )
                 DefaultCardSection(

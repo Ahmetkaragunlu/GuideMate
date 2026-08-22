@@ -7,12 +7,10 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
 import com.ahmetkaragunlu.guidemate.profile.presentation.mapper.toProfileContentUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideProfileContentUiState
-import com.ahmetkaragunlu.guidemate.tour.data.mock.MOCK_CURRENT_GUIDE_ID
-import com.ahmetkaragunlu.guidemate.tour.data.mock.TourCatalogStore
-import com.ahmetkaragunlu.guidemate.tour.data.mock.refreshAtSessionTransitions
+import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
+import com.ahmetkaragunlu.guidemate.tour.domain.repository.TourDiscoveryRepository
 import com.ahmetkaragunlu.guidemate.tour.presentation.mapper.toPopularTourCardUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +25,7 @@ class GuideProfilePreviewViewModel
     @Inject
     constructor(
         private val profileRepository: GuideProfileRepository,
-        tourCatalogStore: TourCatalogStore,
+        private val tourRepository: TourDiscoveryRepository,
     ) : ViewModel() {
         private val loadState =
             MutableStateFlow(
@@ -38,21 +36,17 @@ class GuideProfilePreviewViewModel
                 },
             )
         private var refreshJob: Job? = null
+        private val popularTours = MutableStateFlow<List<TourSearchItem>>(emptyList())
 
         val uiState: StateFlow<GuideProfileContentUiState> =
             combine(
                 profileRepository.ownProfile,
-                tourCatalogStore.state.refreshAtSessionTransitions(),
+                popularTours,
                 loadState,
-            ) { profile, catalog, state ->
+            ) { profile, tours, state ->
                 profile.toProfileContentUiState(
                     loadState = state,
-                    popularTours =
-                        catalog
-                            .bookableTourItemsForGuideAt(
-                                guideId = MOCK_CURRENT_GUIDE_ID,
-                                now = Instant.now(),
-                            ).map { it.toPopularTourCardUiModel() },
+                    popularTours = tours.map { it.toPopularTourCardUiModel() },
                 )
             }.stateIn(
                 scope = viewModelScope,
@@ -64,6 +58,7 @@ class GuideProfilePreviewViewModel
             )
 
         init {
+            profileRepository.cachedOwnProfile?.guideId?.let(::refreshPopularTours)
             refreshProfile()
         }
 
@@ -74,8 +69,11 @@ class GuideProfilePreviewViewModel
                     val hasCachedProfile = profileRepository.cachedOwnProfile != null
                     if (!hasCachedProfile) loadState.value = ContentLoadState.LOADING
                     loadState.value =
-                        when (profileRepository.refreshOwnProfile()) {
-                            is DataResult.Success -> ContentLoadState.CONTENT
+                        when (val result = profileRepository.refreshOwnProfile()) {
+                            is DataResult.Success -> {
+                                refreshPopularTours(result.data.guideId)
+                                ContentLoadState.CONTENT
+                            }
                             is DataResult.Error ->
                                 if (hasCachedProfile) {
                                     ContentLoadState.CONTENT
@@ -84,5 +82,17 @@ class GuideProfilePreviewViewModel
                                 }
                         }
                 }
+        }
+
+        private fun refreshPopularTours(guideId: Long) {
+            viewModelScope.launch {
+                when (val result = tourRepository.getPopularTours(page = 0, size = 20)) {
+                    is DataResult.Success -> {
+                        popularTours.value =
+                            result.data.items.filter { it.guide.id == guideId.toString() }
+                    }
+                    is DataResult.Error -> Unit
+                }
+            }
         }
     }

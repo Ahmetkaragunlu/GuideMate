@@ -8,6 +8,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiMod
 data class TouristHomeUiState(
     val selectedCategory: TourCategory? = null,
     val popularTours: List<PopularTourCardUiModel> = emptyList(),
+    val popularToursLoadState: ContentLoadState = ContentLoadState.LOADING,
     val bestGuides: List<GuideResultUiModel> = emptyList(),
     val bestGuidesLoadState: ContentLoadState = ContentLoadState.LOADING,
 )

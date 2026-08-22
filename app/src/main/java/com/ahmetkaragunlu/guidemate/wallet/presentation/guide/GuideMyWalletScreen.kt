@@ -21,8 +21,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditAlertDialog
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyInput
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,6 +41,14 @@ fun GuideMyWalletScreen(
     var amountAwaitingConfirmation by rememberSaveable { mutableStateOf<Long?>(null) }
     var showInsufficientBalanceDialog by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    GuideMateContentState(
+        state = uiState.loadState,
+        onRetry = viewModel::refresh,
+    ) {}
+    if (uiState.loadState != ContentLoadState.CONTENT) {
+        return
+    }
 
     LaunchedEffect(showBottomSheet) {
         if (showBottomSheet) {

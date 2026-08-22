@@ -16,6 +16,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -31,6 +32,7 @@ import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.transactions.mod
 fun TouristWalletTransactionsContent(
     uiState: TouristWalletTransactionsUiState,
     onFilterSelected: (TouristWalletTransactionFilter) -> Unit,
+    onLoadNextPage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -105,9 +107,13 @@ fun TouristWalletTransactionsContent(
                     ),
             ) {
                 items(
-                    items = uiState.filteredTransactions,
-                    key = { it.transactionId },
-                ) { transaction ->
+                    count = uiState.filteredTransactions.size,
+                    key = { index -> uiState.filteredTransactions[index].transactionId },
+                ) { index ->
+                    val transaction = uiState.filteredTransactions[index]
+                    if (index == uiState.filteredTransactions.lastIndex) {
+                        LaunchedEffect(transaction.transactionId) { onLoadNextPage() }
+                    }
                     TouristWalletTransactionItem(transaction = transaction)
                 }
             }

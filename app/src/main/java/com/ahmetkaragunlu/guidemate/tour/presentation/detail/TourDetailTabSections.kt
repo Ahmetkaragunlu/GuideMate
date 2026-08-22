@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.detail
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,12 +27,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailReviewUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailTab
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiState
@@ -139,8 +138,9 @@ private fun TourReviewItem(
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.Top,
     ) {
-        Image(
-            painter = painterResource(id = review.reviewerImageResId),
+        GuideMateImage(
+            fallbackImageResId = review.reviewerImageResId,
+            imageUrl = review.reviewerImageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier =

@@ -114,7 +114,7 @@ fun PastTripCard(
                     text =
                         stringResource(
                             R.string.amount_format,
-                            trip.priceMinor.toPlatformCurrencyFromMinorUnit(),
+                            trip.totalPriceMinor.toPlatformCurrencyFromMinorUnit(),
                         ),
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),

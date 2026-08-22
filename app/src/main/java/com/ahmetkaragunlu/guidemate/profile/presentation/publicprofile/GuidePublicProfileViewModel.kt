@@ -7,6 +7,9 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
 import com.ahmetkaragunlu.guidemate.profile.presentation.mapper.toProfileContentUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideProfileContentUiState
+import com.ahmetkaragunlu.guidemate.review.domain.repository.ReviewRepository
+import com.ahmetkaragunlu.guidemate.tour.domain.repository.TourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.tour.presentation.mapper.toPopularTourCardUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -20,12 +23,24 @@ class GuidePublicProfileViewModel
     @Inject
     constructor(
         private val profileRepository: GuideProfileRepository,
+        private val tourRepository: TourDiscoveryRepository,
+        private val reviewRepository: ReviewRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(GuideProfileContentUiState())
         val uiState: StateFlow<GuideProfileContentUiState> = _uiState.asStateFlow()
 
         private var requestedGuideId: Long? = null
         private var loadJob: Job? = null
+
+        init {
+            observeReviewChanges()
+        }
+
+        private fun observeReviewChanges() {
+            viewModelScope.launch {
+                reviewRepository.reviewChanges.collect { retry() }
+            }
+        }
 
         fun loadGuide(guideId: Long) {
             if (requestedGuideId == guideId &&
@@ -40,13 +55,27 @@ class GuidePublicProfileViewModel
                     _uiState.value = GuideProfileContentUiState(loadState = ContentLoadState.LOADING)
                     _uiState.value =
                         when (val result = profileRepository.getPublicProfile(guideId)) {
-                            is DataResult.Success ->
-                                result.data.toProfileContentUiState(loadState = ContentLoadState.CONTENT)
+                            is DataResult.Success -> {
+                                val popularTours = loadPopularTours(guideId)
+                                result.data.toProfileContentUiState(
+                                    loadState = ContentLoadState.CONTENT,
+                                    popularTours = popularTours,
+                                )
+                            }
                             is DataResult.Error ->
                                 GuideProfileContentUiState(loadState = ContentLoadState.ERROR)
                         }
                 }
         }
+
+        private suspend fun loadPopularTours(guideId: Long) =
+            when (val result = tourRepository.getPopularTours(page = 0, size = 20)) {
+                is DataResult.Success ->
+                    result.data.items
+                        .filter { it.guide.id == guideId.toString() }
+                        .map { it.toPopularTourCardUiModel() }
+                is DataResult.Error -> emptyList()
+            }
 
         fun retry() {
             requestedGuideId?.let { guideId ->

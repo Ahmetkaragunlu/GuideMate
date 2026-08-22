@@ -21,6 +21,11 @@ object TouristDestination {
     )
 
     @Serializable
+    data class ReservationDetail(
+        val reservationId: String,
+    )
+
+    @Serializable
     data class GuideProfile(
         val guideId: Long,
     )

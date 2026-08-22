@@ -15,7 +15,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
-import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourDetails
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.isEffectivelyTerminal
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
@@ -49,7 +49,7 @@ class GuideTourDetailViewModel
         private val _uiState = MutableStateFlow(GuideTourDetailScreenState())
         val uiState = _uiState.asStateFlow()
 
-        private var details: GuideTourDetails? = null
+        private var details: TourDetails? = null
         private var cancellationIdempotencyKey: String? = null
 
         init {

@@ -19,6 +19,7 @@ data class TourDetailUiState(
     val languagesText: String = "",
     val category: TourCategory? = null,
     val priceMinor: Long = 0,
+    val reservedParticipantCount: Int? = null,
     val bookedCount: Int = 0,
     val capacity: Int = 0,
     val description: String = "",

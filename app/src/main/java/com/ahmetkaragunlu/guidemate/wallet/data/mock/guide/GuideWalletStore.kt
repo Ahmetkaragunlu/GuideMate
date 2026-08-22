@@ -18,18 +18,15 @@ import kotlinx.coroutines.flow.update
 class GuideWalletStore
     @Inject
     constructor() {
-        private val _state = MutableStateFlow(createMockState())
-        val state: StateFlow<GuideWalletState> = _state.asStateFlow()
+        private val mutableState = MutableStateFlow(createMockState())
+        val state: StateFlow<GuideWalletState> = mutableState.asStateFlow()
 
         fun deleteBankAccount(bankAccountId: String) {
-            _state.update { current ->
+            mutableState.update { current ->
                 val remainingAccounts =
                     current.bankAccounts.filterNot { it.bankAccountId == bankAccountId }
                 val normalizedAccounts =
-                    if (
-                        remainingAccounts.isNotEmpty() &&
-                            remainingAccounts.none { it.isDefault }
-                    ) {
+                    if (remainingAccounts.isNotEmpty() && remainingAccounts.none { it.isDefault }) {
                         remainingAccounts.mapIndexed { index, account ->
                             account.copy(isDefault = index == 0)
                         }
@@ -41,7 +38,7 @@ class GuideWalletStore
         }
 
         fun makeDefaultBankAccount(bankAccountId: String) {
-            _state.update { current ->
+            mutableState.update { current ->
                 if (current.bankAccounts.none { it.bankAccountId == bankAccountId }) {
                     return@update current
                 }
@@ -50,8 +47,7 @@ class GuideWalletStore
                         current.bankAccounts
                             .map { account ->
                                 account.copy(isDefault = account.bankAccountId == bankAccountId)
-                            }
-                            .sortedByDescending { it.isDefault },
+                            }.sortedByDescending { it.isDefault },
                 )
             }
         }
@@ -61,7 +57,7 @@ class GuideWalletStore
             accountHolderName: String,
             iban: String,
         ) {
-            _state.update { current ->
+            mutableState.update { current ->
                 val compactIban = iban.replace(" ", "").uppercase()
                 val account =
                     BankAccountUiModel(
@@ -79,50 +75,47 @@ class GuideWalletStore
             val accounts = state.value.bankAccounts
             if (accounts.isEmpty()) return null
             val currentIndex =
-                accounts
-                    .indexOfFirst { it.bankAccountId == currentBankAccountId }
-                    .coerceAtLeast(0)
+                accounts.indexOfFirst { it.bankAccountId == currentBankAccountId }.coerceAtLeast(0)
             return accounts[(currentIndex + 1) % accounts.size]
         }
 
         fun addPendingWithdrawal(
             amountMinor: Long,
+            availableBalanceMinor: Long,
+            currencyCode: String,
             bankAccountId: String,
         ): Boolean {
             val current = state.value
             if (
                 amountMinor <= 0 ||
-                    amountMinor > current.availableWithdrawalBalanceMinor ||
+                    amountMinor > availableBalanceMinor ||
                     current.bankAccounts.none { it.bankAccountId == bankAccountId }
             ) {
                 return false
             }
 
-            val now = Instant.now()
             val transaction =
                 WalletTransactionUiModel(
                     id = UUID.randomUUID().toString(),
-                    occurredAt = now,
+                    occurredAt = Instant.now(),
                     amountMinor = amountMinor,
+                    currencyCode = currencyCode,
                     type = WalletTransactionType.WITHDRAWAL,
                     status = WalletTransactionStatus.PENDING,
                     bankAccountId = bankAccountId,
                 )
-            _state.update { it.copy(recentTransactions = listOf(transaction) + it.recentTransactions) }
+            mutableState.update {
+                it.copy(pendingWithdrawals = listOf(transaction) + it.pendingWithdrawals)
+            }
             return true
         }
 
         private fun String.toMaskedIban(): String =
-            if (length < 8) {
-                this
-            } else {
-                "${take(4)} **** **** **** **** **${takeLast(4)}"
-            }
+            if (length < 8) this else "${take(4)} **** **** **** **** **${takeLast(4)}"
 
         private companion object {
             fun createMockState(): GuideWalletState =
                 GuideWalletState(
-                    balanceMinor = 2_000_000,
                     bankAccounts =
                         listOf(
                             BankAccountUiModel(
@@ -138,35 +131,6 @@ class GuideWalletStore
                                 accountHolderName = "Ahmet Karagünlü",
                                 maskedIban = "TR98 **** **** **** **** **76",
                                 isDefault = false,
-                            ),
-                        ),
-                    recentTransactions =
-                        listOf(
-                            WalletTransactionUiModel(
-                                id = "1",
-                                occurredAt = Instant.parse("2026-02-15T11:30:00Z"),
-                                amountMinor = 75_000,
-                                type = WalletTransactionType.TOUR_INCOME,
-                                referenceTitle = "Ayasofya Turu",
-                            ),
-                            WalletTransactionUiModel(
-                                id = "2",
-                                occurredAt = Instant.parse("2026-02-12T06:15:00Z"),
-                                amountMinor = 500_000,
-                                type = WalletTransactionType.WITHDRAWAL,
-                            ),
-                            WalletTransactionUiModel(
-                                id = "3",
-                                occurredAt = Instant.parse("2026-02-10T03:00:00Z"),
-                                amountMinor = 150_000,
-                                type = WalletTransactionType.TOUR_INCOME,
-                                referenceTitle = "Kapadokya Balon Turu",
-                            ),
-                            WalletTransactionUiModel(
-                                id = "4",
-                                occurredAt = Instant.parse("2026-02-05T13:45:00Z"),
-                                amountMinor = 300_000,
-                                type = WalletTransactionType.WITHDRAWAL,
                             ),
                         ),
                 )

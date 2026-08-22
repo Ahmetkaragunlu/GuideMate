@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 
 @Composable
 fun TourCheckoutScreen(
@@ -15,17 +16,22 @@ fun TourCheckoutScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    TourCheckoutContent(
-        uiState = uiState,
-        onDecreaseParticipant = viewModel::decreaseParticipantCount,
-        onIncreaseParticipant = viewModel::increaseParticipantCount,
-        onPaymentMethodSelected = viewModel::onPaymentMethodSelected,
-        onCardSelected = viewModel::onCardSelected,
-        onManageCardsClick = onNavigateToSavedCards,
-        onTermsAcceptedChange = viewModel::onTermsAcceptedChange,
-        onContinue = {
-            viewModel.createPaymentAttempt()?.let(onNavigateToPayment)
-        },
+    GuideMateContentState(
+        state = uiState.loadState,
+        onRetry = viewModel::refreshTour,
         modifier = modifier,
-    )
+    ) {
+        TourCheckoutContent(
+            uiState = uiState,
+            onDecreaseParticipant = viewModel::decreaseParticipantCount,
+            onIncreaseParticipant = viewModel::increaseParticipantCount,
+            onPaymentMethodSelected = viewModel::onPaymentMethodSelected,
+            onCardSelected = viewModel::onCardSelected,
+            onManageCardsClick = onNavigateToSavedCards,
+            onTermsAcceptedChange = viewModel::onTermsAcceptedChange,
+            onContinue = {
+                viewModel.createPaymentAttempt()?.let(onNavigateToPayment)
+            },
+        )
+    }
 }

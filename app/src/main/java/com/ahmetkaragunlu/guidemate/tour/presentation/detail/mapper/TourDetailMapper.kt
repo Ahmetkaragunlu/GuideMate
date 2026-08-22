@@ -50,6 +50,7 @@ fun TourWithSession.toTourDetailUiState(
                     comment = review.comment,
                     rating = review.rating,
                     reviewerImageResId = review.reviewerImageResId,
+                    reviewerImageUrl = review.reviewerImageUrl,
                 )
             },
     )

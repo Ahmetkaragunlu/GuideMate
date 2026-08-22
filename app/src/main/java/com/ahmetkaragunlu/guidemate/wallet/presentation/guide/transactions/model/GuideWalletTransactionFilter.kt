@@ -20,4 +20,8 @@ enum class GuideWalletTransactionFilter(
         titleResId = R.string.wallet_filter_withdrawals,
         transactionType = WalletTransactionType.WITHDRAWAL,
     ),
+    EARNING_REVERSAL(
+        titleResId = R.string.wallet_filter_reversals,
+        transactionType = WalletTransactionType.EARNING_REVERSAL,
+    ),
 }

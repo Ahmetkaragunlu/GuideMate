@@ -42,20 +42,18 @@ fun SavedCardsContent(
     onConfirmMakeDefaultCard: () -> Unit,
     onAddCardClick: () -> Unit,
     onDismissAddCardSheet: () -> Unit,
-    onSaveCardConsentChange: (Boolean) -> Unit,
     onConfirmAddCard: () -> Unit,
-    showCardAddedMessage: Boolean,
-    onCardAddedMessageShown: () -> Unit,
+    onErrorShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val snackbarHostState = remember { SnackbarHostState() }
-    val cardAddedMessage = stringResource(R.string.card_added_success)
+    val errorMessage = uiState.errorMessage
 
-    LaunchedEffect(showCardAddedMessage) {
-        if (showCardAddedMessage) {
-            onCardAddedMessageShown()
-            snackbarHostState.showSnackbar(cardAddedMessage)
+    LaunchedEffect(errorMessage) {
+        if (errorMessage != null) {
+            onErrorShown()
+            snackbarHostState.showSnackbar(errorMessage)
         }
     }
 
@@ -88,6 +86,16 @@ fun SavedCardsContent(
                     onMakeDefaultClick = { onShowMakeDefaultDialog(card.cardId) },
                 )
             }
+
+            if (uiState.savedCards.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(R.string.no_saved_card),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorResource(R.color.text_color),
+                    )
+                }
+            }
         }
 
         AddCardFab(
@@ -110,8 +118,6 @@ fun SavedCardsContent(
     if (uiState.isAddCardBottomSheetVisible) {
         AddSavedCardBottomSheet(
             sheetState = sheetState,
-            isConsentChecked = uiState.saveCardConsentChecked,
-            onConsentChange = onSaveCardConsentChange,
             onDismiss = onDismissAddCardSheet,
             onConfirm = onConfirmAddCard,
         )
@@ -122,7 +128,10 @@ fun SavedCardsContent(
             title = R.string.delete_card_title,
             text = R.string.delete_card_desc,
             confirmButton = {
-                TextButton(onClick = onConfirmDeleteCard) {
+                TextButton(
+                    onClick = onConfirmDeleteCard,
+                    enabled = !uiState.isMutationInProgress,
+                ) {
                     Text(
                         text = stringResource(R.string.yes),
                         color = MaterialTheme.colorScheme.error,
@@ -146,7 +155,10 @@ fun SavedCardsContent(
             title = R.string.make_default_title,
             text = R.string.make_default_desc,
             confirmButton = {
-                TextButton(onClick = onConfirmMakeDefaultCard) {
+                TextButton(
+                    onClick = onConfirmMakeDefaultCard,
+                    enabled = !uiState.isMutationInProgress,
+                ) {
                     Text(
                         text = stringResource(R.string.yes),
                         color = colorResource(id = R.color.brand_color),

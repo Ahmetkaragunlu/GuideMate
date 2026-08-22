@@ -11,7 +11,7 @@ import com.ahmetkaragunlu.guidemate.tour.data.remote.api.GuideTourApi
 import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CancelTourSessionRequestDto
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
-import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourDetails
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourListType
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.TourReviewSubmission
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.CreateGuideTourInput
@@ -39,7 +39,7 @@ class GuideTourRepositoryImpl @Inject constructor(
             transform = { it.toDomain() },
         )
 
-    override suspend fun getTour(tourId: String): DataResult<GuideTourDetails> =
+    override suspend fun getTour(tourId: String): DataResult<TourDetails> =
         execute(request = { api.getTour(tourId) }, transform = { it.toDomain() })
 
     override suspend fun createTour(input: CreateGuideTourInput): DataResult<TourReviewSubmission> =
@@ -88,7 +88,7 @@ class GuideTourRepositoryImpl @Inject constructor(
             transform = { it.toDomain() },
         )
 
-    override suspend fun archiveTour(tourId: String): DataResult<GuideTourDetails> =
+    override suspend fun archiveTour(tourId: String): DataResult<TourDetails> =
         execute(request = { api.archiveTour(tourId) }, transform = { it.toDomain() })
 
     override suspend fun getDashboard(): DataResult<GuideDashboard> =

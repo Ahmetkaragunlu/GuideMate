@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.profile.presentation.components.CommonProfileMenuItem
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.ProfileUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.TouristProfileMenuTarget
@@ -44,12 +45,18 @@ fun TouristProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    TouristProfileContent(
+    GuideMateContentState(
+        state = uiState.loadState,
+        onRetry = viewModel::refresh,
         modifier = modifier,
-        uiState = uiState,
-        onNavigateToWallet = onNavigateToWallet,
-        onNavigateToAccount = onNavigateToAccount,
-    )
+    ) {
+        TouristProfileContent(
+            modifier = modifier,
+            uiState = uiState,
+            onNavigateToWallet = onNavigateToWallet,
+            onNavigateToAccount = onNavigateToAccount,
+        )
+    }
 }
 
 @Composable

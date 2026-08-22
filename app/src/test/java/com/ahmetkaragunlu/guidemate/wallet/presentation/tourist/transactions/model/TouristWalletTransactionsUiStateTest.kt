@@ -1,8 +1,8 @@
 package com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.transactions.model
 
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionStatus
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionType
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.model.TouristWalletTransactionUiModel
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletTransactionStatus
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletTransactionType
+import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletTransactionUiModel
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -39,8 +39,9 @@ class TouristWalletTransactionsUiStateTest {
     ): TouristWalletTransactionUiModel =
         TouristWalletTransactionUiModel(
             transactionId = id,
-            title = id,
+            referenceTitle = id,
             amountMinor = 10_000,
+            currencyCode = "USD",
             type = type,
             status = TouristWalletTransactionStatus.COMPLETED,
             createdAt = Instant.parse("2026-07-26T12:00:00Z"),

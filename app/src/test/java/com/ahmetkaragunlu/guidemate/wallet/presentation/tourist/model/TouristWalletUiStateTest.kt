@@ -32,8 +32,8 @@ class TouristWalletUiStateTest {
             cardType = PaymentCardType.CREDIT_CARD,
             lastFourDigits = "1234",
             cardHolderName = "Test User",
-            expiryMonth = "12",
-            expiryYear = "2030",
+            expiryMonth = 12,
+            expiryYear = 2030,
             isDefault = isDefault,
         )
 }

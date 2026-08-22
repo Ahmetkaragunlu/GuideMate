@@ -68,10 +68,11 @@ fun TourReviewBottomSheet(
             RatingBar(
                 rating = uiState.rating,
                 onRatingChanged = onRatingChanged,
+                enabled = !uiState.isSubmitting,
             )
-            uiState.errorResId?.let { errorResId ->
+            uiState.errorMessage?.let { errorMessage ->
                 Text(
-                    text = stringResource(errorResId),
+                    text = errorMessage,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
@@ -85,6 +86,7 @@ fun TourReviewBottomSheet(
                         capitalization = KeyboardCapitalization.Sentences,
                     ),
                 singleLine = false,
+                enabled = !uiState.isSubmitting,
                 minLines = 4,
                 maxLines = 6,
                 colors =
@@ -99,6 +101,7 @@ fun TourReviewBottomSheet(
                 text = R.string.submit_tour_review,
                 onClick = onSubmit,
                 enabled = !uiState.isSubmitting,
+                isLoading = uiState.isSubmitting,
             )
         }
     }

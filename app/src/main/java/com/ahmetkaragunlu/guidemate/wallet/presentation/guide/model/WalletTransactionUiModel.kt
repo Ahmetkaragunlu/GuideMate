@@ -6,6 +6,7 @@ data class WalletTransactionUiModel(
     val id: String,
     val occurredAt: Instant,
     val amountMinor: Long,
+    val currencyCode: String = "USD",
     val type: WalletTransactionType,
     val referenceTitle: String? = null,
     val status: WalletTransactionStatus = WalletTransactionStatus.COMPLETED,

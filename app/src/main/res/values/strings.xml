@@ -196,34 +196,18 @@
 
     <string name="saved_cards_description">Kartlarını görüntüleyebilir, silebilir veya varsayılan kartını değiştirebilirsin.</string>
     <string name="add_new_card">Yeni Kart Ekle</string>
-    <string name="add_card_action">KARTI EKLE</string>
-    <string name="card_number">Kart Numarası</string>
-    <string name="card_number_placeholder">1234 5678 9012 3456</string>
-    <string name="card_holder_name">Kart Sahibinin Adı Soyadı</string>
     <string name="card_holder_name_placeholder">Ad Soyad</string>
     <string name="card_holder">Kart Sahibi</string>
     <string name="expiry_date">Son Kullanma</string>
-    <string name="expiry_month_placeholder">AA</string>
-    <string name="expiry_year_placeholder">YY</string>
     <string name="set_as_default">Varsayılan Yap</string>
     <string name="default_card">Varsayılan</string>
-    <string name="card_number_error_message">Kart numarası 16 haneli olmalıdır</string>
-    <string name="card_number_invalid">Kart numarası geçerli değil.</string>
-    <string name="sandbox_card_not_supported">Bu kart Sandbox test kartları arasında bulunamadı.</string>
-    <string name="card_holder_name_error_message">Kart sahibinin adı soyadı boş bırakılamaz</string>
-    <string name="expiry_month_error_message">Geçerli bir ay giriniz</string>
-    <string name="expiry_year_error_message">Geçerli bir yıl giriniz</string>
-    <string name="card_expired_error">Kartın son kullanma tarihi geçmiş.</string>
-    <string name="cvv">CVV</string>
-    <string name="cvv_placeholder">123</string>
-    <string name="cvv_error_message">Geçerli bir CVV giriniz.</string>
-    <string name="secure_card_form_title">Güvenli Kart Ekleme</string>
-    <string name="secure_card_form_description">Kartınız doğrulandıktan sonra yalnızca güvenli ve maskelenmiş bilgiler saklanacaktır.</string>
-    <string name="card_added_success">Kartınız başarıyla eklendi.</string>
 
 
     <string name="delete_card_title">Kartı Sil</string>
     <string name="delete_card_desc">Bu kartı silmek istediğinize emin misiniz?</string>
+    <string name="error_saved_card_not_found">Kayıtlı kart bulunamadı.</string>
+    <string name="error_saved_card_sync_failed">Kayıtlı kart bilgileri güncellenemedi. Lütfen tekrar deneyin.</string>
+    <string name="error_saved_card_provider_unavailable">Kart sağlayıcısına şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.</string>
 
     <string name="make_default_title">Varsayılan Kart Yap</string>
     <string name="make_default_desc">Bu kartı varsayılan ödeme yönteminiz yapmak istiyor musunuz?</string>
@@ -433,7 +417,8 @@
     <string name="tour_review_comment_placeholder">Tur deneyiminizi paylaşın (isteğe bağlı)</string>
     <string name="submit_tour_review">DEĞERLENDİRMEYİ GÖNDER</string>
     <string name="tour_review_rating_required">Devam etmek için bir puan seçin.</string>
-    <string name="tour_review_submission_failed">Değerlendirmeniz gönderilemedi. Lütfen tekrar deneyin.</string>
+    <string name="error_review_not_allowed">Bu rezervasyon henüz değerlendirmeye uygun değil.</string>
+    <string name="error_review_already_exists">Bu tur deneyimini daha önce değerlendirdiniz.</string>
     <string name="tour_review_success_title">Değerlendirmeniz Alındı</string>
     <string name="tour_review_success_message">Deneyiminizi paylaştığınız için teşekkür ederiz.</string>
     <string name="tour_review_submitted_notice">Bu turu değerlendirdiniz.</string>
@@ -460,12 +445,17 @@
     <string name="wallet">Cüzdanım</string>
     <string name="wallet_transaction_history">Cüzdan Hareketleri</string>
     <string name="wallet_transaction_withdrawal_title">Para Çekimi</string>
+    <string name="wallet_transaction_top_up_title">Bakiye Yükleme</string>
+    <string name="wallet_transaction_tour_purchase_title">Tur Ödemesi</string>
+    <string name="wallet_transaction_refund_title">Tur İadesi</string>
+    <string name="wallet_transaction_reversal_title">Kazanç İadesi</string>
     <string name="wallet_filter_all">Tümü</string>
     <string name="wallet_filter_top_up">Para Yükleme</string>
     <string name="wallet_filter_tour_payments">Tur Ödemeleri</string>
     <string name="wallet_filter_refunds">İadeler</string>
     <string name="wallet_filter_tour_income">Tur Kazançları</string>
     <string name="wallet_filter_withdrawals">Para Çekimleri</string>
+    <string name="wallet_filter_reversals">Kazanç İadeleri</string>
     <string name="wallet_transactions_empty">Bu filtreye uygun cüzdan hareketi bulunamadı.</string>
     <string name="default_payment_card">Varsayılan Ödeme Kartı</string>
     <string name="add_payment_card_hint">Ödeme yapmak için güvenli bir kart ekleyin.</string>
@@ -480,14 +470,16 @@
     <string name="secure_card_redirect_description">Kart bilgileriniz GuideMate tarafından alınmaz. Kart ekleme işlemi ödeme sağlayıcısının güvenli sayfasında tamamlanır.</string>
     <string name="secure_card_provider_notice">Kart numarası, son kullanma tarihi ve CVV yalnızca güvenli ödeme sayfasına girilir.</string>
     <string name="secure_card_storage_notice">GuideMate yalnızca sağlayıcının döndürdüğü kart kimliğini ve maskelenmiş kart bilgisini kullanır.</string>
-    <string name="save_card_consent">Kartımı sonraki ödemelerde kullanmak üzere güvenli şekilde kaydetmeyi kabul ediyorum.</string>
-    <string name="continue_to_secure_card_page">DEVAM ET</string>
 
     <string name="checkout_topbar_title">Tur Satın Al</string>
     <string name="checkout_title">Rezervasyonunuzu Tamamlayın</string>
     <string name="checkout_subtitle">Katılımcı sayısını ve ödeme yönteminizi kontrol edin.</string>
     <string name="checkout_participant_count">Katılımcı Sayısı</string>
     <string name="checkout_remaining_capacity">Kalan kontenjan: %1$d</string>
+    <string name="tour_remaining_capacity">%1$d kişilik yer kaldı</string>
+    <string name="tour_search_result_count">%1$d tur bulundu</string>
+    <string name="tour_search_empty_title">Aramanıza uygun tur bulunamadı.</string>
+    <string name="tour_search_clear_filters">Aramayı ve Filtreleri Temizle</string>
     <string name="checkout_unit_price">Kişi başı ücret</string>
     <string name="checkout_payment_method">Ödeme Yöntemi</string>
     <string name="wallet_payment">Cüzdan Bakiyesi</string>
@@ -570,6 +562,23 @@
     <string name="cancel_reservation_message">Rezervasyonunuz iptal edilerek Geçmiş bölümüne taşınacaktır. İade durumu geçerli iptal koşullarına göre belirlenecektir.</string>
     <string name="reservation_cancellation_failed_title">Rezervasyon İptal Edilemedi</string>
     <string name="reservation_cancellation_failed_message">Rezervasyon durumu değişmiş olabilir. Lütfen tekrar deneyin.</string>
+    <string name="reservation_cancellation_success_title">Rezervasyon İptal Edildi</string>
+    <string name="reservation_cancelled_success">Rezervasyonunuz iptal edildi.</string>
+    <string name="reservation_cancelled_refund_started">Rezervasyonunuz iptal edildi ve tam iade işleminiz başlatıldı.</string>
+    <string name="reservation_cancelled_refund_completed">Rezervasyonunuz iptal edildi ve ücretiniz iade edildi.</string>
+    <string name="reservation_cancelled_refund_failed">Rezervasyonunuz iptal edildi ancak iade işlemi tamamlanamadı. Lütfen destek ekibiyle iletişime geçin.</string>
+    <string name="reservation_cancelled_refund_review">Rezervasyonunuz iptal edildi. İade işleminiz kontrol edilmek üzere incelemeye alındı.</string>
+    <string name="reservation_cancelled_no_refund">Rezervasyonunuz iptal edildi. Geçerli iptal koşulları nedeniyle ücret iadesi uygulanmadı.</string>
+    <string name="reservation_detail_full_refund_notice">Bu rezervasyon tam iade kapsamındadır. Güncel iade durumu ödeme hareketlerinize yansıyacaktır.</string>
+    <string name="reservation_detail_no_refund_notice">Bu rezervasyon için geçerli iptal koşulları nedeniyle ücret iadesi uygulanmaz.</string>
+    <string name="upcoming_trips_empty">Henüz yaklaşan bir geziniz bulunmuyor.</string>
+    <string name="past_trips_empty">Henüz geçmiş bir geziniz bulunmuyor.</string>
+    <string name="error_reservation_not_found">Rezervasyon bulunamadı.</string>
+    <string name="error_reservation_already_exists">Bu tur için zaten bir rezervasyonunuz bulunuyor.</string>
+    <string name="error_reservation_not_cancellable">Bu rezervasyon artık iptal edilemiyor.</string>
+    <string name="error_idempotency_conflict">Bu işlem daha önce farklı bilgilerle gönderildi. Lütfen tekrar deneyin.</string>
+    <string name="error_refund_failed">İade işlemi tamamlanamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_refund_amount_exceeded">İade tutarı ödenen tutarı aşamaz.</string>
     <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>
     <string name="price_plus">%1$s +</string>
 

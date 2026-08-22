@@ -1,10 +1,8 @@
 package com.ahmetkaragunlu.guidemate.payment.presentation.savedpaymentmethod
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,8 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,8 +37,6 @@ import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
 @Composable
 fun AddSavedCardBottomSheet(
     sheetState: SheetState,
-    isConsentChecked: Boolean,
-    onConsentChange: (Boolean) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier,
@@ -114,34 +108,11 @@ fun AddSavedCardBottomSheet(
                 )
             }
 
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { onConsentChange(!isConsentChecked) },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Checkbox(
-                    checked = isConsentChecked,
-                    onCheckedChange = onConsentChange,
-                    colors =
-                        CheckboxDefaults.colors(
-                            checkedColor = colorResource(R.color.brand_color),
-                            uncheckedColor = colorResource(R.color.brand_color),
-                        ),
-                )
-                Text(
-                    text = stringResource(R.string.save_card_consent),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
 
             EditButton(
-                text = R.string.continue_to_secure_card_page,
+                text = R.string.ok,
                 onClick = onConfirm,
-                enabled = isConsentChecked,
             )
         }
     }

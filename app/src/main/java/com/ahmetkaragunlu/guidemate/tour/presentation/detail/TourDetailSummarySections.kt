@@ -273,7 +273,7 @@ private fun PriceRow(uiState: TourDetailUiState) {
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.brand_color),
         )
-        if (uiState.capacity > 0) {
+        if (uiState.reservedParticipantCount != null || uiState.capacity > 0) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
                 verticalAlignment = Alignment.CenterVertically,
@@ -286,11 +286,14 @@ private fun PriceRow(uiState: TourDetailUiState) {
                 )
                 Text(
                     text =
-                        stringResource(
-                            R.string.tour_participant_capacity_format,
-                            uiState.bookedCount,
-                            uiState.capacity,
-                        ),
+                        uiState.reservedParticipantCount?.let { participantCount ->
+                            stringResource(R.string.participant_count, participantCount)
+                        }
+                            ?: stringResource(
+                                R.string.tour_participant_capacity_format,
+                                uiState.bookedCount,
+                                uiState.capacity,
+                            ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorResource(R.color.text_color),
                 )

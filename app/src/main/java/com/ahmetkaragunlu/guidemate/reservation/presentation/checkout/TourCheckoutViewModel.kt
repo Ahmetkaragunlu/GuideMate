@@ -5,58 +5,53 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
-import com.ahmetkaragunlu.guidemate.tour.presentation.detail.mapper.toTourDetailUiState
-import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.resolveBookingAvailability
-import com.ahmetkaragunlu.guidemate.tour.data.mock.TourCatalogStore
-import com.ahmetkaragunlu.guidemate.tour.data.mock.refreshAtSessionTransitions
-import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
-import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.checkoutErrorResId
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.tourist.TouristWalletStore
+import com.ahmetkaragunlu.guidemate.payment.data.mock.TouristPaymentStore
+import com.ahmetkaragunlu.guidemate.payment.domain.repository.SavedPaymentMethodRepository
+import com.ahmetkaragunlu.guidemate.payment.presentation.mapper.toUiModel
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentPurpose
-import com.ahmetkaragunlu.guidemate.payment.data.mock.TouristPaymentStore
-import com.ahmetkaragunlu.guidemate.reservation.data.mock.TouristReservationStore
+import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.checkoutErrorResId
+import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
+import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
+import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.resolveBookingAvailability
+import com.ahmetkaragunlu.guidemate.tour.domain.repository.TourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.tour.presentation.detail.mapper.toTourDetailUiState
+import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class TourCheckoutViewModel
     @Inject
     constructor(
         savedStateHandle: SavedStateHandle,
-        private val tourCatalogStore: TourCatalogStore,
-        private val walletStore: TouristWalletStore,
+        private val tourRepository: TourDiscoveryRepository,
+        private val walletRepository: WalletRepository,
+        private val savedPaymentMethodRepository: SavedPaymentMethodRepository,
         private val paymentStore: TouristPaymentStore,
-        private val reservationStore: TouristReservationStore,
     ) : ViewModel() {
         private val sessionId =
             savedStateHandle.toRoute<TouristPaymentDestination.Checkout>().sessionId
+        private val currentTour = MutableStateFlow<TourWithSession?>(null)
         private val actionState = MutableStateFlow(TourCheckoutUiState(sessionId = sessionId))
+        private var loadJob: Job? = null
 
         val uiState: StateFlow<TourCheckoutUiState> =
-            combine(
-                tourCatalogStore.state.refreshAtSessionTransitions(),
-                walletStore.state,
-                actionState,
-            ) {
-                    catalog,
-                    wallet,
-                    action,
-                ->
-                val now = Instant.now()
-                val tourWithSession = catalog.findBySessionId(sessionId)
-                val detail = tourWithSession?.toTourDetailUiState(now)
-                val availableCapacity =
-                    tourWithSession?.session?.let { (it.capacity - it.bookedCount).coerceAtLeast(0) }
-                        ?: 0
+            combine(currentTour, actionState) { tourWithSession, action ->
+                val detail = tourWithSession?.toTourDetailUiState(Instant.now())
+                val availableCapacity = tourWithSession?.session?.availableCapacity ?: 0
 
                 action.copy(
                     tourTitle = detail?.title.orEmpty(),
@@ -69,20 +64,79 @@ class TourCheckoutViewModel
                             maximumValue = availableCapacity.coerceAtLeast(1),
                         ),
                     availableCapacity = availableCapacity,
-                    walletBalanceMinor = wallet.balanceMinor,
-                    savedCards = wallet.savedCards,
-                    selectedCardId =
-                        action.selectedCardId
-                            ?.takeIf { selectedId ->
-                                wallet.savedCards.any { it.cardId == selectedId }
-                            }
-                            ?: wallet.defaultCard?.cardId,
                 )
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = initialState(),
+                initialValue = actionState.value,
             )
+
+        init {
+            refreshTour()
+            viewModelScope.launch {
+                savedPaymentMethodRepository.paymentMethodChanges.collect {
+                    refreshPaymentContext()
+                }
+            }
+        }
+
+        fun refreshTour() {
+            if (loadJob?.isActive == true) return
+            loadJob =
+                viewModelScope.launch {
+                    actionState.update { it.copy(loadState = ContentLoadState.LOADING) }
+                    val tour = tourRepository.getSession(sessionId)
+                    val wallet = walletRepository.getWallet()
+                    val cards = savedPaymentMethodRepository.getSavedPaymentMethods()
+                    if (
+                        tour is DataResult.Error ||
+                            wallet is DataResult.Error ||
+                            cards is DataResult.Error
+                    ) {
+                        currentTour.value = null
+                        actionState.update { it.copy(loadState = ContentLoadState.ERROR) }
+                        return@launch
+                    }
+                    currentTour.value = (tour as DataResult.Success).data
+                    val walletData = (wallet as DataResult.Success).data
+                    val cardItems =
+                        (cards as DataResult.Success).data
+                            .map { it.toUiModel() }
+                            .sortedByDescending { it.isDefault }
+                    actionState.update { current ->
+                        current.copy(
+                            loadState = ContentLoadState.CONTENT,
+                            walletBalanceMinor = walletData.balanceMinor,
+                            walletCurrencyCode = walletData.currencyCode,
+                            savedCards = cardItems,
+                            selectedCardId =
+                                current.selectedCardId?.takeIf { selectedId ->
+                                    cardItems.any { it.cardId == selectedId }
+                                } ?: cardItems.firstOrNull { it.isDefault }?.cardId
+                                    ?: cardItems.firstOrNull()?.cardId,
+                        )
+                    }
+                }
+        }
+
+        private suspend fun refreshPaymentContext() {
+            val wallet = walletRepository.getWallet()
+            val cards = savedPaymentMethodRepository.getSavedPaymentMethods()
+            if (wallet !is DataResult.Success || cards !is DataResult.Success) return
+            val cardItems = cards.data.map { it.toUiModel() }.sortedByDescending { it.isDefault }
+            actionState.update { current ->
+                current.copy(
+                    walletBalanceMinor = wallet.data.balanceMinor,
+                    walletCurrencyCode = wallet.data.currencyCode,
+                    savedCards = cardItems,
+                    selectedCardId =
+                        current.selectedCardId?.takeIf { selectedId ->
+                            cardItems.any { it.cardId == selectedId }
+                        } ?: cardItems.firstOrNull { it.isDefault }?.cardId
+                            ?: cardItems.firstOrNull()?.cardId,
+                )
+            }
+        }
 
         fun decreaseParticipantCount() {
             actionState.update { current ->
@@ -107,10 +161,7 @@ class TourCheckoutViewModel
 
         fun onPaymentMethodSelected(method: PaymentMethod) {
             actionState.update {
-                it.copy(
-                    selectedMethod = method,
-                    validationErrorResId = null,
-                )
+                it.copy(selectedMethod = method, validationErrorResId = null)
             }
         }
 
@@ -126,26 +177,16 @@ class TourCheckoutViewModel
 
         fun onTermsAcceptedChange(isAccepted: Boolean) {
             actionState.update {
-                it.copy(
-                    termsAccepted = isAccepted,
-                    validationErrorResId = null,
-                )
+                it.copy(termsAccepted = isAccepted, validationErrorResId = null)
             }
         }
 
         fun createPaymentAttempt(): String? {
             val state = uiState.value
-            val tourWithSession = tourCatalogStore.state.value.findBySessionId(sessionId)
-            val hasReservation =
-                reservationStore.reservations.value.any { reservation ->
-                    reservation.tourSessionId == sessionId
-                }
+            val tourWithSession = currentTour.value
             val bookingAvailability =
-                tourWithSession.resolveBookingAvailability(hasReservation = hasReservation)
-            val currentAvailableCapacity =
-                tourWithSession?.session?.let { session ->
-                    (session.capacity - session.bookedCount).coerceAtLeast(0)
-                } ?: 0
+                tourWithSession.resolveBookingAvailability(hasReservation = false)
+            val currentAvailableCapacity = tourWithSession?.session?.availableCapacity ?: 0
 
             val errorResId =
                 when {
@@ -176,26 +217,6 @@ class TourCheckoutViewModel
                 savedCardId = state.selectedCardId.takeIf {
                     state.selectedMethod == PaymentMethod.SAVED_CARD
                 },
-            )
-        }
-
-        private fun initialState(): TourCheckoutUiState {
-            val tourWithSession = tourCatalogStore.state.value.findBySessionId(sessionId)
-            val detail = tourWithSession?.toTourDetailUiState(Instant.now())
-            val wallet = walletStore.state.value
-            return TourCheckoutUiState(
-                sessionId = sessionId,
-                tourTitle = detail?.title.orEmpty(),
-                date = detail?.date.orEmpty(),
-                location = detail?.location.orEmpty(),
-                unitPriceMinor = detail?.priceMinor ?: 0,
-                availableCapacity =
-                    tourWithSession?.session?.let {
-                        (it.capacity - it.bookedCount).coerceAtLeast(0)
-                    } ?: 0,
-                walletBalanceMinor = wallet.balanceMinor,
-                savedCards = wallet.savedCards,
-                selectedCardId = wallet.defaultCard?.cardId,
             )
         }
     }

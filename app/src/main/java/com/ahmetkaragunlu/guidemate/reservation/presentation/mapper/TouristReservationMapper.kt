@@ -1,23 +1,18 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.mapper
 
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
+import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripUiModel
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReview
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailReviewUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
-import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
-import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
-import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
-import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripUiModel
-import java.time.Instant
 
-fun TouristReservation.toTripUiModel(
-    currentTour: TourWithSession?,
-    now: Instant = Instant.now(),
-): TripUiModel {
-    val detail = toTourDetailUiState(currentTour = currentTour, now = now)
+fun TouristReservation.toTripUiModel(): TripUiModel {
+    val detail = toTourDetailUiState()
     return TripUiModel(
-        id = id,
+        reservationId = id,
         tourSessionId = tourSessionId,
         title = detail.title,
         date = detail.date,
@@ -28,9 +23,7 @@ fun TouristReservation.toTripUiModel(
         category = checkNotNull(detail.category),
         languagesFlag = detail.languagesFlag,
         languagesText = detail.languagesText,
-        priceMinor = detail.priceMinor,
-        rating = detail.rating,
-        reviewCount = detail.reviewCount.takeIf { it > 0 },
+        totalPriceMinor = totalPriceMinor,
         startsAt = snapshot.startsAt,
         sessionStatus = detail.sessionStatus,
         cancellationReason = detail.cancellationReason,
@@ -38,29 +31,16 @@ fun TouristReservation.toTripUiModel(
 }
 
 fun TouristReservation.toTourDetailUiState(
-    currentTour: TourWithSession?,
-    now: Instant = Instant.now(),
-): TourDetailUiState {
-    val currentSession = currentTour?.session
-    val currentTourData = currentTour?.tour
-    val detailStatus =
-        when {
-            status == TouristReservationStatus.CANCELLED -> TourDetailStatus.CANCELLED
-            currentSession?.status == TourSessionStatus.CANCELLED -> TourDetailStatus.CANCELLED
-            currentSession?.status == TourSessionStatus.COMPLETED ||
-                !snapshot.endsAt.isAfter(now) ->
-                TourDetailStatus.COMPLETED
-            else -> null
-        }
-
-    return TourDetailUiState(
+    publicReviews: List<TourReview> = emptyList(),
+    publicReviewCount: Long = 0,
+): TourDetailUiState =
+    TourDetailUiState(
         sessionId = tourSessionId,
         tourId = snapshot.tourId,
         title = snapshot.title,
         imageResId = snapshot.coverImageResId,
         imageUrl = snapshot.coverImageUrl,
-        rating = currentTourData?.averageRating,
-        reviewCount = currentTourData?.reviewCount ?: 0,
+        reviewCount = publicReviewCount,
         date = snapshot.startsAt.formatTourDateTime(snapshot.timeZoneId),
         durationMinutes = snapshot.durationMinutes,
         location =
@@ -70,26 +50,35 @@ fun TouristReservation.toTourDetailUiState(
         languagesFlag = snapshot.languages.joinToString(separator = " ") { it.flagEmoji },
         languagesText = snapshot.languages.joinToString(separator = ", ") { it.shortCode },
         category = snapshot.category,
-        priceMinor = snapshot.unitPriceMinor,
-        bookedCount = currentSession?.bookedCount ?: participantCount,
-        capacity = currentSession?.capacity ?: participantCount,
+        priceMinor = unitPriceMinor,
+        reservedParticipantCount = participantCount,
         description = snapshot.description,
         meetingPoint = snapshot.meetingPoint,
-        sessionStatus = detailStatus,
-        cancellationReason = currentSession?.cancellationReason,
+        sessionStatus = status.toDetailStatus(),
+        cancellationReason = cancellationReason,
         guideId = snapshot.guide.id,
         guideName = snapshot.guide.displayName,
         guideImageResId = snapshot.guide.profileImageResId,
         guideImageUrl = snapshot.guide.profileImageUrl,
-        reviews =
-            currentTourData?.recentReviews.orEmpty().map { review ->
-                TourDetailReviewUiModel(
-                    id = review.id,
-                    reviewerName = review.reviewerName,
-                    comment = review.comment,
-                    rating = review.rating,
-                    reviewerImageResId = review.reviewerImageResId,
-                )
-            },
+        reviews = publicReviews.map(TourReview::toDetailReviewUiModel),
     )
-}
+
+private fun TouristReservationStatus.toDetailStatus(): TourDetailStatus? =
+    when (this) {
+        TouristReservationStatus.COMPLETED -> TourDetailStatus.COMPLETED
+        TouristReservationStatus.CANCELLED -> TourDetailStatus.CANCELLED
+        TouristReservationStatus.PENDING_PAYMENT,
+        TouristReservationStatus.CONFIRMED,
+        TouristReservationStatus.EXPIRED,
+        -> null
+    }
+
+private fun TourReview.toDetailReviewUiModel(): TourDetailReviewUiModel =
+    TourDetailReviewUiModel(
+        id = id,
+        reviewerName = reviewerName,
+        comment = comment,
+        rating = rating,
+        reviewerImageResId = reviewerImageResId,
+        reviewerImageUrl = reviewerImageUrl,
+    )

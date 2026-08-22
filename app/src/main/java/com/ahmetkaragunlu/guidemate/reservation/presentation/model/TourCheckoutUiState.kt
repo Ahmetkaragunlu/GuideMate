@@ -2,10 +2,12 @@ package com.ahmetkaragunlu.guidemate.reservation.presentation.model
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.SavedPaymentCardUiModel
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentMethod
 
 data class TourCheckoutUiState(
+    val loadState: ContentLoadState = ContentLoadState.LOADING,
     val sessionId: String = "",
     val tourTitle: String = "",
     val date: String = "",
@@ -14,6 +16,7 @@ data class TourCheckoutUiState(
     val participantCount: Int = 1,
     val availableCapacity: Int = 0,
     val walletBalanceMinor: Long = 0,
+    val walletCurrencyCode: String = "USD",
     val savedCards: List<SavedPaymentCardUiModel> = emptyList(),
     val selectedMethod: PaymentMethod = PaymentMethod.SAVED_CARD,
     val selectedCardId: String? = null,

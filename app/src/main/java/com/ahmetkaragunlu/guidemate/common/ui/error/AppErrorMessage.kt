@@ -132,6 +132,27 @@ private fun BackendErrorCode?.toMessage(
             resourceProvider.getString(R.string.error_schedule_conflict)
         BackendErrorCode.CONCURRENT_UPDATE ->
             resourceProvider.getString(R.string.error_concurrent_update)
+        BackendErrorCode.RESERVATION_NOT_FOUND ->
+            resourceProvider.getString(R.string.error_reservation_not_found)
+        BackendErrorCode.RESERVATION_ALREADY_EXISTS ->
+            resourceProvider.getString(R.string.error_reservation_already_exists)
+        BackendErrorCode.RESERVATION_NOT_CANCELLABLE ->
+            resourceProvider.getString(R.string.error_reservation_not_cancellable)
+        BackendErrorCode.REVIEW_NOT_ALLOWED ->
+            resourceProvider.getString(R.string.error_review_not_allowed)
+        BackendErrorCode.REVIEW_ALREADY_EXISTS ->
+            resourceProvider.getString(R.string.error_review_already_exists)
+        BackendErrorCode.IDEMPOTENCY_CONFLICT ->
+            resourceProvider.getString(R.string.error_idempotency_conflict)
+        BackendErrorCode.SAVED_CARD_NOT_FOUND ->
+            resourceProvider.getString(R.string.error_saved_card_not_found)
+        BackendErrorCode.SAVED_CARD_SYNC_FAILED ->
+            resourceProvider.getString(R.string.error_saved_card_sync_failed)
+        BackendErrorCode.SAVED_CARD_PROVIDER_UNAVAILABLE ->
+            resourceProvider.getString(R.string.error_saved_card_provider_unavailable)
+        BackendErrorCode.REFUND_FAILED -> resourceProvider.getString(R.string.error_refund_failed)
+        BackendErrorCode.REFUND_AMOUNT_EXCEEDED ->
+            resourceProvider.getString(R.string.error_refund_amount_exceeded)
         BackendErrorCode.INTERNAL_SERVER_ERROR -> resourceProvider.getString(R.string.error_generic_failure)
         null -> resourceProvider.getString(R.string.error_generic_failure)
     }

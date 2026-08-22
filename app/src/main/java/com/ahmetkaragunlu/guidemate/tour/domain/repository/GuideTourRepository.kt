@@ -2,9 +2,9 @@ package com.ahmetkaragunlu.guidemate.tour.domain.repository
 
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
-import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourListType
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.TourReviewSubmission
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.CreateGuideTourInput
@@ -20,7 +20,7 @@ interface GuideTourRepository {
         size: Int,
     ): DataResult<PagedResult<GuideTourCard>>
 
-    suspend fun getTour(tourId: String): DataResult<GuideTourDetails>
+    suspend fun getTour(tourId: String): DataResult<TourDetails>
 
     suspend fun createTour(input: CreateGuideTourInput): DataResult<TourReviewSubmission>
 
@@ -50,7 +50,7 @@ interface GuideTourRepository {
         idempotencyKey: String,
     ): DataResult<TourSession>
 
-    suspend fun archiveTour(tourId: String): DataResult<GuideTourDetails>
+    suspend fun archiveTour(tourId: String): DataResult<TourDetails>
 
     suspend fun getDashboard(): DataResult<GuideDashboard>
 }

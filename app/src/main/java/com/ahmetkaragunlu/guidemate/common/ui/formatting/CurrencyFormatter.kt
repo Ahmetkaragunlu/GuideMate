@@ -11,10 +11,21 @@ private val platformCurrency: Currency = Currency.getInstance(PLATFORM_CURRENCY_
 private val currencyInputPattern = Regex("""^\d*(?:[.,]\d{0,2})?$""")
 
 fun Long.toPlatformCurrencyFromMinorUnit(locale: Locale = Locale.getDefault()): String {
-    val fractionDigits = platformCurrency.defaultFractionDigits
+    return toCurrencyFromMinorUnit(
+        currencyCode = PLATFORM_CURRENCY_CODE,
+        locale = locale,
+    )
+}
+
+fun Long.toCurrencyFromMinorUnit(
+    currencyCode: String,
+    locale: Locale = Locale.getDefault(),
+): String {
+    val currency = Currency.getInstance(currencyCode)
+    val fractionDigits = currency.defaultFractionDigits
     val formatter =
         NumberFormat.getCurrencyInstance(locale).apply {
-            currency = platformCurrency
+            this.currency = currency
             minimumFractionDigits = fractionDigits
             maximumFractionDigits = fractionDigits
         }
