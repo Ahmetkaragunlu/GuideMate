@@ -11,5 +11,8 @@ data class GuideWalletUiState(
     val defaultMethod: MoneyActionMethodUi? = null,
     val selectedMethod: MoneyActionMethodUi? = null,
     val recentTransactions: List<WalletTransactionUiModel> = emptyList(),
+    val isWithdrawalInProgress: Boolean = false,
     val isWithdrawalRequestSubmitted: Boolean = false,
+    val errorMessage: String? = null,
+    val actionErrorMessage: String? = null,
 )

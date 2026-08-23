@@ -3,15 +3,17 @@ package com.ahmetkaragunlu.guidemate.navigation.tourist.payment
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristDestination
 import com.ahmetkaragunlu.guidemate.navigation.tourist.account.TouristAccountStart
-import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.TourCheckoutScreen
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentPurpose
+import com.ahmetkaragunlu.guidemate.payment.presentation.hosted.HostedPaymentScreen
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.PaymentStatusScreen
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.PaymentSuccessScreen
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentPurpose
+import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.TourCheckoutScreen
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.TouristWalletScreen
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.transactions.TouristWalletTransactionsScreen
 
@@ -55,10 +57,8 @@ internal fun NavGraphBuilder.touristPaymentNavGraph(
             onNavigateToTransactions = {
                 touristNavController.navigateTo(TouristPaymentDestination.WalletTransactions)
             },
-            onNavigateToPayment = { paymentAttemptId ->
-                touristNavController.navigateTo(
-                    TouristPaymentDestination.Status(paymentAttemptId),
-                )
+            onNavigateToPayment = { paymentId ->
+                touristNavController.navigateTo(TouristPaymentDestination.Hosted(paymentId))
             },
         )
     }
@@ -67,32 +67,55 @@ internal fun NavGraphBuilder.touristPaymentNavGraph(
     }
     composable<TouristPaymentDestination.Checkout> {
         TourCheckoutScreen(
-            onNavigateToSavedCards = {
-                routeNavController.navigateTo(
-                    RootDestination.TouristAccount(TouristAccountStart.SAVED_CARDS),
+            onNavigateToPayment = { paymentId, requiresHostedCheckout ->
+                touristNavController.navigateTo(
+                    if (requiresHostedCheckout) {
+                        TouristPaymentDestination.Hosted(paymentId)
+                    } else {
+                        TouristPaymentDestination.Status(
+                            paymentId = paymentId,
+                            openHostedIfRequired = false,
+                        )
+                    },
                 )
             },
-            onNavigateToPayment = { paymentAttemptId ->
-                touristNavController.navigateTo(
-                    TouristPaymentDestination.Status(paymentAttemptId),
-                )
+        )
+    }
+    composable<TouristPaymentDestination.Hosted> { backStackEntry ->
+        val paymentId = backStackEntry.toRoute<TouristPaymentDestination.Hosted>().paymentId
+        HostedPaymentScreen(
+            onVerificationRequired = {
+                touristNavController.navigate(
+                    TouristPaymentDestination.Status(
+                        paymentId = paymentId,
+                        openHostedIfRequired = false,
+                    ),
+                ) {
+                    popUpTo<TouristPaymentDestination.Hosted> { inclusive = true }
+                    launchSingleTop = true
+                }
             },
         )
     }
     composable<TouristPaymentDestination.Status> {
         PaymentStatusScreen(
-            onPaymentSucceeded = { paymentAttemptId ->
+            onHostedCheckoutRequired = { paymentId ->
                 touristNavController.navigate(
-                    TouristPaymentDestination.Success(paymentAttemptId),
+                    TouristPaymentDestination.Hosted(paymentId),
                 ) {
-                    popUpTo<TouristPaymentDestination.Status> {
-                        inclusive = true
-                    }
+                    popUpTo<TouristPaymentDestination.Status> { inclusive = true }
+                    launchSingleTop = true
+                }
+            },
+            onPaymentSucceeded = { paymentId ->
+                touristNavController.navigate(
+                    TouristPaymentDestination.Success(paymentId),
+                ) {
+                    popUpTo<TouristPaymentDestination.Status> { inclusive = true }
                     launchSingleTop = true
                 }
             },
             onExitPayment = touristNavController::navigateUp,
-            onPaymentUnavailable = returnToTouristHome,
         )
     }
     composable<TouristPaymentDestination.Success> {

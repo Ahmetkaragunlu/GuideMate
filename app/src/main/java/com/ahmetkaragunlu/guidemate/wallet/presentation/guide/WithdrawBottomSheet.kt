@@ -37,6 +37,7 @@ internal fun WithdrawBottomSheet(
     onWithdrawAllClick: () -> Unit,
     onDismiss: () -> Unit,
     onConfirm: (Long) -> Unit,
+    isActionInProgress: Boolean,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -56,6 +57,7 @@ internal fun WithdrawBottomSheet(
             onPresetAmountClick = { onAmountChange(it.toString()) },
             onChangeMethodClick = onChangeMethodClick,
             onConfirm = onConfirm,
+            isActionInProgress = isActionInProgress,
             extraContent = {
                 Row(
                     modifier = Modifier

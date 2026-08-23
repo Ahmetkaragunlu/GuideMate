@@ -195,7 +195,6 @@
 
 
     <string name="saved_cards_description">Kartlarını görüntüleyebilir, silebilir veya varsayılan kartını değiştirebilirsin.</string>
-    <string name="add_new_card">Yeni Kart Ekle</string>
     <string name="card_holder_name_placeholder">Ad Soyad</string>
     <string name="card_holder">Kart Sahibi</string>
     <string name="expiry_date">Son Kullanma</string>
@@ -440,7 +439,7 @@
     <string name="withdraw_all">Tümünü Çek</string>
     <string name="default_masked_iban">TR** **** ****</string>
     <string name="change">Değiştir</string>
-    <string name="withdraw_info_text">Tutar 1 iş günü içerisinde hesabınıza aktarılacaktır.</string>
+    <string name="withdraw_info_text">Talebinizin durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
     <string name="add_money_info_text">Yuklenecek tutar guvenli odeme altyapisi uzerinden bakiyenize aktarilacaktir.</string>
     <string name="wallet">Cüzdanım</string>
     <string name="wallet_transaction_history">Cüzdan Hareketleri</string>
@@ -458,7 +457,7 @@
     <string name="wallet_filter_reversals">Kazanç İadeleri</string>
     <string name="wallet_transactions_empty">Bu filtreye uygun cüzdan hareketi bulunamadı.</string>
     <string name="default_payment_card">Varsayılan Ödeme Kartı</string>
-    <string name="add_payment_card_hint">Ödeme yapmak için güvenli bir kart ekleyin.</string>
+    <string name="add_payment_card_hint">Kartınızı güvenli ödeme sırasında kaydedebilirsiniz.</string>
     <string name="manage">Yönet</string>
     <string name="no_saved_card">Kayıtlı kartınız bulunmuyor.</string>
     <string name="card_not_selected">Lütfen bir kart seçin.</string>
@@ -467,9 +466,6 @@
     <string name="payment_status_failed">Başarısız</string>
     <string name="payment_status_refunded">İade Edildi</string>
 
-    <string name="secure_card_redirect_description">Kart bilgileriniz GuideMate tarafından alınmaz. Kart ekleme işlemi ödeme sağlayıcısının güvenli sayfasında tamamlanır.</string>
-    <string name="secure_card_provider_notice">Kart numarası, son kullanma tarihi ve CVV yalnızca güvenli ödeme sayfasına girilir.</string>
-    <string name="secure_card_storage_notice">GuideMate yalnızca sağlayıcının döndürdüğü kart kimliğini ve maskelenmiş kart bilgisini kullanır.</string>
 
     <string name="checkout_topbar_title">Tur Satın Al</string>
     <string name="checkout_title">Rezervasyonunuzu Tamamlayın</string>
@@ -484,9 +480,7 @@
     <string name="checkout_payment_method">Ödeme Yöntemi</string>
     <string name="wallet_payment">Cüzdan Bakiyesi</string>
     <string name="wallet_balance_format">Kullanılabilir bakiye: %1$s</string>
-    <string name="saved_card_payment">Kayıtlı Kart</string>
     <string name="secure_payment_provider_short">Güvenli ödeme sağlayıcısı üzerinden ödeyin.</string>
-    <string name="checkout_no_card">Ödeme için kullanabileceğiniz kayıtlı kart bulunmuyor.</string>
     <string name="checkout_terms_acceptance">Rezervasyon, iptal ve iade koşullarını okudum ve kabul ediyorum.</string>
     <string name="checkout_total">Toplam</string>
     <string name="continue_to_secure_payment">GÜVENLİ ÖDEMEYE DEVAM ET</string>
@@ -501,11 +495,8 @@
     <string name="checkout_error_capacity_changed">Seçtiğiniz katılımcı sayısı için yeterli kontenjan kalmadı.</string>
     <string name="checkout_error_terms_required">Devam etmek için rezervasyon koşullarını kabul edin.</string>
     <string name="checkout_error_insufficient_balance">Cüzdan bakiyeniz bu işlem için yetersiz.</string>
-    <string name="checkout_error_card_required">Devam etmek için bir ödeme kartı seçin.</string>
 
     <string name="payment_topbar_title">Ödeme Durumu</string>
-    <string name="payment_redirecting_title">Güvenli Ödemeye Yönlendiriliyorsunuz</string>
-    <string name="payment_redirecting_description">Ödeme sağlayıcısının güvenli sayfası hazırlanıyor.</string>
     <string name="payment_verifying_title">Ödemeniz Doğrulanıyor</string>
     <string name="payment_verifying_description">İşlem sonucunu güvenli şekilde kontrol ediyoruz. Lütfen bu ekranı kapatmayın.</string>
     <string name="payment_success_title">Ödeme Başarılı</string>
@@ -528,6 +519,7 @@
 
     <string name="bank_accounts">Banka Hesaplarım</string>
     <string name="bank_accounts_description">Kazanç aktarımı ve para çekme işlemlerinde kullanılacak banka hesaplarınızı yönetin.</string>
+    <string name="bank_accounts_empty">Henüz kayıtlı banka hesabınız bulunmuyor.</string>
     <string name="add_bank_account">Banka Hesabı Ekle</string>
     <string name="default_bank_account">Varsayılan Hesap</string>
     <string name="bank_name">Banka Adı</string>
@@ -536,20 +528,26 @@
     <string name="iban">IBAN</string>
     <string name="iban_placeholder">00 0000 0000 0000 0000 0000 00</string>
     <string name="iban_error_message">Geçerli bir Türkiye IBAN bilgisi girin.</string>
-    <string name="iban_bank_not_recognized">IBAN geçerli ancak banka bilgisi belirlenemedi.</string>
     <string name="bank_account_security_notice">Banka hesabı, yalnızca doğrulanmış rehber kazançlarının aktarımı için kullanılır.</string>
     <string name="add_bank_account_action">HESABI EKLE</string>
     <string name="bank_account_not_selected">Lütfen bir banka hesabı seçin.</string>
+    <string name="bank_account_required_title">Banka Hesabı Gerekli</string>
+    <string name="bank_account_required_description">Para çekebilmek için önce Profil > Banka Hesaplarım bölümünden bir hesap ekleyin.</string>
     <string name="delete_bank_account_title">Banka Hesabını Sil</string>
     <string name="delete_bank_account_description">Bu banka hesabını silmek istediğinizden emin misiniz?</string>
     <string name="make_default_bank_account_title">Varsayılan Hesap Yap</string>
     <string name="make_default_bank_account_description">Para çekme işlemlerinde bu hesabın kullanılmasını ister misiniz?</string>
     <string name="withdrawal_request_received_title">Para Çekme Talebi Alındı</string>
-    <string name="withdrawal_request_received_description">Talebiniz kontrol edilmek üzere oluşturuldu. İşlem durumu cüzdan hareketlerinde gösterilecektir.</string>
+    <string name="withdrawal_request_received_description">Talebiniz oluşturuldu. İşlem durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
     <string name="withdrawal_confirmation_title">Para Çekme Onayı</string>
     <string name="withdrawal_confirmation_description">Banka hesabınıza %1$s tutarında para çekme talebi oluşturulmasını onaylıyor musunuz?</string>
     <string name="insufficient_balance_title">Yetersiz Bakiye</string>
     <string name="withdrawal_insufficient_balance_description">Çekmek istediğiniz tutar kullanılabilir bakiyenizi aşıyor. Kullanılabilir bakiyeniz: %1$s.</string>
+    <string name="error_invalid_amount">Geçerli bir tutar girin.</string>
+    <string name="error_insufficient_withdrawable_balance">Kullanılabilir bakiyeniz bu para çekme işlemi için yetersiz.</string>
+    <string name="error_bank_account_not_found">Banka hesabı bulunamadı veya artık kullanılamıyor.</string>
+    <string name="error_bank_account_invalid">Banka hesabı bilgileri geçerli değil.</string>
+    <string name="error_bank_account_already_exists">Bu banka hesabı daha önce eklenmiş.</string>
     <string name="confirm">ONAYLA</string>
 
     <string name="clear">Temizle</string>
@@ -717,8 +715,31 @@
         Kullanıcı, "Okudum ve Kabul Ediyorum" kutucuğunu işaretleyerek işbu sözleşmenin tüm maddelerini kabul etmiş sayılır.
     </string>
 
-
-
-
+    <string name="hosted_card_payment">Kart ile Ödeme</string>
+    <string name="hosted_card_selection_notice">Kart seçimi iyzico güvenli ödeme ekranında yapılır.</string>
+    <string name="payment_charge_currency">Ödeme Para Birimi</string>
+    <string name="payment_charge_amount">Karttan çekilecek tutar</string>
+    <string name="payment_quote_notice">Tutar güncel kur bilgisiyle hesaplandı. Değişiklik yaparsanız teklif yenilenir.</string>
+    <string name="payment_get_quote">ÖDEME TUTARINI GÖR</string>
+    <string name="payment_currency_required">Devam etmek için ödeme para birimini seçin.</string>
+    <string name="secure_payment_title">Güvenli Ödeme</string>
+    <string name="payment_page_load_error">Güvenli ödeme sayfası yüklenemedi.</string>
+    <string name="payment_ssl_error">Güvenli bağlantı doğrulanamadığı için ödeme sayfası kapatıldı.</string>
+    <string name="payment_invalid_url_error">Güvenli ödeme adresi geçersiz.</string>
+    <string name="payment_refund_pending_title">İade İşlemi Başlatıldı</string>
+    <string name="payment_refund_pending_description">Ödemeniz doğrulandı ancak rezervasyon tamamlanamadı. Tam iade işleminiz devam ediyor.</string>
+    <string name="payment_refunded_title">Ödeme İade Edildi</string>
+    <string name="payment_refunded_description">Rezervasyon tamamlanamadığı için ödemenizin tamamı iade edildi.</string>
+    <string name="payment_manual_review_title">İşlem İnceleniyor</string>
+    <string name="payment_manual_review_description">Ödeme ve rezervasyon sonucu güvenliğiniz için incelemeye alındı. Güncel durum size bildirilecek.</string>
+    <string name="error_payment_not_found">Ödeme işlemi bulunamadı.</string>
+    <string name="error_payment_initialization_failed">Güvenli ödeme başlatılamadı. Lütfen tekrar deneyin.</string>
+    <string name="error_payment_verification_failed">Ödeme sonucu doğrulanamadı. Lütfen tekrar kontrol edin.</string>
+    <string name="error_payment_not_cancellable">Bu ödeme artık iptal edilemez. Güncel işlem durumunu kontrol edin.</string>
+    <string name="error_payment_currency_not_supported">Seçtiğiniz para birimi desteklenmiyor.</string>
+    <string name="error_payment_quote_unavailable">Ödeme tutarı şu anda hesaplanamıyor. Lütfen tekrar deneyin.</string>
+    <string name="error_payment_quote_expired">Ödeme teklifi süresi doldu. Güncel tutarı yeniden alın.</string>
+    <string name="error_card_insufficient_funds">Kart bakiyesi bu işlem için yetersiz.</string>
+    <string name="error_payment_method_declined">Kart işlemi banka tarafından reddedildi.</string>
 
 </resources>

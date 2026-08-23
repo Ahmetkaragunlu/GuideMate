@@ -2,76 +2,123 @@ package com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
+import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.wallet.domain.iban.TurkishBankCatalog
 import com.ahmetkaragunlu.guidemate.wallet.domain.iban.TurkishIbanValidator
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.guide.GuideWalletStore
+import com.ahmetkaragunlu.guidemate.wallet.domain.repository.GuideFinanceRepository
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.model.AddBankAccountFormState
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.model.BankAccountsUiState
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+private const val BANK_ACCOUNT_PAGE_SIZE = 50
 
 @HiltViewModel
 class GuideBankAccountsViewModel
     @Inject
     constructor(
-        private val walletStore: GuideWalletStore,
+        private val repository: GuideFinanceRepository,
         private val ibanValidator: TurkishIbanValidator,
         private val bankCatalog: TurkishBankCatalog,
+        private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
-        private val actionState = MutableStateFlow(BankAccountsUiState())
+        private val mutableUiState = MutableStateFlow(BankAccountsUiState())
+        val uiState: StateFlow<BankAccountsUiState> = mutableUiState.asStateFlow()
+        private var refreshJob: Job? = null
 
-        val uiState: StateFlow<BankAccountsUiState> =
-            combine(walletStore.state, actionState) { wallet, action ->
-                action.copy(bankAccounts = wallet.bankAccounts)
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue =
-                    BankAccountsUiState(
-                        bankAccounts = walletStore.state.value.bankAccounts,
-                    ),
-            )
+        init {
+            refresh()
+        }
+
+        fun refresh() {
+            if (refreshJob?.isActive == true) return
+            refreshJob =
+                viewModelScope.launch {
+                    val hasContent = mutableUiState.value.bankAccounts.isNotEmpty()
+                    if (!hasContent) {
+                        mutableUiState.update {
+                            it.copy(loadState = ContentLoadState.LOADING, errorMessage = null)
+                        }
+                    }
+                    when (val result = repository.getBankAccounts(0, BANK_ACCOUNT_PAGE_SIZE)) {
+                        is DataResult.Success ->
+                            mutableUiState.update {
+                                it.copy(
+                                    loadState = ContentLoadState.CONTENT,
+                                    bankAccounts = result.data.items.map { account -> account.toUiModel() },
+                                    errorMessage = null,
+                                )
+                            }
+                        is DataResult.Error ->
+                            mutableUiState.update {
+                                it.copy(
+                                    loadState =
+                                        if (hasContent) {
+                                            ContentLoadState.CONTENT
+                                        } else {
+                                            ContentLoadState.ERROR
+                                        },
+                                    errorMessage = result.error.toMessage(resourceProvider),
+                                )
+                            }
+                    }
+                }
+        }
 
         fun showDeleteDialog(bankAccountId: String) {
-            actionState.update { it.copy(showDeleteDialogFor = bankAccountId) }
+            mutableUiState.update { it.copy(showDeleteDialogFor = bankAccountId) }
         }
 
         fun dismissDeleteDialog() {
-            actionState.update { it.copy(showDeleteDialogFor = null) }
+            mutableUiState.update { it.copy(showDeleteDialogFor = null) }
         }
 
         fun confirmDeleteAccount() {
-            val bankAccountId = actionState.value.showDeleteDialogFor ?: return
-            walletStore.deleteBankAccount(bankAccountId)
-            dismissDeleteDialog()
+            val bankAccountId = mutableUiState.value.showDeleteDialogFor ?: return
+            runMutation(
+                request = { repository.deleteBankAccount(bankAccountId) },
+                onSuccess = {
+                    mutableUiState.update { it.copy(showDeleteDialogFor = null) }
+                    refresh()
+                },
+            )
         }
 
         fun showMakeDefaultDialog(bankAccountId: String) {
-            actionState.update { it.copy(showMakeDefaultDialogFor = bankAccountId) }
+            mutableUiState.update { it.copy(showMakeDefaultDialogFor = bankAccountId) }
         }
 
         fun dismissMakeDefaultDialog() {
-            actionState.update { it.copy(showMakeDefaultDialogFor = null) }
+            mutableUiState.update { it.copy(showMakeDefaultDialogFor = null) }
         }
 
         fun confirmMakeDefaultAccount() {
-            val bankAccountId = actionState.value.showMakeDefaultDialogFor ?: return
-            walletStore.makeDefaultBankAccount(bankAccountId)
-            dismissMakeDefaultDialog()
+            val bankAccountId = mutableUiState.value.showMakeDefaultDialogFor ?: return
+            runMutation(
+                request = { repository.makeDefaultBankAccount(bankAccountId) },
+                onSuccess = {
+                    mutableUiState.update { it.copy(showMakeDefaultDialogFor = null) }
+                    refresh()
+                },
+            )
         }
 
         fun showAddAccountSheet() {
-            actionState.update { it.copy(isAddAccountSheetVisible = true) }
+            mutableUiState.update { it.copy(isAddAccountSheetVisible = true) }
         }
 
         fun dismissAddAccountSheet() {
-            actionState.update {
+            mutableUiState.update {
                 it.copy(
                     isAddAccountSheetVisible = false,
                     addAccountForm = AddBankAccountFormState(),
@@ -97,21 +144,47 @@ class GuideBankAccountsViewModel
         }
 
         fun confirmAddAccount() {
-            val form = actionState.value.addAccountForm
+            val form = mutableUiState.value.addAccountForm
             if (!form.canSubmit) return
-            val bankName = form.bankName ?: return
-            walletStore.addBankAccount(
-                bankName = bankName,
-                accountHolderName = form.accountHolderName,
-                iban = ibanValidator.toNormalizedIban(form.ibanBody),
+            runMutation(
+                request = {
+                    repository.addBankAccount(
+                        iban = ibanValidator.toNormalizedIban(form.ibanBody),
+                        accountHolderName = form.accountHolderName.trim(),
+                    )
+                },
+                onSuccess = {
+                    dismissAddAccountSheet()
+                    refresh()
+                },
             )
-            dismissAddAccountSheet()
+        }
+
+        fun clearError() {
+            mutableUiState.update { it.copy(errorMessage = null) }
+        }
+
+        private fun runMutation(
+            request: suspend () -> DataResult<*>,
+            onSuccess: () -> Unit,
+        ) {
+            if (mutableUiState.value.isMutationInProgress) return
+            viewModelScope.launch {
+                mutableUiState.update { it.copy(isMutationInProgress = true, errorMessage = null) }
+                when (val result = request()) {
+                    is DataResult.Success -> onSuccess()
+                    is DataResult.Error ->
+                        mutableUiState.update {
+                            it.copy(errorMessage = result.error.toMessage(resourceProvider))
+                        }
+                }
+                mutableUiState.update { it.copy(isMutationInProgress = false) }
+            }
         }
 
         private fun updateForm(
             transform: AddBankAccountFormState.() -> AddBankAccountFormState,
         ) {
-            actionState.update { it.copy(addAccountForm = it.addAccountForm.transform()) }
+            mutableUiState.update { it.copy(addAccountForm = it.addAccountForm.transform()) }
         }
-
     }

@@ -63,6 +63,8 @@ fun MoneyActionBottomSheetContent(
     onPresetAmountClick: (Int) -> Unit,
     onChangeMethodClick: () -> Unit,
     onConfirm: (Long) -> Unit,
+    showChangeMethodAction: Boolean = true,
+    isActionInProgress: Boolean = false,
     extraContent: @Composable (() -> Unit)? = null,
 ) {
     Column(
@@ -105,6 +107,7 @@ fun MoneyActionBottomSheetContent(
             selectedMethod = selectedMethod,
             methodType = methodType,
             onChangeMethodClick = onChangeMethodClick,
+            showChangeMethodAction = showChangeMethodAction,
         )
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -119,6 +122,7 @@ fun MoneyActionBottomSheetContent(
             enabled =
                 selectedMethod != null &&
                     amountText.toCurrencyMinorUnitsOrNull()?.let { it > 0 } == true,
+            isLoading = isActionInProgress,
             onConfirm = onConfirm,
         )
     }
@@ -200,6 +204,7 @@ private fun SelectedMethodCard(
     selectedMethod: MoneyActionMethodUi?,
     methodType: MoneyActionMethodType,
     onChangeMethodClick: () -> Unit,
+    showChangeMethodAction: Boolean,
 ) {
     Row(
         modifier =
@@ -254,27 +259,29 @@ private fun SelectedMethodCard(
             }
         }
 
-        Row(
-            modifier =
-                Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .clickable(onClick = onChangeMethodClick)
-                    .padding(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                TablerIcons.Refresh,
-                contentDescription = null,
-                tint = colorResource(R.color.brand_color),
-                modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium)),
-            )
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
-            Text(
-                text = stringResource(R.string.change),
-                color = colorResource(R.color.brand_color),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelLarge,
-            )
+        if (showChangeMethodAction) {
+            Row(
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable(onClick = onChangeMethodClick)
+                        .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    TablerIcons.Refresh,
+                    contentDescription = null,
+                    tint = colorResource(R.color.brand_color),
+                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium)),
+                )
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
+                Text(
+                    text = stringResource(R.string.change),
+                    color = colorResource(R.color.brand_color),
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
         }
     }
 }
@@ -293,13 +300,14 @@ private fun MoneyActionConfirmButton(
     amountText: String,
     actionButtonText: String,
     enabled: Boolean,
+    isLoading: Boolean,
     onConfirm: (Long) -> Unit,
 ) {
     Button(
         onClick = {
             amountText.toCurrencyMinorUnitsOrNull()?.let(onConfirm)
         },
-        enabled = enabled,
+        enabled = enabled && !isLoading,
         modifier =
             Modifier
                 .fillMaxWidth()
@@ -307,11 +315,19 @@ private fun MoneyActionConfirmButton(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
     ) {
-        Text(
-            text = actionButtonText,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onPrimary,
-        )
+        if (isLoading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                color = MaterialTheme.colorScheme.onPrimary,
+                strokeWidth = 2.dp,
+            )
+        } else {
+            Text(
+                text = actionButtonText,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
+        }
     }
 }

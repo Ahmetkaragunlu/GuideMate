@@ -19,12 +19,24 @@ class AddBankAccountFormStateTest {
     }
 
     @Test
-    fun `valid IBAN with unknown bank cannot be submitted`() {
+    fun `valid IBAN with unknown preview bank can be submitted for backend validation`() {
         val state =
             AddBankAccountFormState(
                 accountHolderName = "Ahmet Karagünlü",
                 ibanBody = "470000100100000350930001",
                 isIbanValid = true,
+            )
+
+        assertTrue(state.canSubmit)
+    }
+
+    @Test
+    fun `invalid IBAN cannot be submitted`() {
+        val state =
+            AddBankAccountFormState(
+                accountHolderName = "Ahmet Karagünlü",
+                ibanBody = "470000100100000350930001",
+                isIbanValid = false,
             )
 
         assertFalse(state.canSubmit)

@@ -10,6 +10,10 @@ import androidx.compose.ui.res.stringResource
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.wallet.presentation.components.content.MoneyActionBottomSheetContent
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletUiState
+import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentCurrencySelector
+import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentQuoteSummary
+import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.MoneyActionMethodType
+import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.MoneyActionMethodUi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,7 +22,7 @@ internal fun AddMoneyBottomSheet(
     uiState: TouristWalletUiState,
     onAmountChange: (String) -> Unit,
     onPresetAmountClick: (Int) -> Unit,
-    onChangeCardClick: () -> Unit,
+    onChargeCurrencySelected: (String) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: (Long) -> Unit,
 ) {
@@ -32,13 +36,42 @@ internal fun AddMoneyBottomSheet(
             title = stringResource(R.string.add_money_title),
             amountText = uiState.topUpAmount,
             onAmountChange = onAmountChange,
-            actionButtonText = stringResource(R.string.continue_to_secure_payment),
+            actionButtonText =
+                stringResource(
+                    if (uiState.topUpQuote == null) {
+                        R.string.payment_get_quote
+                    } else {
+                        R.string.continue_to_secure_payment
+                    },
+                ),
             helperText = stringResource(R.string.add_money_info_text),
-            selectedMethod = uiState.selectedMethod,
+            selectedMethod =
+                MoneyActionMethodUi(
+                    id = "hosted-card",
+                    title = stringResource(R.string.hosted_card_payment),
+                    subtitle = stringResource(R.string.hosted_card_selection_notice),
+                    type = MoneyActionMethodType.CARD,
+                ),
             presetAmounts = listOf(100, 250, 500, 1000),
             onPresetAmountClick = onPresetAmountClick,
-            onChangeMethodClick = onChangeCardClick,
+            onChangeMethodClick = { },
             onConfirm = onConfirm,
+            showChangeMethodAction = false,
+            isActionInProgress = uiState.isPaymentActionInProgress,
+            extraContent = {
+                PaymentCurrencySelector(
+                    currencies = uiState.chargeCurrencies,
+                    selectedCurrencyCode = uiState.selectedChargeCurrencyCode,
+                    onCurrencySelected = onChargeCurrencySelected,
+                )
+                uiState.topUpQuote?.let { quote -> PaymentQuoteSummary(quote = quote) }
+                uiState.paymentActionError?.let { errorMessage ->
+                    androidx.compose.material3.Text(
+                        text = errorMessage,
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
         )
     }
 }

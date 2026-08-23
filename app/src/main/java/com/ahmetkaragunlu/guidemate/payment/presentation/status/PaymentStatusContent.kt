@@ -33,22 +33,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentAttemptStatus
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentAttemptUiModel
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentStatusUiModel
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentUiStatus
 
 @Composable
 internal fun PaymentStatusContent(
-    attempt: PaymentAttemptUiModel?,
+    payment: PaymentStatusUiModel?,
+    statusMessage: String?,
     onPrimaryAction: () -> Unit,
     onSecondaryAction: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val presentation = paymentStatusPresentation(attempt?.status)
-    val isPaymentSuccessful = attempt?.status == PaymentAttemptStatus.SUCCEEDED
+    val presentation = paymentStatusPresentation(payment?.status)
+    val isPaymentSuccessful = payment?.status == PaymentUiStatus.SUCCEEDED
     val shouldShowVersion =
-        attempt?.status == PaymentAttemptStatus.REDIRECTING ||
-            attempt?.status == PaymentAttemptStatus.VERIFYING
+        payment?.status == PaymentUiStatus.VERIFYING
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -131,15 +131,15 @@ internal fun PaymentStatusContent(
                     textAlign = TextAlign.Center,
                 )
                 Text(
-                    text = stringResource(presentation.descriptionResId),
+                    text = statusMessage ?: stringResource(presentation.descriptionResId),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorResource(R.color.text_color),
                     textAlign = TextAlign.Center,
                 )
 
-                attempt?.let {
+                payment?.let {
                     Text(
-                        text = it.amountMinor.toPlatformCurrencyFromMinorUnit(),
+                        text = it.amountMinor.toCurrencyFromMinorUnit(it.currencyCode),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(R.color.brand_color),
@@ -148,7 +148,7 @@ internal fun PaymentStatusContent(
                         text =
                             stringResource(
                                 R.string.payment_reference_format,
-                                it.paymentAttemptId.take(8).uppercase(),
+                                it.paymentId.take(8).uppercase(),
                             ),
                         style = MaterialTheme.typography.bodySmall,
                         color = colorResource(R.color.text_color),

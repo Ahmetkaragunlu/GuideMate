@@ -8,18 +8,18 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.auth.presentation.changepassword.ChangePasswordScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.account.helpsupport.HelpSupportScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements.LegalAgreementsScreen
-import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.about.AboutScreen
-import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.BankAccountsScreen
+import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.about.GuideAboutScreen
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.GuideBankAccountsScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.helpsupport.model.guideFaqEntries
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.legalagreements.model.guideLegalClauses
 import com.ahmetkaragunlu.guidemate.notification.presentation.guide.settings.GuideNotificationSettingsScreen
 
 internal fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {
     composable<GuideAccountDestination.BankAccounts> {
-        BankAccountsScreen()
+        GuideBankAccountsScreen()
     }
     composable<GuideAccountDestination.About> {
-        AboutScreen(onSaved = onAboutSaved)
+        GuideAboutScreen(onSaved = onAboutSaved)
     }
     composable<GuideAccountDestination.ChangePassword> {
         ChangePasswordScreen()

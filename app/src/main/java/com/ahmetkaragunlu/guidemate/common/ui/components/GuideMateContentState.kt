@@ -27,6 +27,7 @@ fun GuideMateContentState(
     state: ContentLoadState,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    errorMessage: String? = null,
     content: @Composable () -> Unit,
 ) {
     when (state) {
@@ -35,6 +36,7 @@ fun GuideMateContentState(
             RequestStateContent(
                 isLoading = false,
                 onRetry = onRetry,
+                errorMessage = errorMessage,
                 modifier = modifier,
             )
         ContentLoadState.CONTENT -> content()
@@ -46,6 +48,7 @@ private fun RequestStateContent(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
     onRetry: () -> Unit = {},
+    errorMessage: String? = null,
 ) {
     val brandColor = colorResource(R.color.brand_color)
     Column(
@@ -75,6 +78,13 @@ private fun RequestStateContent(
                     style = Stroke(width = 4.dp.toPx()),
                 )
             }
+        }
+        if (!isLoading && errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = colorResource(R.color.text_color),
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
         Text(
             text =

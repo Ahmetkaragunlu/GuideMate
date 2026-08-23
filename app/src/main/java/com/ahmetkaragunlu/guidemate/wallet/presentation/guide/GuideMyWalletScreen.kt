@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -11,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -40,11 +44,15 @@ fun GuideMyWalletScreen(
     var withdrawAmount by rememberSaveable { mutableStateOf("") }
     var amountAwaitingConfirmation by rememberSaveable { mutableStateOf<Long?>(null) }
     var showInsufficientBalanceDialog by rememberSaveable { mutableStateOf(false) }
+    var showMissingBankAccountDialog by rememberSaveable { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val actionErrorMessage = uiState.actionErrorMessage
 
     GuideMateContentState(
         state = uiState.loadState,
         onRetry = viewModel::refresh,
+        errorMessage = uiState.errorMessage,
     ) {}
     if (uiState.loadState != ContentLoadState.CONTENT) {
         return
@@ -56,11 +64,31 @@ fun GuideMyWalletScreen(
         }
     }
 
+    LaunchedEffect(actionErrorMessage) {
+        if (actionErrorMessage != null) {
+            viewModel.clearActionError()
+            snackbarHostState.showSnackbar(actionErrorMessage)
+        }
+    }
+
+    LaunchedEffect(uiState.isWithdrawalRequestSubmitted) {
+        if (uiState.isWithdrawalRequestSubmitted) {
+            withdrawAmount = ""
+            showBottomSheet = false
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         GuideMyWalletContent(
             uiState = uiState,
             earnings = earnings,
-            onWithdrawClick = { showBottomSheet = true },
+            onWithdrawClick = {
+                if (uiState.defaultMethod == null) {
+                    showMissingBankAccountDialog = true
+                } else {
+                    showBottomSheet = true
+                }
+            },
             onNavigateToEarnings = onNavigateToEarnings,
             onNavigateToTransactions = onNavigateToTransactions,
         )
@@ -84,8 +112,17 @@ fun GuideMyWalletScreen(
                         amountAwaitingConfirmation = amountMinor
                     }
                 },
+                isActionInProgress = uiState.isWithdrawalInProgress,
             )
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-24).dp),
+        )
 
         if (showInsufficientBalanceDialog) {
             EditAlertDialog(
@@ -116,11 +153,9 @@ fun GuideMyWalletScreen(
                     TextButton(
                         onClick = {
                             amountAwaitingConfirmation = null
-                            if (viewModel.requestWithdrawal(amountMinor)) {
-                                withdrawAmount = ""
-                                showBottomSheet = false
-                            }
+                            viewModel.requestWithdrawal(amountMinor)
                         },
+                        enabled = !uiState.isWithdrawalInProgress,
                     ) {
                         Text(
                             text = stringResource(R.string.yes),
@@ -155,6 +190,22 @@ fun GuideMyWalletScreen(
                     }
                 },
                 onDismissRequest = viewModel::dismissWithdrawalConfirmation,
+            )
+        }
+
+        if (showMissingBankAccountDialog) {
+            EditAlertDialog(
+                title = R.string.bank_account_required_title,
+                text = R.string.bank_account_required_description,
+                confirmButton = {
+                    TextButton(onClick = { showMissingBankAccountDialog = false }) {
+                        Text(
+                            text = stringResource(R.string.ok),
+                            color = colorResource(R.color.brand_color),
+                        )
+                    }
+                },
+                onDismissRequest = { showMissingBankAccountDialog = false },
             )
         }
     }

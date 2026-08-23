@@ -22,8 +22,11 @@ import com.ahmetkaragunlu.guidemate.navigation.components.BottomBarItem
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
+import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
+import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
+import com.ahmetkaragunlu.guidemate.payment.presentation.recovery.PaymentRecoveryViewModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Compass
 import compose.icons.tablericons.Home
@@ -37,6 +40,7 @@ fun TouristNavigation(
     onLogoutClick: () -> Unit,
     homeViewModel: TouristHomeViewModel = hiltViewModel(),
     chatListViewModel: ChatListViewModel = hiltViewModel(),
+    paymentRecoveryViewModel: PaymentRecoveryViewModel = hiltViewModel(),
 ) {
     val touristNavController = rememberNavController()
     val navBackStackEntry by touristNavController.currentBackStackEntryAsState()
@@ -44,6 +48,8 @@ fun TouristNavigation(
     val navigationUiConfig = currentDestination.touristNavigationUiConfig()
     val userName by homeViewModel.userName.collectAsStateWithLifecycle()
     val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
+    val pendingPaymentId by
+        paymentRecoveryViewModel.pendingPaymentId.collectAsStateWithLifecycle()
     val activeChatId =
         navBackStackEntry
             ?.takeIf { it.destination.hasRoute<ChatDestination.Detail>() }
@@ -53,6 +59,16 @@ fun TouristNavigation(
 
     LaunchedEffect(chatListViewModel) {
         chatListViewModel.setViewerRole(UserRole.TOURIST)
+    }
+
+    LaunchedEffect(pendingPaymentId, currentDestination?.route) {
+        val paymentId = pendingPaymentId ?: return@LaunchedEffect
+        if (!currentDestination.isPaymentFlowDestination()) {
+            paymentRecoveryViewModel.onRecoveryNavigationHandled()
+            touristNavController.navigateTo(
+                TouristPaymentDestination.Status(paymentId = paymentId),
+            )
+        }
     }
 
     Scaffold(
@@ -103,6 +119,13 @@ fun TouristNavigation(
         }
     }
 }
+
+private fun NavDestination?.isPaymentFlowDestination(): Boolean =
+    this != null &&
+        (hasRoute<TouristPaymentDestination.Checkout>() ||
+            hasRoute<TouristPaymentDestination.Hosted>() ||
+            hasRoute<TouristPaymentDestination.Status>() ||
+            hasRoute<TouristPaymentDestination.Success>())
 
 private enum class TouristBottomBarDestination {
     HOME,

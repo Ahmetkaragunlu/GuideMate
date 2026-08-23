@@ -5,6 +5,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 
 data class GuideWalletTransactionsUiState(
     val loadState: ContentLoadState = ContentLoadState.LOADING,
+    val errorMessage: String? = null,
     val transactions: List<WalletTransactionUiModel> = emptyList(),
     val page: Int = 0,
     val isLastPage: Boolean = true,

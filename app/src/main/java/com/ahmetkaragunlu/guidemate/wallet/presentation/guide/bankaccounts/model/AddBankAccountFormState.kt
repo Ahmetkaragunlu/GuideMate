@@ -16,8 +16,7 @@ data class AddBankAccountFormState(
         get() =
             isAccountHolderNameValid &&
                 isIbanComplete &&
-                isIbanValid &&
-                !bankName.isNullOrBlank()
+                isIbanValid
 
     private companion object {
         const val IBAN_BODY_LENGTH = 24

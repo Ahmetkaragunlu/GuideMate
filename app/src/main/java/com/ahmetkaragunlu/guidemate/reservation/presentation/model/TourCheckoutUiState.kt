@@ -1,10 +1,11 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.model
 
 import androidx.annotation.StringRes
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.payment.presentation.model.SavedPaymentCardUiModel
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentMethod
+import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrency
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentQuote
+import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentLaunch
 
 data class TourCheckoutUiState(
     val loadState: ContentLoadState = ContentLoadState.LOADING,
@@ -17,10 +18,14 @@ data class TourCheckoutUiState(
     val availableCapacity: Int = 0,
     val walletBalanceMinor: Long = 0,
     val walletCurrencyCode: String = "USD",
-    val savedCards: List<SavedPaymentCardUiModel> = emptyList(),
-    val selectedMethod: PaymentMethod = PaymentMethod.SAVED_CARD,
-    val selectedCardId: String? = null,
+    val chargeCurrencies: List<CheckoutCurrency> = emptyList(),
+    val selectedChargeCurrencyCode: String? = null,
+    val quote: PaymentQuote? = null,
+    val selectedMethod: PaymentMethod = PaymentMethod.HOSTED_CARD,
     val termsAccepted: Boolean = false,
+    val isPaymentActionInProgress: Boolean = false,
+    val paymentActionError: String? = null,
+    val paymentLaunch: PaymentLaunch? = null,
     @param:StringRes val validationErrorResId: Int? = null,
 ) {
     val totalMinor: Long

@@ -8,17 +8,14 @@ import org.junit.Test
 
 class TouristWalletUiStateTest {
     @Test
-    fun `default card stays independent from temporary transaction selection`() {
+    fun `provider default card is shown first without local payment selection`() {
         val defaultCard = card(cardId = "default", isDefault = true)
-        val temporaryCard = card(cardId = "temporary", isDefault = false)
         val state =
             TouristWalletUiState(
-                savedCards = listOf(defaultCard, temporaryCard),
-                selectedCardId = temporaryCard.cardId,
+                savedCards = listOf(card(cardId = "other", isDefault = false), defaultCard),
             )
 
         assertEquals(defaultCard.cardId, state.defaultCard?.cardId)
-        assertEquals(temporaryCard.cardId, state.selectedMethod?.id)
     }
 
     private fun card(

@@ -82,14 +82,6 @@ class TouristSavedCardsViewModel
             runMutation { repository.makeDefault(cardId) }
         }
 
-        fun onShowAddCardSheet() {
-            mutableUiState.update { it.copy(isAddCardBottomSheetVisible = true) }
-        }
-
-        fun onDismissAddCardSheet() {
-            mutableUiState.update { it.copy(isAddCardBottomSheetVisible = false) }
-        }
-
         fun onErrorShown() {
             mutableUiState.update { it.copy(errorMessage = null) }
         }

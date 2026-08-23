@@ -7,75 +7,54 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentAttemptStatus
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentPurpose
-import kotlinx.coroutines.delay
-
-private const val MOCK_PAYMENT_STEP_DELAY_MILLIS = 5_000L
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentPurpose
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentUiStatus
 
 @Composable
 fun PaymentStatusScreen(
+    onHostedCheckoutRequired: (String) -> Unit,
     onPaymentSucceeded: (String) -> Unit,
     onExitPayment: () -> Unit,
-    onPaymentUnavailable: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PaymentStatusViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val attempt = uiState.attempt
-    val shouldBlockBackNavigation =
-        when (attempt?.status) {
-            PaymentAttemptStatus.REDIRECTING,
-            PaymentAttemptStatus.VERIFYING,
-            PaymentAttemptStatus.SUCCEEDED,
-            -> true
-            else -> false
-        }
+    val payment = uiState.payment
 
-    BackHandler(enabled = shouldBlockBackNavigation) { }
-    LaunchedEffect(attempt?.status) {
-        when (attempt?.status) {
-            PaymentAttemptStatus.REDIRECTING -> {
-                delay(MOCK_PAYMENT_STEP_DELAY_MILLIS)
-                viewModel.markProviderRedirectCompleted()
-            }
-            PaymentAttemptStatus.VERIFYING -> {
-                delay(MOCK_PAYMENT_STEP_DELAY_MILLIS)
-                viewModel.markMockVerificationCompleted()
-            }
-            PaymentAttemptStatus.SUCCEEDED -> {
-                onPaymentSucceeded(attempt.paymentAttemptId)
-            }
-            else -> Unit
+    BackHandler(enabled = payment?.status == PaymentUiStatus.VERIFYING) { }
+
+    LaunchedEffect(uiState.shouldOpenHostedCheckout, payment?.paymentId) {
+        if (uiState.shouldOpenHostedCheckout && payment != null) {
+            onHostedCheckoutRequired(payment.paymentId)
+        }
+    }
+    LaunchedEffect(payment?.status) {
+        if (payment?.status == PaymentUiStatus.SUCCEEDED) {
+            onPaymentSucceeded(payment.paymentId)
         }
     }
 
-    PaymentStatusContent(
-        attempt = attempt,
-        onPrimaryAction = {
-            when (attempt?.status) {
-                PaymentAttemptStatus.FAILED,
-                PaymentAttemptStatus.TIMEOUT,
-                -> viewModel.retryPayment()
-                PaymentAttemptStatus.CANCELLED,
-                -> onExitPayment()
-                PaymentAttemptStatus.SUCCEEDED ->
-                    onPaymentSucceeded(attempt.paymentAttemptId)
-                null -> onPaymentUnavailable()
-                else -> Unit
-            }
-        },
-        onSecondaryAction = {
-            when (attempt?.status) {
-                PaymentAttemptStatus.REDIRECTING -> viewModel.cancelPayment()
-                PaymentAttemptStatus.FAILED,
-                PaymentAttemptStatus.TIMEOUT,
-                -> onExitPayment()
-                else -> Unit
-            }
-        },
+    GuideMateContentState(
+        state =
+            when {
+                uiState.isLoading -> ContentLoadState.LOADING
+                uiState.errorMessage != null -> ContentLoadState.ERROR
+                else -> ContentLoadState.CONTENT
+            },
+        onRetry = viewModel::refresh,
         modifier = modifier,
-    )
+        errorMessage = uiState.errorMessage,
+    ) {
+        PaymentStatusContent(
+            payment = payment,
+            statusMessage = uiState.statusMessage,
+            onPrimaryAction = onExitPayment,
+            onSecondaryAction = onExitPayment,
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
@@ -86,20 +65,29 @@ fun PaymentSuccessScreen(
     viewModel: PaymentStatusViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val attempt = uiState.attempt
+    val payment = uiState.payment
 
-    BackHandler(enabled = attempt != null) { }
+    BackHandler(enabled = payment != null) { }
 
-    PaymentStatusContent(
-        attempt = attempt,
-        onPrimaryAction = {
-            if (attempt == null) {
-                onPaymentUnavailable()
-            } else {
-                onFinished(attempt.purpose)
-            }
-        },
-        onSecondaryAction = { },
+    GuideMateContentState(
+        state =
+            when {
+                uiState.isLoading -> ContentLoadState.LOADING
+                uiState.errorMessage != null -> ContentLoadState.ERROR
+                else -> ContentLoadState.CONTENT
+            },
+        onRetry = viewModel::refresh,
         modifier = modifier,
-    )
+        errorMessage = uiState.errorMessage,
+    ) {
+        PaymentStatusContent(
+            payment = payment,
+            statusMessage = uiState.statusMessage,
+            onPrimaryAction = {
+                if (payment == null) onPaymentUnavailable() else onFinished(payment.purpose)
+            },
+            onSecondaryAction = { },
+            modifier = modifier,
+        )
+    }
 }

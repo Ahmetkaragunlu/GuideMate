@@ -12,10 +12,10 @@ import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.account.helpsupport.model.faqEntries
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.account.legalagreements.model.legalClauses
 import com.ahmetkaragunlu.guidemate.notification.presentation.tourist.settings.TouristNotificationSettingsScreen
-import com.ahmetkaragunlu.guidemate.payment.presentation.savedpaymentmethod.SavedCardsScreen
+import com.ahmetkaragunlu.guidemate.payment.presentation.savedpaymentmethod.TouristSavedCardsScreen
 
 internal fun NavGraphBuilder.touristAccountNavGraph(accountNavController: NavController) {
-    composable<TouristAccountDestination.SavedCards> { SavedCardsScreen() }
+    composable<TouristAccountDestination.SavedCards> { TouristSavedCardsScreen() }
     composable<TouristAccountDestination.ChangePassword> {
         ChangePasswordScreen()
     }

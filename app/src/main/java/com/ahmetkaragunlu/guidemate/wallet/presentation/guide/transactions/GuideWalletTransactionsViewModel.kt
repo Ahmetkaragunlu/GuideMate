@@ -3,8 +3,10 @@ package com.ahmetkaragunlu.guidemate.wallet.presentation.guide.transactions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
+import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.guide.GuideWalletStore
+import com.ahmetkaragunlu.guidemate.wallet.domain.repository.GuideFinanceRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.model.WalletTransactionUiModel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.transactions.model.GuideWalletTransactionFilter
@@ -25,7 +27,8 @@ class GuideWalletTransactionsViewModel
     @Inject
     constructor(
         private val repository: WalletRepository,
-        private val walletStore: GuideWalletStore,
+        financeRepository: GuideFinanceRepository,
+        private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val mutableUiState = MutableStateFlow(GuideWalletTransactionsUiState())
         val uiState: StateFlow<GuideWalletTransactionsUiState> = mutableUiState.asStateFlow()
@@ -34,7 +37,7 @@ class GuideWalletTransactionsViewModel
         init {
             refresh()
             viewModelScope.launch {
-                walletStore.state.collect { updateVisibleTransactions() }
+                financeRepository.financeChanges.collect { refresh() }
             }
         }
 
@@ -54,6 +57,10 @@ class GuideWalletTransactionsViewModel
             mutableUiState.update { it.copy(selectedFilter = filter) }
         }
 
+        fun clearError() {
+            mutableUiState.update { it.copy(errorMessage = null) }
+        }
+
         private fun loadPage(
             page: Int,
             replace: Boolean,
@@ -61,7 +68,7 @@ class GuideWalletTransactionsViewModel
             viewModelScope.launch {
                 mutableUiState.update {
                     if (replace) {
-                        it.copy(loadState = ContentLoadState.LOADING)
+                        it.copy(loadState = ContentLoadState.LOADING, errorMessage = null)
                     } else {
                         it.copy(isAppending = true)
                     }
@@ -77,6 +84,7 @@ class GuideWalletTransactionsViewModel
                                 page = result.data.page,
                                 isLastPage = result.data.isLast,
                                 isAppending = false,
+                                errorMessage = null,
                             )
                         }
                         updateVisibleTransactions()
@@ -87,6 +95,7 @@ class GuideWalletTransactionsViewModel
                                 loadState =
                                     if (replace) ContentLoadState.ERROR else ContentLoadState.CONTENT,
                                 isAppending = false,
+                                errorMessage = result.error.toMessage(resourceProvider),
                             )
                         }
                 }
@@ -97,8 +106,7 @@ class GuideWalletTransactionsViewModel
             mutableUiState.update {
                 it.copy(
                     transactions =
-                        (walletStore.state.value.pendingWithdrawals + canonicalTransactions)
-                            .sortedByDescending { transaction -> transaction.occurredAt },
+                        canonicalTransactions.sortedByDescending { transaction -> transaction.occurredAt },
                 )
             }
         }

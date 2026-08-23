@@ -36,8 +36,10 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
+import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentCurrencySelector
+import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentQuoteSummary
 import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentMethod
 
 @Composable
 internal fun TourCheckoutContent(
@@ -45,8 +47,7 @@ internal fun TourCheckoutContent(
     onDecreaseParticipant: () -> Unit,
     onIncreaseParticipant: () -> Unit,
     onPaymentMethodSelected: (PaymentMethod) -> Unit,
-    onCardSelected: (String) -> Unit,
-    onManageCardsClick: () -> Unit,
+    onChargeCurrencySelected: (String) -> Unit,
     onTermsAcceptedChange: (Boolean) -> Unit,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
@@ -77,9 +78,15 @@ internal fun TourCheckoutContent(
             CheckoutPaymentMethodSection(
                 uiState = uiState,
                 onPaymentMethodSelected = onPaymentMethodSelected,
-                onCardSelected = onCardSelected,
-                onManageCardsClick = onManageCardsClick,
             )
+            if (uiState.selectedMethod == PaymentMethod.HOSTED_CARD) {
+                PaymentCurrencySelector(
+                    currencies = uiState.chargeCurrencies,
+                    selectedCurrencyCode = uiState.selectedChargeCurrencyCode,
+                    onCurrencySelected = onChargeCurrencySelected,
+                )
+                uiState.quote?.let { PaymentQuoteSummary(quote = it) }
+            }
             TermsRow(
                 checked = uiState.termsAccepted,
                 onCheckedChange = onTermsAcceptedChange,
@@ -91,12 +98,28 @@ internal fun TourCheckoutContent(
                     color = MaterialTheme.colorScheme.error,
                 )
             }
+            uiState.paymentActionError?.let { errorMessage ->
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             CheckoutTotal(totalMinor = uiState.totalMinor)
         }
 
         EditButton(
-            text = R.string.continue_to_secure_payment,
+            text =
+                if (
+                    uiState.selectedMethod == PaymentMethod.HOSTED_CARD &&
+                        uiState.quote == null
+                ) {
+                    R.string.payment_get_quote
+                } else {
+                    R.string.continue_to_secure_payment
+                },
             onClick = onContinue,
+            isLoading = uiState.isPaymentActionInProgress,
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_extra_large)),
         )
     }

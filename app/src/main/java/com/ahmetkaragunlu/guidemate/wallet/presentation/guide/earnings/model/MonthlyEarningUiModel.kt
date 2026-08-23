@@ -8,6 +8,7 @@ data class MonthlyEarningUiModel(
     val year: Int,
     val month: Int,
     val amountMinor: Long,
+    val currencyCode: String,
 )
 
 fun MonthlyEarningUiModel.toPeriodLabel(locale: Locale = Locale.getDefault()): String =

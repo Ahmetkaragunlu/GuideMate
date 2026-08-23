@@ -16,12 +16,16 @@ internal fun NavGraphBuilder.guideWalletNavGraph(
 ) {
     composable<GuideWalletDestination.Earnings> {
         val earningsUiState = earningsViewModel.uiState.collectAsStateWithLifecycle()
-        GuideEarningsScreen(uiState = earningsUiState.value)
+        GuideEarningsScreen(
+            uiState = earningsUiState.value,
+            onRetry = earningsViewModel::refresh,
+            onYearSelected = earningsViewModel::selectYear,
+        )
     }
     composable<GuideWalletDestination.Wallet> {
         val earningsUiState = earningsViewModel.uiState.collectAsStateWithLifecycle()
         GuideMyWalletScreen(
-            earnings = earningsUiState.value.allEarnings,
+            earnings = earningsUiState.value.walletPreviewEarnings,
             onNavigateToEarnings = {
                 navController.navigateTo(GuideWalletDestination.Earnings)
             },

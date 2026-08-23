@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.wallet.presentation.components.model
 
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.SavedPaymentCardUiModel
-import com.ahmetkaragunlu.guidemate.wallet.data.mock.guide.model.BankAccountUiModel
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.model.BankAccountUiModel
 
 fun SavedPaymentCardUiModel.toMoneyActionMethodUi(): MoneyActionMethodUi =
     MoneyActionMethodUi(

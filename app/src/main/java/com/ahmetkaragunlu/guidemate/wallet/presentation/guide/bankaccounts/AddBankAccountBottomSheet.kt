@@ -40,6 +40,7 @@ internal fun AddBankAccountBottomSheet(
     onIbanChange: (String) -> Unit,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    isSubmitting: Boolean,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -72,15 +73,11 @@ internal fun AddBankAccountBottomSheet(
                 value = formState.ibanBody,
                 onValueChange = onIbanChange,
                 placeholderResId = R.string.iban_placeholder,
-                isError =
-                    formState.isIbanComplete &&
-                        (!formState.isIbanValid || formState.bankName == null),
+                isError = formState.isIbanComplete && !formState.isIbanValid,
                 supportingTextResId =
                     when {
                         formState.isIbanComplete && !formState.isIbanValid ->
                             R.string.iban_error_message
-                        formState.isIbanComplete && formState.bankName == null ->
-                            R.string.iban_bank_not_recognized
                         else -> null
                     },
                 keyboardOptions =
@@ -113,6 +110,7 @@ internal fun AddBankAccountBottomSheet(
                 text = R.string.add_bank_account_action,
                 onClick = onConfirm,
                 enabled = formState.canSubmit,
+                isLoading = isSubmitting,
             )
         }
     }

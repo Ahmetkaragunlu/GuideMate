@@ -2,7 +2,8 @@ package com.ahmetkaragunlu.guidemate.navigation.tourist.payment
 
 import kotlinx.serialization.Serializable
 
-const val PAYMENT_ATTEMPT_ID_ARGUMENT = "paymentAttemptId"
+const val PAYMENT_ID_ARGUMENT = "paymentId"
+const val OPEN_HOSTED_IF_REQUIRED_ARGUMENT = "openHostedIfRequired"
 
 object TouristPaymentDestination {
     @Serializable data object Wallet
@@ -15,12 +16,18 @@ object TouristPaymentDestination {
     )
 
     @Serializable
+    data class Hosted(
+        val paymentId: String,
+    )
+
+    @Serializable
     data class Status(
-        val paymentAttemptId: String,
+        val paymentId: String,
+        val openHostedIfRequired: Boolean = true,
     )
 
     @Serializable
     data class Success(
-        val paymentAttemptId: String,
+        val paymentId: String,
     )
 }

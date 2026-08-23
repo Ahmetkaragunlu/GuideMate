@@ -31,15 +31,12 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
-import com.ahmetkaragunlu.guidemate.payment.presentation.model.SavedPaymentCardUiModel
-import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentMethod
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 
 @Composable
 internal fun CheckoutPaymentMethodSection(
     uiState: TourCheckoutUiState,
     onPaymentMethodSelected: (PaymentMethod) -> Unit,
-    onCardSelected: (String) -> Unit,
-    onManageCardsClick: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))) {
         Text(
@@ -61,40 +58,12 @@ internal fun CheckoutPaymentMethodSection(
             onClick = { onPaymentMethodSelected(PaymentMethod.WALLET) },
         )
         PaymentMethodOption(
-            title = stringResource(R.string.saved_card_payment),
+            title = stringResource(R.string.hosted_card_payment),
             subtitle = stringResource(R.string.secure_payment_provider_short),
             icon = Icons.Default.CreditCard,
-            selected = uiState.selectedMethod == PaymentMethod.SAVED_CARD,
-            onClick = { onPaymentMethodSelected(PaymentMethod.SAVED_CARD) },
+            selected = uiState.selectedMethod == PaymentMethod.HOSTED_CARD,
+            onClick = { onPaymentMethodSelected(PaymentMethod.HOSTED_CARD) },
         )
-
-        if (uiState.selectedMethod == PaymentMethod.SAVED_CARD) {
-            if (uiState.savedCards.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.checkout_no_card),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colorResource(R.color.text_color),
-                )
-                Text(
-                    text = stringResource(R.string.add_card),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.brand_color),
-                    modifier =
-                        Modifier
-                            .clickable(onClick = onManageCardsClick)
-                            .padding(vertical = dimensionResource(R.dimen.spacing_tiny)),
-                )
-            } else {
-                uiState.savedCards.forEach { card ->
-                    SavedCardOption(
-                        card = card,
-                        selected = card.cardId == uiState.selectedCardId,
-                        onClick = { onCardSelected(card.cardId) },
-                    )
-                }
-            }
-        }
     }
 }
 
@@ -162,43 +131,6 @@ private fun PaymentMethodOption(
                     RadioButtonDefaults.colors(
                         selectedColor = colorResource(R.color.brand_color),
                     ),
-            )
-        }
-    }
-}
-
-@Composable
-private fun SavedCardOption(
-    card: SavedPaymentCardUiModel,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = onClick,
-            colors =
-                RadioButtonDefaults.colors(
-                    selectedColor = colorResource(R.color.brand_color),
-                ),
-        )
-        Column {
-            Text(
-                text = card.displayName,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = card.maskedCardNumber,
-                style = MaterialTheme.typography.bodySmall,
-                color = colorResource(R.color.text_color),
             )
         }
     }

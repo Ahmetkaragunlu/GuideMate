@@ -25,10 +25,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.components.MonthlyEarningItem
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.GuideEarningsUiState
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
@@ -48,17 +46,9 @@ import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.toP
 @Composable
 fun GuideEarningsContent(
     uiState: GuideEarningsUiState,
+    onYearSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val availableYears =
-        (listOf(uiState.currentMonth) + uiState.history)
-            .map(MonthlyEarningUiModel::year)
-            .distinct()
-            .sortedDescending()
-    var selectedYear by rememberSaveable { mutableIntStateOf(uiState.currentMonth.year) }
-    val selectedYearHistory =
-        uiState.history.filter { earning -> earning.year == selectedYear }
-
     LazyColumn(
         modifier =
             modifier
@@ -72,18 +62,18 @@ fun GuideEarningsContent(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
         item {
-            CurrentMonthEarningsCard(earning = uiState.currentMonth)
+            uiState.currentMonth?.let { CurrentMonthEarningsCard(earning = it) }
         }
 
         item {
             EarningsHistoryHeader(
-                availableYears = availableYears,
-                selectedYear = selectedYear,
-                onYearSelected = { year -> selectedYear = year },
+                availableYears = uiState.availableYears,
+                selectedYear = uiState.selectedYear,
+                onYearSelected = onYearSelected,
             )
         }
 
-        if (selectedYearHistory.isEmpty()) {
+        if (uiState.history.isEmpty()) {
             item {
                 Text(
                     text = stringResource(R.string.earnings_empty_year),
@@ -94,12 +84,12 @@ fun GuideEarningsContent(
             }
         } else {
             itemsIndexed(
-                items = selectedYearHistory,
+                items = uiState.history,
                 key = { _, earning -> earning.year * 100 + earning.month },
             ) { index, earning ->
                 MonthlyEarningItem(
                     earning = earning,
-                    showDivider = index < selectedYearHistory.lastIndex,
+                    showDivider = index < uiState.history.lastIndex,
                 )
             }
         }
@@ -216,7 +206,7 @@ private fun CurrentMonthEarningsCard(
                 color = colorResource(R.color.text_color),
             )
             Text(
-                text = earning.amountMinor.toPlatformCurrencyFromMinorUnit(),
+                text = earning.amountMinor.toCurrencyFromMinorUnit(earning.currencyCode),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF888DED),

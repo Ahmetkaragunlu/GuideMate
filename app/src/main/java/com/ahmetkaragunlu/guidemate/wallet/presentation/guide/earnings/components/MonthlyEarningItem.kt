@@ -16,7 +16,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.toPeriodLabel
 
@@ -41,7 +41,7 @@ fun MonthlyEarningItem(
             fontWeight = FontWeight.Bold,
         )
         Text(
-            text = "+${earning.amountMinor.toPlatformCurrencyFromMinorUnit()}",
+            text = "+${earning.amountMinor.toCurrencyFromMinorUnit(earning.currencyCode)}",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF388E3C),
