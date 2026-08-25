@@ -194,7 +194,10 @@ private fun ToursContent(
                         isLoadingMore ->
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(dimensionResource(R.dimen.spacing_medium)),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     CircularProgressIndicator(
@@ -312,7 +315,10 @@ private fun GuidesContent(
                     if (isLoadingMore) {
                         item {
                             Box(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(dimensionResource(R.dimen.spacing_medium)),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 CircularProgressIndicator(color = colorResource(R.color.brand_color))

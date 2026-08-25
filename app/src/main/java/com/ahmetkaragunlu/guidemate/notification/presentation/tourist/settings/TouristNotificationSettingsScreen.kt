@@ -1,84 +1,103 @@
 package com.ahmetkaragunlu.guidemate.notification.presentation.tourist.settings
 
-import androidx.compose.foundation.layout.Arrangement
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
+import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationPreferencesUiState
+import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationPreferencesViewModel
+import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationSettingsSectionTitle
+import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationSettingsSwitchRow
 
 @Composable
 fun TouristNotificationSettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: TouristNotificationSettingsViewModel = hiltViewModel(),
+    viewModel: NotificationPreferencesViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    LaunchedEffect(uiState.userMessage) {
+        uiState.userMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            viewModel.onMessageShown()
+        }
+    }
 
-    TouristNotificationSettingsContent(
+    GuideMateContentState(
+        state = uiState.loadState,
+        onRetry = viewModel::refresh,
+        errorMessage = uiState.userMessage,
         modifier = modifier,
-        uiState = uiState,
-        onUpcomingReminderChanged = viewModel::onUpcomingReminderChanged,
-        onGuideMessagesChanged = viewModel::onGuideMessagesChanged,
-        onReservationUpdatesChanged = viewModel::onReservationUpdatesChanged,
-        onReviewRequestsChanged = viewModel::onReviewRequestsChanged,
-    )
+    ) {
+        TouristNotificationSettingsContent(
+            uiState = uiState,
+            onUpcomingReminderChanged = viewModel::updateUpcomingTourReminders,
+            onGuideMessagesChanged = viewModel::updateChatMessages,
+            onReservationUpdatesChanged = viewModel::updateReservationUpdates,
+            onReviewRequestsChanged = viewModel::updateReviewRequests,
+        )
+    }
 }
 
 @Composable
 private fun TouristNotificationSettingsContent(
     modifier: Modifier = Modifier,
-    uiState: TouristNotificationSettingsUiState,
+    uiState: NotificationPreferencesUiState,
     onUpcomingReminderChanged: (Boolean) -> Unit,
     onGuideMessagesChanged: (Boolean) -> Unit,
     onReservationUpdatesChanged: (Boolean) -> Unit,
     onReviewRequestsChanged: (Boolean) -> Unit,
 ) {
+    val preferences = checkNotNull(uiState.preferences)
     Column(
         modifier =
             modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
     ) {
-        SectionTitle(title = stringResource(id = R.string.notification_tours_and_reservations))
+        NotificationSettingsSectionTitle(
+            title = stringResource(R.string.notification_tours_and_reservations),
+        )
 
-        SettingsSwitchRow(
+        NotificationSettingsSwitchRow(
             title = stringResource(id = R.string.upcoming_tour_reminders),
             subtitle = stringResource(id = R.string.upcoming_tour_reminders_desc),
-            isChecked = uiState.upcomingReminder,
+            isChecked = preferences.upcomingTourRemindersEnabled,
             onCheckedChange = onUpcomingReminderChanged,
+            enabled = !uiState.isUpdating,
         )
-        SettingsSwitchRow(
+        NotificationSettingsSwitchRow(
             title = stringResource(id = R.string.guide_messages),
             subtitle = stringResource(id = R.string.guide_messages_desc),
-            isChecked = uiState.guideMessages,
+            isChecked = preferences.chatMessagesEnabled,
             onCheckedChange = onGuideMessagesChanged,
+            enabled = !uiState.isUpdating,
         )
-        SettingsSwitchRow(
+        NotificationSettingsSwitchRow(
             title = stringResource(id = R.string.reservation_updates),
             subtitle = stringResource(id = R.string.reservation_updates_desc),
-            isChecked = uiState.reservationUpdates,
+            isChecked = preferences.reservationUpdatesEnabled,
             onCheckedChange = onReservationUpdatesChanged,
+            enabled = !uiState.isUpdating,
         )
 
         HorizontalDivider(
@@ -87,86 +106,25 @@ private fun TouristNotificationSettingsContent(
             modifier = Modifier.padding(vertical = 12.dp),
         )
 
-        SectionTitle(title = stringResource(id = R.string.account_and_interaction))
+        NotificationSettingsSectionTitle(
+            title = stringResource(R.string.account_and_interaction),
+        )
 
-        SettingsSwitchRow(
+        NotificationSettingsSwitchRow(
             title = stringResource(id = R.string.review_requests),
             subtitle = stringResource(id = R.string.review_requests_desc),
-            isChecked = uiState.reviewRequests,
+            isChecked = preferences.reviewRequestsEnabled,
             onCheckedChange = onReviewRequestsChanged,
+            enabled = !uiState.isUpdating,
         )
-        SettingsSwitchRow(
+        NotificationSettingsSwitchRow(
             title = stringResource(id = R.string.security_alerts),
             subtitle = stringResource(id = R.string.security_alerts_desc),
-            isChecked = uiState.securityAlerts,
+            isChecked = preferences.securityAlertsEnabled,
             onCheckedChange = {},
             enabled = false,
         )
 
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-    }
-}
-
-@Composable
-private fun SectionTitle(
-    title: String,
-) {
-    Text(
-        text = title,
-        color = colorResource(id = R.color.brand_color),
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(start = 20.dp, top = 20.dp),
-    )
-}
-
-@Composable
-private fun SettingsSwitchRow(
-    title: String,
-    subtitle: String,
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    enabled: Boolean = true,
-) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .padding(end = 16.dp),
-        ) {
-            Text(
-                text = title,
-                color = if (enabled) Color.Unspecified else colorResource(id = R.color.text_color),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = subtitle,
-                color = colorResource(id = R.color.text_color),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-        }
-
-        Switch(
-            checked = isChecked,
-            onCheckedChange = onCheckedChange,
-            enabled = enabled,
-            colors =
-                SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                    checkedTrackColor = colorResource(id = R.color.brand_color),
-                    uncheckedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                    uncheckedTrackColor = Color(0xFFE0E0E0),
-                    disabledCheckedTrackColor = colorResource(id = R.color.brand_color).copy(alpha = 0.5f),
-                    disabledCheckedThumbColor = Color(0xFFF5F5F5),
-                ),
-        )
     }
 }

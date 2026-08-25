@@ -177,7 +177,10 @@ private fun AboutSection(
                 modifier =
                     Modifier
                         .clickable(onClick = onExpandAboutClick)
-                        .padding(top = 4.dp, start = 8.dp),
+                        .padding(
+                            top = dimensionResource(R.dimen.spacing_tiny),
+                            start = dimensionResource(R.dimen.spacing_small),
+                        ),
             )
         }
     }
@@ -192,7 +195,7 @@ private fun LanguagesSection(
             text = stringResource(R.string.about_languages_title),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
         Row(

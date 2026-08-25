@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.chat.presentation.model
 
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatConversation
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessage
 import java.time.Instant
@@ -9,7 +10,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-internal fun ChatConversation.toChatUiModel(currentUserId: String): ChatUiModel? {
+internal fun ChatConversation.toChatUiModel(currentUserId: Long): ChatUiModel? {
     val remoteParticipant = otherParticipant(currentUserId) ?: return null
     val lastMessage = lastMessage
 
@@ -19,15 +20,16 @@ internal fun ChatConversation.toChatUiModel(currentUserId: String): ChatUiModel?
         name = remoteParticipant.displayName,
         lastMessage = lastMessage?.text.orEmpty(),
         time = lastMessage?.sentAt?.toConversationTime().orEmpty(),
-        avatarResId = remoteParticipant.avatarResId,
+        avatarResId = R.drawable.example,
         avatarUrl = remoteParticipant.avatarUrl,
-        unreadCount = unreadCount(currentUserId),
+        unreadCount = unreadCount,
     )
 }
 
-internal fun ChatMessage.toMessageUiModel(currentUserId: String): MessageUiModel =
+internal fun ChatMessage.toMessageUiModel(currentUserId: Long): MessageUiModel =
     MessageUiModel(
         messageId = messageId,
+        clientMessageId = clientMessageId,
         text = text,
         time = sentAt.toMessageTime(),
         isFromMe = senderId == currentUserId,

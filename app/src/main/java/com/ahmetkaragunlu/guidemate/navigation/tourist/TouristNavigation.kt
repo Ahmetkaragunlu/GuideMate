@@ -1,11 +1,17 @@
 package com.ahmetkaragunlu.guidemate.navigation.tourist
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -19,14 +25,19 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.navigation.components.AppBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.components.AppTopBar
 import com.ahmetkaragunlu.guidemate.navigation.components.BottomBarItem
-import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
+import com.ahmetkaragunlu.guidemate.navigation.notification.toTouristDestination
 import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
 import com.ahmetkaragunlu.guidemate.payment.presentation.recovery.PaymentRecoveryViewModel
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationViewModel
+import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationSyncEffect
+import com.ahmetkaragunlu.guidemate.notification.presentation.components.NotificationBottomSheet
+import com.ahmetkaragunlu.guidemate.notification.presentation.permission.NotificationPermissionEffect
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Compass
 import compose.icons.tablericons.Home
@@ -38,16 +49,23 @@ import compose.icons.tablericons.User
 fun TouristNavigation(
     routeNavController: NavController,
     onLogoutClick: () -> Unit,
+    pendingNotificationTarget: NotificationNavigationTarget?,
+    onNotificationNavigationHandled: (NotificationNavigationTarget) -> Unit,
     homeViewModel: TouristHomeViewModel = hiltViewModel(),
     chatListViewModel: ChatListViewModel = hiltViewModel(),
     paymentRecoveryViewModel: PaymentRecoveryViewModel = hiltViewModel(),
+    notificationViewModel: NotificationViewModel = hiltViewModel(),
 ) {
+    NotificationPermissionEffect()
+    NotificationSyncEffect(notificationViewModel::refresh)
     val touristNavController = rememberNavController()
+    val context = LocalContext.current
     val navBackStackEntry by touristNavController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val navigationUiConfig = currentDestination.touristNavigationUiConfig()
     val userName by homeViewModel.userName.collectAsStateWithLifecycle()
     val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
+    val notificationUiState by notificationViewModel.uiState.collectAsStateWithLifecycle()
     val pendingPaymentId by
         paymentRecoveryViewModel.pendingPaymentId.collectAsStateWithLifecycle()
     val activeChatId =
@@ -56,9 +74,21 @@ fun TouristNavigation(
             ?.toRoute<ChatDestination.Detail>()
             ?.chatId
     val activeChat = chatListUiState.chats.firstOrNull { it.chatId == activeChatId }
+    var showNotifications by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(chatListViewModel) {
-        chatListViewModel.setViewerRole(UserRole.TOURIST)
+    LaunchedEffect(pendingNotificationTarget) {
+        pendingNotificationTarget?.let { target ->
+            target.notificationId?.let(notificationViewModel::markRead)
+            touristNavController.navigateTo(target.toTouristDestination())
+            onNotificationNavigationHandled(target)
+        }
+    }
+
+    LaunchedEffect(notificationUiState.errorMessage) {
+        notificationUiState.errorMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            notificationViewModel.onMessageShown()
+        }
     }
 
     LaunchedEffect(pendingPaymentId, currentDestination?.route) {
@@ -71,21 +101,25 @@ fun TouristNavigation(
         }
     }
 
-    Scaffold(
-        topBar = {
-            AppTopBar(
+    Box {
+        Scaffold(
+            topBar = {
+                AppTopBar(
                 config =
                     navigationUiConfig.topBar.copy(
                         chatTitle = activeChat?.name.orEmpty(),
                         chatAvatarResId = activeChat?.avatarResId ?: R.drawable.example,
+                        chatAvatarUrl = activeChat?.avatarUrl,
                     ),
                 userName = userName,
                 onBackClick = touristNavController::navigateUp,
-                onLogoutClick = onLogoutClick,
-            )
-        },
-        bottomBar = {
-            if (navigationUiConfig.showBottomBar) {
+                    onLogoutClick = onLogoutClick,
+                    unreadNotificationCount = notificationUiState.unreadCount,
+                    onNotificationClick = { showNotifications = true },
+                )
+            },
+            bottomBar = {
+                if (navigationUiConfig.showBottomBar) {
                 val selectedDestination = currentDestination.touristBottomBarDestination()
                 AppBottomBar(
                     selectedDestination = selectedDestination,
@@ -102,21 +136,36 @@ fun TouristNavigation(
                         )
                     },
                 )
-            }
-        },
-    ) { innerPadding ->
-        NavHost(
+                }
+            },
+        ) { innerPadding ->
+            NavHost(
             navController = touristNavController,
             startDestination = TouristDestination.Home,
             modifier = Modifier.padding(innerPadding),
-        ) {
-            touristNavGraph(
+            ) {
+                touristNavGraph(
                 touristNavController = touristNavController,
                 routeNavController = routeNavController,
                 homeViewModel = homeViewModel,
                 chatListViewModel = chatListViewModel,
-            )
+                )
+            }
         }
+
+        NotificationBottomSheet(
+            isVisible = showNotifications,
+            uiState = notificationUiState,
+            onDismiss = { showNotifications = false },
+            onNotificationClick = { target ->
+                showNotifications = false
+                target.notificationId?.let(notificationViewModel::markRead)
+                touristNavController.navigateTo(target.toTouristDestination())
+            },
+            onMarkAllRead = notificationViewModel::markAllRead,
+            onRefresh = notificationViewModel::refresh,
+            onLoadMore = notificationViewModel::loadMore,
+        )
     }
 }
 

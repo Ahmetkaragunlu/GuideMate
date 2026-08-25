@@ -2686,12 +2686,12 @@ Guncel durumlar:
 | Faz 4 - Tour ve guide tour yonetimi | `KISMEN TAMAMLANDI` | Repository, guide list/detail/publish/edit/lifecycle/dashboard, cover media, mock mutation temizligi ve kalite kapilari tamam; calisan backend ile authenticated cihaz E2E kaniti bekleniyor |
 | Faz 5 - Tourist discovery ve public tour | `KISMEN TAMAMLANDI` | Repository, home/popular, gercek tour search/filter/pagination, public session detail, read-only yorumlar, public profil turlari, checkout session yenilemesi, mock katalog temizligi ve otomatik kalite kapilari tamam; calisan backend ve cihaz E2E kaniti bekleniyor |
 | Faz 6 - Reservation ve trips | `KISMEN TAMAMLANDI` | Repository, upcoming/past pagination, reservation snapshot detail, typed reservation route, idempotent cancellation, refund sonucu ve mock temizligi tamam; backend/cihaz E2E ile Faz 9 payment baglantisi bekleniyor |
-| Faz 7 - Review | `KISMEN TAMAMLANDI` | Submit repository/DTO, reservation eligibility UI, mevcut review bottom sheet, canonical reservation/review ve local tourist projection refresh tamam; cihaz E2E ile Faz 12 remote guide invalidation bekleniyor |
+| Faz 7 - Review | `KISMEN TAMAMLANDI` | Submit repository/DTO, reservation eligibility UI, mevcut review bottom sheet, canonical reservation/review, local tourist projection refresh ve Faz 12 remote guide invalidation kodu tamam; iki cihazli FCM E2E kaniti bekleniyor |
 | Faz 8 - Wallet ve saved payment method | `KISMEN TAMAMLANDI` | Iki rolde canonical wallet/history ve turist saved-method list/default/delete kodu tamam; proje sonu cihaz E2E ile Faz 9 hosted kart kaydetme kaniti bekleniyor |
 | Faz 9 - Payment, hosted checkout ve top-up | `KISMEN TAMAMLANDI` | Payment repository/DTO, quote ve currency secimi, hosted WebView, canonical polling/recovery, tour checkout ve wallet top-up kodu tamam; proje sonu iyzico Sandbox/cihaz E2E kaniti bekleniyor |
 | Faz 10 - Guide finance | `KISMEN TAMAMLANDI` | Finance repository/DTO, earnings projection, banka hesabi ve withdrawal kodu tamam; proje sonu backend/cihaz E2E kaniti bekleniyor |
-| Faz 11 - Chat | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
-| Faz 12 - Notification | `BEKLIYOR` | Uygulama ve dogrulama baslamadi |
+| Faz 11 - Chat | `KISMEN TAMAMLANDI` | Chat REST repository, optimistic pending/failed/retry, cursor history, read/unread, ortak badge, authenticated STOMP reconnect/resubscribe, REST resync ve Faz 12 semantic FCM chat target kodu tamam; proje sonu iki cihazli REST/STOMP/FCM E2E kaniti bekleniyor |
+| Faz 12 - Notification | `KISMEN TAMAMLANDI` | REST history/unread/read/preferences, authenticated FID kaydi, ortak iki rol paneli, FCM receiver/channel/permission, typed semantic navigation ve hizli kalite kapilari tamam; merkezi hata gruplama, otomatik test gozden gecirmesi ve proje sonu cihaz/FCM E2E kaniti bekleniyor |
 
 ### Capraz-Faz Bagimlilik ve Geri Donus Kurali
 
@@ -2718,7 +2718,8 @@ Capraz-faz takip kaydi su formatta tutulur:
 | MEDIA-PROFILE-01 | Faz 2 | Faz 3 | Avatar local URI upload sonucu `mediaAssetId` ile profile patch'e baglandi; patch hatasinda yeni sahipsiz medya temizlenip eski avatar korunuyor | Guide avatar degisikliginin own/public profile'da iki cihazdan canonical URL ile gorunmesi | `KOD TAMAMLANDI - E2E BEKLIYOR` |
 | MEDIA-TOUR-01 | Faz 2 | Faz 4 ve 5 | Cover local URI once upload ediliyor; create/change request yalniz `mediaAssetId` tasiyor ve basarisiz request'in sahipsiz yeni medyasi kontrollu siliniyor | Publish/edit sonrasi guide ve tourist tour gorunumlerinin ayni canonical cover URL'yi gostermesi | `KOD TAMAMLANDI - BACKEND/CIHAZ E2E BEKLIYOR` |
 | RESERVATION-PAYMENT-01 | Faz 6 | Faz 9 | Trips/detail/cancel canonical reservation repository'sine gecti; yeni satin alim hosted veya wallet payment sonucunu canonical backend status'u ve reservation durumu ile dogruluyor | Basarili payment sonrasi reservation'in backend listesinde gorunmesi; cancel/refund sonrasi reservation, payment ve wallet state'lerinin birlikte yenilenmesi | `KOD TAMAMLANDI - SANDBOX/CIHAZ E2E BEKLIYOR` |
-| REVIEW-NOTIFICATION-01 | Faz 7 | Faz 12 | Review submit ayni turist oturumundaki reservation, tour, popular/search ve public guide projection'larini dar review change akisi ile yeniliyor; baska cihazdaki acik guide dashboard/profile backend notification event'inin FCM invalidation'ini bekliyor | Turist yorumu sonrasi guide cihazinda bildirim ve canonical dashboard/profile puaninin uygulamayi yeniden baslatmadan yenilenmesi | `FAZ 12 BEKLIYOR` |
+| REVIEW-NOTIFICATION-01 | Faz 7 | Faz 12 | Review submit ayni turist oturumundaki reservation, tour, popular/search ve public guide projection'larini dar review change akisi ile yeniliyor; notification push event'i acik guide dashboard/profile projection'larini canonical backend kaynagindan yeniliyor | Turist yorumu sonrasi guide cihazinda bildirim ve canonical dashboard/profile puaninin uygulamayi yeniden baslatmadan yenilenmesi | `KOD TAMAMLANDI - IKI CIHAZLI FCM E2E BEKLIYOR` |
+| CHAT-NOTIFICATION-01 | Faz 11 | Faz 12 | Uygulama acikken REST/STOMP chat, conversation last-message, read ve unread badge akisi tamamlandi; background/kapali durum semantic `chatId` teslimi typed FCM hedefiyle baglandi | FCM chat bildiriminin canonical `chatId` ile mevcut typed detail destination'ini acmasi, yetkisiz/silinmis hedefte guvenli fallback ve REST resync | `KOD TAMAMLANDI - IKI CIHAZLI REST/STOMP/FCM E2E BEKLIYOR` |
 | WALLET-PAYMENT-01 | Faz 8 | Faz 9 | Saved-method list/default/delete provider metadata repository'sine gecti; gecici FAB kaldirildi ve kart kaydi yalniz hosted iyzico satin alma/top-up akisina baglandi | Hosted checkout'ta kart kaydetme sonrasi kartin saved-method listesinde gorunmesi ve wallet/checkout ekranlarinin canonical listeyi yenilemesi | `KOD TAMAMLANDI - SANDBOX/CIHAZ E2E BEKLIYOR` |
 | WALLET-FINANCE-01 | Faz 8 | Faz 10 | Rehber wallet, banka hesabi, aylik kazanc ve withdrawal akislari `GuideFinanceRepository` ile backend otoritesine baglandi; `GuideWalletStore` ve local bakiye mutasyonu kaldirildi | Banka hesabi islemleri ile idempotent withdrawal sonrasi canonical wallet ve hareketlerin cihazda yenilenmesi | `KOD TAMAMLANDI - BACKEND/CIHAZ E2E BEKLIYOR` |
 
@@ -3172,8 +3173,8 @@ Uygulama sonucu:
   tasiyan ayri projection olarak korunur.
 - Backend yeni review icin guide notification event'i uretir. Baska cihazda
   acik guide dashboard/profile'in anlik invalidation'i
-  `REVIEW-NOTIFICATION-01` ile Faz 12 FCM entegrasyonuna baglidir; ekran yeniden
-  acildiginda mevcut repository zaten canonical projection'i okur.
+  `REVIEW-NOTIFICATION-01` ile Faz 12 FCM push event'ine baglandi; iki cihazli
+  teslimat ve projection yenileme E2E kaniti proje sonuna ertelidir.
 - JDK 21 ile `ktfmtCheck`, ana/test kaynak derlemesi, `lintDebug` ve
   `assembleDebug` kapilari gecti. Test task'lari kullanici karariyla tum fazlar
   ve final tasarim/kod denetimi sonrasina ertelendi.
@@ -3504,6 +3505,35 @@ Mock temizleme kapisi:
 - Mesaj gonderme yalniz acik detail listesini degil conversation last-message
   ve unread state'ini de canonical kaynaktan guncellemeden faz tamamlanmaz.
 
+Uygulama sonucu (2026-08-25):
+
+- Ortak `ChatRepository`; conversation list/find-or-create, cursor history,
+  REST send/read ve total unread endpoint'lerine baglandi. Domain modelleri
+  Retrofit DTO, Android drawable ve role bridge'inden ayrildi.
+- Mesaj `clientMessageId` ile once `PENDING` olarak gorunuyor; REST ACK veya
+  sender'a geri gelen STOMP event'i ayni kaydi canonical server ID/time ile
+  `SENT` yapiyor. Ag hatasi `FAILED` ve ayni idempotency kimligiyle retry
+  davranisina donusuyor.
+- OkHttp WebSocket uzerindeki sinirli STOMP adapter `/ws` endpoint'ine guncel
+  bearer JWT ile CONNECT oluyor, iki private queue'ya abone oluyor ve kopusta
+  bounded reconnect sonrasi conversation/unread/acik history REST resync
+  yapiyor. Socket kalici veri kaynagi yapilmadi.
+- Chat list/detail ve bottom-bar badge ayni repository Flow'larindan besleniyor.
+  `isFromMe`, authenticated `UserRepository.userId` ile mapper'da uretiliyor;
+  sohbet acilinca backend read state ve badge canonical olarak yenileniyor.
+- Public guide profilindeki mevcut mesaj butonu yeni ekran eklenmeden
+  `find-or-create -> chatId -> ChatDestination.Detail` akisina baglandi.
+  Remote avatar ortak `GuideMateImage` siniriyla liste ve topbar'a yansiyor.
+- `ChatStore`, `ChatMockData`, Hans/Ahmet runtime verileri, mock current-user ID
+  ve graph-provided viewer role tamamen kaldirildi.
+- DTO mapper, STOMP frame codec ve repository optimistic/pagination testleri
+  eklendi. `ktfmtCheck`, `compileDebugKotlin`, `testDebugUnitTest`, `lintDebug`
+  ve `assembleDebug` kapilari gecti.
+- Iki kullanicili LAN testi, gercek STOMP reconnect ve app background/kapali
+  FCM chat bildirimi proje sonu kabul turuna aittir. FCM semantic `chatId`
+  hedefinin Faz 12 kodu tamamlandi; iki cihazli REST/STOMP/FCM E2E kaniti
+  olmadan Faz 11 `TAMAMLANDI` sayilmaz.
+
 ### Faz 12 - Notification, FCM ve Semantic Navigation
 
 Notification son feature fazidir; cunku tur, reservation, payment, chat ve
@@ -3514,9 +3544,10 @@ Yapilacaklar:
 
 - `NotificationRepository`; paged history, unread count, read/read-all,
   preferences ve device FCM registration islemlerini kapsar.
-- Firebase Installation ID ve FCM token backend'e authenticated device
-  registration ile gonderilir; logout/account switch'te registration temizligi
-  uygulanir.
+- Canli backend sozlesmesine uygun olarak Firebase Installation ID ve GuideMate
+  installation ID authenticated device registration ile gonderilir. Logout'ta
+  backend registration'i pasiflestirir; Android local notification state'ini
+  temizler. Ayni logout icin ikinci bir unregister istegi atilmaz.
 - FCM receiver payload'i bildirim metnini yerellestirilmis Android resource ve
   backend semantic type/target ID ile guvenli sekilde sunar.
 - `actorDisplayName` dogrudan notification DTO'sundan map edilir; ek user
@@ -3538,12 +3569,58 @@ Mock temizleme kapisi:
 - Uygulama foreground, background ve kapali durum FCM hedefleri; read/unread
   senkronizasyonu ve logout device temizligi dogrulanmadan faz tamamlanmaz.
 
+Uygulama sonucu (2026-08-25):
+
+- Ortak `NotificationRepository`; sayfali history, unread count, tekil/toplu
+  read, iki rol preference sozlesmesi ve authenticated cihaz kaydina baglandi.
+  History ve unread sayaci ayni canonical repository Flow'larindan besleniyor.
+- Guide ve tourist ayni notification bottom sheet'ini kullaniyor. Yeni bir
+  notification ekrani acilmadi; guide ana sayfa son hareketleri de ayni
+  repository verisinden uretiliyor. Paneli acmak toplu okuma yapmiyor; tekil
+  tiklama yalniz ilgili bildirimi, acik aksiyon ise tumunu okuyor.
+- Data-only FCM mesaji ortak `FirebaseMessagingService` ile isleniyor. Android
+  13+ runtime izin akisi, notification channel, bildirim cubuguna uygun ikon ve
+  yerellestirilmis type metinleri eklendi. Izin reddi uygulama ici REST history
+  ve preference akisini engellemiyor; push icin WorkManager eklenmedi.
+- System notification basligi ve guvenli govdesi her `NotificationType` icin
+  Android XML resource'undan cozulur. Type'lar domain'deki TOUR, CHAT, COMMENT,
+  RATING, PAYMENT, SECURITY ve GENERAL gorsel kategorilerine tek noktada map
+  edilir; Compose ve system drawable katmanlari ayni kategoriyi kullanir.
+  Gecici small icon mevcut Android launcher kimliginden uretilmistir ve gercek
+  GuideMate ikonu hazirlandiginda yalniz notification app icon kaynagi
+  degistirilir.
+- Uygulama foreground'a dondugunde ve notification paneli acildiginda history
+  ile unread sayaci REST kaynagindan yenilenir. Boylece FCM gecikse veya sistem
+  izni kapali olsa bile uygulama ici bildirim state'i canonical backend ile
+  tekrar eslenir.
+- Payload'daki semantic type ile `chatId`, `tourId`, `sessionId`,
+  `reservationId` ve `paymentId` merkezi coordinator tarafindan mevcut typed
+  destination'lara cevriliyor. Ham backend route'u veya UI metni navigate
+  edilmiyor; eksik/desteklenmeyen hedef rol ana ekranina guvenli donuyor.
+- Uygulama kapali veya background durumdaki notification intent'i
+  `MainActivity` tarafindan aliniyor; auth/root hazir olana kadar hedef
+  coordinator'da bekletiliyor. Hedef acilirken yalniz ilgili notification read
+  yapiliyor.
+- Review/rating, guide dashboard/profile ve chat push event'leri ilgili
+  canonical repository projection'larini yeniliyor. FCM kalici veri kaynagi
+  degil; REST history ve unread sayaci otorite olmaya devam ediyor.
+- Review notification payload'i ilgili guide tur detayina gidebilmek icin
+  `sessionId` tasir. Basarili sifre degistirme ve sifre sifirlama islemleri
+  backend'de gercek `SECURITY_ALERT` history/push olayi uretir.
+- Eski guide notification mock listesi, local ayar ViewModel'leri, manuel
+  unread state'i, sabit actor verileri ve bunlardan kalan bos paketler
+  kaldirildi.
+- `ktfmtCheck`, `compileDebugKotlin`, `lintDebug` ve `assembleDebug` kapilari
+  gecti. Kararlastirilan merkezi hata mesaji gruplama ve otomatik test
+  envanteri bir sonraki kapanis adimidir; fiziksel cihaz, iki kullanici,
+  background/kapali FCM ve semantic target E2E turu proje sonuna ertelidir.
+
 Faz 12 kapanis ve final test hatirlatma kapisi:
 
-- Faz 12 kodu, ilgili otomatik testleri ve hizli kalite kapilari tamamlandiginda
-  kullaniciya acikca su hatirlatma yapilir: "Tum feature fazlarinin kodu bitti;
-  proje geneli otomatik ve kullanici test envanterini birlikte gozden gecirip
-  final test turuna baslayacaktik."
+- Faz 12 feature kodu ve hizli kalite kapilari tamamlandiginda kullaniciya
+  acikca su hatirlatma yapilir: "Tum feature fazlarinin kodu bitti; once merkezi
+  hata mesaji gruplama ile otomatik kod test envanterini gozden gecirecek,
+  kapsamli kullanici/cihaz/E2E test turunu ise proje sonu yapacaktik."
 - Ayni kapanista merkezi hata mesajlari icin final refactor karari yeniden
   gorusulur. Ortak `ApiErrorParser`, `AppError`, `BackendErrorCode` ve ekranlarin
   `error.toMessage(resourceProvider)` giris noktasi korunur; buyuyen mesaj
@@ -4191,6 +4268,64 @@ olarak kalamaz.
   authoritative amount/currency degeri backend sozlesmesinden gelir.
 - En az varsayilan locale ve Ingilizce cihaz locale'inde kritik akislar tasma,
   kirpilma ve anlamsiz sabit Turkce metin acisindan kontrol edilir.
+
+### Final Gorsel Regresyon Envanteri
+
+Final tasarim kontrolu yalniz yeni tam ekranlari kapsamaz. Backend entegrasyonu
+sonucunda gorunumu veya state'i degisen asagidaki tum yuzeyler emulator ve en az
+bir fiziksel cihazda tek tek kontrol edilir:
+
+Uygulama sirasi once gercek kullanici gibi uctan uca kabul testlerini
+tamamlamaktir. Bu testler sirasinda gorulen ve dogrulanan gorsel maddeler ayni
+anda envanterde `GECTI` veya `DUZELTILDI` olarak isaretlenir. Kullanici testleri
+bittikten sonra yalniz hic gorulmeyen cihaz/state kombinasyonlari ile supheli
+kalan tasarim maddeleri hedefli gorsel regresyon turunda kontrol edilir. Boylece
+ayni akis gereksiz yere bastan tekrarlanmaz ve envanterde kontrol edilmemis bir
+durum kalmaz.
+
+- Ortak tam ekran istek durumu: 36 dp brand color loading dairesi doner ve
+  altinda XML kaynakli `Yukleniyor` metni bulunur. Error durumunda 36 dp sabit
+  refresh oku ile XML kaynakli `Tekrar Dene` metni text color kullanir; yalniz
+  ikon ve metnin olusturdugu hedef tiklanabilir, tum sayfa tiklanabilir olmaz.
+  Empty, append-loading, append-retry ve mevcut veri uzerindeki non-blocking
+  refresh durumlari ayri ayri gorulur.
+- Notification: Android sistem cubugundaki gecici app small icon, GuideMate app
+  etiketi, type'a ozel XML baslik/govde, TOUR/CHAT/COMMENT/RATING/PAYMENT/
+  SECURITY/GENERAL kategori ikonu ve notr ikon rengi kontrol edilir. Foreground,
+  background ve kapali uygulama bildirimi; topbar badge, ortak notification
+  bottom sheet ve guide ana sayfa son hareketleri ayni read/unread sonucunu
+  gostermelidir. Gercek GuideMate app ikonu teslim edildiginde launcher ve
+  notification small icon birlikte yeniden kontrol edilir.
+- Payment: tour checkout ve wallet top-up para birimi secimi, backend quote,
+  platform USD tutari ile charge TRY/EUR tutarinin birbirine karismamasi,
+  secili dilde hosted iyzico WebView, loading/polling/recovery ve SUCCESS/
+  FAILED/CANCELLED/TIMEOUT/REFUND/MANUAL_REVIEW sonuc ekranlari kontrol edilir.
+  Saved payment method liste/default/delete gorunumu korunur; standalone kart
+  ekleme FAB'i veya native ham kart formu geri gelmez.
+- Wallet ve guide payout: iki rolde bakiye, transaction filtre/listesi,
+  reference title, top-up, guide earnings, banka hesabi, varsayilan hesap,
+  withdraw bottom sheet, yetersiz bakiye, onay ve sonuc dialoglari canonical
+  amount/currency/status ile tutarli gorunur.
+- Tour/discovery/reservation/review: home kartlari, search/filter sonuc listesi,
+  pagination, tour detail, guide public profile, publish/edit adimlari,
+  capacity/booked count, reservation snapshot/detail/cancel ve review bottom
+  sheet ayni canonical kaynagin role uygun alanlarini gosterir. Satin alinmis,
+  kapali, dolu, iptal ve tamamlanmis durumlarda butonlar dogru gorunur.
+- Chat: bos liste/detay, conversation last message, unread badge, topbar ad ve
+  avatar, optimistic PENDING, SENT, FAILED ve yalniz basarisiz mesajdaki retry
+  tasarimi; uzun mesaj, klavye, scroll ve iki cihazli anlik mesaj gorunumu
+  kontrol edilir.
+- Profil ve media: local/remote avatar ile tur kapak gorseli, loading/error
+  drawable fallback, upload progress/error/retry, guide performance/level,
+  guide/tourist profil onizleme ve account ekranlari kontrol edilir.
+- Ortak UI: topbar/bottom bar gorunurlugu, geri tusu, typed notification hedefi,
+  dialog, bottom sheet, snackbar/toast, picker, switch/radio/checkbox renkleri,
+  LazyColumn, klavye ve portrait/landscape davranisi mevcut GuideMate tasarimiyla
+  karsilastirilir. Tum gorunen metinler XML kaynagindan gelir; text, brand,
+  border ve notr renkler tanimli kaynaklardan kullanilir.
+
+Bu envanterdeki her madde icin `GECTI`, `DUZELTILDI` veya kanitli bir `ERTELENDI`
+sonucu yazilmadan final tasarim kontrolu tamamlanmis sayilmaz.
 
 ### Final Kanit Kaydi
 

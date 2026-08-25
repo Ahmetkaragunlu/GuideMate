@@ -99,6 +99,7 @@ dependencies {
   // Push notifications
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.messaging)
+  implementation(libs.firebase.installations)
 
   // Google Places
   implementation(libs.places)

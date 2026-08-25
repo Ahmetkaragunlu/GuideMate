@@ -5,7 +5,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.guide.account.GuideAccountStart
@@ -19,7 +18,7 @@ import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewMode
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.GuideEarningsViewModel
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeScreen
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeViewModel
-import com.ahmetkaragunlu.guidemate.notification.presentation.guide.viewmodel.GuideNotificationsViewModel
+import com.ahmetkaragunlu.guidemate.notification.presentation.model.NotificationUiModel
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.GuideProfileScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.preview.GuideProfilePreviewScreen
@@ -29,16 +28,15 @@ internal fun NavGraphBuilder.guideNavGraph(
     routeNavController: NavController,
     homeViewModel: GuideHomeViewModel,
     earningsViewModel: GuideEarningsViewModel,
-    notificationsViewModel: GuideNotificationsViewModel,
+    recentNotifications: List<NotificationUiModel>,
     chatListViewModel: ChatListViewModel,
     onBackActionChanged: ((() -> Unit)?) -> Unit,
 ) {
     composable<GuideDestination.Home> {
         val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
-        val notificationsUiState by notificationsViewModel.uiState.collectAsStateWithLifecycle()
         GuideHomeScreen(
             uiState = homeUiState,
-            recentNotifications = notificationsUiState.recentNotifications,
+            recentNotifications = recentNotifications,
             onNavigateToEarnings = {
                 guideNavController.navigateTo(GuideWalletDestination.Earnings)
             },
@@ -52,10 +50,11 @@ internal fun NavGraphBuilder.guideNavGraph(
             onNavigateToDetail = { chatId ->
                 guideNavController.navigateTo(ChatDestination.Detail(chatId))
             },
+            onRetry = chatListViewModel::refresh,
         )
     }
     composable<ChatDestination.Detail> {
-        ChatDetailScreen(viewerRole = UserRole.GUIDE)
+        ChatDetailScreen()
     }
     composable<GuideDestination.Profile> {
         GuideProfileScreen(

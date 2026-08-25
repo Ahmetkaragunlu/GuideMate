@@ -164,7 +164,7 @@ private fun MoneyAmountField(
             Text(
                 text = currencySymbol,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(end = 16.dp),
+                modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_medium)),
                 color = Color.DarkGray,
             )
         },
@@ -265,7 +265,7 @@ private fun SelectedMethodCard(
                     Modifier
                         .clip(RoundedCornerShape(4.dp))
                         .clickable(onClick = onChangeMethodClick)
-                        .padding(4.dp),
+                        .padding(dimensionResource(R.dimen.spacing_tiny)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(

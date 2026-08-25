@@ -35,8 +35,8 @@ fun EditDropdown(
             value = value,
             colors =
                 OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFeeedf1),
-                    unfocusedBorderColor = Color(0xFFeeedf1),
+                    focusedBorderColor = colorResource(R.color.border_color),
+                    unfocusedBorderColor = colorResource(R.color.border_color),
                     cursorColor = Color.Transparent,
                     unfocusedTextColor = colorResource(R.color.text_color),
                 ),

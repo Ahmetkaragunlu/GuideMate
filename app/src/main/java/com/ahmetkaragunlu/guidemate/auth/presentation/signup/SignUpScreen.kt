@@ -220,7 +220,7 @@ private fun TermsBottomSheet(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                    .padding(horizontal = 24.dp, vertical = dimensionResource(R.dimen.spacing_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -229,7 +229,7 @@ private fun TermsBottomSheet(
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             Column(
                 modifier =
                     Modifier

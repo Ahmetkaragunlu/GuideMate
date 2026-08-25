@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 
 data class ChatUiModel(
     val chatId: String,
-    val remoteUserId: String,
+    val remoteUserId: Long,
     val name: String,
     val lastMessage: String,
     val time: String,

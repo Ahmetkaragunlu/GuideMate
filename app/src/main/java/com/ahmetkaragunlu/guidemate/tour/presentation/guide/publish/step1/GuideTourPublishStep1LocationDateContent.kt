@@ -174,8 +174,8 @@ private fun Step1LocationField(
         },
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
                 cursorColor = Color.Transparent,
                 unfocusedTextColor = colorResource(R.color.text_color),
             ),

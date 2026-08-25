@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.chat.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,12 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.chat.presentation.model.ChatUiModel
+import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 
 @Composable
 fun ChatListItem(
@@ -45,8 +44,9 @@ fun ChatListItem(
                 .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(id = chatItem.avatarResId),
+        GuideMateImage(
+            fallbackImageResId = chatItem.avatarResId,
+            imageUrl = chatItem.avatarUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier =
@@ -67,7 +67,7 @@ fun ChatListItem(
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
             Text(
                 text = chatItem.lastMessage,
                 style = MaterialTheme.typography.bodyMedium,

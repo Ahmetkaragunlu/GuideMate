@@ -147,8 +147,8 @@ private fun Step3TourNameField(
         keyboardOptions = KeyboardOptions.Default,
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
             ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         modifier = Modifier.fillMaxWidth(),
@@ -274,8 +274,8 @@ private fun Step3DescriptionField(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
             ),
         modifier =
             Modifier

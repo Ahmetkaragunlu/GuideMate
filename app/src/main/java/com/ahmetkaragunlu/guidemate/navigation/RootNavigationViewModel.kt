@@ -9,6 +9,9 @@ import com.ahmetkaragunlu.guidemate.auth.domain.repository.AuthRepository
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.OnboardingRepository
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.navigation.auth.AuthStartDestination
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,10 +38,14 @@ class RootNavigationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val onboardingRepository: OnboardingRepository,
+    private val notificationRepository: NotificationRepository,
+    private val notificationNavigationCoordinator: NotificationNavigationCoordinator,
 ) : ViewModel() {
     private var authStartDestination = AuthStartDestination.SIGN_IN
     private val _uiState = MutableStateFlow(RootNavigationUiState())
     val uiState: StateFlow<RootNavigationUiState> = _uiState.asStateFlow()
+    val pendingNotificationTarget: StateFlow<NotificationNavigationTarget?> =
+        notificationNavigationCoordinator.pendingTarget
 
     init {
         viewModelScope.launch {
@@ -50,7 +57,12 @@ class RootNavigationViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
+            notificationRepository.clearLocalState()
         }
+    }
+
+    fun onNotificationNavigationHandled(target: NotificationNavigationTarget) {
+        notificationNavigationCoordinator.consume(target)
     }
 
     fun completeOnboarding() {

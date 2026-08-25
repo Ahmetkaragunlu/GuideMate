@@ -6,7 +6,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
@@ -75,6 +74,7 @@ internal fun NavGraphBuilder.touristNavGraph(
             onNavigateToDetail = { chatId ->
                 touristNavController.navigateTo(ChatDestination.Detail(chatId))
             },
+            onRetry = chatListViewModel::refresh,
         )
     }
     composable<TouristDestination.Profile> {
@@ -97,7 +97,7 @@ internal fun NavGraphBuilder.touristNavGraph(
         )
     }
     composable<ChatDestination.Detail> {
-        ChatDetailScreen(viewerRole = UserRole.TOURIST)
+        ChatDetailScreen()
     }
     composable<TouristDestination.TourDetail> {
         TouristTourDetailScreen(
@@ -113,6 +113,9 @@ internal fun NavGraphBuilder.touristNavGraph(
         val destination = backStackEntry.toRoute<TouristDestination.GuideProfile>()
         GuidePublicProfileScreen(
             guideId = destination.guideId,
+            onNavigateToChat = { chatId ->
+                touristNavController.navigateTo(ChatDestination.Detail(chatId))
+            },
             onTourClick = { sessionId ->
                 touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
             },

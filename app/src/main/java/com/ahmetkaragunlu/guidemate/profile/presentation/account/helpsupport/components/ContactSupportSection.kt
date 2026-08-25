@@ -48,7 +48,7 @@ fun ContactSupportSection(
                 modifier =
                     Modifier
                         .clickable(onClick = onContactSupportClick)
-                        .padding(8.dp),
+                        .padding(dimensionResource(R.dimen.spacing_small)),
             )
         }
     }

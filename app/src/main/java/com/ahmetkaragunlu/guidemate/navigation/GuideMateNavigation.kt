@@ -16,7 +16,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.navigation.auth.authNavGraph
@@ -31,12 +33,15 @@ fun GuideMateNavigation(
     viewModel: RootNavigationViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pendingNotificationTarget by
+        viewModel.pendingNotificationTarget.collectAsStateWithLifecycle()
     if (!uiState.isReady) {
         RootNavigationLoading()
         return
     }
 
     val navController = rememberNavController()
+    val rootBackStackEntry by navController.currentBackStackEntryAsState()
     val initialTarget = remember { uiState.target }
     var appliedTarget by remember { mutableStateOf(initialTarget) }
 
@@ -47,6 +52,18 @@ fun GuideMateNavigation(
                 clearBackStackFrom = appliedTarget.toRootDestination(),
             )
             appliedTarget = uiState.target
+        }
+    }
+
+    LaunchedEffect(pendingNotificationTarget, uiState.target, rootBackStackEntry?.destination) {
+        if (pendingNotificationTarget == null) return@LaunchedEffect
+        when {
+            uiState.target == RootNavigationTarget.GUIDE &&
+                rootBackStackEntry?.destination?.hasRoute<RootDestination.GuideAccount>() == true ->
+                navController.popBackStack<RootDestination.Guide>(inclusive = false)
+            uiState.target == RootNavigationTarget.TOURIST &&
+                rootBackStackEntry?.destination?.hasRoute<RootDestination.TouristAccount>() == true ->
+                navController.popBackStack<RootDestination.Tourist>(inclusive = false)
         }
     }
 
@@ -68,6 +85,8 @@ fun GuideMateNavigation(
             TouristNavigation(
                 routeNavController = navController,
                 onLogoutClick = viewModel::logout,
+                pendingNotificationTarget = pendingNotificationTarget,
+                onNotificationNavigationHandled = viewModel::onNotificationNavigationHandled,
             )
         }
 
@@ -75,6 +94,8 @@ fun GuideMateNavigation(
             GuideNavigation(
                 routeNavController = navController,
                 onLogoutClick = viewModel::logout,
+                pendingNotificationTarget = pendingNotificationTarget,
+                onNotificationNavigationHandled = viewModel::onNotificationNavigationHandled,
             )
         }
 

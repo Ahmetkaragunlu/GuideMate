@@ -65,7 +65,10 @@ fun BankAccountsContent(
         modifier =
             modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(
+                    horizontal = dimensionResource(R.dimen.spacing_medium),
+                    vertical = 12.dp,
+                ),
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -109,7 +112,10 @@ fun BankAccountsContent(
             modifier =
                 Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = 36.dp, end = 16.dp),
+                    .padding(
+                        bottom = 36.dp,
+                        end = dimensionResource(R.dimen.spacing_medium),
+                    ),
         ) {
             Icon(
                 imageVector = Icons.Outlined.Add,

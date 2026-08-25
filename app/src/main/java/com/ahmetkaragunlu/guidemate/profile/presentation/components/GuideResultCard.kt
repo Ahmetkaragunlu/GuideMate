@@ -52,7 +52,10 @@ fun GuideResultCard(
         elevation = CardDefaults.cardElevation(2.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(dimensionResource(R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             GuideMateImage(
@@ -92,7 +95,11 @@ fun GuideResultCard(
                 modifier = Modifier.wrapContentSize(),
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier =
+                        Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.spacing_small),
+                            vertical = dimensionResource(R.dimen.spacing_tiny),
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(

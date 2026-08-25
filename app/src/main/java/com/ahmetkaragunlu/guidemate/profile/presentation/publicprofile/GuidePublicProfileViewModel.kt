@@ -3,7 +3,10 @@ package com.ahmetkaragunlu.guidemate.profile.presentation.publicprofile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
+import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.chat.domain.repository.ChatRepository
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
 import com.ahmetkaragunlu.guidemate.profile.presentation.mapper.toProfileContentUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideProfileContentUiState
@@ -14,7 +17,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -25,12 +31,19 @@ class GuidePublicProfileViewModel
         private val profileRepository: GuideProfileRepository,
         private val tourRepository: TourDiscoveryRepository,
         private val reviewRepository: ReviewRepository,
+        private val chatRepository: ChatRepository,
+        private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(GuideProfileContentUiState())
         val uiState: StateFlow<GuideProfileContentUiState> = _uiState.asStateFlow()
 
         private var requestedGuideId: Long? = null
         private var loadJob: Job? = null
+        private var startChatJob: Job? = null
+        private val mutableChatDestinations = MutableSharedFlow<String>()
+        val chatDestinations: SharedFlow<String> = mutableChatDestinations.asSharedFlow()
+        private val mutableChatErrors = MutableSharedFlow<String>()
+        val chatErrors: SharedFlow<String> = mutableChatErrors.asSharedFlow()
 
         init {
             observeReviewChanges()
@@ -82,5 +95,17 @@ class GuidePublicProfileViewModel
                 requestedGuideId = null
                 loadGuide(guideId)
             }
+        }
+
+        fun startChat(guideId: Long) {
+            if (startChatJob?.isActive == true) return
+            startChatJob =
+                viewModelScope.launch {
+                    when (val result = chatRepository.findOrCreate(guideId)) {
+                        is DataResult.Success -> mutableChatDestinations.emit(result.data.chatId)
+                        is DataResult.Error ->
+                            mutableChatErrors.emit(result.error.toMessage(resourceProvider))
+                    }
+                }
         }
     }

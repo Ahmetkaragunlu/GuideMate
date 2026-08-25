@@ -1,12 +1,13 @@
 package com.ahmetkaragunlu.guidemate.auth.data.local.session
 
+import com.ahmetkaragunlu.guidemate.auth.domain.session.AccessTokenProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TokenManager @Inject constructor(
     private val sessionStorage: SecureSessionStorage,
-) {
+) : AccessTokenProvider {
     fun saveTokens(
         accessToken: String,
         refreshToken: String?,
@@ -19,7 +20,7 @@ class TokenManager @Inject constructor(
         sessionStorage.putAll(values)
     }
 
-    fun getAccessToken(): String? = sessionStorage.get(KEY_ACCESS_TOKEN)
+    override fun getAccessToken(): String? = sessionStorage.get(KEY_ACCESS_TOKEN)
 
     fun getRefreshToken(): String? = sessionStorage.get(KEY_REFRESH_TOKEN)
 

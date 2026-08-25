@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.chat.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,12 +15,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.chat.presentation.model.MessageUiModel
 
 @Composable
-fun MessageBubble(message: MessageUiModel) {
+fun MessageBubble(
+    message: MessageUiModel,
+    onRetry: () -> Unit,
+) {
     val isMe = message.isFromMe
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -47,11 +54,32 @@ fun MessageBubble(message: MessageUiModel) {
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
+            val statusText =
+                when (message.deliveryStatus) {
+                    ChatMessageDeliveryStatus.PENDING -> stringResource(R.string.chat_message_sending)
+                    ChatMessageDeliveryStatus.FAILED -> stringResource(R.string.chat_message_retry)
+                    ChatMessageDeliveryStatus.SENT -> message.time
+                }
             Text(
-                text = message.time,
+                text = statusText,
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.Gray,
-                modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp),
+                color =
+                    if (message.deliveryStatus == ChatMessageDeliveryStatus.FAILED) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        Color.Gray
+                    },
+                modifier =
+                    Modifier
+                        .padding(
+                            top = dimensionResource(R.dimen.spacing_tiny),
+                            start = dimensionResource(R.dimen.spacing_tiny),
+                            end = dimensionResource(R.dimen.spacing_tiny),
+                        )
+                        .clickable(
+                            enabled = message.deliveryStatus == ChatMessageDeliveryStatus.FAILED,
+                            onClick = onRetry,
+                        ),
             )
         }
     }

@@ -96,7 +96,10 @@ fun TouristTripsScreen(
                         uiState.isLoadingMore ->
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(dimensionResource(R.dimen.spacing_medium)),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     CircularProgressIndicator(

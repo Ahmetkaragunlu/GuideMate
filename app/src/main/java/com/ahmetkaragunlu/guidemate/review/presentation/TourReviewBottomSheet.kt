@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -91,8 +90,8 @@ fun TourReviewBottomSheet(
                 maxLines = 6,
                 colors =
                     OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFEEEDF1),
-                        unfocusedBorderColor = Color(0xFFEEEDF1),
+                        focusedBorderColor = colorResource(R.color.border_color),
+                        unfocusedBorderColor = colorResource(R.color.border_color),
                     ),
                 shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
                 modifier = Modifier.fillMaxWidth(),

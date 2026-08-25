@@ -1,26 +1,25 @@
 package com.ahmetkaragunlu.guidemate.common.ui.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Refresh
 
 @Composable
 fun GuideMateContentState(
@@ -51,15 +50,9 @@ private fun RequestStateContent(
     errorMessage: String? = null,
 ) {
     val brandColor = colorResource(R.color.brand_color)
+    val indicatorSize = dimensionResource(R.dimen.request_state_indicator_size)
     Column(
-        modifier =
-            modifier
-                .fillMaxSize()
-                .clickable(
-                    enabled = !isLoading,
-                    role = Role.Button,
-                    onClick = onRetry,
-                ),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement =
             Arrangement.spacedBy(
@@ -68,14 +61,17 @@ private fun RequestStateContent(
             ),
     ) {
         if (isLoading) {
-            CircularProgressIndicator(color = brandColor)
+            CircularProgressIndicator(
+                modifier = Modifier.size(indicatorSize),
+                color = brandColor,
+            )
         } else {
-            Canvas(modifier = Modifier.size(48.dp)) {
-                drawCircle(
-                    color = brandColor,
-                    radius = size.minDimension / 2f - 2.dp.toPx(),
-                    center = Offset(size.width / 2f, size.height / 2f),
-                    style = Stroke(width = 4.dp.toPx()),
+            IconButton(onClick = onRetry) {
+                Icon(
+                    imageVector = TablerIcons.Refresh,
+                    contentDescription = stringResource(R.string.common_retry),
+                    tint = brandColor,
+                    modifier = Modifier.size(indicatorSize),
                 )
             }
         }
@@ -93,6 +89,7 @@ private fun RequestStateContent(
                 ),
             color = colorResource(R.color.text_color),
             style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.clickable(enabled = !isLoading, onClick = onRetry),
         )
     }
 }

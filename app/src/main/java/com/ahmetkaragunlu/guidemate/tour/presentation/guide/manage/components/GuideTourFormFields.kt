@@ -47,8 +47,8 @@ fun GuideTourPriceField(
         },
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
                 cursorColor = Color.Transparent,
                 focusedPlaceholderColor = colorResource(R.color.brand_color),
                 unfocusedPlaceholderColor = colorResource(R.color.brand_color),
@@ -79,8 +79,8 @@ fun GuideTourCapacityField(
         leadingIcon = { Text(text = "👥") },
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
                 cursorColor = Color.Transparent,
             ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
@@ -113,8 +113,8 @@ fun GuideTourMeetingPointField(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
             ),
         modifier =
             Modifier

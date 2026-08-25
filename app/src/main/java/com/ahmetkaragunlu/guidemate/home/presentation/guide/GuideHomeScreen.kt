@@ -45,17 +45,17 @@ import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromM
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.model.GuideStatistic
-import com.ahmetkaragunlu.guidemate.notification.presentation.guide.components.notificationIcon
-import com.ahmetkaragunlu.guidemate.notification.presentation.guide.components.notificationMessage
-import com.ahmetkaragunlu.guidemate.notification.presentation.guide.components.notificationRelativeTime
-import com.ahmetkaragunlu.guidemate.notification.presentation.guide.model.GuideNotificationUiModel
+import com.ahmetkaragunlu.guidemate.notification.presentation.components.notificationMessage
+import com.ahmetkaragunlu.guidemate.notification.presentation.components.notificationRelativeTime
+import com.ahmetkaragunlu.guidemate.notification.presentation.mapper.notificationIcon
+import com.ahmetkaragunlu.guidemate.notification.presentation.model.NotificationUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowRight
 
 @Composable
 fun GuideHomeScreen(
     uiState: GuideHomeUiState,
-    recentNotifications: List<GuideNotificationUiModel>,
+    recentNotifications: List<NotificationUiModel>,
     onNavigateToEarnings: () -> Unit,
     onRetryPerformance: () -> Unit,
     modifier: Modifier = Modifier,
@@ -133,7 +133,7 @@ private fun GuideStatCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-        border = BorderStroke(width = 1.dp, color = Color(0xFFeeedf1)),
+        border = BorderStroke(width = 1.dp, color = colorResource(R.color.border_color)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
@@ -247,7 +247,7 @@ private fun StatusItemCard(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        border = BorderStroke(width = 1.dp, color = Color(0xFFeeedf1)),
+        border = BorderStroke(width = 1.dp, color = colorResource(R.color.border_color)),
     ) {
         Column(
             modifier =
@@ -284,14 +284,14 @@ private fun StatusItemCard(
 
 @Composable
 private fun RecentActivities(
-    notifications: List<GuideNotificationUiModel>,
+    notifications: List<NotificationUiModel>,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
-        border = BorderStroke(width = 1.dp, color = Color(0xFFeeedf1)),
+        border = BorderStroke(width = 1.dp, color = colorResource(R.color.border_color)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         LazyColumn(
@@ -300,6 +300,20 @@ private fun RecentActivities(
                     .fillMaxWidth()
                     .padding(dimensionResource(R.dimen.spacing_medium)),
         ) {
+            if (notifications.isEmpty()) {
+                item(key = "recent-activities-empty") {
+                    Text(
+                        text = stringResource(R.string.notifications_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorResource(R.color.text_color),
+                        textAlign = TextAlign.Center,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(dimensionResource(R.dimen.spacing_medium)),
+                    )
+                }
+            }
             itemsIndexed(
                 items = notifications,
                 key = { _, notification -> notification.id },
@@ -315,7 +329,7 @@ private fun RecentActivities(
                         Icon(
                             imageVector = notification.type.notificationIcon(),
                             contentDescription = null,
-                            tint = Color.Gray,
+                            tint = colorResource(R.color.notification_icon_color),
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
@@ -338,7 +352,7 @@ private fun RecentActivities(
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
                             thickness = 0.5.dp,
-                            color = Color(0xFFeeedf1),
+                            color = colorResource(R.color.border_color),
                         )
                     }
                 }

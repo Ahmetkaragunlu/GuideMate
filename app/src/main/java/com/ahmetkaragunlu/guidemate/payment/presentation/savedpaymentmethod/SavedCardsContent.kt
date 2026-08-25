@@ -53,7 +53,10 @@ fun SavedCardsContent(
         modifier =
             modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(
+                    horizontal = dimensionResource(R.dimen.spacing_medium),
+                    vertical = 12.dp,
+                ),
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

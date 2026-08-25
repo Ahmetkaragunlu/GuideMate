@@ -95,8 +95,8 @@ internal fun TourEditField(
         leadingIcon = leadingText?.let { { Text(text = it) } },
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
                 unfocusedTextColor = colorResource(R.color.text_color),
             ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
@@ -165,16 +165,16 @@ internal fun TourEditNumericField(
         colors =
             if (useBrandTextColor) {
                 OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFEEEDF1),
-                    unfocusedBorderColor = Color(0xFFEEEDF1),
+                    focusedBorderColor = colorResource(R.color.border_color),
+                    unfocusedBorderColor = colorResource(R.color.border_color),
                     cursorColor = Color.Transparent,
                     focusedTextColor = colorResource(R.color.brand_color),
                     unfocusedTextColor = colorResource(R.color.brand_color),
                 )
             } else {
                 OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFEEEDF1),
-                    unfocusedBorderColor = Color(0xFFEEEDF1),
+                    focusedBorderColor = colorResource(R.color.border_color),
+                    unfocusedBorderColor = colorResource(R.color.border_color),
                     cursorColor = Color.Transparent,
                 )
             },
@@ -212,8 +212,8 @@ internal fun TourEditMultilineField(
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         colors =
             OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFEEEDF1),
-                unfocusedBorderColor = Color(0xFFEEEDF1),
+                focusedBorderColor = colorResource(R.color.border_color),
+                unfocusedBorderColor = colorResource(R.color.border_color),
             ),
         modifier =
             Modifier

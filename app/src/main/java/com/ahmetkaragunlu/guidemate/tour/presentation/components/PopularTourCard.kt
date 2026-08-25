@@ -127,7 +127,7 @@ fun PopularTourCard(
                                 .clip(CircleShape)
                                 .border(1.dp, Color.LightGray, CircleShape),
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
                     Text(
                         text =
                             buildAnnotatedString {

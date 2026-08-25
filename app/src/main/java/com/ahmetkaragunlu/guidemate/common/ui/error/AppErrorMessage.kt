@@ -183,6 +183,15 @@ private fun BackendErrorCode?.toMessage(
         BackendErrorCode.REFUND_FAILED -> resourceProvider.getString(R.string.error_refund_failed)
         BackendErrorCode.REFUND_AMOUNT_EXCEEDED ->
             resourceProvider.getString(R.string.error_refund_amount_exceeded)
+        BackendErrorCode.NOTIFICATION_NOT_FOUND ->
+            resourceProvider.getString(R.string.error_notification_not_found)
+        BackendErrorCode.CHAT_NOT_FOUND -> resourceProvider.getString(R.string.error_chat_not_found)
+        BackendErrorCode.CHAT_PARTICIPANT_INVALID ->
+            resourceProvider.getString(R.string.error_chat_participant_invalid)
+        BackendErrorCode.CHAT_MESSAGE_NOT_FOUND ->
+            resourceProvider.getString(R.string.error_chat_message_not_found)
+        BackendErrorCode.CHAT_MESSAGE_TOO_LONG ->
+            resourceProvider.getString(R.string.error_chat_message_too_long)
         BackendErrorCode.INTERNAL_SERVER_ERROR -> resourceProvider.getString(R.string.error_generic_failure)
         null -> resourceProvider.getString(R.string.error_generic_failure)
     }

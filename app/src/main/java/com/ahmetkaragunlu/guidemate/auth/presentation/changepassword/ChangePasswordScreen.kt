@@ -138,7 +138,7 @@ private fun ChangePasswordContent(
             style = MaterialTheme.typography.labelSmall,
             modifier =
                 Modifier
-                    .padding(horizontal = 4.dp)
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_tiny))
                     .align(Alignment.CenterHorizontally),
         )
 
@@ -264,7 +264,11 @@ private fun PasswordInputField(
             color = colorResource(R.color.text_color),
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(bottom = 6.dp, start = 4.dp),
+            modifier =
+                Modifier.padding(
+                    bottom = 6.dp,
+                    start = dimensionResource(R.dimen.spacing_tiny),
+                ),
         )
 
         EditTextField(

@@ -2,7 +2,6 @@ package com.ahmetkaragunlu.guidemate.navigation.components
 
 import androidx.annotation.StringRes
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -22,14 +21,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
 import compose.icons.tablericons.Bell
@@ -43,6 +41,7 @@ data class AppTopBarConfig(
     @param:StringRes val titleResId: Int,
     val chatTitle: String = "",
     @param:DrawableRes val chatAvatarResId: Int = R.drawable.example,
+    val chatAvatarUrl: String? = null,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,16 +90,16 @@ fun AppTopBar(
             title = {
                 if (config.isChatDetail) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(id = config.chatAvatarResId),
+                        GuideMateImage(
+                            fallbackImageResId = config.chatAvatarResId,
+                            imageUrl = config.chatAvatarUrl,
                             contentDescription = null,
-                            contentScale = ContentScale.Crop,
                             modifier =
                                 Modifier
                                     .size(32.dp)
                                     .clip(CircleShape),
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
                         Text(
                             text = config.chatTitle,
                             style = MaterialTheme.typography.titleMedium,

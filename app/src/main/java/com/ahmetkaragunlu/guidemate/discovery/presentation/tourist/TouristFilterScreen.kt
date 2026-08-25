@@ -219,7 +219,7 @@ fun TouristFilterContent(
                     ButtonDefaults.outlinedButtonColors(
                         containerColor = Color.White,
                     ),
-                border = BorderStroke(width = 1.dp, color = Color(0xFFeeedf1)),
+                border = BorderStroke(width = 1.dp, color = colorResource(R.color.border_color)),
             ) {
                 Text(
                     text = stringResource(R.string.clear),

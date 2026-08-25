@@ -6,24 +6,17 @@ data class ChatConversation(
     val chatId: String,
     val guide: ChatParticipant,
     val tourist: ChatParticipant,
+    val lastMessage: ChatMessage?,
+    val unreadCount: Int,
     val createdAt: Instant,
-    val messages: List<ChatMessage>,
-    val unreadCounts: Map<String, Int> = emptyMap(),
+    val lastActivityAt: Instant,
 ) {
-    val lastMessage: ChatMessage?
-        get() = messages.maxByOrNull(ChatMessage::sentAt)
+    fun containsUser(userId: Long): Boolean = guide.userId == userId || tourist.userId == userId
 
-    val lastActivityAt: Instant
-        get() = lastMessage?.sentAt ?: createdAt
-
-    fun containsUser(userId: String): Boolean = guide.userId == userId || tourist.userId == userId
-
-    fun otherParticipant(userId: String): ChatParticipant? =
+    fun otherParticipant(userId: Long): ChatParticipant? =
         when (userId) {
             guide.userId -> tourist
             tourist.userId -> guide
             else -> null
         }
-
-    fun unreadCount(userId: String): Int = unreadCounts[userId] ?: 0
 }

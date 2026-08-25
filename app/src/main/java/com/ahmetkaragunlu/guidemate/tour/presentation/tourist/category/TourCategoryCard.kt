@@ -48,7 +48,7 @@ fun TourCategoryCard(
         elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 1.dp),
     ) {
         Row(
-            modifier = Modifier.padding(all = 8.dp),
+            modifier = Modifier.padding(all = dimensionResource(R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(category.icon, null)

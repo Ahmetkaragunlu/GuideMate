@@ -118,7 +118,7 @@ fun GuideLevelInfoBottomSheet(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp)
+                        .padding(top = dimensionResource(R.dimen.spacing_small))
                         .clickable(onClick = onDismiss),
                 textAlign = TextAlign.Center,
             )
@@ -175,7 +175,10 @@ private fun GuideLevelRowCard(
                                         color = Color(0xFFE8F7EC),
                                         shape = RoundedCornerShape(10.dp),
                                     )
-                                    .padding(horizontal = 8.dp, vertical = 3.dp),
+                                    .padding(
+                                        horizontal = dimensionResource(R.dimen.spacing_small),
+                                        vertical = 3.dp,
+                                    ),
                         )
                     }
                 }

@@ -10,6 +10,8 @@ import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
 import com.ahmetkaragunlu.guidemate.media.domain.repository.MediaRepository
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfile
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfileUpdate
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
@@ -39,6 +41,7 @@ class GuideProfileViewModel
         private val mediaRepository: MediaRepository,
         private val resourceProvider: ResourceProvider,
         private val tourRepository: TourDiscoveryRepository,
+        notificationRepository: NotificationRepository,
     ) : ViewModel() {
         private val loadState =
             MutableStateFlow(
@@ -81,6 +84,17 @@ class GuideProfileViewModel
         init {
             profileRepository.cachedOwnProfile?.guideId?.let(::refreshPopularTours)
             refreshProfile()
+            viewModelScope.launch {
+                notificationRepository.pushEvents.collect { target ->
+                    if (
+                        target.type == NotificationType.RATING_RECEIVED ||
+                            target.type == NotificationType.COMMENT_RECEIVED ||
+                            target.type == NotificationType.TOUR_COMPLETED
+                    ) {
+                        refreshProfile()
+                    }
+                }
+            }
         }
 
         fun refreshProfile() {

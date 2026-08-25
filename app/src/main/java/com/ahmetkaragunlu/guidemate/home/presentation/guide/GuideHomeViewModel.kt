@@ -7,6 +7,8 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.model.GuideHomeUiState
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.model.toDashboardStatistics
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,6 +28,7 @@ class GuideHomeViewModel
     constructor(
         userRepository: UserRepository,
         private val tourRepository: GuideTourRepository,
+        notificationRepository: NotificationRepository,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(GuideHomeUiState())
         val uiState = _uiState.asStateFlow()
@@ -42,6 +45,11 @@ class GuideHomeViewModel
 
         init {
             refreshDashboard()
+            viewModelScope.launch {
+                notificationRepository.pushEvents.collect { target ->
+                    if (target.type.affectsGuideDashboard()) refreshDashboard()
+                }
+            }
         }
 
         fun refreshDashboard() {
@@ -82,3 +90,12 @@ class GuideHomeViewModel
                 }
         }
     }
+
+private fun NotificationType.affectsGuideDashboard(): Boolean =
+    this == NotificationType.TOUR_PURCHASED ||
+        this == NotificationType.RESERVATION_CANCELLED ||
+        this == NotificationType.TOUR_COMPLETED ||
+        this == NotificationType.RATING_RECEIVED ||
+        this == NotificationType.COMMENT_RECEIVED ||
+        this == NotificationType.EARNING_AVAILABLE ||
+        this == NotificationType.WITHDRAWAL_COMPLETED
