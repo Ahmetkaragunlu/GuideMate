@@ -1,804 +1,151 @@
 <resources>
     <string name="app_name">Guide Mate</string>
-    <string name="onboarding_title_1">Şehri Özgürce Keşfet</string>
-    <string name="onboarding_description_1">Sıkıcı turlardan sıkıldın mı? GuideMate ile şehrin gizli hazinelerini, en iyi bilen yerel rehberlerle özgürce keşfet.</string>
-    <string name="onboarding_title_2">Şehrini Tanıt Ve Kazan</string>
-    <string name="onboarding_description2">Bildiğin sokakları ve favori mekanlarını dünyayla paylaş. Kendi rotanı oluştur, turistlere rehberlik et ve güvenle kazan.</string>
-    <string name="onboarding_title_3">Güvenli Buluşma</string>
-    <string name="onboarding_description_3">Sana en uygun rehberi veya gezgini bul. Ödemeden tura kadar her adımda GuideMate güvencesi seninle. Hadi başlayalım!</string>
-    <string name="get_started">Başlayalım</string>
-    <string name="next">İleri</string>
-    <string name="already_have_an_account">Zaten bir hesabın var mı?</string>
-    <string name="login">Giriş yap</string>
-    <string name="dont_have_an_account">Hesabınız yok mu? </string>
-
-
-    <string name="or_continue_with">Veya şununla devam et</string>
-    <string name="google">Google</string>
-    <string name="sign_up">Kayıt ol</string>
-    <string name="sign_up_text">Kayıt olun</string>
-    <string name="forgot_password">Şifremi unuttum?</string>
-    <string name="sign_in_title">Hoş Geldin</string>
-    <string name="sign_in_subtitle">Keşfetmeye kaldığın yerden devam et</string>
-    <string name="name">İsim</string>
-    <string name="last_name">Soy İsim</string>
-    <string name="email">E-posta</string>
-    <string name="name_error_message">İsim en az 3 karakter olmalıdır</string>
-    <string name="email_error_message">Geçersiz e-posta adresi</string>
-    <string name="last_name_error_message">Soy isim en az 2 karakter olmalıdır</string>
-    <string name="password_error_message">Şifre en az 8 rakamdan oluşmalıdır</string>
-    <string name="confirm_password_error_message">Şifreler eşleşmiyor</string>
-    <string name="error_fix_fields">Lütfen hatalı alanları düzeltiniz.</string>
-    <string name="error_fill_all_fields">Lütfen tüm alanları doldurunuz.</string>
-    <string name="send_reset_link">Sıfırlama Bağlantısı Gönder</string>
-    <plurals name="password_reset_retry_wait">
-        <item quantity="one">%1$d saniye sonra tekrar deneyebilirsiniz.</item>
-        <item quantity="other">%1$d saniye sonra tekrar deneyebilirsiniz.</item>
-    </plurals>
-    <string name="reset_password_title">Şifre Yenileme</string>
-    <string name="reset_password_description">E-posta adresinize bir sıfırlama bağlantısı göndereceğiz. Lütfen e-posta adresinizi girin.</string>
-    <string name="agree_terms_conditions">Şartları ve koşulları kabul ediyorum</string>
-
-
-    <string name="password">Şifre</string>
-    <string name="confirm_password">Şifreni Onayla</string>
-    <string name="traveler">Gezgin</string>
-    <string name="sign_up_title">Hesabını Oluştur</string>
-    <string name="sign_up_subtitle">Yeni yerler keşfetmek ve paylaşmak için hemen kayıt ol!</string>
-    <string name="traveler_description">Yeni yerler keşfetmek istiyorum.</string>
-    <string name="local_guide">Yerel Rehber</string>
-    <string name="local_guide_description">Turlar düzenlemek istiyorum.</string>
-    <string name="choose_user_type_title">Nasıl kullanmak istersin?</string>
-    <string name="choose_user_type_description">Deneyimini buna göre kişiselleştireceğiz.</string>
-
-    <string name="about">Hakkımda</string>
-    <string name="about_specialty_title">Uzmanlık Unvanı</string>
-    <string name="about_specialty_placeholder">Sanat Tarihçisi</string>
-    <string name="about_specialty_helper">* Turistlerin göreceği ana unvanınız.</string>
-    <string name="about_specialty_validation_error">Uzmanlık unvanı en az 2 karakter olmalıdır.</string>
-    <string name="about_biography_title">Biyografi (Hakkımda)</string>
-    <string name="about_biography_placeholder">İstanbul’un tarihi dokusunu ve kültürel hikayelerini anlatmayı seven bir rehberim.</string>
-    <string name="about_biography_validation_error">Biyografi en az 20 karakter olmalıdır.</string>
-    <string name="about_form_validation_error">Kaydetmeden önce unvan ve biyografi alanlarını kontrol edin.</string>
-    <string name="about_languages_title">Konuşulan Diller</string>
-    <string name="about_add_language">+ Dil Ekle</string>
-    <string name="about_save_action">KAYDET</string>
-    <string name="view_as_tourist">Turistin Gözünden Gör</string>
-    <string name="preview_screen_title">Önizleme Ekranı</string>
-    <string name="preview_about_text">Merhaba, ben Ahmet. Yıllardır İstanbul’un tarihi semtlerinde yürüyüş turları düzenliyorum. Tur boyunca sadece yapıları değil, o yapıların ardındaki insan hikayelerini, kültürel dönüşümleri ve günlük hayatı da paylaşmayı seviyorum. Amacım, şehri turist gibi değil, yerel biri gibi hissettirerek gezdirmek.</string>
-    <string name="preview_read_more">Devamını Gör</string>
-    <string name="preview_popular_tours_title">Popüler Turlar</string>
-    <string name="preview_see_all">Tümünü Gör</string>
-    <string name="preview_send_message">Mesaj Gönder</string>
-    <string name="rating_format">%1$s Puan</string>
-    <string name="tour_count_format">%1$s Tur</string>
-    <string name="guide_level_sheet_title">Rozet Seviyeleri</string>
-    <string name="guide_level_sheet_subtitle">GuideMate platformundaki başarı durumunuz</string>
-    <string name="guide_level_sheet_close_icon">✖</string>
-    <string name="guide_level_sheet_confirm">Anladım</string>
-
-    <string name="guide_level_current_level_owner">Şu anki seviyeniz</string>
-    <string name="guide_level_current_level_visitor">Rehberin seviyesi</string>
-
-    <string name="guide_level_approved_icon">🟢</string>
-    <string name="guide_level_approved_title">Onaylı Rehber</string>
-    <string name="guide_level_approved_desc">Belgeleri onaylanmış resmi rehber.</string>
-
-    <string name="guide_level_silver_icon">🥉</string>
-    <string name="guide_level_silver_title">Gümüş Rehber</string>
-    <string name="guide_level_silver_desc">Şartlar: En az 5 Tur, 3 Değerlendirme ve 3.7 Puan.</string>
-
-    <string name="guide_level_super_icon">🥇</string>
-    <string name="guide_level_super_title">Süper Rehber</string>
-    <string name="guide_level_super_desc">Şartlar: En az 20 Tur, 10 Değerlendirme ve 4.5 Puan.</string>
-
-    <string name="guide_level_legendary_icon">💎</string>
-    <string name="guide_level_legendary_title">Efsane Rehber</string>
-    <string name="guide_level_legendary_desc">Şartlar: En az 100 Tur, 30 Değerlendirme ve 4.8 Puan.</string>
-
-    <string name="info">Bilgi</string>
-
 
     <string name="error_no_internet">İnternet bağlantınızı kontrol edin.</string>
+
     <string name="error_server">Sunucu kaynaklı bir hata oluştu. Kod: %d</string>
+
     <string name="error_unknown">Beklenmedik bir hata oluştu.</string>
-    <string name="error_session_expired">Oturum süreniz doldu, lütfen tekrar giriş yapın.</string>
+
     <string name="error_generic_failure">İşlem başarısız oldu.</string>
-    <string name="error_user_not_found">Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı.</string>
-    <string name="error_email_already_exists">Bu e-posta adresi zaten kullanılıyor.</string>
-    <string name="error_account_pending_verification">Giriş yapmadan önce e-posta adresinizi doğrulamanız gerekiyor.</string>
-    <string name="error_account_disabled">Hesabınız kullanıma kapatılmış. Destek ekibiyle iletişime geçin.</string>
-    <string name="error_invalid_credentials">E-posta adresi veya şifre hatalı.</string>
-    <string name="error_current_password_incorrect">Mevcut şifreniz hatalı.</string>
-    <string name="error_password_policy">Şifre en az 8 rakamdan oluşmalıdır.</string>
-    <string name="error_password_same_as_current">Yeni şifreniz mevcut şifrenizden farklı olmalıdır.</string>
+
     <string name="error_passwords_do_not_match">Şifreler eşleşmiyor.</string>
-    <string name="error_role_already_selected">Kullanıcı türünüz daha önce seçilmiş.</string>
-    <string name="error_role_not_found">Seçtiğiniz kullanıcı türü bulunamadı.</string>
-    <string name="error_invalid_installation">Cihaz oturumu doğrulanamadı. Lütfen tekrar giriş yapın.</string>
-    <string name="error_invalid_token">Bağlantı geçersiz veya artık kullanılamıyor.</string>
-    <string name="error_token_already_used">Bu bağlantı daha önce kullanılmış.</string>
-    <string name="error_google_login_failed">Google ile giriş tamamlanamadı. Lütfen tekrar deneyin.</string>
-    <string name="error_google_account_not_found">Bu Google hesabıyla eşleşen bir GuideMate hesabı bulunamadı. Önce normal kayıt oluşturun.</string>
-    <string name="error_google_account_mismatch">Google hesabınız kayıtlı e-posta adresinizle eşleşmiyor.</string>
+
     <string name="error_forbidden">Bu işlem için yetkiniz bulunmuyor.</string>
+
     <string name="error_validation_failed">Lütfen girdiğiniz bilgileri kontrol edin.</string>
+
     <string name="error_malformed_request">İstek işlenemedi. Lütfen bilgilerinizi kontrol edip tekrar deneyin.</string>
+
     <string name="error_data_conflict">Bilgiler güncellendiği için işlem tamamlanamadı. Lütfen tekrar deneyin.</string>
+
     <string name="error_rate_limited">Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.</string>
+
     <plurals name="error_rate_limited_with_seconds">
         <item quantity="one">Çok fazla deneme yaptınız. %1$d saniye sonra tekrar deneyin.</item>
         <item quantity="other">Çok fazla deneme yaptınız. %1$d saniye sonra tekrar deneyin.</item>
     </plurals>
-    <string name="error_email_delivery_failed">E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.</string>
+
     <string name="error_field_required">Bu alan zorunludur.</string>
+
     <string name="error_invalid_field_size">Girdiğiniz değer uygun uzunlukta değil.</string>
+
     <string name="error_invalid_field_format">Girdiğiniz değer uygun formatta değil.</string>
+
     <string name="error_invalid_field">Bu alanı kontrol edin.</string>
-    <string name="error_select_role">Devam etmek için bir kullanıcı türü seçin.</string>
-    <string name="error_terms_required">Lütfen Kullanıcı Sözleşmesini okuyup onaylayın.</string>
-    <string name="terms_dialog_title">Kullanıcı Sözleşmesi ve Gizlilik Politikası</string>
-    <string name="success">Başarılı</string>
-    <string name="reset_password_link_sent">Bu e-postaya uygun bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Lütfen gelen kutunuzu kontrol edin.</string>
-    <plurals name="login_retry_wait">
-        <item quantity="one">Tekrar giriş yapmak için %1$d saniye bekleyin.</item>
-        <item quantity="other">Tekrar giriş yapmak için %1$d saniye bekleyin.</item>
-    </plurals>
 
     <string name="tourist_home">Anasayfa</string>
+
     <string name="welcome_message">Hoş geldin, %1$s 👋</string>
+
     <string name="tourist_explore">Keşfet</string>
+
     <string name="tourist_trips">Gezilerim</string>
+
     <string name="tourist_chat">Sohbet</string>
+
     <string name="tourist_profile">Hesabım</string>
 
-
     <string name="guide_home">Anasayfa</string>
+
     <string name="guide_tours">Turlarım</string>
+
     <string name="guide_chat">Sohbet</string>
-    <string name="chat_input_placeholder">Mesaj yazın...</string>
-    <string name="chat_empty_history">Henüz sohbet geçmişiniz yok.</string>
-    <string name="chat_message_sending">Gönderiliyor…</string>
-    <string name="chat_message_retry">Gönderilemedi. Tekrar dene</string>
-    <string name="error_chat_not_found">Sohbet bulunamadı veya bu sohbete erişiminiz yok.</string>
-    <string name="error_chat_participant_invalid">Bu kullanıcıyla sohbet başlatılamıyor.</string>
-    <string name="error_chat_message_not_found">Mesaj bulunamadı.</string>
-    <string name="error_chat_message_too_long">Mesaj en fazla 2.000 karakter olabilir.</string>
+
     <string name="guide_profile">Hesabım</string>
-    <string name="public_guide_profile">Rehber Profili</string>
+
     <string name="guide_wallet">Cüzdan</string>
 
-
-    <string name="completed_tours">Tamamlanan Tur</string>
-    <string name="total_participants">Katılımcı</string>
-    <string name="average_rating">Ortalama Puan</string>
-    <string name="this_month_earnings">Bu ayki kazanç</string>
-    <string name="earnings_by_month">Aylık Kazançlar</string>
-    <string name="guide_earnings">Kazançlarım</string>
-    <string name="earnings_history">Geçmiş Kazançlar</string>
-    <string name="earnings_empty_year">Bu yıl için geçmiş kazanç bulunmuyor.</string>
-    <string name="view_all">Tümünü Gör</string>
-    <string name="tour_status">Tur Durumu</string>
-    <string name="tour_details">Tur Detayları</string>
-    <string name="active_tours">Yayında</string>
-    <string name="pending_tours">Onay Bekliyor</string>
-    <string name="recent_activities">Son hareketler</string>
     <string name="notifications">Bildirimler</string>
-    <string name="notifications_subtitle">Hesabınızdaki son gelişmeler</string>
+
     <string name="notifications_empty">Henüz bildiriminiz yok.</string>
-    <string name="notification_mark_all_read">Tümünü okundu yap</string>
-    <string name="notification_tour_purchased">%1$s, %2$s turunu satın aldı.</string>
-    <string name="notification_tour_purchased_generic">Turunuz için yeni bir rezervasyon yapıldı.</string>
-    <plurals name="notification_rating_received">
-        <item quantity="one">%1$s, %2$s için %3$d yıldız verdi.</item>
-        <item quantity="other">%1$s, %2$s için %3$d yıldız verdi.</item>
-    </plurals>
-    <string name="notification_rating_received_generic">Turunuz için yeni bir puan verildi.</string>
-    <string name="notification_withdrawal_completed">%1$s tutarındaki para çekme işleminiz tamamlandı.</string>
-    <string name="notification_withdrawal_completed_generic">Para çekme işleminiz tamamlandı.</string>
-    <string name="notification_comment_received">%1$s, %2$s için yorum yaptı.</string>
-    <string name="notification_comment_received_generic">Turunuz için yeni bir yorum yapıldı.</string>
-    <string name="notification_preview">“%1$s”</string>
-    <string name="notification_tour_approved">%1$s turunuz onaylandı ve yayına alındı.</string>
-    <string name="notification_tour_approved_generic">Turunuz onaylandı ve yayına alındı.</string>
-    <string name="notification_tour_rejected">%1$s turunuz reddedildi.</string>
-    <string name="notification_tour_rejected_generic">Turunuz reddedildi.</string>
-    <string name="notification_rejection_reason">Gerekçe: %1$s</string>
-    <string name="notification_tour_change_approved">Tur değişikliği talebiniz onaylandı.</string>
-    <string name="notification_tour_change_rejected">Tur değişikliği talebiniz reddedildi.</string>
-    <string name="notification_reservation_confirmed">Rezervasyonunuz onaylandı.</string>
-    <string name="notification_reservation_cancelled">Rezervasyon iptaliyle ilgili bir güncelleme var.</string>
-    <string name="notification_tour_cancelled">Turunuz iptal edildi.</string>
-    <string name="notification_tour_completed">%1$s turunuz tamamlandı ve Geçmiş bölümüne taşındı.</string>
-    <string name="notification_tour_completed_generic">Turunuz tamamlandı ve Geçmiş bölümüne taşındı.</string>
-    <string name="notification_review_request">Tamamlanan turunuzu değerlendirebilirsiniz.</string>
-    <string name="notification_payment_succeeded">Ödeme işleminiz başarıyla tamamlandı.</string>
-    <string name="notification_payment_failed">Ödeme işleminiz tamamlanamadı.</string>
-    <string name="notification_refund_requested">İade talebiniz işleme alındı.</string>
-    <string name="notification_refund_completed">İade işleminiz tamamlandı.</string>
-    <string name="notification_refund_failed">İade işleminiz tamamlanamadı.</string>
-    <string name="notification_refund_manual_review">İade işleminiz kontrol ediliyor.</string>
-    <string name="notification_earning_available">Yeni kazancınız kullanılabilir bakiyenize eklendi.</string>
-    <string name="notification_chat_message">Yeni bir mesajınız var.</string>
-    <string name="notification_upcoming_tour_reminder">Yaklaşan turunuz için hatırlatma var.</string>
-    <string name="notification_security_alert">Hesabınızla ilgili bir güvenlik uyarısı var.</string>
-    <string name="notification_generic_update">Hesabınızla ilgili yeni bir güncelleme var.</string>
-    <string name="notification_channel_id" translatable="false">guidemate_updates</string>
-    <string name="notification_channel_name">GuideMate bildirimleri</string>
-    <string name="notification_channel_description">Tur, rezervasyon, ödeme ve mesaj güncellemeleri</string>
-    <string name="notification_title_tour_approved">Tur onaylandı</string>
-    <string name="notification_title_tour_rejected">Tur reddedildi</string>
-    <string name="notification_title_tour_change_approved">Tur değişikliği onaylandı</string>
-    <string name="notification_title_tour_change_rejected">Tur değişikliği reddedildi</string>
-    <string name="notification_title_tour_purchased">Yeni rezervasyon</string>
-    <string name="notification_title_reservation_confirmed">Rezervasyon onaylandı</string>
-    <string name="notification_title_reservation_cancelled">Rezervasyon güncellendi</string>
-    <string name="notification_title_tour_cancelled">Tur iptal edildi</string>
-    <string name="notification_title_tour_completed">Tur tamamlandı</string>
-    <string name="notification_title_review_request">Turunuzu değerlendirin</string>
-    <string name="notification_title_rating_received">Yeni puan</string>
-    <string name="notification_title_comment_received">Yeni yorum</string>
-    <string name="notification_title_payment_succeeded">Ödeme başarılı</string>
-    <string name="notification_title_payment_failed">Ödeme başarısız</string>
-    <string name="notification_title_refund_requested">İade talebi alındı</string>
-    <string name="notification_title_refund_completed">İade tamamlandı</string>
-    <string name="notification_title_refund_failed">İade başarısız</string>
-    <string name="notification_title_refund_manual_review">İade inceleniyor</string>
-    <string name="notification_title_earning_available">Kazanç kullanılabilir</string>
-    <string name="notification_title_withdrawal_completed">Para çekme tamamlandı</string>
-    <string name="notification_title_chat_message">Yeni mesaj</string>
-    <string name="notification_title_upcoming_tour_reminder">Yaklaşan tur</string>
-    <string name="notification_title_security_alert">Güvenlik uyarısı</string>
-    <string name="notification_title_general">Yeni bildirim</string>
-    <string name="error_notification_not_found">Bildirim bulunamadı veya artık erişilemiyor.</string>
-
-
-    <string name="saved_cards_description">Kartlarını görüntüleyebilir, silebilir veya varsayılan kartını değiştirebilirsin.</string>
-    <string name="card_holder_name_placeholder">Ad Soyad</string>
-    <string name="card_holder">Kart Sahibi</string>
-    <string name="expiry_date">Son Kullanma</string>
-    <string name="set_as_default">Varsayılan Yap</string>
-    <string name="default_card">Varsayılan</string>
-
-
-    <string name="delete_card_title">Kartı Sil</string>
-    <string name="delete_card_desc">Bu kartı silmek istediğinize emin misiniz?</string>
-    <string name="error_saved_card_not_found">Kayıtlı kart bulunamadı.</string>
-    <string name="error_saved_card_sync_failed">Kayıtlı kart bilgileri güncellenemedi. Lütfen tekrar deneyin.</string>
-    <string name="error_saved_card_provider_unavailable">Kart sağlayıcısına şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.</string>
-
-    <string name="make_default_title">Varsayılan Kart Yap</string>
-    <string name="make_default_desc">Bu kartı varsayılan ödeme yönteminiz yapmak istiyor musunuz?</string>
 
     <string name="yes">Evet</string>
+
     <string name="no">Hayır</string>
 
-    <string name="tab_upcoming">Yaklaşan</string>
-    <string name="tab_past">Geçmiş</string>
-
-    <string name="category_culture">Kültür</string>
-    <string name="category_all">Tümü</string>
-    <string name="category_food">Yemek</string>
-    <string name="category_nature">Doğa</string>
-    <string name="category_art">Sanat</string>
-    <string name="category_entertainment">Eğlence</string>
-    <string name="category_adventure">Macera</string>
-
-    <string name="best_guides_in_region">Bu Bölgedeki En İyi Rehberler</string>
-
-    <string name="popular_experiences">Popüler Deneyimler</string>
-    <string name="categories">Kategoriler</string>
-
-    <string name="tab_tours">Turlar</string>
-    <string name="tab_active">Aktif</string>
-    <string name="tab_review">İncelemede</string>
-    <string name="guide_tours_empty_active">Henüz aktif bir turunuz yok.</string>
-    <string name="guide_tours_empty_review">İncelemede olan bir turunuz yok.</string>
-    <string name="guide_tours_empty_past">Henüz geçmiş bir turunuz yok.</string>
-    <string name="pending_review">Onay Bekliyor</string>
-    <string name="rejected">Reddedildi</string>
-    <string name="rejection_reason_format">Gerekçe: %1$s</string>
     <string name="edit_tour">Turu Düzenle</string>
-    <string name="spoken_languages">Hizmet Verilen Diller</string>
-    <string name="active_booking_edit_lock">Aktif rezervasyon bulunduğu için tarih, saat, süre ve buluşma noktası değiştirilemez.</string>
-    <string name="published_tour_identity_edit_lock">Yayınlanmış bir turun ülke ve şehir kimliği değiştirilemez. Farklı bir rota için yeni tur oluşturun.</string>
-    <string name="save_changes">DEĞİŞİKLİKLERİ KAYDET</string>
-    <string name="resubmit_for_review">ONAYA GÖNDER</string>
-    <string name="unsaved_tour_changes_title">Kaydedilmemiş Değişiklikler</string>
-    <string name="unsaved_tour_changes_message">Yaptığınız değişiklikler kaybolacak. Düzenlemeden çıkmak istiyor musunuz?</string>
-    <string name="tour_edit_review_confirmation_title">Değişiklikleri Onaya Gönder</string>
-    <string name="tour_edit_review_confirmation_message">Bu değişiklikler yeniden incelenecek ve onaylanana kadar tur yeni rezervasyonlara kapatılacaktır. Devam etmek istiyor musunuz?</string>
-    <string name="error_tour_edit_no_changes">Kaydedilecek bir değişiklik bulunmuyor.</string>
-    <string name="tour_edit_partial_success">Tur bilgileri onaya gönderildi ancak oturum değişiklikleri kaydedilemedi: %1$s</string>
-    <string name="resubmit_for_review_confirmation_title">Turu Onaya Gönder</string>
-    <string name="resubmit_for_review_confirmation_message">Yaptığınız düzenlemeler yeniden incelenmek üzere gönderilecektir. Devam etmek istiyor musunuz?</string>
-    <string name="archive_tour_draft">Taslağı Sil</string>
-    <string name="archive_tour_draft_title">Reddedilen Taslağı Sil</string>
-    <string name="archive_tour_draft_message">Bu taslak İncelemede listesinden kaldırılacaktır. Devam etmek istiyor musunuz?</string>
-    <string name="tour_operation_session_not_found">Tur oturumu bulunamadı. Lütfen listeyi yenileyip tekrar deneyin.</string>
-    <string name="tour_operation_tour_not_found">Tur bulunamadı. Lütfen listeyi yenileyip tekrar deneyin.</string>
-    <string name="tour_operation_session_started">Başlamış veya süresi geçmiş bir turun yayın durumu değiştirilemez.</string>
-    <string name="tour_operation_not_approved">Tur onaylanmadan yeni rezervasyonlara açılamaz.</string>
-    <string name="tour_operation_capacity_full">Kontenjan dolu olduğu için tur yeni rezervasyonlara açılamaz.</string>
-    <string name="tour_operation_status_not_manageable">Turun mevcut durumu bu işlem için uygun değil.</string>
-    <string name="tour_operation_not_archivable">Bu tur İncelemede listesinden kaldırılamıyor.</string>
+
     <string name="error_invalid_language_code">Seçilen dillerden biri desteklenmiyor.</string>
-    <string name="error_tour_not_found">Tur bulunamadı. Listeyi yenileyip tekrar deneyin.</string>
-    <string name="error_tour_not_approved">Bu işlem için turun önce onaylanması gerekiyor.</string>
-    <string name="error_tour_change_pending">Bu tur için zaten incelemede olan bir değişiklik var.</string>
-    <string name="error_tour_location_locked">Yayınlanmış turun ülke ve şehir bilgisi değiştirilemez.</string>
-    <string name="error_tour_not_archivable">Bu tur şu anda silinemez.</string>
-    <string name="error_tour_review_not_found">Tur inceleme kaydı bulunamadı.</string>
-    <string name="error_tour_review_state_invalid">Turun inceleme durumu bu işlem için uygun değil.</string>
-    <string name="error_invalid_category_code">Seçilen kategori desteklenmiyor.</string>
-    <string name="error_invalid_country_code">Seçilen ülke bilgisi geçersiz.</string>
-    <string name="error_invalid_time_zone">Turun saat dilimi bilgisi geçersiz.</string>
-    <string name="error_session_not_found">Tur oturumu bulunamadı. Listeyi yenileyip tekrar deneyin.</string>
-    <string name="error_session_not_bookable">Bu tur oturumu şu anda rezervasyona uygun değil.</string>
-    <string name="error_session_already_started">Başlamış veya süresi geçmiş tur değiştirilemez.</string>
-    <string name="error_session_has_reservations">Mevcut rezervasyonlar nedeniyle bu değişiklik yapılamıyor.</string>
-    <string name="error_capacity_not_available">Turun boş kontenjanı kalmadı.</string>
-    <string name="error_capacity_below_booked_count">Kontenjan mevcut katılımcı sayısından düşük olamaz.</string>
-    <string name="error_session_status_not_manageable">Turun mevcut durumu bu işlem için uygun değil.</string>
-    <string name="error_schedule_conflict">Seçilen tarih ve saatte başka bir turunuz bulunuyor.</string>
-    <string name="error_concurrent_update">Tur başka bir işlemle güncellendi. Verileri yenileyip tekrar deneyin.</string>
-    <string name="cancel_tour_title">Turu İptal Et</string>
-    <string name="cancel_tour_warning">Bu işlem geri alınamaz. Mevcut rezervasyonlar iptal edilecek ve turistlere tam iade süreci başlatılacaktır.</string>
-    <string name="cancel_tour_no_booking_warning">Bu seans iptal edilerek Geçmiş bölümüne taşınacaktır.</string>
-    <string name="cancellation_reason">İptal nedeni</string>
-    <string name="cancellation_reason_format">İptal nedeni: %1$s</string>
-    <string name="tour_status_completed">Tamamlandı</string>
-    <string name="tour_status_cancelled">İptal Edildi</string>
-    <string name="confirm_cancellation">İPTALİ ONAYLA</string>
-    <string name="republish_tour_title">Turu Yeniden Yayınla</string>
-    <string name="republish_tour">TURU YENİDEN YAYINLA</string>
-    <string name="select_tour_date">Tur tarihi seçin</string>
-    <string name="select_tour_time">Başlangıç saati seçin</string>
-    <string name="select_tour_duration">Tur süresi seçin</string>
+
     <string name="select">Seç</string>
-    <string name="error_tour_schedule_invalid">Tur tarihi gelecekte olmalı; süre, fiyat ve kapasite sıfırdan büyük olmalıdır.</string>
-    <string name="error_tour_edit_invalid">Değişiklikler kaydedilemedi. Tarih ve saat çakışmasını, süre ve fiyatı, ayrıca kontenjanın mevcut rezervasyon sayısından düşük olmadığını kontrol edin.</string>
-    <string name="error_tour_step1_invalid">Konumu, gelecekteki tur tarihini, başlangıç saatini ve tur süresini kontrol edin.</string>
-    <string name="error_tour_step2_invalid">Kategori, en az bir hizmet dili, pozitif ücret ve kapasite gereklidir.</string>
-    <string name="error_tour_step3_invalid">Tur adı, kapak fotoğrafı, açıklama ve buluşma noktası alanlarını doldurun.</string>
+
     <string name="error_image_too_large">Fotoğraf en fazla 5 MB olabilir.</string>
+
     <string name="error_image_invalid_type">Yalnız JPG, PNG veya WebP formatında fotoğraf seçebilirsiniz.</string>
+
     <string name="error_image_source_unavailable">Fotoğraf kaynağı açılamadı. Lütfen tekrar deneyin.</string>
+
     <string name="error_media_not_found">Fotoğraf bulunamadı veya artık kullanılamıyor.</string>
+
     <string name="error_media_storage_failed">Fotoğraf şu anda kaydedilemiyor. Lütfen tekrar deneyin.</string>
+
     <string name="error_media_in_use">Kullanımda olan fotoğraf silinemez.</string>
+
     <string name="error_media_purpose_mismatch">Bu fotoğraf seçilen alan için kullanılamıyor.</string>
-    <string name="error_session_creation">Tarih, saat, süre, fiyat ve kapasiteyi kontrol edin. Başka bir turunuzla saat çakışması da olabilir.</string>
-    <string name="tab_guides">Rehberler</string>
-    <string name="search_tours">Tur Ara</string>
-    <string name="search_guide">Rehber Ara</string>
+
     <string name="filter">Filtrele</string>
-    <string name="rating">Puan</string>
+
     <string name="select_languages">Dil Seçimi</string>
-    <string name="language">Dil Seç</string>
+
     <string name="select_country">Ülke Seç</string>
-    <string name="select_city">Şehir Seç</string>
+
     <string name="selection_search_country">Ülke ara</string>
+
     <string name="selection_search_city">Şehir ara</string>
+
     <string name="selection_search_language">Dil ara</string>
+
     <string name="selection_city_title">%1$s şehirleri</string>
+
     <string name="selection_city_query_hint">Şehirleri görmek için en az 2 karakter yazın.</string>
+
     <string name="selection_no_results">Sonuç bulunamadı.</string>
+
     <string name="selection_city_error">Şehirler yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.</string>
+
     <string name="selection_retry">Tekrar Dene</string>
+
     <string name="common_loading">Yükleniyor</string>
+
     <string name="common_retry">Tekrar Dene</string>
-    <string name="guide_search_empty">Henüz uygun bir rehber bulunamadı.</string>
-    <string name="guide_profile_not_found">Rehber profili bulunamadı.</string>
-    <string name="guide_profile_update_success">Profiliniz güncellendi.</string>
-    <string name="guide_profile_complete_about_first">Profil fotoğrafınızı eklemeden önce Hakkımda bölümündeki unvan ve biyografinizi kaydedin.</string>
+
     <string name="selection_done">Tamam</string>
+
     <string name="selection_powered_by_google">Powered by Google</string>
-    <string name="price_range">Fiyat Aralığı</string>
-
-
-    <string name="profile_current_balance">MEVCUT BAKİYE</string>
-    <string name="profile_add_money">PARA YÜKLE</string>
-    <string name="withdraw_money">PARA ÇEK</string>
-    <string name="profile_default_user">Misafir Kullanıcı</string>
-    <string name="profile_brand_name">GuideMate</string>
 
     <string name="saved_cards">Kayıtlı Kartlarım</string>
+
     <string name="add_card">Kart Ekle</string>
+
     <string name="change_password">Şifre Değiştir</string>
-    <string name="current_password">Mevcut Şifre</string>
-    <string name="new_password">Yeni Şifre</string>
-    <string name="new_password_repeat">Yeni Şifre Tekrar</string>
-    <string name="change_password_helper_text">Şifreniz en az 8 rakamdan oluşmalıdır.</string>
-    <string name="update_password_action">ŞİFREYİ GÜNCELLE</string>
-    <string name="notification_settings">Bildirim Ayarları</string>
-    <string name="legal_agreements">Yasal &amp; Sözleşmeler</string>
+
     <string name="help_support">Yardım &amp; Destek</string>
+
     <string name="account_settings">Hesap Ayarları</string>
 
-    <string name="total_withdrawable_balance">TOPLAM ÇEKİLEBİLİR BAKİYE</string>
-    <string name="recent_transactions">Son Hareketler</string>
-    <string name="live">Yayında</string>
-    <string name="edit">Düzenle</string>
-    <string name="guide_tour_publish_step1_title">Turunuz Nerede ve Ne Zaman?</string>
-    <string name="guide_tour_publish_step2_title">Teknik Detaylar ve Ücret</string>
-    <string name="guide_tour_publish_step3_title">Tur Detayları ve Görseller</string>
-    <string name="guide_tour_publish_topbar_step1_title">Adım 1: Tur Bilgileri</string>
-    <string name="guide_tour_publish_topbar_step2_title">Adım 2: Teknik Detaylar</string>
-    <string name="guide_tour_publish_topbar_step3_title">Adım 3: İçerik ve Görseller</string>
-    <string name="guide_tour_publish_topbar_step4_title">Adım 4: Turu Yayınla</string>
-    <string name="guide_tour_publish_step1_progress_label">Adım 1/4</string>
-    <string name="guide_tour_publish_step1_subtitle">Turistlerin sizi bulabilmesi için temel bilgileri girin.</string>
-    <string name="guide_tour_publish_step1_location_label">Ülke ve Şehir</string>
-    <string name="guide_tour_publish_step1_date_label">Tur Tarihi</string>
-    <string name="guide_tour_publish_step1_time_label">Başlangıç Saati</string>
-    <string name="guide_tour_publish_step1_duration_label">Tur Süresi (Dakika)</string>
-    <string name="guide_tour_publish_step1_next_button">Adım 2: Teknik Detaylar</string>
-    <string name="guide_tour_publish_step2_progress_label">Adım 2/4</string>
-    <string name="guide_tour_publish_step2_subtitle">Turunuzun kategorisini, sunduğunuz dilleri ve kişi başı ücretini belirleyin.</string>
-    <string name="guide_tour_publish_step2_category_label">Tur Kategorisi</string>
-    <string name="guide_tour_publish_step2_price_label">Kişi Başı Ücret</string>
-    <string name="guide_tour_publish_step2_capacity_label">Maksimum Katılımcı</string>
-    <string name="guide_tour_publish_step2_next_button">Adım 3: İçerik ve Görseller</string>
-    <string name="guide_tour_publish_step3_progress_label">Adım 3/4</string>
-    <string name="guide_tour_publish_step3_subtitle">Turunuzun adını, fotoğraflarını ve diğer önemli detayları ekleyin.</string>
-    <string name="guide_tour_publish_step3_name_label">Tur Adı</string>
-    <string name="guide_tour_publish_step3_name_placeholder">Örn: İstanbul Tarihi Yarımada Yürüyüşü</string>
-    <string name="guide_tour_publish_step3_photos_label">Tur Fotoğrafı</string>
-    <string name="guide_tour_publish_step3_photos_title">Kapak fotoğrafı</string>
-    <string name="guide_tour_publish_step3_photos_placeholder">Kapak fotoğrafı seçmek için dokunun</string>
-    <string name="guide_tour_publish_step3_photos_meta">JPG/PNG/WebP • Max 5 MB</string>
-    <string name="tour_cover_photo_source_title">Kapak fotoğrafı ekle</string>
-    <string name="profile_photo_source_title">Profil fotoğrafı ekle</string>
     <string name="choose_from_gallery">Galeriden seç</string>
+
     <string name="take_photo">Fotoğraf çek</string>
-    <string name="change_cover_photo">Kapak fotoğrafını değiştirmek için dokunun</string>
-    <string name="guide_tour_publish_step3_description_label">Tur Detayları (Hakkında)</string>
-    <string name="guide_tour_publish_step3_description_placeholder">Turistlere bu turda neler yaşatacağınızı, rotanızı ve öne çıkan detayları profesyonelce anlatın...</string>
-    <string name="guide_tour_publish_step3_meeting_label">Buluşma Noktası</string>
-    <string name="guide_tour_publish_step3_meeting_placeholder">Turistlerle tam olarak nerede ve nasıl buluşacağınızı detaylıca açıklayın...</string>
-    <string name="guide_tour_publish_step3_next_button">👁️ İLERİ: ÖNİZLEME (FİNAL) ></string>
-    <string name="guide_tour_publish_step4_progress_label">4/4</string>
-    <string name="guide_tour_publish_step4_preview_banner">👁️ Önizleme Modu: Turistler böyle görecek</string>
-    <string name="guide_tour_publish_step4_guide_role">Rehber</string>
-    <string name="guide_tour_publish_step4_view_profile">Profili Görüntüle ></string>
-    <string name="guide_tour_publish_step4_tab_details">Detaylar</string>
-    <string name="guide_tour_publish_step4_tab_meeting">Buluşma</string>
-    <string name="guide_tour_publish_step4_tab_reviews">Yorumlar</string>
-    <string name="send_for_review">ONAYA GÖNDER</string>
-    <string name="cancel_tour">TURU İPTAL ET</string>
-    <string name="book_tour">TURU REZERVE ET</string>
-    <string name="no_reviews_yet">Bu tur için henüz yorum yapılmadı.</string>
-    <string name="review_tour">TURU DEĞERLENDİR</string>
-    <string name="tour_review_title">Tur Deneyiminizi Değerlendirin</string>
-    <string name="tour_review_subtitle">Puanınız ve yorumunuz diğer turistlerin doğru turu seçmesine yardımcı olur.</string>
-    <string name="tour_review_comment_placeholder">Tur deneyiminizi paylaşın (isteğe bağlı)</string>
+
     <string name="submit_tour_review">DEĞERLENDİRMEYİ GÖNDER</string>
-    <string name="tour_review_rating_required">Devam etmek için bir puan seçin.</string>
-    <string name="error_review_not_allowed">Bu rezervasyon henüz değerlendirmeye uygun değil.</string>
-    <string name="error_review_already_exists">Bu tur deneyimini daha önce değerlendirdiniz.</string>
-    <string name="tour_review_success_title">Değerlendirmeniz Alındı</string>
-    <string name="tour_review_success_message">Deneyiminizi paylaştığınız için teşekkür ederiz.</string>
-    <string name="tour_review_submitted_notice">Bu turu değerlendirdiniz.</string>
-    <string name="earnings_format">Kazanç: %1$s</string>
-    <string name="amount_format">Tutar: %1$s</string>
-    <string name="rating_review_format">%1$.1f (%2$d)</string>
 
-    <string name="category_label">Kategori: %1$s</string>
-    <string name="participant_count">%1$d Katılımcı</string>
-    <string name="tour_duration_format">%1$d dk</string>
-    <string name="tour_participant_capacity_format">%1$d/%2$d</string>
-
-    <string name="hidden">Gizli</string>
-
-
-    <string name="withdraw_title">Para Çekme</string>
-    <string name="add_money_title">Para Yükleme</string>
-    <string name="available_balance_format">Kullanılabilir Bakiye: %1$s</string>
-    <string name="withdraw_all">Tümünü Çek</string>
-    <string name="default_masked_iban">TR** **** ****</string>
-    <string name="change">Değiştir</string>
-    <string name="withdraw_info_text">Talebinizin durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
-    <string name="add_money_info_text">Yuklenecek tutar guvenli odeme altyapisi uzerinden bakiyenize aktarilacaktir.</string>
     <string name="wallet">Cüzdanım</string>
-    <string name="wallet_transaction_history">Cüzdan Hareketleri</string>
-    <string name="wallet_transaction_withdrawal_title">Para Çekimi</string>
-    <string name="wallet_transaction_top_up_title">Bakiye Yükleme</string>
-    <string name="wallet_transaction_tour_purchase_title">Tur Ödemesi</string>
-    <string name="wallet_transaction_refund_title">Tur İadesi</string>
-    <string name="wallet_transaction_reversal_title">Kazanç İadesi</string>
-    <string name="wallet_filter_all">Tümü</string>
-    <string name="wallet_filter_top_up">Para Yükleme</string>
-    <string name="wallet_filter_tour_payments">Tur Ödemeleri</string>
-    <string name="wallet_filter_refunds">İadeler</string>
-    <string name="wallet_filter_tour_income">Tur Kazançları</string>
-    <string name="wallet_filter_withdrawals">Para Çekimleri</string>
-    <string name="wallet_filter_reversals">Kazanç İadeleri</string>
-    <string name="wallet_transactions_empty">Bu filtreye uygun cüzdan hareketi bulunamadı.</string>
-    <string name="default_payment_card">Varsayılan Ödeme Kartı</string>
-    <string name="add_payment_card_hint">Kartınızı güvenli ödeme sırasında kaydedebilirsiniz.</string>
-    <string name="manage">Yönet</string>
-    <string name="no_saved_card">Kayıtlı kartınız bulunmuyor.</string>
-    <string name="card_not_selected">Lütfen bir kart seçin.</string>
-    <string name="payment_status_pending">Bekliyor</string>
-    <string name="payment_status_completed">Tamamlandı</string>
-    <string name="payment_status_failed">Başarısız</string>
-    <string name="payment_status_refunded">İade Edildi</string>
 
-
-    <string name="checkout_topbar_title">Tur Satın Al</string>
-    <string name="checkout_title">Rezervasyonunuzu Tamamlayın</string>
-    <string name="checkout_subtitle">Katılımcı sayısını ve ödeme yönteminizi kontrol edin.</string>
-    <string name="checkout_participant_count">Katılımcı Sayısı</string>
-    <string name="checkout_remaining_capacity">Kalan kontenjan: %1$d</string>
-    <string name="tour_remaining_capacity">%1$d kişilik yer kaldı</string>
-    <string name="tour_search_result_count">%1$d tur bulundu</string>
-    <string name="tour_search_empty_title">Aramanıza uygun tur bulunamadı.</string>
-    <string name="tour_search_clear_filters">Aramayı ve Filtreleri Temizle</string>
-    <string name="checkout_unit_price">Kişi başı ücret</string>
-    <string name="checkout_payment_method">Ödeme Yöntemi</string>
-    <string name="wallet_payment">Cüzdan Bakiyesi</string>
-    <string name="wallet_balance_format">Kullanılabilir bakiye: %1$s</string>
-    <string name="secure_payment_provider_short">Güvenli ödeme sağlayıcısı üzerinden ödeyin.</string>
-    <string name="checkout_terms_acceptance">Rezervasyon, iptal ve iade koşullarını okudum ve kabul ediyorum.</string>
-    <string name="checkout_total">Toplam</string>
     <string name="continue_to_secure_payment">GÜVENLİ ÖDEMEYE DEVAM ET</string>
-    <string name="tour_booking_unavailable">Bu tur şu anda rezervasyona uygun değil.</string>
-    <string name="tour_booking_not_approved">Bu tur şu anda yayında değil.</string>
-    <string name="tour_booking_closed">Bu tur rehber tarafından yeni rezervasyonlara kapatıldı.</string>
-    <string name="tour_booking_full">Bu turun kontenjanı doldu.</string>
-    <string name="tour_booking_started">Bu turun rezervasyon süresi sona erdi.</string>
-    <string name="checkout_error_already_reserved">Bu tur için zaten bir rezervasyonunuz bulunuyor.</string>
-    <string name="checkout_error_tour_completed">Bu tur tamamlandığı için yeni rezervasyon alınamıyor.</string>
-    <string name="checkout_error_tour_cancelled">Bu tur iptal edildiği için rezervasyon yapılamıyor.</string>
-    <string name="checkout_error_capacity_changed">Seçtiğiniz katılımcı sayısı için yeterli kontenjan kalmadı.</string>
-    <string name="checkout_error_terms_required">Devam etmek için rezervasyon koşullarını kabul edin.</string>
-    <string name="checkout_error_insufficient_balance">Cüzdan bakiyeniz bu işlem için yetersiz.</string>
 
-    <string name="payment_topbar_title">Ödeme Durumu</string>
-    <string name="payment_verifying_title">Ödemeniz Doğrulanıyor</string>
-    <string name="payment_verifying_description">İşlem sonucunu güvenli şekilde kontrol ediyoruz. Lütfen bu ekranı kapatmayın.</string>
-    <string name="payment_success_title">Ödeme Başarılı</string>
-    <string name="payment_success_description">Ödeme işleminiz başarıyla doğrulandı.</string>
-    <string name="payment_failed_title">Ödeme Başarısız</string>
-    <string name="payment_failed_description">Ödeme işlemi tamamlanamadı. Bilgilerinizi kontrol ederek yeniden deneyebilirsiniz.</string>
-    <string name="payment_cancelled_title">Ödeme İptal Edildi</string>
-    <string name="payment_cancelled_description">İşlem tamamlanmadan ödeme sayfasından ayrıldınız.</string>
-    <string name="payment_timeout_title">Ödeme Zaman Aşımına Uğradı</string>
-    <string name="payment_timeout_description">Ödeme sağlayıcısından zamanında yanıt alınamadı. İşlem durumunu yeniden kontrol edin.</string>
-    <string name="payment_not_found_title">İşlem Bulunamadı</string>
-    <string name="payment_not_found_description">Bu ödeme işlemine ait güncel bilgiye ulaşılamadı.</string>
-    <string name="payment_reference_format">İşlem referansı: %1$s</string>
-    <string name="payment_done">TAMAM</string>
-    <string name="payment_retry">TEKRAR DENE</string>
-    <string name="payment_return">GERİ DÖN</string>
-    <string name="payment_exit">ÖDEMEDEN ÇIK</string>
-    <string name="payment_return_home">ANA SAYFAYA DÖN</string>
-    <string name="cancel_payment">Ödemeyi İptal Et</string>
-
-    <string name="bank_accounts">Banka Hesaplarım</string>
-    <string name="bank_accounts_description">Kazanç aktarımı ve para çekme işlemlerinde kullanılacak banka hesaplarınızı yönetin.</string>
-    <string name="bank_accounts_empty">Henüz kayıtlı banka hesabınız bulunmuyor.</string>
-    <string name="add_bank_account">Banka Hesabı Ekle</string>
-    <string name="default_bank_account">Varsayılan Hesap</string>
-    <string name="bank_name">Banka Adı</string>
-    <string name="bank_name_placeholder">IBAN girildiğinde otomatik belirlenir</string>
-    <string name="account_holder_name">Hesap Sahibi</string>
-    <string name="iban">IBAN</string>
-    <string name="iban_placeholder">00 0000 0000 0000 0000 0000 00</string>
-    <string name="iban_error_message">Geçerli bir Türkiye IBAN bilgisi girin.</string>
-    <string name="bank_account_security_notice">Banka hesabı, yalnızca doğrulanmış rehber kazançlarının aktarımı için kullanılır.</string>
-    <string name="add_bank_account_action">HESABI EKLE</string>
-    <string name="bank_account_not_selected">Lütfen bir banka hesabı seçin.</string>
-    <string name="bank_account_required_title">Banka Hesabı Gerekli</string>
-    <string name="bank_account_required_description">Para çekebilmek için önce Profil > Banka Hesaplarım bölümünden bir hesap ekleyin.</string>
-    <string name="delete_bank_account_title">Banka Hesabını Sil</string>
-    <string name="delete_bank_account_description">Bu banka hesabını silmek istediğinizden emin misiniz?</string>
-    <string name="make_default_bank_account_title">Varsayılan Hesap Yap</string>
-    <string name="make_default_bank_account_description">Para çekme işlemlerinde bu hesabın kullanılmasını ister misiniz?</string>
-    <string name="withdrawal_request_received_title">Para Çekme Talebi Alındı</string>
-    <string name="withdrawal_request_received_description">Talebiniz oluşturuldu. İşlem durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
-    <string name="withdrawal_confirmation_title">Para Çekme Onayı</string>
-    <string name="withdrawal_confirmation_description">Banka hesabınıza %1$s tutarında para çekme talebi oluşturulmasını onaylıyor musunuz?</string>
-    <string name="insufficient_balance_title">Yetersiz Bakiye</string>
-    <string name="withdrawal_insufficient_balance_description">Çekmek istediğiniz tutar kullanılabilir bakiyenizi aşıyor. Kullanılabilir bakiyeniz: %1$s.</string>
     <string name="error_invalid_amount">Geçerli bir tutar girin.</string>
-    <string name="error_insufficient_withdrawable_balance">Kullanılabilir bakiyeniz bu para çekme işlemi için yetersiz.</string>
-    <string name="error_bank_account_not_found">Banka hesabı bulunamadı veya artık kullanılamıyor.</string>
-    <string name="error_bank_account_invalid">Banka hesabı bilgileri geçerli değil.</string>
-    <string name="error_bank_account_already_exists">Bu banka hesabı daha önce eklenmiş.</string>
-    <string name="confirm">ONAYLA</string>
 
-    <string name="clear">Temizle</string>
-    <string name="apply_filter">Filtreleri Uygula</string>
     <string name="ok">Tamam</string>
-    <string name="zero">0</string>
+
     <string name="cancel">İptal</string>
-    <string name="cancel_action">İptal Et</string>
-    <string name="cancel_reservation_title">Rezervasyonu İptal Et</string>
-    <string name="cancel_reservation_message">Rezervasyonunuz iptal edilerek Geçmiş bölümüne taşınacaktır. İade durumu geçerli iptal koşullarına göre belirlenecektir.</string>
-    <string name="reservation_cancellation_failed_title">Rezervasyon İptal Edilemedi</string>
-    <string name="reservation_cancellation_failed_message">Rezervasyon durumu değişmiş olabilir. Lütfen tekrar deneyin.</string>
-    <string name="reservation_cancellation_success_title">Rezervasyon İptal Edildi</string>
-    <string name="reservation_cancelled_success">Rezervasyonunuz iptal edildi.</string>
-    <string name="reservation_cancelled_refund_started">Rezervasyonunuz iptal edildi ve tam iade işleminiz başlatıldı.</string>
-    <string name="reservation_cancelled_refund_completed">Rezervasyonunuz iptal edildi ve ücretiniz iade edildi.</string>
-    <string name="reservation_cancelled_refund_failed">Rezervasyonunuz iptal edildi ancak iade işlemi tamamlanamadı. Lütfen destek ekibiyle iletişime geçin.</string>
-    <string name="reservation_cancelled_refund_review">Rezervasyonunuz iptal edildi. İade işleminiz kontrol edilmek üzere incelemeye alındı.</string>
-    <string name="reservation_cancelled_no_refund">Rezervasyonunuz iptal edildi. Geçerli iptal koşulları nedeniyle ücret iadesi uygulanmadı.</string>
-    <string name="reservation_detail_full_refund_notice">Bu rezervasyon tam iade kapsamındadır. Güncel iade durumu ödeme hareketlerinize yansıyacaktır.</string>
-    <string name="reservation_detail_no_refund_notice">Bu rezervasyon için geçerli iptal koşulları nedeniyle ücret iadesi uygulanmaz.</string>
-    <string name="upcoming_trips_empty">Henüz yaklaşan bir geziniz bulunmuyor.</string>
-    <string name="past_trips_empty">Henüz geçmiş bir geziniz bulunmuyor.</string>
-    <string name="error_reservation_not_found">Rezervasyon bulunamadı.</string>
-    <string name="error_reservation_already_exists">Bu tur için zaten bir rezervasyonunuz bulunuyor.</string>
-    <string name="error_reservation_not_cancellable">Bu rezervasyon artık iptal edilemiyor.</string>
+
     <string name="error_idempotency_conflict">Bu işlem daha önce farklı bilgilerle gönderildi. Lütfen tekrar deneyin.</string>
-    <string name="error_refund_failed">İade işlemi tamamlanamadı. Lütfen tekrar deneyin.</string>
-    <string name="error_refund_amount_exceeded">İade tutarı ödenen tutarı aşamaz.</string>
+
     <string name="error_no_response_from_server">Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.</string>
-    <string name="price_plus">%1$s +</string>
-
-    <string name="terms_read_and_approve">Okudum, Onaylıyorum</string>
-    <string name="terms_continue_reading">Okumaya Devam Edin…</string>
-
-    <string name="verification_required_title">Doğrulama Gerekli</string>
-    <string name="registration_success_message">Kaydınız başarıyla alındı! E-posta adresinize gönderilen doğrulama bağlantısına tıklayın.</string>
-    <string name="account_pending_verification_message">E-posta adresiniz henüz doğrulanmamış. Yeni bir doğrulama bağlantısı gönderebiliriz.</string>
-    <plurals name="verification_resend_wait">
-        <item quantity="one">Yeni bağlantı göndermek için %1$d saniye bekleyin.</item>
-        <item quantity="other">Yeni bağlantı göndermek için %1$d saniye bekleyin.</item>
-    </plurals>
-    <string name="resend_verification_email">Tekrar Gönder</string>
-    <string name="verification_email_sent">Doğrulama bağlantısı e-posta adresinize yeniden gönderildi.</string>
-    <string name="close">Kapat</string>
-    <string name="password_changed_title">Şifre Güncellendi</string>
-    <string name="password_changed_message">Şifreniz başarıyla güncellendi. Güvenliğiniz için yeni şifrenizle tekrar giriş yapın.</string>
-
-
-    <string name="default_web_client_id">677861073392-4ni851g7ggkhb8ngk9418u346t4so9rd.apps.googleusercontent.com</string>
-
-
-    <string name="notification_tours_and_reservations">Turlar ve Rezervasyonlar</string>
-    <string name="upcoming_tour_reminders">Yaklaşan Tur Hatırlatıcıları</string>
-    <string name="upcoming_tour_reminders_desc">Tur saati ve buluşma noktası</string>
-    <string name="guide_messages">Rehber Mesajları</string>
-    <string name="guide_messages_desc">Rehberden gelen anlık mesajlar</string>
-    <string name="reservation_updates">Rezervasyon Güncellemeleri</string>
-    <string name="reservation_updates_desc">Onay, iptal ve değişiklik detayları</string>
-    <string name="account_and_interaction">Hesap ve Etkileşim</string>
-    <string name="review_requests">Değerlendirme İstekleri</string>
-    <string name="review_requests_desc">Tur sonrası yorum hatırlatmaları</string>
-    <string name="security_alerts">Güvenlik Uyarıları</string>
-    <string name="security_alerts_desc">Şifre değişimi, yeni giriş bildirimleri</string>
-
-    <string name="guide_notification_tours_and_reservations">Turlar ve Rezervasyonlar</string>
-    <string name="guide_upcoming_tour_reminders">Yaklaşan Tur Hatırlatıcıları</string>
-    <string name="guide_upcoming_tour_reminders_desc">Başlamak üzere olan turlarınız için saat ve buluşma noktası detayları.</string>
-    <string name="guide_tourist_messages">Turist Mesajları</string>
-    <string name="guide_tourist_messages_desc">Tura katılacak misafirlerinizden gelen anlık mesajlar ve sorular.</string>
-    <string name="guide_reservation_updates">Rezervasyon Güncellemeleri</string>
-    <string name="guide_reservation_updates_desc">Turlarınıza yapılan yeni rezervasyonlar ve turist iptalleri.</string>
-    <string name="guide_account_and_interaction">Hesap ve Etkileşim</string>
-    <string name="guide_payments_and_earnings">Ödeme ve Hak Edişler</string>
-    <string name="guide_payments_and_earnings_desc">Tamamlanan turların hizmet bedeli banka hesabınıza aktarıldığında.</string>
-    <string name="guide_new_reviews">Yeni Değerlendirmeler</string>
-    <string name="guide_new_reviews_desc">Turistler profilinize veya turunuza yeni bir puan ve yorum bıraktığında.</string>
-    <string name="guide_security_alerts">Güvenlik Uyarıları</string>
-    <string name="guide_security_alerts_desc">Şifre değişimi ve yeni giriş bildirimleri.</string>
-
-
-    <string name="legal_title">Kullanıcı Sözleşmesi ve Şartlar</string>
-    <string name="legal_intro">GuideMate platformunu kullanarak aşağıdaki temel şartları ve yasal yükümlülükleri kabul etmiş sayılırsınız. Lütfen dikkatlice okuyunuz.</string>
-
-    <string name="legal_clause_1_title">1. Hizmet Kullanımı ve Sorumluluklar</string>
-    <string name="legal_clause_1_desc">Kullanıcılar, platform üzerinden sundukları veya aldıkları tur hizmetlerinde doğru bilgi vermekle yükümlüdür. GuideMate, rehber ve turist arasındaki doğrudan iletişimde yalnızca bir aracı platformdur.</string>
-
-    <string name="legal_clause_2_title">2. Gizlilik ve Veri Güvenliği</string>
-    <string name="legal_clause_2_desc">Kişisel verileriniz ve ödeme bilgileriniz uluslararası güvenlik standartlarında ve KVKK kapsamında korunmaktadır. Verileriniz, yalnızca rezervasyon süreçlerinin yürütülmesi amacıyla işlenir.</string>
-
-    <string name="legal_clause_3_title">3. İptal ve İade Koşulları</string>
-    <string name="legal_clause_3_desc">Tura 48 saat kalana kadar yapılan iptallerde platform üzerinden tam iade sağlanır. Daha geç yapılan iptallerde sistemin standart kesinti politikaları devreye girer.</string>
-
-    <string name="legal_clause_4_title">4. Fikri Mülkiyet Hakları</string>
-    <string name="legal_clause_4_desc">Uygulama içerisindeki tüm tasarımlar, metinler, logolar ve sistemin işleyiş algoritmaları GuideMate\'in yasal mülkiyetindedir. İzinsiz kopyalanamaz ve dağıtılamaz.</string>
-
-    <string name="guide_legal_title">Rehber Hizmet Sözleşmesi ve Şartlar</string>
-    <string name="guide_legal_intro">GuideMate platformunda "Rehber" olarak hizmet vererek aşağıdaki temel şartları ve yasal yükümlülükleri kabul etmiş sayılırsınız. Lütfen dikkatlice okuyunuz.</string>
-    <string name="guide_legal_clause_1_title">1. Hizmet Sunumu ve Profesyonellik</string>
-    <string name="guide_legal_clause_1_desc">Rehberler, platformda yayınladıkları turların içeriği hakkında doğru bilgi vermek ve onaylanan rezervasyonları taahhüt edilen saatte, eksiksiz olarak gerçekleştirmekle yükümlüdür. GuideMate, hizmet sağlayıcı ile turist arasındaki doğrudan iletişimde yalnızca bir aracı platformdur.</string>
-    <string name="guide_legal_clause_2_title">2. Gizlilik ve Veri Güvenliği</string>
-    <string name="guide_legal_clause_2_desc">Kişisel verileriniz, banka hesap bilgileriniz ve turistlerle olan iletişiminiz uluslararası güvenlik standartlarında ve KVKK kapsamında korunmaktadır. Verileriniz, yalnızca operasyonel süreçlerin yürütülmesi amacıyla işlenir.</string>
-    <string name="guide_legal_clause_3_title">3. İptal Politikası ve Sorumluluklar</string>
-    <string name="guide_legal_clause_3_desc">Turistlerin, tura 48 saat kalana kadar ücretsiz iptal ve tam iade hakkı bulunmaktadır. Rehber tarafından yapılan mazeretsiz ve son dakika iptalleri, turist mağduriyetine yol açacağından; profil puanının düşürülmesine, hesabın askıya alınmasına veya platformdan tamamen ihraca neden olabilir.</string>
-    <string name="guide_legal_clause_4_title">4. Ödemeler ve Komisyon</string>
-    <string name="guide_legal_clause_4_desc">GuideMate, platform üzerinden başarıyla tamamlanan turlardan önceden belirlenen oranlarda hizmet bedeli (komisyon) tahsil eder. İptal ve iade kontrolleri tamamlanan net rehber hak edişleri, kullanılabilir cüzdan bakiyesine yansıtılır. Rehber, kayıtlı banka hesabını seçerek para çekme talebi oluşturabilir ve işlem durumunu cüzdan hareketlerinden takip edebilir.</string>
-    <string name="guide_legal_clause_5_title">5. Fikri Mülkiyet Hakları</string>
-    <string name="guide_legal_clause_5_desc">Uygulama içerisindeki tüm tasarımlar, metinler, logolar ve sistemin işleyiş algoritmaları GuideMate\'in yasal mülkiyetindedir. İzinsiz kopyalanamaz ve dağıtılamaz.</string>
 
     <string name="app_version">GuideMate v1.0.0</string>
 
-
-
-
-    <string name="support_intro">GuideMate deneyiminizle ilgili en çok merak edilen soruların yanıtlarını aşağıda bulabilirsiniz.</string>
-    <string name="guide_support_intro">GuideMate rehber deneyiminizle ilgili en çok merak edilen soruların yanıtlarını aşağıda bulabilirsiniz.</string>
-
-    <string name="faq_1_title">Nasıl tur rezervasyonu yapabilirim?</string>
-    <string name="faq_1_desc">Arama ekranından gitmek istediğiniz şehri veya turistik mekanı seçin. Size uygun rehberi bulduktan sonra takvimden tarih ve saat seçerek ödeme adımına geçebilir ve rezervasyonunuzu anında tamamlayabilirsiniz.</string>
-
-    <string name="faq_2_title">Rezervasyonumu iptal edebilir miyim?</string>
-    <string name="faq_2_desc">Evet, tur başlangıç saatine 48 saat kalana kadar yaptığınız iptallerde tam iade alırsınız. Daha yakın saatlerdeki iptallerde sistemin standart kesinti politikaları devreye girer.</string>
-
-    <string name="faq_3_title">Rehberimle nasıl iletişime geçeceğim?</string>
-    <string name="faq_3_desc">Rehberin profilindeki mesaj seçeneğinden rezervasyon öncesinde sorularınızı iletebilir; rezervasyon sonrasında aynı sohbet üzerinden buluşma noktası ve diğer detayları netleştirebilirsiniz.</string>
-
-    <string name="faq_4_title">Tur sırasında bir sorun yaşarsam ne yapmalıyım?</string>
-    <string name="faq_4_desc">Rehberin buluşma noktasına gelmemesi veya hizmetin taahhüt edildiği gibi olmaması durumunda anında destek ekibimize ulaşarak iade talebinde bulunabilirsiniz.</string>
-
-    <string name="guide_faq_1_title">Nasıl yeni bir tur oluşturup yayınlayabilirim?</string>
-    <string name="guide_faq_1_desc">Profilinizdeki "Turlarım" sekmesinden yeni bir tur ekleyebilir; turun içeriğini, fiyatını, süresini ve maksimum kontenjanını belirleyerek onay sonrasında turistlerin rezervasyonuna açabilirsiniz.</string>
-    <string name="guide_faq_2_title">Bir turist rezervasyonunu iptal ederse ne olur?</string>
-    <string name="guide_faq_2_desc">Turistlerin tura 48 saat kalana kadar ücretsiz iptal hakkı vardır. Ancak 48 saatten daha az bir süre kala yapılan iptallerde, rehber olarak sizin mağduriyetinizi önlemek adına standart kesinti politikalarımız çerçevesinde hesabınıza belirli bir telafi ödemesi yansıtılır.</string>
-    <string name="guide_faq_3_title">Turistlerimle nasıl iletişime geçeceğim?</string>
-    <string name="guide_faq_3_desc">Turistler rezervasyon öncesinde profiliniz üzerinden size soru gönderebilir; rezervasyon sonrasında aynı sohbet üzerinden buluşma noktası, saat teyidi ve diğer detayları netleştirebilirsiniz.</string>
-    <string name="guide_faq_4_title">Ödememi ne zaman ve nasıl alacağım?</string>
-    <string name="guide_faq_4_desc">Tamamlanan turlardan doğan net hak edişleriniz, iptal ve iade kontrollerinin ardından kullanılabilir cüzdan bakiyenize yansıtılır. Cüzdan ekranından kayıtlı banka hesabınızı seçerek para çekme talebi oluşturabilir ve durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
-
-    <string name="contact_support_question">Sorunuzun yanıtını bulamadınız mı?</string>
-    <string name="contact_support_action">Canlı Desteğe Bağlan</string>
-
-
-
-
-    <string name="terms_and_conditions_full_text">
-        GUIDEMATE KULLANICI SÖZLEŞMESİ, GİZLİLİK POLİTİKASI VE AÇIK RIZA METNİ\n\n
-        1. TARAFLAR VE KONU\n
-        İşbu sözleşme, GuideMate mobil uygulaması (bundan böyle "Platform" olarak anılacaktır) ile uygulamayı kullanan Turist veya Rehber (bundan böyle "Kullanıcı" olarak anılacaktır) arasında akdedilmiştir. Kullanıcı, uygulamayı kullanarak veya ödeme yaparak aşağıdaki şartları peşinen kabul etmiş sayılır.\n\n
-        2. HİZMETİN KAPSAMI\n
-        GuideMate, seyahat etmek isteyen kullanıcılar (Turist) ile profesyonel rehberlik hizmeti verenleri (Rehber) bir araya getiren bir "Aracı Hizmet Sağlayıcı"dır. GuideMate, turların doğrudan düzenleyicisi değil, güvenli buluşma ve ödeme platformudur.\n\n
-        3. ÖDEME VE GÜVENLİK \n
-        3.1. Tüm ödemeler, Platform üzerinden Kredi/Banka Kartı ile 256-bit SSL sertifikalı güvenli ödeme altyapısı kullanılarak yapılır.\n
-        3.2. Kullanıcı kart bilgileri GuideMate sunucularında ASLA SAKLANMAZ. İşlemler, uluslararası güvenlik standartlarına (PCI-DSS) sahip ödeme kuruluşları aracılığıyla gerçekleştirilir.\n
-        3.3. Platform Dışı Ödeme Yasağı: Güvenlik gereği, Turist ve Rehber arasındaki tüm para transferi uygulama üzerinden yapılmalıdır. Elden nakit ödeme veya harici IBAN transferlerinde yaşanan mağduriyetlerde GuideMate hiçbir hukuki sorumluluk kabul etmez.\n\n
-        4. KİŞİSEL VERİLERİN KORUNMASI (KVKK AYDINLATMA METNİ)\n
-        4.1. Paylaştığınız Ad, Soyad, E-posta, Konum ve İletişim bilgileri; hizmetin ifası, fatura düzenlenmesi ve güvenliğin sağlanması amacıyla 6698 sayılı KVKK kapsamında işlenmektedir.\n
-        4.2. Kişisel verileriniz, yasal zorunluluklar haricinde üçüncü şahıslarla paylaşılmaz. Rehberler, sadece turun gerçekleşmesi için gerekli olan sınırlı bilgileri görebilir.\n\n
-        5. İPTAL VE İADE KOŞULLARI\n
-        5.1. Turist, satın aldığı turu, tur başlangıç saatinden 24 saat öncesine kadar iptal etmesi durumunda %100 ücret iadesi alır.\n
-        5.2. Son 24 saat içinde yapılan iptallerde hizmet bedeli kesintisi uygulanabilir.\n
-        5.3. Rehber tarafından kaynaklanan iptallerde, ödemenin tamamı Turist’e kesintisiz iade edilir.\n\n
-        6. KULLANIM KURALLARI VE YASAKLAR\n
-        Platform üzerinde genel ahlaka aykırı, tehditkar, yanıltıcı veya taciz edici mesajlaşmalar yasaktır. Rehberlerin "Profesyonel Turist Rehberi" kokartına sahip olması zorunludur.\n\n
-        7. YÜRÜRLÜK\n
-        Kullanıcı, "Okudum ve Kabul Ediyorum" kutucuğunu işaretleyerek işbu sözleşmenin tüm maddelerini kabul etmiş sayılır.
-    </string>
-
-    <string name="hosted_card_payment">Kart ile Ödeme</string>
-    <string name="hosted_card_selection_notice">Kart seçimi iyzico güvenli ödeme ekranında yapılır.</string>
-    <string name="payment_charge_currency">Ödeme Para Birimi</string>
-    <string name="payment_charge_amount">Karttan çekilecek tutar</string>
-    <string name="payment_quote_notice">Tutar güncel kur bilgisiyle hesaplandı. Değişiklik yaparsanız teklif yenilenir.</string>
-    <string name="payment_get_quote">ÖDEME TUTARINI GÖR</string>
-    <string name="payment_currency_required">Devam etmek için ödeme para birimini seçin.</string>
     <string name="secure_payment_title">Güvenli Ödeme</string>
-    <string name="payment_page_load_error">Güvenli ödeme sayfası yüklenemedi.</string>
-    <string name="payment_ssl_error">Güvenli bağlantı doğrulanamadığı için ödeme sayfası kapatıldı.</string>
-    <string name="payment_invalid_url_error">Güvenli ödeme adresi geçersiz.</string>
-    <string name="payment_refund_pending_title">İade İşlemi Başlatıldı</string>
-    <string name="payment_refund_pending_description">Ödemeniz doğrulandı ancak rezervasyon tamamlanamadı. Tam iade işleminiz devam ediyor.</string>
-    <string name="payment_refunded_title">Ödeme İade Edildi</string>
-    <string name="payment_refunded_description">Rezervasyon tamamlanamadığı için ödemenizin tamamı iade edildi.</string>
-    <string name="payment_manual_review_title">İşlem İnceleniyor</string>
-    <string name="payment_manual_review_description">Ödeme ve rezervasyon sonucu güvenliğiniz için incelemeye alındı. Güncel durum size bildirilecek.</string>
-    <string name="error_payment_not_found">Ödeme işlemi bulunamadı.</string>
-    <string name="error_payment_initialization_failed">Güvenli ödeme başlatılamadı. Lütfen tekrar deneyin.</string>
-    <string name="error_payment_verification_failed">Ödeme sonucu doğrulanamadı. Lütfen tekrar kontrol edin.</string>
-    <string name="error_payment_not_cancellable">Bu ödeme artık iptal edilemez. Güncel işlem durumunu kontrol edin.</string>
-    <string name="error_payment_currency_not_supported">Seçtiğiniz para birimi desteklenmiyor.</string>
-    <string name="error_payment_quote_unavailable">Ödeme tutarı şu anda hesaplanamıyor. Lütfen tekrar deneyin.</string>
-    <string name="error_payment_quote_expired">Ödeme teklifi süresi doldu. Güncel tutarı yeniden alın.</string>
-    <string name="error_card_insufficient_funds">Kart bakiyesi bu işlem için yetersiz.</string>
-    <string name="error_payment_method_declined">Kart işlemi banka tarafından reddedildi.</string>
 
 </resources>

@@ -17,7 +17,7 @@ import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import com.ahmetkaragunlu.guidemate.payment.presentation.locale.currentCheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentLaunch
 import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.checkoutErrorResId
-import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
+import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.TourCheckoutUiState
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.resolveBookingAvailability
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.TourDiscoveryRepository

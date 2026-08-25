@@ -1,9 +1,7 @@
 package com.ahmetkaragunlu.guidemate.tour.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.ApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
-import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.tour.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.tour.data.mapper.toDto
@@ -21,53 +19,59 @@ import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.UpdateTourSessio
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSession
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
-import retrofit2.Response
 
 class GuideTourRepositoryImpl @Inject constructor(
     private val api: GuideTourApi,
-    private val apiErrorParser: ApiErrorParser,
-    private val networkExceptionMapper: NetworkExceptionMapper,
+    private val apiCallExecutor: ApiCallExecutor,
 ) : GuideTourRepository {
     override suspend fun getTours(
         tab: GuideTourListType,
         page: Int,
         size: Int,
     ): DataResult<PagedResult<GuideTourCard>> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.getTours(tab = tab.name, page = page, size = size) },
             transform = { it.toDomain() },
         )
 
     override suspend fun getTour(tourId: String): DataResult<TourDetails> =
-        execute(request = { api.getTour(tourId) }, transform = { it.toDomain() })
+        apiCallExecutor.execute(request = { api.getTour(tourId) }, transform = { it.toDomain() })
 
     override suspend fun createTour(input: CreateGuideTourInput): DataResult<TourReviewSubmission> =
-        execute(request = { api.createTour(input.toDto()) }, transform = { it.toDomain() })
+        apiCallExecutor.execute(request = { api.createTour(input.toDto()) }, transform = { it.toDomain() })
 
     override suspend fun submitChange(
         tourId: String,
         input: SubmitTourChangeInput,
     ): DataResult<TourReviewSubmission> =
-        execute(request = { api.submitChange(tourId, input.toDto()) }, transform = { it.toDomain() })
+        apiCallExecutor.execute(
+            request = { api.submitChange(tourId, input.toDto()) },
+            transform = { it.toDomain() },
+        )
 
     override suspend fun addSession(
         tourId: String,
         input: TourSessionInput,
     ): DataResult<TourSession> =
-        execute(request = { api.addSession(tourId, input.toDto()) }, transform = { it.toDomain() })
+        apiCallExecutor.execute(
+            request = { api.addSession(tourId, input.toDto()) },
+            transform = { it.toDomain() },
+        )
 
     override suspend fun updateSession(
         sessionId: String,
         input: UpdateTourSessionInput,
     ): DataResult<TourSession> =
-        execute(request = { api.updateSession(sessionId, input.toDto()) }, transform = { it.toDomain() })
+        apiCallExecutor.execute(
+            request = { api.updateSession(sessionId, input.toDto()) },
+            transform = { it.toDomain() },
+        )
 
     override suspend fun setSessionBookingOpen(
         sessionId: String,
         isOpen: Boolean,
     ): DataResult<TourSession> =
-        execute(
+        apiCallExecutor.execute(
             request = { if (isOpen) api.openSession(sessionId) else api.closeSession(sessionId) },
             transform = { it.toDomain() },
         )
@@ -77,7 +81,7 @@ class GuideTourRepositoryImpl @Inject constructor(
         reason: String,
         idempotencyKey: String,
     ): DataResult<TourSession> =
-        execute(
+        apiCallExecutor.execute(
             request = {
                 api.cancelSession(
                     sessionId = sessionId,
@@ -89,26 +93,11 @@ class GuideTourRepositoryImpl @Inject constructor(
         )
 
     override suspend fun archiveTour(tourId: String): DataResult<TourDetails> =
-        execute(request = { api.archiveTour(tourId) }, transform = { it.toDomain() })
+        apiCallExecutor.execute(
+            request = { api.archiveTour(tourId) },
+            transform = { it.toDomain() },
+        )
 
     override suspend fun getDashboard(): DataResult<GuideDashboard> =
-        execute(request = api::getDashboard, transform = { it.toDomain() })
-
-    private suspend fun <ResponseBody, Domain> execute(
-        request: suspend () -> Response<ResponseBody>,
-        transform: (ResponseBody) -> Domain,
-    ): DataResult<Domain> =
-        try {
-            val response = request()
-            if (!response.isSuccessful) {
-                DataResult.Error(apiErrorParser.parse(response))
-            } else {
-                response.body()?.let { DataResult.Success(transform(it)) }
-                    ?: DataResult.Error(AppError.NoResponseFromServer)
-            }
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: Exception) {
-            DataResult.Error(networkExceptionMapper.map(exception), exception)
-        }
+        apiCallExecutor.execute(request = api::getDashboard, transform = { it.toDomain() })
 }

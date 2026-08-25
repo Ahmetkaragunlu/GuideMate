@@ -16,7 +16,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.location.model.CountryOption
 import java.util.Locale
 

@@ -1,7 +1,6 @@
 package com.ahmetkaragunlu.guidemate.tour.data.mapper
 
-import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.media.data.mapper.toDomain
@@ -87,7 +86,6 @@ fun TourDetailResponseDto.toDomain(): TourDetails {
                     GuidePublicSummary(
                         id = guide.guideId.toString(),
                         displayName = guide.displayName,
-                        profileImageResId = R.drawable.unnamed,
                         profileImageUrl = guide.avatar?.imageUrl,
                     ),
                 title = title,
@@ -99,7 +97,6 @@ fun TourDetailResponseDto.toDomain(): TourDetails {
                 timeZoneId = timeZoneId,
                 category = categoryCode.toTourCategory(),
                 languages = languageCodes.map { it.toTourLanguage(locale) },
-                coverImageResId = R.drawable.example,
                 coverMediaId = cover.mediaAssetId,
                 coverImageUrl = cover.imageUrl,
                 approvalStatus = TourApprovalStatus.valueOf(approvalStatus),

@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.tour.data.mapper
 
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import java.util.Locale

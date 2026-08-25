@@ -1,10 +1,10 @@
 package com.ahmetkaragunlu.guidemate.common.location.data.remote
 
 import android.content.Context
-import com.ahmetkaragunlu.guidemate.common.location.data.CitySearchService
-import com.ahmetkaragunlu.guidemate.common.location.data.CitySearchSession
 import com.ahmetkaragunlu.guidemate.common.location.model.CityOption
 import com.ahmetkaragunlu.guidemate.common.location.model.CitySearchResult
+import com.ahmetkaragunlu.guidemate.common.location.search.CitySearchService
+import com.ahmetkaragunlu.guidemate.common.location.search.CitySearchSession
 import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction

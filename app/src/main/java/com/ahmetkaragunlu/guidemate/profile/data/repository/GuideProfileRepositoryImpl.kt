@@ -1,10 +1,8 @@
 package com.ahmetkaragunlu.guidemate.profile.data.repository
 
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.ApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
-import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.profile.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.profile.data.mapper.toDto
@@ -14,18 +12,15 @@ import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfileUpdate
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideSearchResult
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import retrofit2.Response
 
 class GuideProfileRepositoryImpl @Inject constructor(
     private val api: GuideProfileApi,
     private val userRepository: UserRepository,
-    private val apiErrorParser: ApiErrorParser,
-    private val networkExceptionMapper: NetworkExceptionMapper,
+    private val apiCallExecutor: ApiCallExecutor,
 ) : GuideProfileRepository {
     private val ownProfileCache = MutableStateFlow<GuideProfile?>(null)
 
@@ -38,19 +33,19 @@ class GuideProfileRepositoryImpl @Inject constructor(
         get() = ownProfileCache.value?.takeIf { it.guideId == userRepository.userState.value.userId }
 
     override suspend fun refreshOwnProfile(): DataResult<GuideProfile> =
-        execute(
+        apiCallExecutor.execute(
             request = api::getOwnProfile,
             transform = { it.toDomain() },
         ).also(::cacheSuccess)
 
     override suspend fun updateOwnProfile(update: GuideProfileUpdate): DataResult<GuideProfile> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.updateOwnProfile(update.toDto()) },
             transform = { it.toDomain() },
         ).also(::cacheSuccess)
 
     override suspend fun getPublicProfile(guideId: Long): DataResult<GuideProfile> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.getPublicProfile(guideId) },
             transform = { it.toDomain() },
         )
@@ -60,7 +55,7 @@ class GuideProfileRepositoryImpl @Inject constructor(
         page: Int,
         size: Int,
     ): DataResult<PagedResult<GuideSearchResult>> =
-        execute(
+        apiCallExecutor.execute(
             request = {
                 api.searchGuides(
                     query = query?.trim()?.takeIf(String::isNotEmpty),
@@ -72,7 +67,7 @@ class GuideProfileRepositoryImpl @Inject constructor(
         )
 
     override suspend fun getTopGuides(limit: Int): DataResult<List<GuideSearchResult>> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.getTopGuides(limit) },
             transform = { guides -> guides.map { it.toDomain() } },
         )
@@ -80,26 +75,4 @@ class GuideProfileRepositoryImpl @Inject constructor(
     private fun cacheSuccess(result: DataResult<GuideProfile>) {
         if (result is DataResult.Success) ownProfileCache.value = result.data
     }
-
-    private suspend fun <ResponseBody, Domain> execute(
-        request: suspend () -> Response<ResponseBody>,
-        transform: (ResponseBody) -> Domain,
-    ): DataResult<Domain> =
-        try {
-            val response = request()
-            if (!response.isSuccessful) {
-                DataResult.Error(apiErrorParser.parse(response))
-            } else {
-                val body = response.body()
-                if (body == null) {
-                    DataResult.Error(AppError.NoResponseFromServer)
-                } else {
-                    DataResult.Success(transform(body))
-                }
-            }
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: Exception) {
-            DataResult.Error(networkExceptionMapper.map(exception), exception)
-        }
 }

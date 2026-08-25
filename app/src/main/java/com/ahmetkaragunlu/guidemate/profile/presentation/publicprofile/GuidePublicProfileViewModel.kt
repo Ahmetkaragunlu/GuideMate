@@ -82,10 +82,16 @@ class GuidePublicProfileViewModel
         }
 
         private suspend fun loadPopularTours(guideId: Long) =
-            when (val result = tourRepository.getPopularTours(page = 0, size = 20)) {
+            when (
+                val result =
+                    tourRepository.getPopularToursForGuide(
+                        guideId = guideId,
+                        page = 0,
+                        size = 20,
+                    )
+            ) {
                 is DataResult.Success ->
                     result.data.items
-                        .filter { it.guide.id == guideId.toString() }
                         .map { it.toPopularTourCardUiModel() }
                 is DataResult.Error -> emptyList()
             }

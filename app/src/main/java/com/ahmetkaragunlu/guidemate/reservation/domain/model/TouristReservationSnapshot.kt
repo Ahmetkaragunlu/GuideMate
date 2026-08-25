@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.reservation.domain.model
 
-import androidx.annotation.DrawableRes
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
@@ -18,7 +17,6 @@ data class TouristReservationSnapshot(
     val timeZoneId: String,
     val category: TourCategory,
     val languages: List<TourLanguage>,
-    @param:DrawableRes val coverImageResId: Int,
     val coverMediaId: String?,
     val coverImageUrl: String?,
     val startsAt: Instant,

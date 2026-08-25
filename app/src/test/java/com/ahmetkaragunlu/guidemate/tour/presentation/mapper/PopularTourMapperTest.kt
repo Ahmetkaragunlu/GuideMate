@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.mapper
 
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
@@ -34,7 +35,6 @@ class PopularTourMapperTest {
                     GuidePublicSummary(
                         id = "guide-1",
                         displayName = "Ahmet Yılmaz",
-                        profileImageResId = 11,
                         profileImageUrl = "content://guide-avatar",
                     ),
             )
@@ -48,7 +48,7 @@ class PopularTourMapperTest {
         assertEquals("", card.languagesFlag)
         assertEquals("", card.languagesText)
         assertEquals(item.guide.displayName, card.guideName)
-        assertEquals(item.guide.profileImageResId, card.guideImageResId)
+        assertEquals(R.drawable.unnamed, card.guideImageResId)
         assertEquals(item.guide.profileImageUrl, card.guideImageUrl)
     }
 }

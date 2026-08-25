@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.wallet.presentation.components.content.MoneyActionBottomSheetContent
+import com.ahmetkaragunlu.guidemate.wallet.presentation.components.MoneyActionBottomSheetContent
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletUiState
 import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentCurrencySelector
 import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentQuoteSummary

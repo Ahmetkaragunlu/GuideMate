@@ -2,10 +2,9 @@ package com.ahmetkaragunlu.guidemate.notification.data.repository
 
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.common.coroutines.ApplicationScope
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
-import com.ahmetkaragunlu.guidemate.common.result.AppError
+import com.ahmetkaragunlu.guidemate.common.network.ApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.result.mapSuccess
 import com.ahmetkaragunlu.guidemate.common.storage.installation.InstallationIdDataSource
 import com.ahmetkaragunlu.guidemate.notification.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.notification.data.mapper.toDto
@@ -19,7 +18,6 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPrefer
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +31,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import retrofit2.Response
 
 private const val NOTIFICATION_PAGE_SIZE = 20
 
@@ -45,8 +42,7 @@ constructor(
     private val installationIdDataSource: InstallationIdDataSource,
     private val pushInstallationIdProvider: PushInstallationIdProvider,
     private val userRepository: UserRepository,
-    private val apiErrorParser: ApiErrorParser,
-    private val networkExceptionMapper: NetworkExceptionMapper,
+    private val apiCallExecutor: ApiCallExecutor,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) : NotificationRepository {
     private val mutableNotifications = MutableStateFlow<List<AppNotification>>(emptyList())
@@ -77,7 +73,7 @@ constructor(
 
     override suspend fun refreshNotifications(): DataResult<List<AppNotification>> =
         pageMutex.withLock {
-            execute(
+            apiCallExecutor.execute(
                 request = { api.getNotifications(page = 0, size = NOTIFICATION_PAGE_SIZE) },
                 transform = { page -> page.content.map { it.toDomain() } to !page.isLast },
             ).mapSuccess { (notifications, hasMore) ->
@@ -94,7 +90,7 @@ constructor(
                 return@withLock DataResult.Success(mutableNotifications.value)
             }
             val nextPage = currentPage + 1
-            execute(
+            apiCallExecutor.execute(
                 request = {
                     api.getNotifications(page = nextPage, size = NOTIFICATION_PAGE_SIZE)
                 },
@@ -108,7 +104,7 @@ constructor(
         }
 
     override suspend fun refreshUnreadCount(): DataResult<Int> =
-        execute(
+        apiCallExecutor.execute(
             request = api::getUnreadCount,
             transform = { it.unreadCount.toSafeInt() },
         ).mapSuccess { count ->
@@ -117,7 +113,7 @@ constructor(
         }
 
     override suspend fun markRead(notificationId: String): DataResult<AppNotification> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.markRead(notificationId) },
             transform = { it.toDomain() },
         ).mapSuccess { updated ->
@@ -136,7 +132,7 @@ constructor(
         }
 
     override suspend fun markAllRead(): DataResult<Int> =
-        execute(
+        apiCallExecutor.execute(
             request = api::markAllRead,
             transform = { it.unreadCount.toSafeInt() },
         ).mapSuccess { unreadCount ->
@@ -148,7 +144,7 @@ constructor(
         }
 
     override suspend fun refreshPreferences(): DataResult<NotificationPreferences> =
-        execute(
+        apiCallExecutor.execute(
             request = api::getPreferences,
             transform = { it.toDomain() },
         ).mapSuccess { preferences ->
@@ -159,7 +155,7 @@ constructor(
     override suspend fun updatePreferences(
         update: NotificationPreferenceUpdate,
     ): DataResult<NotificationPreferences> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.updatePreferences(update.toDto()) },
             transform = { it.toDomain() },
         ).mapSuccess { preferences ->
@@ -168,7 +164,7 @@ constructor(
         }
 
     override suspend fun registerDevice(): DataResult<Unit> =
-        executeUnit {
+        apiCallExecutor.executeUnit {
             api.registerDevice(
                 RegisterDeviceRequestDto(
                     installationId = installationIdDataSource.getOrCreate(),
@@ -206,40 +202,6 @@ constructor(
                 }
         }
     }
-
-    private suspend fun <ResponseBody, Domain> execute(
-        request: suspend () -> Response<ResponseBody>,
-        transform: (ResponseBody) -> Domain,
-    ): DataResult<Domain> =
-        try {
-            val response = request()
-            if (!response.isSuccessful) {
-                DataResult.Error(apiErrorParser.parse(response))
-            } else {
-                response.body()?.let { DataResult.Success(transform(it)) }
-                    ?: DataResult.Error(AppError.NoResponseFromServer)
-            }
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: Exception) {
-            DataResult.Error(networkExceptionMapper.map(exception), exception)
-        }
-
-    private suspend fun executeUnit(
-        request: suspend () -> Response<*>,
-    ): DataResult<Unit> =
-        try {
-            val response = request()
-            if (response.isSuccessful) {
-                DataResult.Success(Unit)
-            } else {
-                DataResult.Error(apiErrorParser.parse(response))
-            }
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: Exception) {
-            DataResult.Error(networkExceptionMapper.map(exception), exception)
-        }
 }
 
 private fun mergeNotifications(
@@ -251,9 +213,3 @@ private fun mergeNotifications(
         .sortedByDescending(AppNotification::createdAt)
 
 private fun Long.toSafeInt(): Int = coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
-
-private inline fun <T, R> DataResult<T>.mapSuccess(transform: (T) -> R): DataResult<R> =
-    when (this) {
-        is DataResult.Success -> DataResult.Success(transform(data))
-        is DataResult.Error -> this
-    }

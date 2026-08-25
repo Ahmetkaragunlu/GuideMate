@@ -12,19 +12,27 @@ data class ExploreUiState(
     val selectedTab: ExploreTab = ExploreTab.TOURS,
     val draftFilters: TourFilterUiState = TourFilterUiState(),
     val appliedFilters: TourFilterUiState = TourFilterUiState(),
-    val toursSearchQuery: String = "",
-    val tourResults: List<TourSearchResultUiModel> = emptyList(),
-    val tourResultCount: Long = 0,
-    val tourResultsLoadState: ContentLoadState = ContentLoadState.LOADING,
-    val isLoadingMoreTours: Boolean = false,
-    val tourAppendFailed: Boolean = false,
-    val canLoadMoreTours: Boolean = false,
-    val guidesSearchQuery: String = "",
-    val guideResults: List<GuideResultUiModel> = emptyList(),
-    val guideResultsLoadState: ContentLoadState = ContentLoadState.LOADING,
-    val isLoadingMoreGuides: Boolean = false,
-    val guideAppendFailed: Boolean = false,
-    val canLoadMoreGuides: Boolean = false,
+    val tours: TourExploreState = TourExploreState(),
+    val guides: GuideExploreState = GuideExploreState(),
+)
+
+data class TourExploreState(
+    val searchQuery: String = "",
+    val results: List<TourSearchResultUiModel> = emptyList(),
+    val resultCount: Long = 0,
+    val loadState: ContentLoadState = ContentLoadState.LOADING,
+    val isLoadingMore: Boolean = false,
+    val appendFailed: Boolean = false,
+    val canLoadMore: Boolean = false,
+)
+
+data class GuideExploreState(
+    val searchQuery: String = "",
+    val results: List<GuideResultUiModel> = emptyList(),
+    val loadState: ContentLoadState = ContentLoadState.LOADING,
+    val isLoadingMore: Boolean = false,
+    val appendFailed: Boolean = false,
+    val canLoadMore: Boolean = false,
 )
 
 data class TourFilterUiState(

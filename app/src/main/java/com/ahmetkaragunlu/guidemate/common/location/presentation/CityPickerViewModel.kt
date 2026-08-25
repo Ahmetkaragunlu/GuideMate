@@ -2,9 +2,9 @@ package com.ahmetkaragunlu.guidemate.common.location.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ahmetkaragunlu.guidemate.common.location.data.CitySearchService
-import com.ahmetkaragunlu.guidemate.common.location.data.CitySearchSession
 import com.ahmetkaragunlu.guidemate.common.location.model.CitySearchResult
+import com.ahmetkaragunlu.guidemate.common.location.search.CitySearchService
+import com.ahmetkaragunlu.guidemate.common.location.search.CitySearchSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job

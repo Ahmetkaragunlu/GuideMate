@@ -29,4 +29,12 @@ class AuthEndpointPolicyTest {
             ),
         )
     }
+
+    @Test
+    fun `public and refresh endpoints never request access token authentication`() {
+        assertFalse(AuthEndpointPolicy.requiresAccessToken("/api/v1/auth/login"))
+        assertFalse(AuthEndpointPolicy.requiresAccessToken("/api/v1/auth/forgot-password"))
+        assertTrue(AuthEndpointPolicy.requiresAccessToken("/api/v1/tours/mine"))
+        assertTrue(AuthEndpointPolicy.isRefreshRequest("/api/v1/auth/refresh-token"))
+    }
 }

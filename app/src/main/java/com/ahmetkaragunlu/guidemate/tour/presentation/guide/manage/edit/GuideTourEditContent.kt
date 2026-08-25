@@ -26,8 +26,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
-import com.ahmetkaragunlu.guidemate.common.ui.components.EditDatePickerField
-import com.ahmetkaragunlu.guidemate.common.ui.components.EditTimePickerField
+import com.ahmetkaragunlu.guidemate.common.ui.components.picker.EditDatePickerField
+import com.ahmetkaragunlu.guidemate.common.ui.components.picker.EditTimePickerField
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.platformCurrencySymbol
 import com.ahmetkaragunlu.guidemate.tour.presentation.category.TourCategoryCatalog
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus

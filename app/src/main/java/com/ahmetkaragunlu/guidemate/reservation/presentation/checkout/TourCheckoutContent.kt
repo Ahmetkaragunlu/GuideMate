@@ -39,7 +39,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromM
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentCurrencySelector
 import com.ahmetkaragunlu.guidemate.payment.presentation.components.PaymentQuoteSummary
-import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
+import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.TourCheckoutUiState
 
 @Composable
 internal fun TourCheckoutContent(

@@ -22,7 +22,7 @@ class TourBookingAvailabilityTest {
                 tour =
                     Tour(
                         id = "tour-1",
-                        guide = GuidePublicSummary("guide-1", "Test Guide", 0),
+                        guide = GuidePublicSummary("guide-1", "Test Guide"),
                         title = "Test Tour",
                         description = "Test description",
                         country = "Türkiye",
@@ -30,7 +30,6 @@ class TourBookingAvailabilityTest {
                         timeZoneId = "Europe/Istanbul",
                         category = TourCategory.CULTURE,
                         languages = emptyList(),
-                        coverImageResId = 0,
                         approvalStatus = TourApprovalStatus.APPROVED,
                     ),
                 session =

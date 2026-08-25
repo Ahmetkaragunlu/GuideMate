@@ -10,8 +10,8 @@ import com.ahmetkaragunlu.guidemate.profile.presentation.account.helpsupport.Hel
 import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements.LegalAgreementsScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.about.GuideAboutScreen
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.GuideBankAccountsScreen
-import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.helpsupport.model.guideFaqEntries
-import com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.legalagreements.model.guideLegalClauses
+import com.ahmetkaragunlu.guidemate.profile.presentation.account.helpsupport.model.guideFaqEntries
+import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements.model.guideLegalClauses
 import com.ahmetkaragunlu.guidemate.notification.presentation.guide.settings.GuideNotificationSettingsScreen
 
 internal fun NavGraphBuilder.guideAccountNavGraph(onAboutSaved: () -> Unit) {

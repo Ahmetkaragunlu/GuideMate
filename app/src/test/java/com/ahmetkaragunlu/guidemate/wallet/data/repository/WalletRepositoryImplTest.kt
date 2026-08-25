@@ -1,7 +1,6 @@
 package com.ahmetkaragunlu.guidemate.wallet.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.wallet.data.remote.api.WalletApi
@@ -9,7 +8,6 @@ import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WalletResponseDto
 import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WalletTransactionResponseDto
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionDirection
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionType
-import com.google.gson.Gson
 import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -54,8 +52,7 @@ class WalletRepositoryImplTest {
     private fun createRepository(api: WalletApi): WalletRepositoryImpl =
         WalletRepositoryImpl(
             api = api,
-            apiErrorParser = ApiErrorParser(Gson()),
-            networkExceptionMapper = NetworkExceptionMapper(),
+            apiCallExecutor = testApiCallExecutor(),
         )
 
     private class FakeWalletApi : WalletApi {

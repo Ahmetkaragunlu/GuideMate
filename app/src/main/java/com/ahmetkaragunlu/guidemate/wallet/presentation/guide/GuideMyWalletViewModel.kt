@@ -11,7 +11,7 @@ import com.ahmetkaragunlu.guidemate.wallet.domain.model.BankAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.GuideFinanceRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
-import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.toMoneyActionMethodUi
+import com.ahmetkaragunlu.guidemate.wallet.presentation.mapper.toMoneyActionMethodUi
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.model.BankAccountUiModel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.bankaccounts.model.toUiModel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.model.GuideWalletUiState

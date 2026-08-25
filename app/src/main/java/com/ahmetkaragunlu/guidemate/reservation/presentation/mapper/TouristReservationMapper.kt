@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.mapper
 
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripUiModel
@@ -38,7 +39,7 @@ fun TouristReservation.toTourDetailUiState(
         sessionId = tourSessionId,
         tourId = snapshot.tourId,
         title = snapshot.title,
-        imageResId = snapshot.coverImageResId,
+        imageResId = R.drawable.example,
         imageUrl = snapshot.coverImageUrl,
         reviewCount = publicReviewCount,
         date = snapshot.startsAt.formatTourDateTime(snapshot.timeZoneId),
@@ -58,7 +59,7 @@ fun TouristReservation.toTourDetailUiState(
         cancellationReason = cancellationReason,
         guideId = snapshot.guide.id,
         guideName = snapshot.guide.displayName,
-        guideImageResId = snapshot.guide.profileImageResId,
+        guideImageResId = R.drawable.unnamed,
         guideImageUrl = snapshot.guide.profileImageUrl,
         reviews = publicReviews.map(TourReview::toDetailReviewUiModel),
     )
@@ -79,6 +80,6 @@ private fun TourReview.toDetailReviewUiModel(): TourDetailReviewUiModel =
         reviewerName = reviewerName,
         comment = comment,
         rating = rating,
-        reviewerImageResId = reviewerImageResId,
+        reviewerImageResId = R.drawable.unnamed,
         reviewerImageUrl = reviewerImageUrl,
     )

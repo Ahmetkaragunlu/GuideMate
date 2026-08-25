@@ -15,7 +15,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.step1.GuideT
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.step2.GuideTourPublishStep2CategoryPriceScreen
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.step3.GuideTourPublishStep3DetailsMediaScreen
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.step4.GuideTourPublishStep4PreviewPublishScreen
-import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.viewmodel.GuideTourPublishViewModel
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.GuideTourPublishViewModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.GUIDE_MY_TOURS_SELECTED_TAB_RESULT
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import kotlinx.serialization.Serializable

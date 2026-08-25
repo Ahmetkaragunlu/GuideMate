@@ -1,7 +1,6 @@
 package com.ahmetkaragunlu.guidemate.wallet.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.wallet.data.remote.api.GuideFinanceApi
@@ -13,7 +12,6 @@ import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalRequestDt
 import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalResponseDto
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.PayoutMode
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WithdrawalStatus
-import com.google.gson.Gson
 import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -73,8 +71,7 @@ class GuideFinanceRepositoryImplTest {
     private fun createRepository(api: GuideFinanceApi): GuideFinanceRepositoryImpl =
         GuideFinanceRepositoryImpl(
             api = api,
-            apiErrorParser = ApiErrorParser(Gson()),
-            networkExceptionMapper = NetworkExceptionMapper(),
+            apiCallExecutor = testApiCallExecutor(),
         )
 
     private class FakeGuideFinanceApi : GuideFinanceApi {

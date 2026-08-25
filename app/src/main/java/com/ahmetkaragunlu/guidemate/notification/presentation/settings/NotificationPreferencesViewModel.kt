@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -25,23 +26,19 @@ constructor(
     private val repository: NotificationRepository,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
-    private val loadState = MutableStateFlow(ContentLoadState.LOADING)
-    private val isUpdating = MutableStateFlow(false)
-    private val userMessage = MutableStateFlow<String?>(null)
+    private val operationState = MutableStateFlow(NotificationPreferencesOperationState())
     private var refreshJob: Job? = null
 
     val uiState: StateFlow<NotificationPreferencesUiState> =
         combine(
             repository.preferences,
-            loadState,
-            isUpdating,
-            userMessage,
-        ) { preferences, currentLoadState, updating, message ->
+            operationState,
+        ) { preferences, operation ->
             NotificationPreferencesUiState(
                 preferences = preferences,
-                loadState = currentLoadState,
-                isUpdating = updating,
-                userMessage = message,
+                loadState = operation.loadState,
+                isUpdating = operation.isUpdating,
+                userMessage = operation.userMessage,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -58,18 +55,23 @@ constructor(
         refreshJob =
             viewModelScope.launch {
                 if (repository.preferences.value == null) {
-                    loadState.value = ContentLoadState.LOADING
+                    operationState.update { it.copy(loadState = ContentLoadState.LOADING) }
                 }
                 when (val result = repository.refreshPreferences()) {
-                    is DataResult.Success -> loadState.value = ContentLoadState.CONTENT
+                    is DataResult.Success ->
+                        operationState.update { it.copy(loadState = ContentLoadState.CONTENT) }
                     is DataResult.Error -> {
-                        userMessage.value = result.error.toMessage(resourceProvider)
-                        loadState.value =
-                            if (repository.preferences.value == null) {
-                                ContentLoadState.ERROR
-                            } else {
-                                ContentLoadState.CONTENT
-                            }
+                        operationState.update {
+                            it.copy(
+                                loadState =
+                                    if (repository.preferences.value == null) {
+                                        ContentLoadState.ERROR
+                                    } else {
+                                        ContentLoadState.CONTENT
+                                    },
+                                userMessage = result.error.toMessage(resourceProvider),
+                            )
+                        }
                     }
                 }
             }
@@ -100,20 +102,28 @@ constructor(
     }
 
     fun onMessageShown() {
-        userMessage.value = null
+        operationState.update { it.copy(userMessage = null) }
     }
 
     private fun update(update: NotificationPreferenceUpdate) {
-        if (isUpdating.value) return
+        if (operationState.value.isUpdating) return
         viewModelScope.launch {
-            isUpdating.value = true
+            operationState.update { it.copy(isUpdating = true) }
             when (val result = repository.updatePreferences(update)) {
                 is DataResult.Success -> Unit
                 is DataResult.Error -> {
-                    userMessage.value = result.error.toMessage(resourceProvider)
+                    operationState.update {
+                        it.copy(userMessage = result.error.toMessage(resourceProvider))
+                    }
                 }
             }
-            isUpdating.value = false
+            operationState.update { it.copy(isUpdating = false) }
         }
     }
 }
+
+private data class NotificationPreferencesOperationState(
+    val loadState: ContentLoadState = ContentLoadState.LOADING,
+    val isUpdating: Boolean = false,
+    val userMessage: String? = null,
+)

@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
 import java.util.Locale
 

@@ -1,7 +1,6 @@
 package com.ahmetkaragunlu.guidemate.reservation.data.mapper
 
-import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
@@ -78,7 +77,6 @@ private fun ReservationSnapshotResponseDto.toDomain(): TouristReservationSnapsho
             GuidePublicSummary(
                 id = guide.guideId.toString(),
                 displayName = guide.displayName,
-                profileImageResId = R.drawable.unnamed,
                 profileImageUrl = guide.avatar?.imageUrl,
             ),
         title = title,
@@ -90,7 +88,6 @@ private fun ReservationSnapshotResponseDto.toDomain(): TouristReservationSnapsho
         timeZoneId = timeZoneId,
         category = categoryCode.toTourCategory(),
         languages = languageCodes.map { it.toTourLanguage(locale) },
-        coverImageResId = R.drawable.example,
         coverMediaId = cover?.mediaAssetId,
         coverImageUrl = cover?.imageUrl,
         startsAt = Instant.parse(startsAt),

@@ -9,7 +9,7 @@ import java.util.Locale
 
 fun GuideTourPublishUiState.toPreviewDetailUiState(): TourDetailUiState =
     TourDetailUiState(
-        title = tourName.ifBlank { "Ayasofya Gizli Tarih Turu" },
+        title = tourName,
         imageResId = previewImageResId,
         imageUrl = selectedCoverImageUri,
         date =
@@ -22,16 +22,10 @@ fun GuideTourPublishUiState.toPreviewDetailUiState(): TourDetailUiState =
         languagesFlag = spokenLanguages.joinToString(separator = " ") { it.flagEmoji },
         languagesText = spokenLanguages.joinToString(separator = ", ") { it.shortCode },
         category = category,
-        priceMinor = price.toCurrencyMinorUnitsOrNull() ?: 150_000,
+        priceMinor = price.toCurrencyMinorUnitsOrNull() ?: 0,
         capacity = capacity.toIntOrNull() ?: 0,
-        description =
-            tourDescription.ifBlank {
-                "Bu turda Ayasofya ve çevresindeki tarihi noktaları yerel bir bakış açısıyla keşfedeceksiniz."
-            },
-        meetingPoint =
-            meetingPoint.ifBlank {
-                "Buluşma noktası: Ayasofya Meydanı ana giriş kapısı önü."
-            },
+        description = tourDescription,
+        meetingPoint = meetingPoint,
         guideName = guideName,
         guideImageResId = guideImageResId,
         guideImageUrl = guideImageUrl,

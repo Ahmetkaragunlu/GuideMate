@@ -30,10 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
-import com.ahmetkaragunlu.guidemate.common.ui.components.EditDatePickerField
-import com.ahmetkaragunlu.guidemate.common.ui.components.EditDurationDropdown
+import com.ahmetkaragunlu.guidemate.common.ui.components.picker.EditDatePickerField
+import com.ahmetkaragunlu.guidemate.common.ui.components.picker.EditDurationDropdown
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditTextField
-import com.ahmetkaragunlu.guidemate.common.ui.components.EditTimePickerField
+import com.ahmetkaragunlu.guidemate.common.ui.components.picker.EditTimePickerField
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.components.GuideTourPublishStepProgress
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.components.GuideTourPublishValidationMessage
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.model.GuideTourPublishStep

@@ -9,6 +9,9 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.fieldMessage
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.AuthRepository
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.NumericPasswordPolicy
+import com.ahmetkaragunlu.guidemate.auth.presentation.changepassword.model.ChangePasswordFormState
+import com.ahmetkaragunlu.guidemate.auth.presentation.changepassword.model.ChangePasswordScreenState
+import com.ahmetkaragunlu.guidemate.auth.presentation.changepassword.model.ChangePasswordValidationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,13 +66,20 @@ class ChangePasswordViewModel @Inject constructor(
         }
     }
 
-    fun isCurrentPasswordValid(): Boolean =
+    fun validationState(): ChangePasswordValidationState =
+        ChangePasswordValidationState(
+            isCurrentPasswordValid = isCurrentPasswordValid(),
+            isNewPasswordValid = isNewPasswordValid(),
+            isConfirmationValid = isConfirmNewPasswordValid(),
+        )
+
+    private fun isCurrentPasswordValid(): Boolean =
         passwordPolicy.isValid(_formState.value.currentPassword)
 
-    fun isNewPasswordValid(): Boolean =
+    private fun isNewPasswordValid(): Boolean =
         passwordPolicy.isValid(_formState.value.newPassword)
 
-    fun isConfirmNewPasswordValid(): Boolean {
+    private fun isConfirmNewPasswordValid(): Boolean {
         val form = _formState.value
         return form.newPassword == form.confirmNewPassword
     }

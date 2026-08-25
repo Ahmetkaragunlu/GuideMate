@@ -1,0 +1,201 @@
+<resources>
+    <string name="chat_input_placeholder">Mesaj yazın...</string>
+
+    <string name="chat_empty_history">Henüz sohbet geçmişiniz yok.</string>
+
+    <string name="chat_message_sending">Gönderiliyor…</string>
+
+    <string name="chat_message_retry">Gönderilemedi. Tekrar dene</string>
+
+    <string name="error_chat_not_found">Sohbet bulunamadı veya bu sohbete erişiminiz yok.</string>
+
+    <string name="error_chat_participant_invalid">Bu kullanıcıyla sohbet başlatılamıyor.</string>
+
+    <string name="error_chat_message_not_found">Mesaj bulunamadı.</string>
+
+    <string name="error_chat_message_too_long">Mesaj en fazla 2.000 karakter olabilir.</string>
+
+    <string name="notifications_subtitle">Hesabınızdaki son gelişmeler</string>
+
+    <string name="notification_mark_all_read">Tümünü okundu yap</string>
+
+    <string name="notification_tour_purchased">%1$s, %2$s turunu satın aldı.</string>
+
+    <string name="notification_tour_purchased_generic">Turunuz için yeni bir rezervasyon yapıldı.</string>
+
+    <plurals name="notification_rating_received">
+        <item quantity="one">%1$s, %2$s için %3$d yıldız verdi.</item>
+        <item quantity="other">%1$s, %2$s için %3$d yıldız verdi.</item>
+    </plurals>
+
+    <string name="notification_rating_received_generic">Turunuz için yeni bir puan verildi.</string>
+
+    <string name="notification_withdrawal_completed">%1$s tutarındaki para çekme işleminiz tamamlandı.</string>
+
+    <string name="notification_withdrawal_completed_generic">Para çekme işleminiz tamamlandı.</string>
+
+    <string name="notification_comment_received">%1$s, %2$s için yorum yaptı.</string>
+
+    <string name="notification_comment_received_generic">Turunuz için yeni bir yorum yapıldı.</string>
+
+    <string name="notification_preview">“%1$s”</string>
+
+    <string name="notification_tour_approved">%1$s turunuz onaylandı ve yayına alındı.</string>
+
+    <string name="notification_tour_approved_generic">Turunuz onaylandı ve yayına alındı.</string>
+
+    <string name="notification_tour_rejected">%1$s turunuz reddedildi.</string>
+
+    <string name="notification_tour_rejected_generic">Turunuz reddedildi.</string>
+
+    <string name="notification_rejection_reason">Gerekçe: %1$s</string>
+
+    <string name="notification_tour_change_approved">Tur değişikliği talebiniz onaylandı.</string>
+
+    <string name="notification_tour_change_rejected">Tur değişikliği talebiniz reddedildi.</string>
+
+    <string name="notification_reservation_confirmed">Rezervasyonunuz onaylandı.</string>
+
+    <string name="notification_reservation_cancelled">Rezervasyon iptaliyle ilgili bir güncelleme var.</string>
+
+    <string name="notification_tour_cancelled">Turunuz iptal edildi.</string>
+
+    <string name="notification_tour_completed">%1$s turunuz tamamlandı ve Geçmiş bölümüne taşındı.</string>
+
+    <string name="notification_tour_completed_generic">Turunuz tamamlandı ve Geçmiş bölümüne taşındı.</string>
+
+    <string name="notification_review_request">Tamamlanan turunuzu değerlendirebilirsiniz.</string>
+
+    <string name="notification_payment_succeeded">Ödeme işleminiz başarıyla tamamlandı.</string>
+
+    <string name="notification_payment_failed">Ödeme işleminiz tamamlanamadı.</string>
+
+    <string name="notification_refund_requested">İade talebiniz işleme alındı.</string>
+
+    <string name="notification_refund_completed">İade işleminiz tamamlandı.</string>
+
+    <string name="notification_refund_failed">İade işleminiz tamamlanamadı.</string>
+
+    <string name="notification_refund_manual_review">İade işleminiz kontrol ediliyor.</string>
+
+    <string name="notification_earning_available">Yeni kazancınız kullanılabilir bakiyenize eklendi.</string>
+
+    <string name="notification_chat_message">Yeni bir mesajınız var.</string>
+
+    <string name="notification_upcoming_tour_reminder">Yaklaşan turunuz için hatırlatma var.</string>
+
+    <string name="notification_security_alert">Hesabınızla ilgili bir güvenlik uyarısı var.</string>
+
+    <string name="notification_generic_update">Hesabınızla ilgili yeni bir güncelleme var.</string>
+
+    <string name="notification_channel_id" translatable="false">guidemate_updates</string>
+
+    <string name="notification_channel_name">GuideMate bildirimleri</string>
+
+    <string name="notification_channel_description">Tur, rezervasyon, ödeme ve mesaj güncellemeleri</string>
+
+    <string name="notification_title_tour_approved">Tur onaylandı</string>
+
+    <string name="notification_title_tour_rejected">Tur reddedildi</string>
+
+    <string name="notification_title_tour_change_approved">Tur değişikliği onaylandı</string>
+
+    <string name="notification_title_tour_change_rejected">Tur değişikliği reddedildi</string>
+
+    <string name="notification_title_tour_purchased">Yeni rezervasyon</string>
+
+    <string name="notification_title_reservation_confirmed">Rezervasyon onaylandı</string>
+
+    <string name="notification_title_reservation_cancelled">Rezervasyon güncellendi</string>
+
+    <string name="notification_title_tour_cancelled">Tur iptal edildi</string>
+
+    <string name="notification_title_tour_completed">Tur tamamlandı</string>
+
+    <string name="notification_title_review_request">Turunuzu değerlendirin</string>
+
+    <string name="notification_title_rating_received">Yeni puan</string>
+
+    <string name="notification_title_comment_received">Yeni yorum</string>
+
+    <string name="notification_title_payment_succeeded">Ödeme başarılı</string>
+
+    <string name="notification_title_payment_failed">Ödeme başarısız</string>
+
+    <string name="notification_title_refund_requested">İade talebi alındı</string>
+
+    <string name="notification_title_refund_completed">İade tamamlandı</string>
+
+    <string name="notification_title_refund_failed">İade başarısız</string>
+
+    <string name="notification_title_refund_manual_review">İade inceleniyor</string>
+
+    <string name="notification_title_earning_available">Kazanç kullanılabilir</string>
+
+    <string name="notification_title_withdrawal_completed">Para çekme tamamlandı</string>
+
+    <string name="notification_title_chat_message">Yeni mesaj</string>
+
+    <string name="notification_title_upcoming_tour_reminder">Yaklaşan tur</string>
+
+    <string name="notification_title_security_alert">Güvenlik uyarısı</string>
+
+    <string name="notification_title_general">Yeni bildirim</string>
+
+    <string name="error_notification_not_found">Bildirim bulunamadı veya artık erişilemiyor.</string>
+
+    <string name="notification_settings">Bildirim Ayarları</string>
+
+    <string name="notification_tours_and_reservations">Turlar ve Rezervasyonlar</string>
+
+    <string name="upcoming_tour_reminders">Yaklaşan Tur Hatırlatıcıları</string>
+
+    <string name="upcoming_tour_reminders_desc">Tur saati ve buluşma noktası</string>
+
+    <string name="guide_messages">Rehber Mesajları</string>
+
+    <string name="guide_messages_desc">Rehberden gelen anlık mesajlar</string>
+
+    <string name="reservation_updates">Rezervasyon Güncellemeleri</string>
+
+    <string name="reservation_updates_desc">Onay, iptal ve değişiklik detayları</string>
+
+    <string name="account_and_interaction">Hesap ve Etkileşim</string>
+
+    <string name="review_requests">Değerlendirme İstekleri</string>
+
+    <string name="review_requests_desc">Tur sonrası yorum hatırlatmaları</string>
+
+    <string name="security_alerts">Güvenlik Uyarıları</string>
+
+    <string name="security_alerts_desc">Şifre değişimi, yeni giriş bildirimleri</string>
+
+    <string name="guide_notification_tours_and_reservations">Turlar ve Rezervasyonlar</string>
+
+    <string name="guide_upcoming_tour_reminders">Yaklaşan Tur Hatırlatıcıları</string>
+
+    <string name="guide_upcoming_tour_reminders_desc">Başlamak üzere olan turlarınız için saat ve buluşma noktası detayları.</string>
+
+    <string name="guide_tourist_messages">Turist Mesajları</string>
+
+    <string name="guide_tourist_messages_desc">Tura katılacak misafirlerinizden gelen anlık mesajlar ve sorular.</string>
+
+    <string name="guide_reservation_updates">Rezervasyon Güncellemeleri</string>
+
+    <string name="guide_reservation_updates_desc">Turlarınıza yapılan yeni rezervasyonlar ve turist iptalleri.</string>
+
+    <string name="guide_account_and_interaction">Hesap ve Etkileşim</string>
+
+    <string name="guide_payments_and_earnings">Ödeme ve Hak Edişler</string>
+
+    <string name="guide_payments_and_earnings_desc">Tamamlanan turların hizmet bedeli banka hesabınıza aktarıldığında.</string>
+
+    <string name="guide_new_reviews">Yeni Değerlendirmeler</string>
+
+    <string name="guide_new_reviews_desc">Turistler profilinize veya turunuza yeni bir puan ve yorum bıraktığında.</string>
+
+    <string name="guide_security_alerts">Güvenlik Uyarıları</string>
+
+    <string name="guide_security_alerts_desc">Şifre değişimi ve yeni giriş bildirimleri.</string>
+
+</resources>

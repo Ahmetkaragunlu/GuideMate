@@ -10,6 +10,8 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.AuthRepository
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.EmailPolicy
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.NumericPasswordPolicy
+import com.ahmetkaragunlu.guidemate.auth.presentation.signup.model.SignUpFormState
+import com.ahmetkaragunlu.guidemate.auth.presentation.signup.model.SignUpScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -12,17 +12,16 @@ import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageHistory
 import com.ahmetkaragunlu.guidemate.chat.domain.repository.ChatRepository
 import com.ahmetkaragunlu.guidemate.common.coroutines.ApplicationScope
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.ApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.result.mapSuccess
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.min
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -34,7 +33,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.Response
 
 private const val MESSAGE_PAGE_SIZE = 50
 private const val MAX_RECONNECT_DELAY_SECONDS = 30L
@@ -46,8 +44,7 @@ constructor(
     private val api: ChatApi,
     private val realtimeClient: ChatRealtimeClient,
     private val userRepository: UserRepository,
-    private val apiErrorParser: ApiErrorParser,
-    private val networkExceptionMapper: NetworkExceptionMapper,
+    private val apiCallExecutor: ApiCallExecutor,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) : ChatRepository {
     private val mutableConversations = MutableStateFlow<List<ChatConversation>>(emptyList())
@@ -71,7 +68,7 @@ constructor(
         messageHistory(chatId).asStateFlow()
 
     override suspend fun refreshConversations(): DataResult<List<ChatConversation>> =
-        execute(
+        apiCallExecutor.execute(
             request = api::getConversations,
             transform = { responses ->
                 responses.map { it.toDomain() }.sortedByDescending(ChatConversation::lastActivityAt)
@@ -81,7 +78,7 @@ constructor(
         }
 
     override suspend fun refreshUnreadCount(): DataResult<Int> =
-        execute(
+        apiCallExecutor.execute(
             request = api::getUnreadCount,
             transform = { it.unreadCount.toSafeInt() },
         ).also { result ->
@@ -89,7 +86,7 @@ constructor(
         }
 
     override suspend fun loadInitialMessages(chatId: String): DataResult<ChatMessageHistory> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.getMessages(chatId = chatId, size = MESSAGE_PAGE_SIZE) },
             transform = { it.toDomain() },
         ).also { result ->
@@ -106,7 +103,7 @@ constructor(
         val current = messageHistory(chatId).value
         if (!current.hasMore || current.nextCursor == null) return DataResult.Success(current)
 
-        return execute(
+        return apiCallExecutor.execute(
             request = {
                 api.getMessages(
                     chatId = chatId,
@@ -164,7 +161,7 @@ constructor(
     }
 
     override suspend fun markRead(chatId: String): DataResult<Int> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.markRead(chatId) },
             transform = { it.unreadCount.toSafeInt() },
         ).also { result ->
@@ -183,7 +180,7 @@ constructor(
         }
 
     override suspend fun findOrCreate(remoteUserId: Long): DataResult<ChatConversation> =
-        execute(
+        apiCallExecutor.execute(
             request = { api.findOrCreate(remoteUserId) },
             transform = { it.toDomain() },
         ).also { result ->
@@ -197,7 +194,7 @@ constructor(
 
     private suspend fun sendPendingMessage(message: ChatMessage): DataResult<ChatMessage> {
         val result =
-            execute(
+            apiCallExecutor.execute(
                 request = {
                     api.sendMessage(
                         chatId = message.chatId,
@@ -323,30 +320,5 @@ constructor(
             compareBy(ChatMessage::sentAt, ChatMessage::messageId),
         )
     }
-
-    private suspend fun <ResponseBody, Domain> execute(
-        request: suspend () -> Response<ResponseBody>,
-        transform: (ResponseBody) -> Domain,
-    ): DataResult<Domain> =
-        try {
-            val response = request()
-            if (!response.isSuccessful) {
-                DataResult.Error(apiErrorParser.parse(response))
-            } else {
-                response.body()?.let { DataResult.Success(transform(it)) }
-                    ?: DataResult.Error(AppError.NoResponseFromServer)
-            }
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: Exception) {
-            DataResult.Error(networkExceptionMapper.map(exception), exception)
-        }
-
     private fun Long.toSafeInt(): Int = coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
-
-    private inline fun <T, R> DataResult<T>.mapSuccess(transform: (T) -> R): DataResult<R> =
-        when (this) {
-            is DataResult.Success -> DataResult.Success(transform(data))
-            is DataResult.Error -> this
-        }
 }

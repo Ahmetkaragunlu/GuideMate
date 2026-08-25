@@ -1,0 +1,198 @@
+<resources>
+    <string name="onboarding_title_1">Şehri Özgürce Keşfet</string>
+
+    <string name="onboarding_description_1">Sıkıcı turlardan sıkıldın mı? GuideMate ile şehrin gizli hazinelerini, en iyi bilen yerel rehberlerle özgürce keşfet.</string>
+
+    <string name="onboarding_title_2">Şehrini Tanıt Ve Kazan</string>
+
+    <string name="onboarding_description2">Bildiğin sokakları ve favori mekanlarını dünyayla paylaş. Kendi rotanı oluştur, turistlere rehberlik et ve güvenle kazan.</string>
+
+    <string name="onboarding_title_3">Güvenli Buluşma</string>
+
+    <string name="onboarding_description_3">Sana en uygun rehberi veya gezgini bul. Ödemeden tura kadar her adımda GuideMate güvencesi seninle. Hadi başlayalım!</string>
+
+    <string name="get_started">Başlayalım</string>
+
+    <string name="next">İleri</string>
+
+    <string name="already_have_an_account">Zaten bir hesabın var mı?</string>
+
+    <string name="login">Giriş yap</string>
+
+    <string name="dont_have_an_account">Hesabınız yok mu? </string>
+
+    <string name="or_continue_with">Veya şununla devam et</string>
+
+    <string name="google">Google</string>
+
+    <string name="sign_up">Kayıt ol</string>
+
+    <string name="sign_up_text">Kayıt olun</string>
+
+    <string name="forgot_password">Şifremi unuttum?</string>
+
+    <string name="sign_in_title">Hoş Geldin</string>
+
+    <string name="sign_in_subtitle">Keşfetmeye kaldığın yerden devam et</string>
+
+    <string name="name">İsim</string>
+
+    <string name="last_name">Soy İsim</string>
+
+    <string name="email">E-posta</string>
+
+    <string name="name_error_message">İsim en az 3 karakter olmalıdır</string>
+
+    <string name="email_error_message">Geçersiz e-posta adresi</string>
+
+    <string name="last_name_error_message">Soy isim en az 2 karakter olmalıdır</string>
+
+    <string name="password_error_message">Şifre en az 8 rakamdan oluşmalıdır</string>
+
+    <string name="confirm_password_error_message">Şifreler eşleşmiyor</string>
+
+    <string name="error_fix_fields">Lütfen hatalı alanları düzeltiniz.</string>
+
+    <string name="error_fill_all_fields">Lütfen tüm alanları doldurunuz.</string>
+
+    <string name="send_reset_link">Sıfırlama Bağlantısı Gönder</string>
+
+    <plurals name="password_reset_retry_wait">
+        <item quantity="one">%1$d saniye sonra tekrar deneyebilirsiniz.</item>
+        <item quantity="other">%1$d saniye sonra tekrar deneyebilirsiniz.</item>
+    </plurals>
+
+    <string name="reset_password_title">Şifre Yenileme</string>
+
+    <string name="reset_password_description">E-posta adresinize bir sıfırlama bağlantısı göndereceğiz. Lütfen e-posta adresinizi girin.</string>
+
+    <string name="agree_terms_conditions">Şartları ve koşulları kabul ediyorum</string>
+
+    <string name="password">Şifre</string>
+
+    <string name="confirm_password">Şifreni Onayla</string>
+
+    <string name="traveler">Gezgin</string>
+
+    <string name="sign_up_title">Hesabını Oluştur</string>
+
+    <string name="sign_up_subtitle">Yeni yerler keşfetmek ve paylaşmak için hemen kayıt ol!</string>
+
+    <string name="traveler_description">Yeni yerler keşfetmek istiyorum.</string>
+
+    <string name="local_guide">Yerel Rehber</string>
+
+    <string name="local_guide_description">Turlar düzenlemek istiyorum.</string>
+
+    <string name="choose_user_type_title">Nasıl kullanmak istersin?</string>
+
+    <string name="choose_user_type_description">Deneyimini buna göre kişiselleştireceğiz.</string>
+
+    <string name="error_user_not_found">Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı.</string>
+
+    <string name="error_email_already_exists">Bu e-posta adresi zaten kullanılıyor.</string>
+
+    <string name="error_account_pending_verification">Giriş yapmadan önce e-posta adresinizi doğrulamanız gerekiyor.</string>
+
+    <string name="error_account_disabled">Hesabınız kullanıma kapatılmış. Destek ekibiyle iletişime geçin.</string>
+
+    <string name="error_invalid_credentials">E-posta adresi veya şifre hatalı.</string>
+
+    <string name="error_current_password_incorrect">Mevcut şifreniz hatalı.</string>
+
+    <string name="error_password_policy">Şifre en az 8 rakamdan oluşmalıdır.</string>
+
+    <string name="error_password_same_as_current">Yeni şifreniz mevcut şifrenizden farklı olmalıdır.</string>
+
+    <string name="error_role_already_selected">Kullanıcı türünüz daha önce seçilmiş.</string>
+
+    <string name="error_role_not_found">Seçtiğiniz kullanıcı türü bulunamadı.</string>
+
+    <string name="error_invalid_installation">Cihaz oturumu doğrulanamadı. Lütfen tekrar giriş yapın.</string>
+
+    <string name="error_invalid_token">Bağlantı geçersiz veya artık kullanılamıyor.</string>
+
+    <string name="error_token_already_used">Bu bağlantı daha önce kullanılmış.</string>
+
+    <string name="error_google_login_failed">Google ile giriş tamamlanamadı. Lütfen tekrar deneyin.</string>
+
+    <string name="error_google_account_not_found">Bu Google hesabıyla eşleşen bir GuideMate hesabı bulunamadı. Önce normal kayıt oluşturun.</string>
+
+    <string name="error_google_account_mismatch">Google hesabınız kayıtlı e-posta adresinizle eşleşmiyor.</string>
+
+    <string name="error_email_delivery_failed">E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.</string>
+
+    <string name="error_select_role">Devam etmek için bir kullanıcı türü seçin.</string>
+
+    <string name="error_terms_required">Lütfen Kullanıcı Sözleşmesini okuyup onaylayın.</string>
+
+    <string name="terms_dialog_title">Kullanıcı Sözleşmesi ve Gizlilik Politikası</string>
+
+    <string name="success">Başarılı</string>
+
+    <string name="reset_password_link_sent">Bu e-postaya uygun bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Lütfen gelen kutunuzu kontrol edin.</string>
+
+    <plurals name="login_retry_wait">
+        <item quantity="one">Tekrar giriş yapmak için %1$d saniye bekleyin.</item>
+        <item quantity="other">Tekrar giriş yapmak için %1$d saniye bekleyin.</item>
+    </plurals>
+
+    <string name="current_password">Mevcut Şifre</string>
+
+    <string name="new_password">Yeni Şifre</string>
+
+    <string name="new_password_repeat">Yeni Şifre Tekrar</string>
+
+    <string name="update_password_action">ŞİFREYİ GÜNCELLE</string>
+
+    <string name="terms_read_and_approve">Okudum, Onaylıyorum</string>
+
+    <string name="terms_continue_reading">Okumaya Devam Edin…</string>
+
+    <string name="verification_required_title">Doğrulama Gerekli</string>
+
+    <string name="registration_success_message">Kaydınız başarıyla alındı! E-posta adresinize gönderilen doğrulama bağlantısına tıklayın.</string>
+
+    <string name="account_pending_verification_message">E-posta adresiniz henüz doğrulanmamış. Yeni bir doğrulama bağlantısı gönderebiliriz.</string>
+
+    <plurals name="verification_resend_wait">
+        <item quantity="one">Yeni bağlantı göndermek için %1$d saniye bekleyin.</item>
+        <item quantity="other">Yeni bağlantı göndermek için %1$d saniye bekleyin.</item>
+    </plurals>
+
+    <string name="resend_verification_email">Tekrar Gönder</string>
+
+    <string name="verification_email_sent">Doğrulama bağlantısı e-posta adresinize yeniden gönderildi.</string>
+
+    <string name="close">Kapat</string>
+
+    <string name="password_changed_title">Şifre Güncellendi</string>
+
+    <string name="password_changed_message">Şifreniz başarıyla güncellendi. Güvenliğiniz için yeni şifrenizle tekrar giriş yapın.</string>
+
+    <string name="default_web_client_id">677861073392-4ni851g7ggkhb8ngk9418u346t4so9rd.apps.googleusercontent.com</string>
+
+    <string name="terms_and_conditions_full_text">
+        GUIDEMATE KULLANICI SÖZLEŞMESİ, GİZLİLİK POLİTİKASI VE AÇIK RIZA METNİ\n\n
+        1. TARAFLAR VE KONU\n
+        İşbu sözleşme, GuideMate mobil uygulaması (bundan böyle "Platform" olarak anılacaktır) ile uygulamayı kullanan Turist veya Rehber (bundan böyle "Kullanıcı" olarak anılacaktır) arasında akdedilmiştir. Kullanıcı, uygulamayı kullanarak veya ödeme yaparak aşağıdaki şartları peşinen kabul etmiş sayılır.\n\n
+        2. HİZMETİN KAPSAMI\n
+        GuideMate, seyahat etmek isteyen kullanıcılar (Turist) ile profesyonel rehberlik hizmeti verenleri (Rehber) bir araya getiren bir "Aracı Hizmet Sağlayıcı"dır. GuideMate, turların doğrudan düzenleyicisi değil, güvenli buluşma ve ödeme platformudur.\n\n
+        3. ÖDEME VE GÜVENLİK \n
+        3.1. Tüm ödemeler, Platform üzerinden Kredi/Banka Kartı ile 256-bit SSL sertifikalı güvenli ödeme altyapısı kullanılarak yapılır.\n
+        3.2. Kullanıcı kart bilgileri GuideMate sunucularında ASLA SAKLANMAZ. İşlemler, uluslararası güvenlik standartlarına (PCI-DSS) sahip ödeme kuruluşları aracılığıyla gerçekleştirilir.\n
+        3.3. Platform Dışı Ödeme Yasağı: Güvenlik gereği, Turist ve Rehber arasındaki tüm para transferi uygulama üzerinden yapılmalıdır. Elden nakit ödeme veya harici IBAN transferlerinde yaşanan mağduriyetlerde GuideMate hiçbir hukuki sorumluluk kabul etmez.\n\n
+        4. KİŞİSEL VERİLERİN KORUNMASI (KVKK AYDINLATMA METNİ)\n
+        4.1. Paylaştığınız Ad, Soyad, E-posta, Konum ve İletişim bilgileri; hizmetin ifası, fatura düzenlenmesi ve güvenliğin sağlanması amacıyla 6698 sayılı KVKK kapsamında işlenmektedir.\n
+        4.2. Kişisel verileriniz, yasal zorunluluklar haricinde üçüncü şahıslarla paylaşılmaz. Rehberler, sadece turun gerçekleşmesi için gerekli olan sınırlı bilgileri görebilir.\n\n
+        5. İPTAL VE İADE KOŞULLARI\n
+        5.1. Turist, satın aldığı turu, tur başlangıç saatinden 24 saat öncesine kadar iptal etmesi durumunda %100 ücret iadesi alır.\n
+        5.2. Son 24 saat içinde yapılan iptallerde hizmet bedeli kesintisi uygulanabilir.\n
+        5.3. Rehber tarafından kaynaklanan iptallerde, ödemenin tamamı Turist’e kesintisiz iade edilir.\n\n
+        6. KULLANIM KURALLARI VE YASAKLAR\n
+        Platform üzerinde genel ahlaka aykırı, tehditkar, yanıltıcı veya taciz edici mesajlaşmalar yasaktır. Rehberlerin "Profesyonel Turist Rehberi" kokartına sahip olması zorunludur.\n\n
+        7. YÜRÜRLÜK\n
+        Kullanıcı, "Okudum ve Kabul Ediyorum" kutucuğunu işaretleyerek işbu sözleşmenin tüm maddelerini kabul etmiş sayılır.
+    </string>
+
+</resources>

@@ -1,7 +1,6 @@
 package com.ahmetkaragunlu.guidemate.tour.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
@@ -20,7 +19,6 @@ import com.ahmetkaragunlu.guidemate.tour.data.remote.model.UpdateTourSessionRequ
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourListType
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.UpdateTourSessionInput
-import com.google.gson.Gson
 import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -75,8 +73,7 @@ class GuideTourRepositoryImplTest {
     private fun createRepository(api: GuideTourApi): GuideTourRepositoryImpl =
         GuideTourRepositoryImpl(
             api = api,
-            apiErrorParser = ApiErrorParser(Gson()),
-            networkExceptionMapper = NetworkExceptionMapper(),
+            apiCallExecutor = testApiCallExecutor(),
         )
 
     private class FakeGuideTourApi : GuideTourApi {

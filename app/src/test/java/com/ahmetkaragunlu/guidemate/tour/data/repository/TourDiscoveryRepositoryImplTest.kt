@@ -1,7 +1,6 @@
 package com.ahmetkaragunlu.guidemate.tour.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
@@ -12,7 +11,6 @@ import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSearchItemRespons
 import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionResponseDto
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchQuery
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchSort
-import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -70,11 +68,20 @@ class TourDiscoveryRepositoryImplTest {
             assertEquals("session-1", (sessionResult as DataResult.Success).data.session.id)
         }
 
+    @Test
+    fun `guide popular tours forwards guide id to backend`() = runBlocking {
+        val api = FakeTourDiscoveryApi()
+        val repository = createRepository(api)
+
+        repository.getPopularToursForGuide(guideId = 42L, page = 0, size = 20)
+
+        assertEquals(42L, api.popularGuideId)
+    }
+
     private fun createRepository(api: TourDiscoveryApi): TourDiscoveryRepositoryImpl =
         TourDiscoveryRepositoryImpl(
             api = api,
-            apiErrorParser = ApiErrorParser(Gson()),
-            networkExceptionMapper = NetworkExceptionMapper(),
+            apiCallExecutor = testApiCallExecutor(),
         )
 
     private class FakeTourDiscoveryApi : TourDiscoveryApi {
@@ -84,6 +91,7 @@ class TourDiscoveryRepositoryImplTest {
         var categoryCode: String? = null
         var languageCodes: List<String>? = null
         var sort: String? = null
+        var popularGuideId: Long? = null
 
         override suspend fun searchTours(
             query: String?,
@@ -118,10 +126,12 @@ class TourDiscoveryRepositoryImplTest {
         }
 
         override suspend fun getPopularTours(
+            guideId: Long?,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<TourSearchItemResponseDto>> =
-            Response.success(
+        ): Response<ApiPageResponse<TourSearchItemResponseDto>> {
+            popularGuideId = guideId
+            return Response.success(
                 ApiPageResponse(
                     content = listOf(searchItemResponse()),
                     page = page,
@@ -132,6 +142,7 @@ class TourDiscoveryRepositoryImplTest {
                     isLast = true,
                 ),
             )
+        }
 
         override suspend fun getTour(tourId: String): Response<TourDetailResponseDto> =
             Response.success(

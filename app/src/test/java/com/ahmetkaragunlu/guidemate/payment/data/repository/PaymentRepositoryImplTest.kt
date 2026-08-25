@@ -1,7 +1,6 @@
 package com.ahmetkaragunlu.guidemate.payment.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.payment.data.local.PendingPaymentStorage
 import com.ahmetkaragunlu.guidemate.payment.data.remote.api.PaymentApi
@@ -16,7 +15,6 @@ import com.ahmetkaragunlu.guidemate.payment.data.remote.model.WalletTopUpRequest
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
-import com.google.gson.Gson
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -92,8 +90,7 @@ class PaymentRepositoryImplTest {
         PaymentRepositoryImpl(
             api = api,
             pendingPaymentStorage = storage,
-            apiErrorParser = ApiErrorParser(Gson()),
-            networkExceptionMapper = NetworkExceptionMapper(),
+            apiCallExecutor = testApiCallExecutor(),
         )
 
     private class FakePendingPaymentStorage(initialPaymentId: String? = null) :

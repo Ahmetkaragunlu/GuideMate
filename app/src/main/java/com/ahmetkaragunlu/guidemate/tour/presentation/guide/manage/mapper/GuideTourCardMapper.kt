@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.mapper
 
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus

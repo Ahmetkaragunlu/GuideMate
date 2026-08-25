@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.profile.presentation.mapper
 
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfile
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier

@@ -1,8 +1,6 @@
 package com.ahmetkaragunlu.guidemate.payment.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
-import com.ahmetkaragunlu.guidemate.common.result.AppError
+import com.ahmetkaragunlu.guidemate.common.network.ApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.payment.data.local.PendingPaymentStorage
 import com.ahmetkaragunlu.guidemate.payment.data.mapper.toDomain
@@ -18,27 +16,25 @@ import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentQuote
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 class PaymentRepositoryImpl @Inject constructor(
     private val api: PaymentApi,
     private val pendingPaymentStorage: PendingPaymentStorage,
-    private val apiErrorParser: ApiErrorParser,
-    private val networkExceptionMapper: NetworkExceptionMapper,
+    private val apiCallExecutor: ApiCallExecutor,
 ) : PaymentRepository {
     override val pendingPaymentId: Flow<String?> = pendingPaymentStorage.paymentId
 
     override suspend fun getCheckoutCurrencies(): DataResult<CheckoutCurrencies> =
-        execute(api::getCheckoutCurrencies) { it.toDomain() }
+        apiCallExecutor.execute(api::getCheckoutCurrencies) { it.toDomain() }
 
     override suspend fun quoteTour(
         sessionId: String,
         participantCount: Int,
         chargeCurrencyCode: String,
     ): DataResult<PaymentQuote> =
-        execute(
+        apiCallExecutor.execute(
             request = {
                 api.quoteTour(
                     TourPaymentQuoteRequestDto(
@@ -55,7 +51,7 @@ class PaymentRepositoryImpl @Inject constructor(
         amountMinor: Long,
         chargeCurrencyCode: String,
     ): DataResult<PaymentQuote> =
-        execute(
+        apiCallExecutor.execute(
             request = {
                 api.quoteWalletTopUp(
                     WalletTopUpQuoteRequestDto(
@@ -121,23 +117,5 @@ class PaymentRepositoryImpl @Inject constructor(
     private suspend fun executePayment(
         request: suspend () -> Response<com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentResponseDto>,
     ): DataResult<Payment> =
-        execute(request = request, transform = { it.toDomain() })
-
-    private suspend fun <ResponseBody, Domain> execute(
-        request: suspend () -> Response<ResponseBody>,
-        transform: (ResponseBody) -> Domain,
-    ): DataResult<Domain> =
-        try {
-            val response = request()
-            if (!response.isSuccessful) {
-                DataResult.Error(apiErrorParser.parse(response))
-            } else {
-                response.body()?.let { DataResult.Success(transform(it)) }
-                    ?: DataResult.Error(AppError.NoResponseFromServer)
-            }
-        } catch (exception: CancellationException) {
-            throw exception
-        } catch (exception: Exception) {
-            DataResult.Error(networkExceptionMapper.map(exception), exception)
-        }
+        apiCallExecutor.execute(request = request, transform = { it.toDomain() })
 }

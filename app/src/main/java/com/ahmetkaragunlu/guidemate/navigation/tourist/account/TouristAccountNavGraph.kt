@@ -9,8 +9,8 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.auth.presentation.changepassword.ChangePasswordScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.account.helpsupport.HelpSupportScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements.LegalAgreementsScreen
-import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.account.helpsupport.model.faqEntries
-import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.account.legalagreements.model.legalClauses
+import com.ahmetkaragunlu.guidemate.profile.presentation.account.helpsupport.model.touristFaqEntries
+import com.ahmetkaragunlu.guidemate.profile.presentation.account.legalagreements.model.touristLegalClauses
 import com.ahmetkaragunlu.guidemate.notification.presentation.tourist.settings.TouristNotificationSettingsScreen
 import com.ahmetkaragunlu.guidemate.payment.presentation.savedpaymentmethod.TouristSavedCardsScreen
 
@@ -26,13 +26,13 @@ internal fun NavGraphBuilder.touristAccountNavGraph(accountNavController: NavCon
         LegalAgreementsScreen(
             titleResId = R.string.legal_title,
             introResId = R.string.legal_intro,
-            legalClauses = legalClauses,
+            legalClauses = touristLegalClauses,
         )
     }
     composable<TouristAccountDestination.HelpSupport> {
         HelpSupportScreen(
             introResId = R.string.support_intro,
-            faqEntries = faqEntries,
+            faqEntries = touristFaqEntries,
         )
     }
 }

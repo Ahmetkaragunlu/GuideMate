@@ -19,6 +19,12 @@ interface TourDiscoveryRepository {
         size: Int,
     ): DataResult<PagedResult<TourSearchItem>>
 
+    suspend fun getPopularToursForGuide(
+        guideId: Long,
+        page: Int,
+        size: Int,
+    ): DataResult<PagedResult<TourSearchItem>>
+
     suspend fun getTour(tourId: String): DataResult<TourDetails>
 
     suspend fun getSession(sessionId: String): DataResult<TourWithSession>

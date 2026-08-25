@@ -1,11 +1,9 @@
 package com.ahmetkaragunlu.guidemate.payment.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.payment.data.remote.api.SavedPaymentMethodApi
 import com.ahmetkaragunlu.guidemate.payment.data.remote.model.SavedPaymentMethodResponseDto
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -69,8 +67,7 @@ class SavedPaymentMethodRepositoryImplTest {
     private fun createRepository(api: SavedPaymentMethodApi): SavedPaymentMethodRepositoryImpl =
         SavedPaymentMethodRepositoryImpl(
             api = api,
-            apiErrorParser = ApiErrorParser(Gson()),
-            networkExceptionMapper = NetworkExceptionMapper(),
+            apiCallExecutor = testApiCallExecutor(),
         )
 
     private class FakeSavedPaymentMethodApi : SavedPaymentMethodApi {

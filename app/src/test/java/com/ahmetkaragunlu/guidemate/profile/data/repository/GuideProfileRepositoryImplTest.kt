@@ -3,8 +3,7 @@ package com.ahmetkaragunlu.guidemate.profile.data.repository
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
-import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
-import com.ahmetkaragunlu.guidemate.common.network.error.NetworkExceptionMapper
+import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.profile.data.remote.api.GuideProfileApi
@@ -12,7 +11,6 @@ import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuidePerformanceRe
 import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideProfileResponseDto
 import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideSearchItemResponseDto
 import com.ahmetkaragunlu.guidemate.profile.data.remote.model.UpdateGuideProfileRequestDto
-import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -45,8 +43,7 @@ class GuideProfileRepositoryImplTest {
         GuideProfileRepositoryImpl(
             api = FakeGuideProfileApi(),
             userRepository = userRepository,
-            apiErrorParser = ApiErrorParser(Gson()),
-            networkExceptionMapper = NetworkExceptionMapper(),
+            apiCallExecutor = testApiCallExecutor(),
         )
 
     private class FakeUserRepository : UserRepository {

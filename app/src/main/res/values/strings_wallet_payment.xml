@@ -1,0 +1,304 @@
+<resources>
+    <string name="this_month_earnings">Bu ayki kazanç</string>
+
+    <string name="earnings_by_month">Aylık Kazançlar</string>
+
+    <string name="guide_earnings">Kazançlarım</string>
+
+    <string name="earnings_history">Geçmiş Kazançlar</string>
+
+    <string name="earnings_empty_year">Bu yıl için geçmiş kazanç bulunmuyor.</string>
+
+    <string name="view_all">Tümünü Gör</string>
+
+    <string name="saved_cards_description">Kartlarını görüntüleyebilir, silebilir veya varsayılan kartını değiştirebilirsin.</string>
+
+    <string name="card_holder_name_placeholder">Ad Soyad</string>
+
+    <string name="card_holder">Kart Sahibi</string>
+
+    <string name="expiry_date">Son Kullanma</string>
+
+    <string name="set_as_default">Varsayılan Yap</string>
+
+    <string name="default_card">Varsayılan</string>
+
+    <string name="delete_card_title">Kartı Sil</string>
+
+    <string name="delete_card_desc">Bu kartı silmek istediğinize emin misiniz?</string>
+
+    <string name="error_saved_card_not_found">Kayıtlı kart bulunamadı.</string>
+
+    <string name="error_saved_card_sync_failed">Kayıtlı kart bilgileri güncellenemedi. Lütfen tekrar deneyin.</string>
+
+    <string name="error_saved_card_provider_unavailable">Kart sağlayıcısına şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+
+    <string name="make_default_title">Varsayılan Kart Yap</string>
+
+    <string name="make_default_desc">Bu kartı varsayılan ödeme yönteminiz yapmak istiyor musunuz?</string>
+
+    <string name="withdraw_money">PARA ÇEK</string>
+
+    <string name="total_withdrawable_balance">TOPLAM ÇEKİLEBİLİR BAKİYE</string>
+
+    <string name="recent_transactions">Son Hareketler</string>
+
+    <string name="earnings_format">Kazanç: %1$s</string>
+
+    <string name="amount_format">Tutar: %1$s</string>
+
+    <string name="withdraw_title">Para Çekme</string>
+
+    <string name="add_money_title">Para Yükleme</string>
+
+    <string name="available_balance_format">Kullanılabilir Bakiye: %1$s</string>
+
+    <string name="withdraw_all">Tümünü Çek</string>
+
+    <string name="default_masked_iban">TR** **** ****</string>
+
+    <string name="change">Değiştir</string>
+
+    <string name="withdraw_info_text">Talebinizin durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
+
+    <string name="add_money_info_text">Yuklenecek tutar guvenli odeme altyapisi uzerinden bakiyenize aktarilacaktir.</string>
+
+    <string name="wallet_transaction_history">Cüzdan Hareketleri</string>
+
+    <string name="wallet_transaction_withdrawal_title">Para Çekimi</string>
+
+    <string name="wallet_transaction_top_up_title">Bakiye Yükleme</string>
+
+    <string name="wallet_transaction_tour_purchase_title">Tur Ödemesi</string>
+
+    <string name="wallet_transaction_refund_title">Tur İadesi</string>
+
+    <string name="wallet_transaction_reversal_title">Kazanç İadesi</string>
+
+    <string name="wallet_filter_all">Tümü</string>
+
+    <string name="wallet_filter_top_up">Para Yükleme</string>
+
+    <string name="wallet_filter_tour_payments">Tur Ödemeleri</string>
+
+    <string name="wallet_filter_refunds">İadeler</string>
+
+    <string name="wallet_filter_tour_income">Tur Kazançları</string>
+
+    <string name="wallet_filter_withdrawals">Para Çekimleri</string>
+
+    <string name="wallet_filter_reversals">Kazanç İadeleri</string>
+
+    <string name="wallet_transactions_empty">Bu filtreye uygun cüzdan hareketi bulunamadı.</string>
+
+    <string name="default_payment_card">Varsayılan Ödeme Kartı</string>
+
+    <string name="add_payment_card_hint">Kartınızı güvenli ödeme sırasında kaydedebilirsiniz.</string>
+
+    <string name="manage">Yönet</string>
+
+    <string name="no_saved_card">Kayıtlı kartınız bulunmuyor.</string>
+
+    <string name="card_not_selected">Lütfen bir kart seçin.</string>
+
+    <string name="payment_status_pending">Bekliyor</string>
+
+    <string name="payment_status_completed">Tamamlandı</string>
+
+    <string name="payment_status_failed">Başarısız</string>
+
+    <string name="payment_status_refunded">İade Edildi</string>
+
+    <string name="checkout_topbar_title">Tur Satın Al</string>
+
+    <string name="checkout_title">Rezervasyonunuzu Tamamlayın</string>
+
+    <string name="checkout_subtitle">Katılımcı sayısını ve ödeme yönteminizi kontrol edin.</string>
+
+    <string name="checkout_participant_count">Katılımcı Sayısı</string>
+
+    <string name="checkout_remaining_capacity">Kalan kontenjan: %1$d</string>
+
+    <string name="checkout_unit_price">Kişi başı ücret</string>
+
+    <string name="checkout_payment_method">Ödeme Yöntemi</string>
+
+    <string name="wallet_payment">Cüzdan Bakiyesi</string>
+
+    <string name="wallet_balance_format">Kullanılabilir bakiye: %1$s</string>
+
+    <string name="checkout_terms_acceptance">Rezervasyon, iptal ve iade koşullarını okudum ve kabul ediyorum.</string>
+
+    <string name="checkout_total">Toplam</string>
+
+    <string name="checkout_error_already_reserved">Bu tur için zaten bir rezervasyonunuz bulunuyor.</string>
+
+    <string name="checkout_error_tour_completed">Bu tur tamamlandığı için yeni rezervasyon alınamıyor.</string>
+
+    <string name="checkout_error_tour_cancelled">Bu tur iptal edildiği için rezervasyon yapılamıyor.</string>
+
+    <string name="checkout_error_capacity_changed">Seçtiğiniz katılımcı sayısı için yeterli kontenjan kalmadı.</string>
+
+    <string name="checkout_error_terms_required">Devam etmek için rezervasyon koşullarını kabul edin.</string>
+
+    <string name="checkout_error_insufficient_balance">Cüzdan bakiyeniz bu işlem için yetersiz.</string>
+
+    <string name="payment_topbar_title">Ödeme Durumu</string>
+
+    <string name="payment_verifying_title">Ödemeniz Doğrulanıyor</string>
+
+    <string name="payment_verifying_description">İşlem sonucunu güvenli şekilde kontrol ediyoruz. Lütfen bu ekranı kapatmayın.</string>
+
+    <string name="payment_success_title">Ödeme Başarılı</string>
+
+    <string name="payment_success_description">Ödeme işleminiz başarıyla doğrulandı.</string>
+
+    <string name="payment_failed_title">Ödeme Başarısız</string>
+
+    <string name="payment_failed_description">Ödeme işlemi tamamlanamadı. Bilgilerinizi kontrol ederek yeniden deneyebilirsiniz.</string>
+
+    <string name="payment_cancelled_title">Ödeme İptal Edildi</string>
+
+    <string name="payment_cancelled_description">İşlem tamamlanmadan ödeme sayfasından ayrıldınız.</string>
+
+    <string name="payment_timeout_title">Ödeme Zaman Aşımına Uğradı</string>
+
+    <string name="payment_timeout_description">Ödeme sağlayıcısından zamanında yanıt alınamadı. İşlem durumunu yeniden kontrol edin.</string>
+
+    <string name="payment_not_found_title">İşlem Bulunamadı</string>
+
+    <string name="payment_not_found_description">Bu ödeme işlemine ait güncel bilgiye ulaşılamadı.</string>
+
+    <string name="payment_reference_format">İşlem referansı: %1$s</string>
+
+    <string name="payment_done">TAMAM</string>
+
+    <string name="payment_retry">TEKRAR DENE</string>
+
+    <string name="payment_return">GERİ DÖN</string>
+
+    <string name="payment_exit">ÖDEMEDEN ÇIK</string>
+
+    <string name="payment_return_home">ANA SAYFAYA DÖN</string>
+
+    <string name="cancel_payment">Ödemeyi İptal Et</string>
+
+    <string name="bank_accounts">Banka Hesaplarım</string>
+
+    <string name="bank_accounts_description">Kazanç aktarımı ve para çekme işlemlerinde kullanılacak banka hesaplarınızı yönetin.</string>
+
+    <string name="bank_accounts_empty">Henüz kayıtlı banka hesabınız bulunmuyor.</string>
+
+    <string name="add_bank_account">Banka Hesabı Ekle</string>
+
+    <string name="default_bank_account">Varsayılan Hesap</string>
+
+    <string name="bank_name">Banka Adı</string>
+
+    <string name="bank_name_placeholder">IBAN girildiğinde otomatik belirlenir</string>
+
+    <string name="account_holder_name">Hesap Sahibi</string>
+
+    <string name="iban">IBAN</string>
+
+    <string name="iban_placeholder">00 0000 0000 0000 0000 0000 00</string>
+
+    <string name="iban_error_message">Geçerli bir Türkiye IBAN bilgisi girin.</string>
+
+    <string name="bank_account_security_notice">Banka hesabı, yalnızca doğrulanmış rehber kazançlarının aktarımı için kullanılır.</string>
+
+    <string name="add_bank_account_action">HESABI EKLE</string>
+
+    <string name="bank_account_not_selected">Lütfen bir banka hesabı seçin.</string>
+
+    <string name="bank_account_required_title">Banka Hesabı Gerekli</string>
+
+    <string name="bank_account_required_description">Para çekebilmek için önce Profil > Banka Hesaplarım bölümünden bir hesap ekleyin.</string>
+
+    <string name="delete_bank_account_title">Banka Hesabını Sil</string>
+
+    <string name="delete_bank_account_description">Bu banka hesabını silmek istediğinizden emin misiniz?</string>
+
+    <string name="make_default_bank_account_title">Varsayılan Hesap Yap</string>
+
+    <string name="make_default_bank_account_description">Para çekme işlemlerinde bu hesabın kullanılmasını ister misiniz?</string>
+
+    <string name="withdrawal_request_received_title">Para Çekme Talebi Alındı</string>
+
+    <string name="withdrawal_request_received_description">Talebiniz oluşturuldu. İşlem durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
+
+    <string name="withdrawal_confirmation_title">Para Çekme Onayı</string>
+
+    <string name="withdrawal_confirmation_description">Banka hesabınıza %1$s tutarında para çekme talebi oluşturulmasını onaylıyor musunuz?</string>
+
+    <string name="insufficient_balance_title">Yetersiz Bakiye</string>
+
+    <string name="withdrawal_insufficient_balance_description">Çekmek istediğiniz tutar kullanılabilir bakiyenizi aşıyor. Kullanılabilir bakiyeniz: %1$s.</string>
+
+    <string name="error_insufficient_withdrawable_balance">Kullanılabilir bakiyeniz bu para çekme işlemi için yetersiz.</string>
+
+    <string name="error_bank_account_not_found">Banka hesabı bulunamadı veya artık kullanılamıyor.</string>
+
+    <string name="error_bank_account_invalid">Banka hesabı bilgileri geçerli değil.</string>
+
+    <string name="error_bank_account_already_exists">Bu banka hesabı daha önce eklenmiş.</string>
+
+    <string name="confirm">ONAYLA</string>
+
+    <string name="zero">0</string>
+
+    <string name="error_refund_failed">İade işlemi tamamlanamadı. Lütfen tekrar deneyin.</string>
+
+    <string name="error_refund_amount_exceeded">İade tutarı ödenen tutarı aşamaz.</string>
+
+    <string name="hosted_card_payment">Kart ile Ödeme</string>
+
+    <string name="hosted_card_selection_notice">Kart seçimi iyzico güvenli ödeme ekranında yapılır.</string>
+
+    <string name="payment_charge_currency">Ödeme Para Birimi</string>
+
+    <string name="payment_charge_amount">Karttan çekilecek tutar</string>
+
+    <string name="payment_quote_notice">Tutar güncel kur bilgisiyle hesaplandı. Değişiklik yaparsanız teklif yenilenir.</string>
+
+    <string name="payment_get_quote">ÖDEME TUTARINI GÖR</string>
+
+    <string name="payment_currency_required">Devam etmek için ödeme para birimini seçin.</string>
+
+    <string name="payment_page_load_error">Güvenli ödeme sayfası yüklenemedi.</string>
+
+    <string name="payment_ssl_error">Güvenli bağlantı doğrulanamadığı için ödeme sayfası kapatıldı.</string>
+
+    <string name="payment_invalid_url_error">Güvenli ödeme adresi geçersiz.</string>
+
+    <string name="payment_refund_pending_title">İade İşlemi Başlatıldı</string>
+
+    <string name="payment_refund_pending_description">Ödemeniz doğrulandı ancak rezervasyon tamamlanamadı. Tam iade işleminiz devam ediyor.</string>
+
+    <string name="payment_refunded_title">Ödeme İade Edildi</string>
+
+    <string name="payment_refunded_description">Rezervasyon tamamlanamadığı için ödemenizin tamamı iade edildi.</string>
+
+    <string name="payment_manual_review_title">İşlem İnceleniyor</string>
+
+    <string name="payment_manual_review_description">Ödeme ve rezervasyon sonucu güvenliğiniz için incelemeye alındı. Güncel durum size bildirilecek.</string>
+
+    <string name="error_payment_not_found">Ödeme işlemi bulunamadı.</string>
+
+    <string name="error_payment_initialization_failed">Güvenli ödeme başlatılamadı. Lütfen tekrar deneyin.</string>
+
+    <string name="error_payment_verification_failed">Ödeme sonucu doğrulanamadı. Lütfen tekrar kontrol edin.</string>
+
+    <string name="error_payment_not_cancellable">Bu ödeme artık iptal edilemez. Güncel işlem durumunu kontrol edin.</string>
+
+    <string name="error_payment_currency_not_supported">Seçtiğiniz para birimi desteklenmiyor.</string>
+
+    <string name="error_payment_quote_unavailable">Ödeme tutarı şu anda hesaplanamıyor. Lütfen tekrar deneyin.</string>
+
+    <string name="error_payment_quote_expired">Ödeme teklifi süresi doldu. Güncel tutarı yeniden alın.</string>
+
+    <string name="error_card_insufficient_funds">Kart bakiyesi bu işlem için yetersiz.</string>
+
+    <string name="error_payment_method_declined">Kart işlemi banka tarafından reddedildi.</string>
+
+</resources>

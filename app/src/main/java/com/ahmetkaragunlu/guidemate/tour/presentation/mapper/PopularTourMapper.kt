@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.mapper
 
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
 import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiModel
@@ -23,7 +23,7 @@ fun TourSearchItem.toPopularTourCardUiModel(
         languagesFlag = languages.joinToString(separator = " ") { it.flagEmoji },
         languagesText = languages.joinToString(separator = ", ") { it.shortCode },
         guideName = guide.displayName,
-        guideImageResId = guide.profileImageResId,
+        guideImageResId = R.drawable.unnamed,
         guideImageUrl = guide.profileImageUrl,
     )
 }
@@ -49,7 +49,7 @@ fun TourSearchItem.toSearchResultUiModel(
         languagesText = languages.joinToString(separator = ", ") { it.shortCode },
         availableCapacity = availableCapacity,
         guideName = guide.displayName,
-        guideImageResId = guide.profileImageResId,
+        guideImageResId = R.drawable.unnamed,
         guideImageUrl = guide.profileImageUrl,
     )
 }

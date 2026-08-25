@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.review.data.mapper
 
-import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.review.data.remote.model.ReviewSubmissionRequestDto
@@ -28,7 +27,6 @@ private fun TourReviewResponseDto.toDomain(): TourReview =
         reviewerName = reviewerDisplayName,
         rating = rating,
         comment = comment.orEmpty(),
-        reviewerImageResId = R.drawable.unnamed,
         reviewerImageUrl = reviewerAvatar?.imageUrl,
         submittedAt = Instant.parse(submittedAt),
     )

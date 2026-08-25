@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
-import com.ahmetkaragunlu.guidemate.wallet.presentation.components.content.MoneyActionBottomSheetContent
+import com.ahmetkaragunlu.guidemate.wallet.presentation.components.MoneyActionBottomSheetContent
 import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.MoneyActionMethodType
 import com.ahmetkaragunlu.guidemate.wallet.presentation.components.model.MoneyActionMethodUi
 

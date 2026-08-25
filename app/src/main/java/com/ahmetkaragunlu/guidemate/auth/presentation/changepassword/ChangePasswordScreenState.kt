@@ -1,9 +1,0 @@
-package com.ahmetkaragunlu.guidemate.auth.presentation.changepassword
-
-data class ChangePasswordScreenState(
-    val errorMessage: String? = null,
-    val currentPasswordErrorMessage: String? = null,
-    val newPasswordErrorMessage: String? = null,
-    val isLoading: Boolean = false,
-    val showSuccessDialog: Boolean = false,
-)

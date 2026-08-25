@@ -26,6 +26,7 @@ interface TourDiscoveryApi {
 
     @GET("api/v1/tours/popular")
     suspend fun getPopularTours(
+        @Query("guideId") guideId: Long?,
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Response<ApiPageResponse<TourSearchItemResponseDto>>

@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.tour.domain.model
 
-import androidx.annotation.DrawableRes
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import java.time.Instant
@@ -18,7 +17,6 @@ data class Tour(
     val timeZoneId: String,
     val category: TourCategory,
     val languages: List<TourLanguage>,
-    @param:DrawableRes val coverImageResId: Int,
     val coverMediaId: String? = null,
     val coverImageUrl: String? = null,
     val approvalStatus: TourApprovalStatus,

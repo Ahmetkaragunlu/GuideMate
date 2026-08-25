@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.mapper
 
-import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationActor
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
@@ -81,7 +80,6 @@ class TouristReservationMapperTest {
                         GuidePublicSummary(
                             id = "10",
                             displayName = "Ahmet Yılmaz",
-                            profileImageResId = R.drawable.unnamed,
                         ),
                     title = "Kapadokya Turu",
                     description = "Tur açıklaması",
@@ -92,7 +90,6 @@ class TouristReservationMapperTest {
                     timeZoneId = "Europe/Istanbul",
                     category = TourCategory.CULTURE,
                     languages = listOf(TourLanguage("tr", "🇹🇷", "Türkçe", "TR")),
-                    coverImageResId = R.drawable.example,
                     coverMediaId = null,
                     coverImageUrl = null,
                     startsAt = Instant.parse("2027-05-24T06:00:00Z"),

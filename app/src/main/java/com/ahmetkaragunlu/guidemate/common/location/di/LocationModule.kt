@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.common.location.di
 
 import com.ahmetkaragunlu.guidemate.common.location.data.remote.GooglePlacesCitySearchService
-import com.ahmetkaragunlu.guidemate.common.location.data.CitySearchService
+import com.ahmetkaragunlu.guidemate.common.location.search.CitySearchService
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

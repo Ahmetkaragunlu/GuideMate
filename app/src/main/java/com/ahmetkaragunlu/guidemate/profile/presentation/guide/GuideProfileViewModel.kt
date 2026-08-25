@@ -3,7 +3,7 @@ package com.ahmetkaragunlu.guidemate.profile.presentation.guide
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.location.data.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -43,17 +44,17 @@ class GuideProfileViewModel
         private val tourRepository: TourDiscoveryRepository,
         notificationRepository: NotificationRepository,
     ) : ViewModel() {
-        private val loadState =
+        private val operationState =
             MutableStateFlow(
-                if (profileRepository.cachedOwnProfile == null) {
-                    ContentLoadState.LOADING
-                } else {
-                    ContentLoadState.CONTENT
-                },
+                GuideProfileOperationState(
+                    loadState =
+                        if (profileRepository.cachedOwnProfile == null) {
+                            ContentLoadState.LOADING
+                        } else {
+                            ContentLoadState.CONTENT
+                        },
+                ),
             )
-        private val selectedProfileImageUri = MutableStateFlow<String?>(null)
-        private val isAvatarUpdating = MutableStateFlow(false)
-        private val userMessage = MutableStateFlow<String?>(null)
         private val popularTours = MutableStateFlow<List<TourSearchItem>>(emptyList())
         private var refreshJob: Job? = null
 
@@ -61,15 +62,13 @@ class GuideProfileViewModel
             combine(
                 profileRepository.ownProfile,
                 popularTours,
-                selectedProfileImageUri,
-                isAvatarUpdating,
-                combine(loadState, userMessage, ::Pair),
-            ) { profile, tours, selectedImageUri, avatarUpdating, request ->
+                operationState,
+            ) { profile, tours, operation ->
                 profile.toUiState(
-                    loadState = request.first,
-                    selectedProfileImageUri = selectedImageUri,
-                    isAvatarUpdating = avatarUpdating,
-                    userMessage = request.second,
+                    loadState = operation.loadState,
+                    selectedProfileImageUri = operation.selectedProfileImageUri,
+                    isAvatarUpdating = operation.isAvatarUpdating,
+                    userMessage = operation.userMessage,
                     popularTours = tours.map { it.toPopularTourCardUiModel() },
                 )
             }.stateIn(
@@ -77,7 +76,7 @@ class GuideProfileViewModel
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue =
                     profileRepository.cachedOwnProfile.toUiState(
-                        loadState = loadState.value,
+                        loadState = operationState.value.loadState,
                     ),
             )
 
@@ -102,17 +101,21 @@ class GuideProfileViewModel
             refreshJob =
                 viewModelScope.launch {
                     val hasCachedProfile = profileRepository.cachedOwnProfile != null
-                    if (!hasCachedProfile) loadState.value = ContentLoadState.LOADING
+                    if (!hasCachedProfile) {
+                        operationState.update { it.copy(loadState = ContentLoadState.LOADING) }
+                    }
                     when (val result = profileRepository.refreshOwnProfile()) {
                         is DataResult.Success -> {
-                            loadState.value = ContentLoadState.CONTENT
+                            operationState.update { it.copy(loadState = ContentLoadState.CONTENT) }
                             refreshPopularTours(result.data.guideId)
                         }
                         is DataResult.Error -> {
                             if (hasCachedProfile) {
-                                userMessage.value = result.error.toMessage(resourceProvider)
+                                operationState.update {
+                                    it.copy(userMessage = result.error.toMessage(resourceProvider))
+                                }
                             } else {
-                                loadState.value = ContentLoadState.ERROR
+                                operationState.update { it.copy(loadState = ContentLoadState.ERROR) }
                             }
                         }
                     }
@@ -121,10 +124,16 @@ class GuideProfileViewModel
 
         private fun refreshPopularTours(guideId: Long) {
             viewModelScope.launch {
-                when (val result = tourRepository.getPopularTours(page = 0, size = 20)) {
+                when (
+                    val result =
+                        tourRepository.getPopularToursForGuide(
+                            guideId = guideId,
+                            page = 0,
+                            size = 20,
+                        )
+                ) {
                     is DataResult.Success -> {
-                        popularTours.value =
-                            result.data.items.filter { it.guide.id == guideId.toString() }
+                        popularTours.value = result.data.items
                     }
                     is DataResult.Error -> Unit
                 }
@@ -132,7 +141,7 @@ class GuideProfileViewModel
         }
 
         fun onProfileImageSelected(uri: String) {
-            if (isAvatarUpdating.value) return
+            if (operationState.value.isAvatarUpdating) return
             val currentProfile = profileRepository.cachedOwnProfile
             if (currentProfile == null ||
                 currentProfile.specialtyTitle.length !in
@@ -142,22 +151,36 @@ class GuideProfileViewModel
                     GuideProfileUpdate.MIN_BIOGRAPHY_LENGTH..
                         GuideProfileUpdate.MAX_BIOGRAPHY_LENGTH
             ) {
-                userMessage.value =
-                    resourceProvider.getString(R.string.guide_profile_complete_about_first)
+                operationState.update {
+                    it.copy(
+                        userMessage =
+                            resourceProvider.getString(
+                                R.string.guide_profile_complete_about_first,
+                            ),
+                    )
+                }
                 return
             }
-            selectedProfileImageUri.value = uri
-            isAvatarUpdating.value = true
+            operationState.update {
+                it.copy(selectedProfileImageUri = uri, isAvatarUpdating = true)
+            }
             viewModelScope.launch {
                 when (val uploadResult = mediaRepository.uploadImage(uri, MediaPurpose.GUIDE_AVATAR)) {
                     is DataResult.Error -> {
-                        userMessage.value = uploadResult.error.toMessage(resourceProvider)
+                        operationState.update {
+                            it.copy(userMessage = uploadResult.error.toMessage(resourceProvider))
+                        }
                     }
                     is DataResult.Success -> {
                         val profile = profileRepository.cachedOwnProfile
                         if (profile == null) {
                             mediaRepository.deleteUnreferenced(uploadResult.data.mediaAssetId)
-                            userMessage.value = resourceProvider.getString(R.string.error_generic_failure)
+                            operationState.update {
+                                it.copy(
+                                    userMessage =
+                                        resourceProvider.getString(R.string.error_generic_failure),
+                                )
+                            }
                         } else {
                             val updateResult =
                                 profileRepository.updateOwnProfile(
@@ -165,23 +188,39 @@ class GuideProfileViewModel
                                 )
                             if (updateResult is DataResult.Error) {
                                 mediaRepository.deleteUnreferenced(uploadResult.data.mediaAssetId)
-                                userMessage.value = updateResult.error.toMessage(resourceProvider)
+                                operationState.update {
+                                    it.copy(userMessage = updateResult.error.toMessage(resourceProvider))
+                                }
                             } else {
-                                userMessage.value =
-                                    resourceProvider.getString(R.string.guide_profile_update_success)
+                                operationState.update {
+                                    it.copy(
+                                        userMessage =
+                                            resourceProvider.getString(
+                                                R.string.guide_profile_update_success,
+                                            ),
+                                    )
+                                }
                             }
                         }
                     }
                 }
-                selectedProfileImageUri.value = null
-                isAvatarUpdating.value = false
+                operationState.update {
+                    it.copy(selectedProfileImageUri = null, isAvatarUpdating = false)
+                }
             }
         }
 
         fun onUserMessageShown() {
-            userMessage.value = null
+            operationState.update { it.copy(userMessage = null) }
         }
     }
+
+private data class GuideProfileOperationState(
+    val loadState: ContentLoadState,
+    val selectedProfileImageUri: String? = null,
+    val isAvatarUpdating: Boolean = false,
+    val userMessage: String? = null,
+)
 
 private fun GuideProfile?.toUiState(
     loadState: ContentLoadState,

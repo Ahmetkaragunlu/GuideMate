@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
-import com.ahmetkaragunlu.guidemate.reservation.presentation.model.TourCheckoutUiState
+import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.TourCheckoutUiState
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 
 @Composable

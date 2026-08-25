@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.detail.mapper
 
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailReviewUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiState
@@ -16,7 +17,7 @@ fun TourWithSession.toTourDetailUiState(
         sessionId = session.id,
         tourId = tour.id,
         title = tour.title,
-        imageResId = tour.coverImageResId,
+        imageResId = R.drawable.example,
         imageUrl = tour.coverImageUrl,
         rating = tour.averageRating,
         reviewCount = tour.reviewCount,
@@ -40,7 +41,7 @@ fun TourWithSession.toTourDetailUiState(
         cancellationReason = session.cancellationReason,
         guideId = tour.guide.id,
         guideName = tour.guide.displayName,
-        guideImageResId = tour.guide.profileImageResId,
+        guideImageResId = R.drawable.unnamed,
         guideImageUrl = tour.guide.profileImageUrl,
         reviews =
             tour.recentReviews.map { review ->
@@ -49,7 +50,7 @@ fun TourWithSession.toTourDetailUiState(
                     reviewerName = review.reviewerName,
                     comment = review.comment,
                     rating = review.rating,
-                    reviewerImageResId = review.reviewerImageResId,
+                    reviewerImageResId = R.drawable.unnamed,
                     reviewerImageUrl = review.reviewerImageUrl,
                 )
             },

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.chat.domain.repository.ChatRepository
 import com.ahmetkaragunlu.guidemate.chat.presentation.model.ChatListUiState
-import com.ahmetkaragunlu.guidemate.chat.presentation.model.toChatUiModel
+import com.ahmetkaragunlu.guidemate.chat.presentation.mapper.toChatUiModel
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider

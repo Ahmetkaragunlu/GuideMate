@@ -86,10 +86,16 @@ class GuideProfilePreviewViewModel
 
         private fun refreshPopularTours(guideId: Long) {
             viewModelScope.launch {
-                when (val result = tourRepository.getPopularTours(page = 0, size = 20)) {
+                when (
+                    val result =
+                        tourRepository.getPopularToursForGuide(
+                            guideId = guideId,
+                            page = 0,
+                            size = 20,
+                        )
+                ) {
                     is DataResult.Success -> {
-                        popularTours.value =
-                            result.data.items.filter { it.guide.id == guideId.toString() }
+                        popularTours.value = result.data.items
                     }
                     is DataResult.Error -> Unit
                 }

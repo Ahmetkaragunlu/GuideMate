@@ -3932,6 +3932,41 @@ repository/mapper/ViewModel testleriyle degistirilir. `ExampleUnitTest` ve
 dogrulanirsa silinir. `SandboxCardInputRulesTest` ve mock-store testleri runtime
 mocklariyla birlikte bosa dusuyorsa tutulmaz.
 
+### 2026-08-26 Android Otomatik Test Denetimi
+
+Durum: TAMAMLANDI. Bu kayit kapsamli kullanici, fiziksel cihaz, LAN, iyzico
+Sandbox, FCM ve iki kullanicili STOMP E2E turunun tamamlandigi anlamina gelmez.
+
+- Mevcut testlerin her biri gercek domain, mapper, repository, state veya
+  entegrasyon riskiyle eslestirildi. Sablon, sandbox veya bosa dusmus mock-store
+  testi bulunmadigi icin sirf test sayisini azaltmak adina calisan test silinmedi.
+- Auth validation/mapping, token saklama, refresh rotation, tek retry ve terminal
+  oturum temizleme testleri tamamlandi.
+- Ortak API executor icin basari, bos cevap, structured backend error, network
+  error ve coroutine cancellation sinirlari tamamlandi.
+- Reservation cancellation, review submit/refresh, notification pagination/read/
+  device registration, semantic navigation ve bilinmeyen payload testleri
+  tamamlandi.
+- Payment polling, terminal sonuc, pending-payment recovery ve publish-preview
+  mapper testleri tamamlandi.
+- Chat optimistic send, failed/retry, canonical unread, cursor merge ve beklemeli
+  STOMP reconnect + REST resync davranislari tamamlandi.
+- Kritik Android runtime sinirlari icin ortak loading/error/retry Compose testi ve
+  hosted-card checkout'ta terms -> quote -> payment sirasi instrumentation testi
+  eklendi.
+- Guncel envanter 120 local unit test ve 4 emulator instrumentation testidir.
+- `ktfmtCheck`, debug production/unit/instrumentation derlemeleri, tum local unit
+  testler, `lintDebug`, `assembleDebug`, `git diff --check` ve Pixel 8a API 36
+  uzerinde `connectedDebugAndroidTest` gecti.
+- Lint sonucu 0 error'dur. Dependency update, mevcut Compose modifier/plural/
+  drawable stil uyarilari final davranis testinin parcasi degildir. FCM servisinin
+  `onNewToken` uyarisi ise GuideMate'in backend ile birlikte registration token
+  yerine Firebase Installation ID kullanan bilincli sozlesmesi nedeniyle davranis
+  degisikligi yapilmadan korunmustur.
+- Son kabul icin backend/PostgreSQL/OpenAPI, iki kullanicili LAN, gercek FCM,
+  STOMP, process death, medya, fiziksel cihaz ve iyzico Sandbox senaryolari asagidaki
+  kullanici/E2E envanterinde calistirilip kanitlanmalidir.
+
 ### Uygulama Geneli UI ve Kullanici Kabul Testleri
 
 Bu liste yalniz mevcut ekranlarla sinirli degildir. Kalan fazlarda eklenen her

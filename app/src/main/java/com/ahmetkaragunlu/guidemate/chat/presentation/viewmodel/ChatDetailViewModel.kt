@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.chat.domain.repository.ChatRepository
 import com.ahmetkaragunlu.guidemate.chat.presentation.model.ChatDetailUiState
-import com.ahmetkaragunlu.guidemate.chat.presentation.model.toMessageUiModel
+import com.ahmetkaragunlu.guidemate.chat.presentation.mapper.toMessageUiModel
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
