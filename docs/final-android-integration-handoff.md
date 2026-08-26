@@ -3954,7 +3954,16 @@ Sandbox, FCM ve iki kullanicili STOMP E2E turunun tamamlandigi anlamina gelmez.
 - Kritik Android runtime sinirlari icin ortak loading/error/retry Compose testi ve
   hosted-card checkout'ta terms -> quote -> payment sirasi instrumentation testi
   eklendi.
-- Guncel envanter 120 local unit test ve 4 emulator instrumentation testidir.
+- Risk temelli ViewModel denetiminde 37 Hilt ViewModel'in tamamina yuzeysel test
+  yazilmadi. Auth/root, bildirim tercihleri, tur yayinlama-duzenleme-yonetim,
+  discovery pagination, profil, rezervasyon/yorum, wallet/withdrawal, banka
+  hesabi ve hosted payment gibi state veya mutation riski yuksek akislara
+  odaklanildi. Guncel envanter 23 ViewModel test sinifi dahil 145 local unit test
+  ve 4 emulator instrumentation testidir.
+- `SavedStateHandle.toRoute`, Android `Bundle` ve locale API'lerine gercekten
+  bagimli yerel ViewModel testleri Robolectric ile JVM'de calisir; saf domain,
+  mapper ve repository testleri normal JUnit olarak kalir. Robolectric uygulama
+  runtime bagimliligi degildir.
 - `ktfmtCheck`, debug production/unit/instrumentation derlemeleri, tum local unit
   testler, `lintDebug`, `assembleDebug`, `git diff --check` ve Pixel 8a API 36
   uzerinde `connectedDebugAndroidTest` gecti.
