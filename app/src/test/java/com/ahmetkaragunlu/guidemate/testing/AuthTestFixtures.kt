@@ -86,6 +86,10 @@ class FakeUserRepository(initialState: UserState = UserState()) : UserRepository
     override val userState: StateFlow<UserState> = state
 
     override suspend fun restoreCachedUser(): UserState = restoredUser
+
+    override suspend fun updateAvatar(mediaAssetId: String, imageUrl: String) {
+        state.value = state.value.copy(avatarMediaId = mediaAssetId, avatarUrl = imageUrl)
+    }
 }
 
 class FakeOnboardingRepository(

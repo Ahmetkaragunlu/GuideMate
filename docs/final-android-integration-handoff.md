@@ -1613,7 +1613,7 @@ olusturulacaktir. Bos veya gelecege donuk repository acilmayacaktir.
 | --- | --- | --- | --- |
 | Mevcut `AuthRepository` | `/api/v1/auth/**` | Auth ekranlari, root session | Mevcut gercek yapi korunur |
 | Mevcut `UserRepository` | `/auth/me` ve auth response | Root, profil basliklari, kimlik/rol | Hardcoded kullanici ve rol |
-| `MediaRepository` | `/api/v1/media` | Guide avatar, publish/edit cover | Local URI'yi kalici URL sanan akislari |
+| `MediaRepository` | `/api/v1/media` | User avatar, publish/edit cover | Local URI'yi kalici URL sanan akislari |
 | `GuideProfileRepository` | Own/public profile, guide search/top | Guide profil/about/preview, tourist guide UI | `GuideProfileSharedStore`, profil mocklari |
 | `GuideTourRepository` | Private guide tour, session, dashboard | Home, publish, Turlarim, guide detail/edit | `TourCatalogStore`un guide mutation otoritesi |
 | `TourDiscoveryRepository` | Public tour search/popular/detail/session | Tourist home/explore/public detail | `TourCatalogStore`un public discovery otoritesi |
@@ -1673,7 +1673,7 @@ Hans, turist/rehber kimligi uretmez.
 
 | Ekran/aksiyon | Endpoint/DTO | Repository ve mapper | Canonical sonuc |
 | --- | --- | --- | --- |
-| Avatar secme | `POST /api/v1/media?purpose=GUIDE_AVATAR`, multipart -> `MediaUploadResponse` | `MediaRepository.uploadImage(localUri, GUIDE_AVATAR)`; response -> `MediaAsset` | Donen `mediaAssetId` profile patch'e verilir; local URI kalici model olmaz |
+| Avatar secme | `POST /api/v1/media?purpose=USER_AVATAR`, ardindan `PUT /api/v1/users/me/avatar` | `UserAvatarRepository` kamera/galeri URI'sini upload + attach olarak orkestre eder | Turist ve rehber ayni user avatar sozlesmesini kullanir; local URI kalici model olmaz, attach hatasinda sahipsiz upload temizlenir |
 | Cover secme | `POST /api/v1/media?purpose=TOUR_COVER` | `MediaRepository.uploadImage(localUri, TOUR_COVER)` | Donen ID create/change request'e girer |
 | Goruntu okuma | `GET /api/v1/media/{mediaId}/content`, response `imageUrl` | Coil-backed ortak `GuideMateImage` | Local content/file URI ve HTTP/HTTPS tek noktada; fallback tasarimi korunur |
 | Kullanilmayan draft silme | `DELETE /api/v1/media/{mediaId}` | `MediaRepository.deleteUnreferenced` | Yalniz backend izin verirse silinir; `MEDIA_IN_USE` gorunur hata olur |
@@ -2681,8 +2681,8 @@ Guncel durumlar:
 | --- | --- | --- |
 | Faz 0 - Feature-first refactor | `TAMAMLANDI` | Format, compile, unit test, lint ve debug APK kapilari gecti |
 | Faz 1 - Ortak teknik temel ve auth | `TAMAMLANDI` | Auth/OpenAPI uyumu, ortak pagination, hata parsing, LAN ve kalite kapilari dogrulandi |
-| Faz 2 - Medya | `KISMEN TAMAMLANDI` | Medya altyapisi, loader, avatar ve guide/tourist canonical cover kod baglantisi tamam; cihaz E2E kaniti bekleniyor |
-| Faz 3 - Guide profile ve public guide | `KISMEN TAMAMLANDI` | Repository, own/public profile, avatar patch, guide search/top ve otomatik kalite kapilari tamam; calisan backend ile cihaz E2E kaniti bekleniyor |
+| Faz 2 - Medya | `KISMEN TAMAMLANDI` | Medya altyapisi, loader, ortak turist/rehber user avatar ve guide/tourist canonical cover kod baglantisi tamam; cihaz E2E kaniti bekleniyor |
+| Faz 3 - Guide profile ve public guide | `KISMEN TAMAMLANDI` | Repository, own/public profile, ortak user avatar, guide search/top ve otomatik kalite kapilari tamam; calisan backend ile cihaz E2E kaniti bekleniyor |
 | Faz 4 - Tour ve guide tour yonetimi | `KISMEN TAMAMLANDI` | Repository, guide list/detail/publish/edit/lifecycle/dashboard, cover media, mock mutation temizligi ve kalite kapilari tamam; calisan backend ile authenticated cihaz E2E kaniti bekleniyor |
 | Faz 5 - Tourist discovery ve public tour | `KISMEN TAMAMLANDI` | Repository, home/popular, gercek tour search/filter/pagination, public session detail, read-only yorumlar, public profil turlari, checkout session yenilemesi, mock katalog temizligi ve otomatik kalite kapilari tamam; calisan backend ve cihaz E2E kaniti bekleniyor |
 | Faz 6 - Reservation ve trips | `KISMEN TAMAMLANDI` | Repository, upcoming/past pagination, reservation snapshot detail, typed reservation route, idempotent cancellation, refund sonucu ve mock temizligi tamam; backend/cihaz E2E ile Faz 9 payment baglantisi bekleniyor |
@@ -2715,7 +2715,7 @@ Capraz-faz takip kaydi su formatta tutulur:
 
 | Kayit | Kaynak faz | Hedef faz | Bagimli is | Kapanis kaniti | Durum |
 | --- | --- | --- | --- | --- | --- |
-| MEDIA-PROFILE-01 | Faz 2 | Faz 3 | Avatar local URI upload sonucu `mediaAssetId` ile profile patch'e baglandi; patch hatasinda yeni sahipsiz medya temizlenip eski avatar korunuyor | Guide avatar degisikliginin own/public profile'da iki cihazdan canonical URL ile gorunmesi | `KOD TAMAMLANDI - E2E BEKLIYOR` |
+| MEDIA-PROFILE-01 | Faz 2 | Faz 3 | Turist ve rehber avatar local URI'si `USER_AVATAR` olarak yuklenip ortak user avatar endpoint'ine baglandi; attach hatasinda yeni sahipsiz medya temizlenip eski avatar korunuyor | Iki rolun avatar degisikliginin profil, yorum ve chat projection'larinda canonical URL ile iki cihazdan gorunmesi | `KOD TAMAMLANDI - E2E BEKLIYOR` |
 | MEDIA-TOUR-01 | Faz 2 | Faz 4 ve 5 | Cover local URI once upload ediliyor; create/change request yalniz `mediaAssetId` tasiyor ve basarisiz request'in sahipsiz yeni medyasi kontrollu siliniyor | Publish/edit sonrasi guide ve tourist tour gorunumlerinin ayni canonical cover URL'yi gostermesi | `KOD TAMAMLANDI - BACKEND/CIHAZ E2E BEKLIYOR` |
 | RESERVATION-PAYMENT-01 | Faz 6 | Faz 9 | Trips/detail/cancel canonical reservation repository'sine gecti; yeni satin alim hosted veya wallet payment sonucunu canonical backend status'u ve reservation durumu ile dogruluyor | Basarili payment sonrasi reservation'in backend listesinde gorunmesi; cancel/refund sonrasi reservation, payment ve wallet state'lerinin birlikte yenilenmesi | `KOD TAMAMLANDI - SANDBOX/CIHAZ E2E BEKLIYOR` |
 | REVIEW-NOTIFICATION-01 | Faz 7 | Faz 12 | Review submit ayni turist oturumundaki reservation, tour, popular/search ve public guide projection'larini dar review change akisi ile yeniliyor; notification push event'i acik guide dashboard/profile projection'larini canonical backend kaynagindan yeniliyor | Turist yorumu sonrasi guide cihazinda bildirim ve canonical dashboard/profile puaninin uygulamayi yeniden baslatmadan yenilenmesi | `KOD TAMAMLANDI - IKI CIHAZLI FCM E2E BEKLIYOR` |

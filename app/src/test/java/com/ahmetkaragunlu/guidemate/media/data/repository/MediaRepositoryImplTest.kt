@@ -30,14 +30,14 @@ class MediaRepositoryImplTest {
         val api = FakeMediaApi()
         val repository = createRepository(api)
 
-        val result = repository.uploadImage("content://image/1", MediaPurpose.GUIDE_AVATAR)
+        val result = repository.uploadImage("content://image/1", MediaPurpose.USER_AVATAR)
 
         assertTrue(result is DataResult.Success)
         val asset = (result as DataResult.Success).data
         assertEquals("media-1", asset.mediaAssetId)
-        assertEquals(MediaPurpose.GUIDE_AVATAR, asset.purpose)
+        assertEquals(MediaPurpose.USER_AVATAR, asset.purpose)
         assertEquals(MediaStatus.READY, asset.status)
-        assertEquals(MediaPurpose.GUIDE_AVATAR.name, api.lastUploadPurpose)
+        assertEquals(MediaPurpose.USER_AVATAR.name, api.lastUploadPurpose)
     }
 
     @Test
@@ -60,7 +60,7 @@ class MediaRepositoryImplTest {
     fun `does not expose media before backend marks it ready`() = runBlocking {
         val repository = createRepository(FakeMediaApi(uploadStatus = "PENDING"))
 
-        val result = repository.uploadImage("content://image/1", MediaPurpose.GUIDE_AVATAR)
+        val result = repository.uploadImage("content://image/1", MediaPurpose.USER_AVATAR)
 
         assertTrue(result is DataResult.Error)
         assertSame(AppError.Unknown, (result as DataResult.Error).error)

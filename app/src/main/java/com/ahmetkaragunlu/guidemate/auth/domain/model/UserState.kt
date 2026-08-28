@@ -7,6 +7,8 @@ data class UserState(
     val lastName: String? = null,
     val isRoleSelected: Boolean = false,
     val role: UserRole? = null,
+    val avatarMediaId: String? = null,
+    val avatarUrl: String? = null,
 ) {
     val isAuthenticated: Boolean
         get() = userId != null && !email.isNullOrBlank()

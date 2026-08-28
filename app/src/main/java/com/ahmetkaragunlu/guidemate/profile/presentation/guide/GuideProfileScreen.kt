@@ -1,8 +1,6 @@
 package com.ahmetkaragunlu.guidemate.profile.presentation.guide
 
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,18 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.PhotoCamera
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,9 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.colorResource
@@ -47,13 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 import com.ahmetkaragunlu.guidemate.common.ui.image.ImageSourcePicker
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.profile.presentation.level.GuideLevelInfoBottomSheet
 import com.ahmetkaragunlu.guidemate.profile.presentation.level.model.GuideLevelViewerType
 import com.ahmetkaragunlu.guidemate.profile.presentation.level.model.titleResId
 import com.ahmetkaragunlu.guidemate.profile.presentation.components.CommonProfileMenuItem
+import com.ahmetkaragunlu.guidemate.profile.presentation.components.EditableProfileAvatar
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.components.ProfileStatsRow
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.guideProfileMenuOptions
@@ -93,56 +84,13 @@ fun GuideProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
-            Box(contentAlignment = Alignment.BottomEnd) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color.LightGray)
-                            .clickable(enabled = !profileState.isAvatarUpdating) {
-                                showPhotoSourceSheet = true
-                            },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    GuideMateImage(
-                        fallbackImageResId = profileState.profileImageResId,
-                        imageUrl = profileState.displayProfileImageUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-
-                Surface(
-                    onClick = { showPhotoSourceSheet = true },
-                    enabled = !profileState.isAvatarUpdating,
-                    modifier =
-                        Modifier
-                            .size(32.dp)
-                            .offset(x = 4.dp, y = 4.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    shadowElevation = 4.dp,
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        if (profileState.isAvatarUpdating) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                color = colorResource(R.color.brand_color),
-                                strokeWidth = 2.dp,
-                            )
-                        } else {
-                            Icon(
-                                Icons.Rounded.PhotoCamera,
-                                contentDescription = null,
-                                tint = colorResource(R.color.brand_color),
-                                modifier = Modifier.size(20.dp),
-                            )
-                        }
-                    }
-                }
-            }
+            EditableProfileAvatar(
+                imageUrl = profileState.displayProfileImageUrl,
+                fallbackImageResId = profileState.profileImageResId,
+                isUpdating = profileState.isAvatarUpdating,
+                size = 100.dp,
+                onClick = { showPhotoSourceSheet = true },
+            )
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(

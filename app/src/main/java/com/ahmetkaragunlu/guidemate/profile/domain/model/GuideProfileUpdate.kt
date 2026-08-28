@@ -4,7 +4,6 @@ data class GuideProfileUpdate(
     val specialtyTitle: String,
     val biography: String,
     val languageCodes: List<String>,
-    val avatarMediaId: String? = null,
 ) {
     companion object {
         const val MIN_SPECIALTY_TITLE_LENGTH = 2

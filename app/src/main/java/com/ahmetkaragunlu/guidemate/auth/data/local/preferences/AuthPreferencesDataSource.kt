@@ -48,6 +48,8 @@ class AuthPreferencesDataSource @Inject constructor(
             preferences.putOrRemove(LAST_NAME, user.lastName)
             preferences[ROLE_SELECTED] = user.isRoleSelected
             preferences.putOrRemove(USER_ROLE, user.role?.toStoredValue())
+            preferences.putOrRemove(AVATAR_MEDIA_ID, user.avatarMediaId)
+            preferences.putOrRemove(AVATAR_URL, user.avatarUrl)
         }
         _userState.value = user
     }
@@ -60,6 +62,8 @@ class AuthPreferencesDataSource @Inject constructor(
             preferences.remove(LAST_NAME)
             preferences.remove(ROLE_SELECTED)
             preferences.remove(USER_ROLE)
+            preferences.remove(AVATAR_MEDIA_ID)
+            preferences.remove(AVATAR_URL)
         }
         _userState.value = UserState()
     }
@@ -81,6 +85,8 @@ class AuthPreferencesDataSource @Inject constructor(
             lastName = this[LAST_NAME],
             isRoleSelected = this[ROLE_SELECTED] ?: false,
             role = this[USER_ROLE]?.toUserRoleOrNull(),
+            avatarMediaId = this[AVATAR_MEDIA_ID],
+            avatarUrl = this[AVATAR_URL],
         )
 
     private fun String.toUserRoleOrNull(): UserRole? =
@@ -120,6 +126,8 @@ class AuthPreferencesDataSource @Inject constructor(
         val LAST_NAME = stringPreferencesKey("last_name")
         val ROLE_SELECTED = booleanPreferencesKey("role_selected")
         val USER_ROLE = stringPreferencesKey("user_role")
+        val AVATAR_MEDIA_ID = stringPreferencesKey("avatar_media_id")
+        val AVATAR_URL = stringPreferencesKey("avatar_url")
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
 
         const val NO_USER_ID = -1L

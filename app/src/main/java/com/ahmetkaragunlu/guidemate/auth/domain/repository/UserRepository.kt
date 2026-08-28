@@ -7,4 +7,6 @@ interface UserRepository {
     val userState: StateFlow<UserState>
 
     suspend fun restoreCachedUser(): UserState
+
+    suspend fun updateAvatar(mediaAssetId: String, imageUrl: String)
 }

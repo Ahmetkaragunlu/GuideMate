@@ -40,5 +40,4 @@ data class UpdateGuideProfileRequestDto(
     @SerializedName("specialtyTitle") val specialtyTitle: String,
     @SerializedName("biography") val biography: String,
     @SerializedName("languageCodes") val languageCodes: List<String>,
-    @SerializedName("avatarMediaId") val avatarMediaId: String?,
 )

@@ -200,6 +200,8 @@ veya ikinci auth sistemi kurulmaz.
 #### `users`
 
 - Mevcut `BIGINT` primary key korunur.
+- `avatar_media_id UUID NULL FK media_assets`, turist ve rehberin ortak kullanici
+  avatar referansidir.
 - Auth/current-user cevabi `userId`, `email`, `firstName`, `lastName`, `role`,
   `roleSelected` dondurmeye devam eder.
 - Tur, rezervasyon, mesaj, odeme ve bildirim sahipliginin ana kullanici FK'sidir.
@@ -217,7 +219,7 @@ Alanlar:
 
 - `id UUID PK`
 - `owner_user_id BIGINT FK users`
-- `purpose VARCHAR`: `GUIDE_AVATAR`, `TOUR_COVER`
+- `purpose VARCHAR`: `USER_AVATAR`, `TOUR_COVER`
 - `storage_key VARCHAR UNIQUE`
 - `original_file_name VARCHAR`
 - `content_type VARCHAR`
@@ -241,7 +243,7 @@ Kurallar:
   sayilmaz; MIME/icerik ve maksimum `5 MB` boyut backend'de dogrulanir.
 - Kullanici tarafindan gelen dosya adi storage key olarak kullanilmaz. Backend
   tahmin edilemez benzersiz key uretir ve path traversal'a izin vermez.
-- Her rehberin tek aktif `GUIDE_AVATAR`, her turun tek aktif `TOUR_COVER`
+- Her turist veya rehber kullanicinin tek aktif `USER_AVATAR`, her turun tek aktif `TOUR_COVER`
   medyasi olur. Ilk portfolio surumunde galeri veya coklu tur fotografi yoktur.
 - Upload ve degistirme yetkisi JWT principal, medya sahipligi ve ilgili
   tur/profil sahipligiyle dogrulanir. Profil ve onayli tur gorselleri public
@@ -269,7 +271,6 @@ Kurallar:
 - `user_id BIGINT PK/FK users`
 - `specialty_title VARCHAR`
 - `biography TEXT`
-- `avatar_media_id UUID NULL FK media_assets`
 - `created_at`, `updated_at`
 
 Bir `GUIDE` kullanicinin en fazla bir rehber profili olur.

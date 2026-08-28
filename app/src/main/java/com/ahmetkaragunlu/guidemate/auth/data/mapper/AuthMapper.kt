@@ -14,6 +14,8 @@ internal fun AuthResponse.toDomain(): UserState =
         lastName = lastName,
         isRoleSelected = isRoleSelected,
         role = role?.toDomain(),
+        avatarMediaId = avatar?.mediaAssetId,
+        avatarUrl = avatar?.imageUrl,
     )
 
 internal fun CurrentUserResponse.toDomain(): UserState =
@@ -24,6 +26,8 @@ internal fun CurrentUserResponse.toDomain(): UserState =
         lastName = lastName,
         isRoleSelected = isRoleSelected,
         role = role?.toDomain(),
+        avatarMediaId = avatar?.mediaAssetId,
+        avatarUrl = avatar?.imageUrl,
     )
 
 internal fun UserRole.toNetwork(): RoleType =

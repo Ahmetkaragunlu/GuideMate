@@ -1,28 +1,29 @@
 package com.ahmetkaragunlu.guidemate.profile.presentation.tourist
 
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
+import com.ahmetkaragunlu.guidemate.common.ui.image.ImageSourcePicker
 import com.ahmetkaragunlu.guidemate.profile.presentation.components.CommonProfileMenuItem
+import com.ahmetkaragunlu.guidemate.profile.presentation.components.EditableProfileAvatar
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.ProfileUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.TouristProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.menuOptions
@@ -44,6 +47,16 @@ fun TouristProfileScreen(
     onNavigateToWallet: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showPhotoSourceSheet by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+    val resources = LocalResources.current
+
+    LaunchedEffect(uiState.userMessage) {
+        uiState.userMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            viewModel.onUserMessageShown()
+        }
+    }
 
     GuideMateContentState(
         state = uiState.loadState,
@@ -53,16 +66,28 @@ fun TouristProfileScreen(
         TouristProfileContent(
             modifier = modifier,
             uiState = uiState,
+            onProfileImageClick = { showPhotoSourceSheet = true },
             onNavigateToWallet = onNavigateToWallet,
             onNavigateToAccount = onNavigateToAccount,
         )
     }
+
+    ImageSourcePicker(
+        isVisible = showPhotoSourceSheet,
+        titleResId = R.string.profile_photo_source_title,
+        onDismissRequest = { showPhotoSourceSheet = false },
+        onImageSelected = viewModel::onProfileImageSelected,
+        onError = { errorResId ->
+            Toast.makeText(context, resources.getString(errorResId), Toast.LENGTH_LONG).show()
+        },
+    )
 }
 
 @Composable
 private fun TouristProfileContent(
     modifier: Modifier = Modifier,
     uiState: ProfileUiState,
+    onProfileImageClick: () -> Unit,
     onNavigateToWallet: () -> Unit,
     onNavigateToAccount: (TouristProfileMenuTarget) -> Unit,
 ) {
@@ -79,6 +104,9 @@ private fun TouristProfileContent(
         ProfileHeader(
             fullName = uiState.fullName,
             email = uiState.email,
+            imageUrl = uiState.displayAvatarUrl,
+            isAvatarUpdating = uiState.isAvatarUpdating,
+            onProfileImageClick = onProfileImageClick,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -99,15 +127,16 @@ private fun TouristProfileContent(
 private fun ProfileHeader(
     fullName: String,
     email: String,
+    imageUrl: String?,
+    isAvatarUpdating: Boolean,
+    onProfileImageClick: () -> Unit,
 ) {
-    Image(
-        painter = painterResource(id = R.drawable.example),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier =
-            Modifier
-                .size(80.dp)
-                .clip(CircleShape),
+    EditableProfileAvatar(
+        imageUrl = imageUrl,
+        fallbackImageResId = R.drawable.example,
+        isUpdating = isAvatarUpdating,
+        size = 80.dp,
+        onClick = onProfileImageClick,
     )
     Spacer(modifier = Modifier.height(12.dp))
     Text(

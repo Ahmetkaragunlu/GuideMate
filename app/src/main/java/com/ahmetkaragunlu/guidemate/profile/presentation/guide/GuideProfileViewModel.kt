@@ -8,14 +8,13 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
-import com.ahmetkaragunlu.guidemate.media.domain.repository.MediaRepository
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfile
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfileUpdate
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
+import com.ahmetkaragunlu.guidemate.profile.domain.repository.UserAvatarRepository
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideProfileUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideSpokenLanguageUi
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
@@ -39,7 +38,7 @@ class GuideProfileViewModel
     @Inject
     constructor(
         private val profileRepository: GuideProfileRepository,
-        private val mediaRepository: MediaRepository,
+        private val userAvatarRepository: UserAvatarRepository,
         private val resourceProvider: ResourceProvider,
         private val tourRepository: TourDiscoveryRepository,
         notificationRepository: NotificationRepository,
@@ -142,65 +141,22 @@ class GuideProfileViewModel
 
         fun onProfileImageSelected(uri: String) {
             if (operationState.value.isAvatarUpdating) return
-            val currentProfile = profileRepository.cachedOwnProfile
-            if (currentProfile == null ||
-                currentProfile.specialtyTitle.length !in
-                    GuideProfileUpdate.MIN_SPECIALTY_TITLE_LENGTH..
-                        GuideProfileUpdate.MAX_SPECIALTY_TITLE_LENGTH ||
-                currentProfile.biography.length !in
-                    GuideProfileUpdate.MIN_BIOGRAPHY_LENGTH..
-                        GuideProfileUpdate.MAX_BIOGRAPHY_LENGTH
-            ) {
-                operationState.update {
-                    it.copy(
-                        userMessage =
-                            resourceProvider.getString(
-                                R.string.guide_profile_complete_about_first,
-                            ),
-                    )
-                }
-                return
-            }
             operationState.update {
                 it.copy(selectedProfileImageUri = uri, isAvatarUpdating = true)
             }
             viewModelScope.launch {
-                when (val uploadResult = mediaRepository.uploadImage(uri, MediaPurpose.GUIDE_AVATAR)) {
+                when (val result = userAvatarRepository.updateAvatar(uri)) {
                     is DataResult.Error -> {
                         operationState.update {
-                            it.copy(userMessage = uploadResult.error.toMessage(resourceProvider))
+                            it.copy(userMessage = result.error.toMessage(resourceProvider))
                         }
                     }
                     is DataResult.Success -> {
-                        val profile = profileRepository.cachedOwnProfile
-                        if (profile == null) {
-                            mediaRepository.deleteUnreferenced(uploadResult.data.mediaAssetId)
-                            operationState.update {
-                                it.copy(
-                                    userMessage =
-                                        resourceProvider.getString(R.string.error_generic_failure),
-                                )
-                            }
-                        } else {
-                            val updateResult =
-                                profileRepository.updateOwnProfile(
-                                    profile.toUpdate(uploadResult.data.mediaAssetId),
-                                )
-                            if (updateResult is DataResult.Error) {
-                                mediaRepository.deleteUnreferenced(uploadResult.data.mediaAssetId)
-                                operationState.update {
-                                    it.copy(userMessage = updateResult.error.toMessage(resourceProvider))
-                                }
-                            } else {
-                                operationState.update {
-                                    it.copy(
-                                        userMessage =
-                                            resourceProvider.getString(
-                                                R.string.guide_profile_update_success,
-                                            ),
-                                    )
-                                }
-                            }
+                        operationState.update {
+                            it.copy(
+                                userMessage =
+                                    resourceProvider.getString(R.string.profile_photo_update_success),
+                            )
                         }
                     }
                 }
@@ -254,11 +210,3 @@ private fun GuideProfile?.toUiState(
         userMessage = userMessage,
     )
 }
-
-private fun GuideProfile.toUpdate(avatarMediaId: String): GuideProfileUpdate =
-    GuideProfileUpdate(
-        specialtyTitle = specialtyTitle,
-        biography = biography,
-        languageCodes = languageCodes,
-        avatarMediaId = avatarMediaId,
-    )

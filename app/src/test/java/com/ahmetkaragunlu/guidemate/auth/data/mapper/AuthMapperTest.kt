@@ -4,6 +4,7 @@ import com.ahmetkaragunlu.guidemate.auth.data.remote.model.RoleType
 import com.ahmetkaragunlu.guidemate.auth.data.remote.model.response.AuthResponse
 import com.ahmetkaragunlu.guidemate.auth.data.remote.model.response.CurrentUserResponse
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -22,6 +23,7 @@ class AuthMapperTest {
                     lastName = "Lovelace",
                     isRoleSelected = true,
                     role = RoleType.ROLE_GUIDE,
+                    avatar = MediaReferenceResponseDto("avatar-1", "https://example.com/avatar.jpg"),
                 )
                 .toDomain()
 
@@ -31,6 +33,8 @@ class AuthMapperTest {
         assertEquals("Lovelace", result.lastName)
         assertTrue(result.isRoleSelected)
         assertEquals(UserRole.GUIDE, result.role)
+        assertEquals("avatar-1", result.avatarMediaId)
+        assertEquals("https://example.com/avatar.jpg", result.avatarUrl)
     }
 
     @Test
@@ -43,6 +47,7 @@ class AuthMapperTest {
                     lastName = "Hopper",
                     isRoleSelected = false,
                     role = null,
+                    avatar = null,
                 )
                 .toDomain()
 

@@ -1,9 +1,11 @@
 package com.ahmetkaragunlu.guidemate.profile.data.repository
 
+import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.common.network.ApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
 import com.ahmetkaragunlu.guidemate.profile.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.profile.data.mapper.toDto
 import com.ahmetkaragunlu.guidemate.profile.data.remote.api.GuideProfileApi
@@ -26,11 +28,14 @@ class GuideProfileRepositoryImpl @Inject constructor(
 
     override val ownProfile: Flow<GuideProfile?> =
         combine(ownProfileCache, userRepository.userState) { profile, user ->
-            profile?.takeIf { it.guideId == user.userId }
+            profile?.takeIf { it.guideId == user.userId }?.withAvatarFrom(user)
         }.distinctUntilChanged()
 
     override val cachedOwnProfile: GuideProfile?
-        get() = ownProfileCache.value?.takeIf { it.guideId == userRepository.userState.value.userId }
+        get() {
+            val user = userRepository.userState.value
+            return ownProfileCache.value?.takeIf { it.guideId == user.userId }?.withAvatarFrom(user)
+        }
 
     override suspend fun refreshOwnProfile(): DataResult<GuideProfile> =
         apiCallExecutor.execute(
@@ -74,5 +79,11 @@ class GuideProfileRepositoryImpl @Inject constructor(
 
     private fun cacheSuccess(result: DataResult<GuideProfile>) {
         if (result is DataResult.Success) ownProfileCache.value = result.data
+    }
+
+    private fun GuideProfile.withAvatarFrom(user: UserState): GuideProfile {
+        val mediaAssetId = user.avatarMediaId ?: return this
+        val imageUrl = user.avatarUrl ?: return this
+        return copy(avatar = MediaReference(mediaAssetId, imageUrl))
     }
 }

@@ -108,6 +108,11 @@ class NotificationRepositoryImplTest {
         override val userState: StateFlow<UserState> = mutableUserState
 
         override suspend fun restoreCachedUser(): UserState = userState.value
+
+        override suspend fun updateAvatar(mediaAssetId: String, imageUrl: String) {
+            mutableUserState.value =
+                mutableUserState.value.copy(avatarMediaId = mediaAssetId, avatarUrl = imageUrl)
+        }
     }
 
     private class FakeNotificationApi(

@@ -2,10 +2,10 @@ package com.ahmetkaragunlu.guidemate.profile.presentation.guide
 
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.FakeTourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.testing.FakeUserAvatarRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -24,14 +24,14 @@ class GuideProfileViewModelTest {
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun selectedAvatarIsUploadedThenSavedAsMediaId() =
+    fun selectedAvatarIsUpdatedThroughSharedUserAvatarRepository() =
         runTest {
             val profileRepository = FakeGuideProfileRepository()
-            val mediaRepository = FakeMediaRepository()
+            val userAvatarRepository = FakeUserAvatarRepository()
             val viewModel =
                 GuideProfileViewModel(
                     profileRepository = profileRepository,
-                    mediaRepository = mediaRepository,
+                    userAvatarRepository = userAvatarRepository,
                     resourceProvider = FakeResourceProvider(),
                     tourRepository = FakeTourDiscoveryRepository(),
                     notificationRepository = FakeNotificationRepository(),
@@ -42,8 +42,7 @@ class GuideProfileViewModelTest {
             viewModel.onProfileImageSelected("content://avatar")
             runCurrent()
 
-            assertEquals("content://avatar", mediaRepository.uploadedUri)
-            assertEquals("media-1", profileRepository.lastUpdate?.avatarMediaId)
+            assertEquals("content://avatar", userAvatarRepository.selectedUri)
             assertFalse(viewModel.profileState.value.isAvatarUpdating)
             assertNull(viewModel.profileState.value.selectedProfileImageUri)
             collection.cancel()

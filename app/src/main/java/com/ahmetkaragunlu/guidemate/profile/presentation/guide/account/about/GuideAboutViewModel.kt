@@ -127,7 +127,6 @@ class GuideAboutViewModel
                                 specialtyTitle = form.specialtyTitle.trim(),
                                 biography = form.biography.trim(),
                                 languageCodes = form.spokenLanguages.map { it.code },
-                                avatarMediaId = null,
                             ),
                         )
                     when (result) {

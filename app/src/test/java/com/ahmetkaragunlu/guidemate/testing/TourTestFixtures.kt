@@ -14,6 +14,7 @@ import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideSearchResult
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.profile.domain.model.performance.GuidePerformanceSummary
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
+import com.ahmetkaragunlu.guidemate.profile.domain.repository.UserAvatarRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.Tour
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
@@ -137,6 +138,17 @@ class FakeMediaRepository : MediaRepository {
     override suspend fun deleteUnreferenced(mediaAssetId: String): DataResult<Unit> {
         deletedMediaIds += mediaAssetId
         return DataResult.Success(Unit)
+    }
+}
+
+class FakeUserAvatarRepository : UserAvatarRepository {
+    var updateResult: DataResult<MediaReference> =
+        DataResult.Success(MediaReference("media-1", "https://example.com/avatar.jpg"))
+    var selectedUri: String? = null
+
+    override suspend fun updateAvatar(localUri: String): DataResult<MediaReference> {
+        selectedUri = localUri
+        return updateResult
     }
 }
 

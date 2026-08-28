@@ -12,4 +12,13 @@ class UserRepositoryImpl @Inject constructor(
     override val userState: StateFlow<UserState> = preferences.userState
 
     override suspend fun restoreCachedUser(): UserState = preferences.restoreUser()
+
+    override suspend fun updateAvatar(mediaAssetId: String, imageUrl: String) {
+        preferences.saveUser(
+            userState.value.copy(
+                avatarMediaId = mediaAssetId,
+                avatarUrl = imageUrl,
+            ),
+        )
+    }
 }

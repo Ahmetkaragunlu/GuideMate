@@ -33,6 +33,14 @@ class GuideProfileRepositoryImplTest {
         assertEquals(42L, repository.cachedOwnProfile?.guideId)
         assertEquals(42L, repository.ownProfile.first()?.guideId)
 
+        userRepository.updateAvatar("avatar-1", "https://example.com/avatar.jpg")
+
+        assertEquals("avatar-1", repository.cachedOwnProfile?.avatar?.mediaAssetId)
+        assertEquals(
+            "https://example.com/avatar.jpg",
+            repository.ownProfile.first()?.avatar?.imageUrl,
+        )
+
         userRepository.updateUser(userId = 7)
 
         assertNull(repository.cachedOwnProfile)
@@ -51,6 +59,10 @@ class GuideProfileRepositoryImplTest {
         override val userState: StateFlow<UserState> = state
 
         override suspend fun restoreCachedUser(): UserState = state.value
+
+        override suspend fun updateAvatar(mediaAssetId: String, imageUrl: String) {
+            state.value = state.value.copy(avatarMediaId = mediaAssetId, avatarUrl = imageUrl)
+        }
 
         fun updateUser(userId: Long) {
             state.value = userState(userId)

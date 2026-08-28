@@ -56,7 +56,6 @@ fun GuideProfileUpdate.toDto(): UpdateGuideProfileRequestDto =
         specialtyTitle = specialtyTitle,
         biography = biography,
         languageCodes = languageCodes,
-        avatarMediaId = avatarMediaId,
     )
 
 private fun GuidePerformanceResponseDto.toDomain(): GuidePerformanceSummary =
