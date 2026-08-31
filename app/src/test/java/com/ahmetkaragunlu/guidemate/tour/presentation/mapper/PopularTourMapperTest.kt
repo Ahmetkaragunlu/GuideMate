@@ -50,7 +50,7 @@ class PopularTourMapperTest {
         assertEquals("", card.languagesFlag)
         assertEquals("", card.languagesText)
         assertEquals(item.guide.displayName, card.guideName)
-        assertEquals(R.drawable.unnamed, card.guideImageResId)
+        assertEquals(R.drawable.ic_default_avatar, card.guideImageResId)
         assertEquals(item.guide.profileImageUrl, card.guideImageUrl)
     }
 }

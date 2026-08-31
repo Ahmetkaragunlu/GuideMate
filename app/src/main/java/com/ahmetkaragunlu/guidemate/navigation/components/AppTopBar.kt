@@ -46,7 +46,7 @@ data class AppTopBarConfig(
     val showLogoutButton: Boolean,
     @param:StringRes val titleResId: Int,
     val chatTitle: String = "",
-    @param:DrawableRes val chatAvatarResId: Int = R.drawable.example,
+    @param:DrawableRes val chatAvatarResId: Int = R.drawable.ic_default_avatar,
     val chatAvatarUrl: String? = null,
 )
 

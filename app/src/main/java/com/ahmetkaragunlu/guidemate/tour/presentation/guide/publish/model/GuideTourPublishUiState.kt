@@ -72,12 +72,12 @@ data class TourPublishContentFormState(
     val tourName: String = "",
     val tourDescription: String = "",
     val selectedCoverImageUri: String? = null,
-    @param:DrawableRes val previewImageResId: Int = R.drawable.example,
+    @param:DrawableRes val previewImageResId: Int = R.drawable.ic_image_unavailable,
 )
 
 data class TourPublishGuideState(
     val name: String = "",
-    @param:DrawableRes val imageResId: Int = R.drawable.unnamed,
+    @param:DrawableRes val imageResId: Int = R.drawable.ic_default_avatar,
     val imageUrl: String? = null,
 )
 

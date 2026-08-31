@@ -11,7 +11,6 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfile
-import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfileUpdate
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.UserAvatarRepository

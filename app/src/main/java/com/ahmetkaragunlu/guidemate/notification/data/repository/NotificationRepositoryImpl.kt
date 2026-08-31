@@ -163,15 +163,18 @@ constructor(
             preferences
         }
 
-    override suspend fun registerDevice(): DataResult<Unit> =
-        apiCallExecutor.executeUnit {
+    override suspend fun registerDevice(pushInstallationId: String?): DataResult<Unit> {
+        if (!userRepository.userState.value.isAuthenticated) return DataResult.Success(Unit)
+        return apiCallExecutor.executeUnit {
             api.registerDevice(
                 RegisterDeviceRequestDto(
                     installationId = installationIdDataSource.getOrCreate(),
-                    firebaseInstallationId = pushInstallationIdProvider.getId(),
+                    firebaseInstallationId =
+                        pushInstallationId ?: pushInstallationIdProvider.getId(),
                 ),
             )
         }
+    }
 
     override fun onPushReceived(target: NotificationNavigationTarget) {
         mutablePushEvents.tryEmit(target)

@@ -236,7 +236,7 @@ private fun Step3UploadArea(
             }
         } else {
             GuideMateImage(
-                fallbackImageResId = R.drawable.example,
+                fallbackImageResId = R.drawable.ic_image_unavailable,
                 imageUrl = selectedImageUri,
                 contentDescription = stringResource(R.string.change_cover_photo),
                 contentScale = ContentScale.Crop,

@@ -80,6 +80,30 @@ class NotificationRepositoryImplTest {
         assertEquals("firebase-installation-1", request?.firebaseInstallationId)
     }
 
+    @Test
+    fun `firebase callback identifier is registered for authenticated user`() = runTest {
+        val api = FakeNotificationApi()
+        val userRepository =
+            FakeUserRepository(
+                UserState(userId = 7, email = "user@example.com"),
+            )
+        val repository = createRepository(api, userRepository, backgroundScope)
+
+        repository.registerDevice("firebase-callback-installation")
+
+        assertEquals("firebase-callback-installation", api.deviceRequest?.firebaseInstallationId)
+    }
+
+    @Test
+    fun `firebase callback does not register device before authentication`() = runTest {
+        val api = FakeNotificationApi()
+        val repository = createRepository(api, FakeUserRepository(), backgroundScope)
+
+        repository.registerDevice("firebase-callback-installation")
+
+        assertEquals(null, api.deviceRequest)
+    }
+
     private fun createRepository(
         api: NotificationApi,
         userRepository: UserRepository,

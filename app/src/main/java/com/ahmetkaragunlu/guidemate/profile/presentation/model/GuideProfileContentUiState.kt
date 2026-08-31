@@ -6,7 +6,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiMod
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 
 data class GuideProfileContentUiState(
-    val profileImageResId: Int = R.drawable.unnamed,
+    val profileImageResId: Int = R.drawable.ic_default_avatar,
     val profileImageUrl: String? = null,
     val displayName: String = "",
     val title: String = "",

@@ -9,7 +9,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiMod
 data class GuideProfileUiState(
     val guideId: Long? = null,
     val displayName: String = "",
-    val profileImageResId: Int = R.drawable.unnamed,
+    val profileImageResId: Int = R.drawable.ic_default_avatar,
     val profileImageUrl: String? = null,
     val selectedProfileImageUri: String? = null,
     val title: String = "",

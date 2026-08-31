@@ -59,7 +59,8 @@ class FakeNotificationRepository : NotificationRepository {
         return result
     }
 
-    override suspend fun registerDevice(): DataResult<Unit> = DataResult.Success(Unit)
+    override suspend fun registerDevice(pushInstallationId: String?): DataResult<Unit> =
+        DataResult.Success(Unit)
 
     override fun onPushReceived(target: NotificationNavigationTarget) = Unit
 

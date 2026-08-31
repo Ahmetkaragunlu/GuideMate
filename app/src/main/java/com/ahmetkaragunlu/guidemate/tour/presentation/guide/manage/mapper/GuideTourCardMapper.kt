@@ -31,7 +31,7 @@ fun GuideTourCard.toGuideTourCardUiModel(
         title = title,
         date = startsAt.formatTourDateTime(timeZoneId),
         location = listOf(cityName, country).filter(String::isNotBlank).joinToString(", "),
-        imageResId = R.drawable.example,
+        imageResId = R.drawable.ic_image_unavailable,
         imageUrl = cover?.imageUrl,
         participantCount = bookedCount,
         capacity = capacity,

@@ -22,7 +22,7 @@ interface NotificationRepository {
     suspend fun markAllRead(): DataResult<Int>
     suspend fun refreshPreferences(): DataResult<NotificationPreferences>
     suspend fun updatePreferences(update: NotificationPreferenceUpdate): DataResult<NotificationPreferences>
-    suspend fun registerDevice(): DataResult<Unit>
+    suspend fun registerDevice(pushInstallationId: String? = null): DataResult<Unit>
     fun onPushReceived(target: NotificationNavigationTarget)
     fun clearLocalState()
 }

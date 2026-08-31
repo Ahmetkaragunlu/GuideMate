@@ -83,10 +83,6 @@
 
     <string name="guide_profile_not_found">Rehber profili bulunamadı.</string>
 
-    <string name="guide_profile_update_success">Profiliniz güncellendi.</string>
-
-    <string name="guide_profile_complete_about_first">Profil fotoğrafınızı eklemeden önce Hakkımda bölümündeki unvan ve biyografinizi kaydedin.</string>
-
     <string name="profile_current_balance">MEVCUT BAKİYE</string>
 
     <string name="profile_add_money">PARA YÜKLE</string>

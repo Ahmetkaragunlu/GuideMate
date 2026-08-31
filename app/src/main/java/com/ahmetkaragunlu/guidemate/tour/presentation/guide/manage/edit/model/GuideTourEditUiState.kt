@@ -71,7 +71,7 @@ data class GuideTourEditContentFormState(
     val description: String = "",
     val category: TourCategory? = null,
     val languages: List<TourLanguage> = emptyList(),
-    @param:DrawableRes val coverImageResId: Int = R.drawable.example,
+    @param:DrawableRes val coverImageResId: Int = R.drawable.ic_image_unavailable,
     val coverImageUrl: String? = null,
     val coverMediaId: String? = null,
     val selectedCoverImageUri: String? = null,

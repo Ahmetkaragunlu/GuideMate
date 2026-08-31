@@ -17,7 +17,7 @@ fun TourWithSession.toTourDetailUiState(
         sessionId = session.id,
         tourId = tour.id,
         title = tour.title,
-        imageResId = R.drawable.example,
+        imageResId = R.drawable.ic_image_unavailable,
         imageUrl = tour.coverImageUrl,
         rating = tour.averageRating,
         reviewCount = tour.reviewCount,
@@ -41,7 +41,7 @@ fun TourWithSession.toTourDetailUiState(
         cancellationReason = session.cancellationReason,
         guideId = tour.guide.id,
         guideName = tour.guide.displayName,
-        guideImageResId = R.drawable.unnamed,
+        guideImageResId = R.drawable.ic_default_avatar,
         guideImageUrl = tour.guide.profileImageUrl,
         reviews =
             tour.recentReviews.map { review ->
@@ -50,7 +50,7 @@ fun TourWithSession.toTourDetailUiState(
                     reviewerName = review.reviewerName,
                     comment = review.comment,
                     rating = review.rating,
-                    reviewerImageResId = R.drawable.unnamed,
+                    reviewerImageResId = R.drawable.ic_default_avatar,
                     reviewerImageUrl = review.reviewerImageUrl,
                 )
             },

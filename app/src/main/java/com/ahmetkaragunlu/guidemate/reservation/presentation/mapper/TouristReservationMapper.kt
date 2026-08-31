@@ -39,7 +39,7 @@ fun TouristReservation.toTourDetailUiState(
         sessionId = tourSessionId,
         tourId = snapshot.tourId,
         title = snapshot.title,
-        imageResId = R.drawable.example,
+        imageResId = R.drawable.ic_image_unavailable,
         imageUrl = snapshot.coverImageUrl,
         reviewCount = publicReviewCount,
         date = snapshot.startsAt.formatTourDateTime(snapshot.timeZoneId),
@@ -59,7 +59,7 @@ fun TouristReservation.toTourDetailUiState(
         cancellationReason = cancellationReason,
         guideId = snapshot.guide.id,
         guideName = snapshot.guide.displayName,
-        guideImageResId = R.drawable.unnamed,
+        guideImageResId = R.drawable.ic_default_avatar,
         guideImageUrl = snapshot.guide.profileImageUrl,
         reviews = publicReviews.map(TourReview::toDetailReviewUiModel),
     )
@@ -80,6 +80,6 @@ private fun TourReview.toDetailReviewUiModel(): TourDetailReviewUiModel =
         reviewerName = reviewerName,
         comment = comment,
         rating = rating,
-        reviewerImageResId = R.drawable.unnamed,
+        reviewerImageResId = R.drawable.ic_default_avatar,
         reviewerImageUrl = reviewerImageUrl,
     )

@@ -99,7 +99,8 @@ fun GuideNavigation(
                     config =
                         navigationUiConfig.topBar.copy(
                             chatTitle = activeChat?.name.orEmpty(),
-                            chatAvatarResId = activeChat?.avatarResId ?: R.drawable.example,
+                            chatAvatarResId =
+                                activeChat?.avatarResId ?: R.drawable.ic_default_avatar,
                             chatAvatarUrl = activeChat?.avatarUrl,
                         ),
                     userName = userName,

@@ -12,7 +12,6 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrencies
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
-import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentQuote
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import com.ahmetkaragunlu.guidemate.payment.presentation.locale.currentCheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentLaunch

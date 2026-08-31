@@ -93,18 +93,6 @@
 
     <string name="tour_operation_session_not_found">Tur oturumu bulunamadı. Lütfen listeyi yenileyip tekrar deneyin.</string>
 
-    <string name="tour_operation_tour_not_found">Tur bulunamadı. Lütfen listeyi yenileyip tekrar deneyin.</string>
-
-    <string name="tour_operation_session_started">Başlamış veya süresi geçmiş bir turun yayın durumu değiştirilemez.</string>
-
-    <string name="tour_operation_not_approved">Tur onaylanmadan yeni rezervasyonlara açılamaz.</string>
-
-    <string name="tour_operation_capacity_full">Kontenjan dolu olduğu için tur yeni rezervasyonlara açılamaz.</string>
-
-    <string name="tour_operation_status_not_manageable">Turun mevcut durumu bu işlem için uygun değil.</string>
-
-    <string name="tour_operation_not_archivable">Bu tur İncelemede listesinden kaldırılamıyor.</string>
-
     <string name="error_tour_not_found">Tur bulunamadı. Listeyi yenileyip tekrar deneyin.</string>
 
     <string name="error_tour_not_approved">Bu işlem için turun önce onaylanması gerekiyor.</string>

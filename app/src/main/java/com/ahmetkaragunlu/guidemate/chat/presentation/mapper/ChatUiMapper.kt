@@ -22,7 +22,7 @@ internal fun ChatConversation.toChatUiModel(currentUserId: Long): ChatUiModel? {
         name = remoteParticipant.displayName,
         lastMessage = lastMessage?.text.orEmpty(),
         time = lastMessage?.sentAt?.toConversationTime().orEmpty(),
-        avatarResId = R.drawable.example,
+        avatarResId = R.drawable.ic_default_avatar,
         avatarUrl = remoteParticipant.avatarUrl,
         unreadCount = unreadCount,
     )

@@ -52,7 +52,7 @@ class GuideTourPublishViewModel
                     guide =
                         draft.guide.copy(
                             name = profile?.displayName.orEmpty(),
-                            imageResId = R.drawable.unnamed,
+                            imageResId = R.drawable.ic_default_avatar,
                             imageUrl = profile?.avatar?.imageUrl,
                         ),
                 )

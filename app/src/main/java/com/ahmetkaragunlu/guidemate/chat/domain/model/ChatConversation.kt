@@ -11,8 +11,6 @@ data class ChatConversation(
     val createdAt: Instant,
     val lastActivityAt: Instant,
 ) {
-    fun containsUser(userId: Long): Boolean = guide.userId == userId || tourist.userId == userId
-
     fun otherParticipant(userId: Long): ChatParticipant? =
         when (userId) {
             guide.userId -> tourist

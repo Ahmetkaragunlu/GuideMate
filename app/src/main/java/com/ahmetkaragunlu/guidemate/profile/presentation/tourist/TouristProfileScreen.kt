@@ -133,7 +133,7 @@ private fun ProfileHeader(
 ) {
     EditableProfileAvatar(
         imageUrl = imageUrl,
-        fallbackImageResId = R.drawable.example,
+        fallbackImageResId = R.drawable.ic_default_avatar,
         isUpdating = isAvatarUpdating,
         size = 80.dp,
         onClick = onProfileImageClick,

@@ -38,6 +38,13 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 - Degisiklik nedeniyle gercekten bosa dusen kod, import, resource, test, dosya
   veya paket temizlenir. Bilincli ertelenen ya da halen gecis gorevi bulunan kod
   gereksiz diye silinmez.
+- Her uygulama sonunda degisen kapsamin kullanim taramasi yapilir. Artik
+  cagrilmayan fonksiyon, kullanilmayan kod blogu, import, parametre, property,
+  resource, test yardimcisi, dosya veya bos paket kesin olarak bosa dustuyse
+  ayni degisiklik kapsaminda temizlenir. Yalniz gelecekte kullanilabilir
+  varsayimiyla kod tutulmaz; ancak baska faza bilincli ertelenen, dis sozlesmenin
+  parcasi olan veya runtime/reflection/DI tarafindan kullanilan kod kanitsiz
+  sekilde silinmez.
 - Secret, token, kart verisi, tam IBAN, provider credential, teknik exception
   veya hassas kullanici verisi source control, log veya UI hata metnine sizmaz.
 - Her uygulama dilimi sonunda paket/katman, bagimlilik yonu, isimlendirme,
@@ -589,7 +596,7 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ### DEG-012 - MVP Ornek Gorsellerini Kaldirma ve Anlamli Placeholder Kullanimi
 
-- Durum: `ONAYLANDI`
+- Durum: `UYGULANDI`
 - Dogrulanan mevcut davranis:
   - `example.jpg` MVP asamasinda gecici gorsel olarak eklenmis; turist profil
     fotografi, tur kapagi ve sohbet avatari dahil farkli anlamlara sahip
@@ -648,8 +655,19 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
     gereksiz unit test yazilmayacaktir.
   - Resource referanslari derleme/lint ile; avatar, tur kapagi, sohbet ve medya
     hata gorunumleri ilgili kullanici testleriyle dogrulanacaktir.
-- Uygulama izni: VERILMEDI; sonraki maddelerle birlikte toplu `uygula` komutu
-  bekleniyor.
+- Uygulama sonucu:
+  - Insan avatarlarinin ortak fallback'i `ic_default_avatar` vector resource'una
+    tasindi.
+  - Tur kapagi ve genel medya yukleme hatalarinin fallback'i
+    `ic_image_unavailable` vector resource'una tasindi.
+  - `example.jpg` ve `unnamed.jpg` tum kod/test referanslarindan kaldirildi ve
+    drawable dosyalari silindi.
+  - Backend, DTO, persistence, navigasyon, tasarim ve kullanici akisi
+    degistirilmedi.
+  - Yeni business davranisi eklenmedigi icin gereksiz yeni test yazilmadi;
+    mevcut mapper resource beklentisi yeni semantik fallback ile guncellendi.
+  - Temiz build uzerinde `ktfmtCheck`, JVM testleri, Android test kaynak
+    derlemesi, `lintDebug` ve `assembleDebug` basarili tamamlandi.
 - Dogrulama:
   - Fotograf yuklememis yeni turist ve rehberde notr kisi avatarinin gorunmesi.
   - Gercek avatar yuklenince vector yerine remote fotograf gorunmesi.
@@ -661,18 +679,72 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   - Kapak secilmeden tur yayinlanamamasi ve placeholder'in kapak sayilmamasi.
   - Projede `example` ve `unnamed` drawable referansi veya dosyasi kalmamasi.
 
+### DEG-013 - FCM FID Kaydi ve Kanitlanmis Kullanilmayan Kod Temizligi
+
+- Durum: `UYGULANDI`
+- FCM davranis karari:
+  - Android manifestte FID tabanli Firebase Messaging modu acilmalidir.
+  - Firebase yapilandirmasi bulunan uygulama sureci FCM'e `register()` ile
+    kaydolmalidir; Firebase bulunmayan JVM/Robolectric ortaminda uygulama
+    baslangici cokmemelidir.
+  - Guncel FID `onRegistered()` callback'i ile alinmali ve oturum acmis
+    kullanicinin mevcut notification repository cihaz kaydi uzerinden backend'e
+    gonderilmelidir.
+  - Callback oturum acilmadan gelirse yetkisiz backend istegi atilmamalidir.
+    Kullanici oturum actiginda mevcut user-state gozlemcisi cihaz kaydini
+    tamamlamaya devam etmelidir.
+  - Backend'in FID hedefleyen mevcut `setFid()` kullanimi, endpoint'i ve veri
+    modeli degistirilmemelidir.
+- Katman ve bagimlilik karari:
+  - Firebase uygulama kaydi application composition root'ta, Firebase callback'i
+    messaging service'te, backend cihaz eslemesi notification repository'de
+    kalmalidir.
+  - Presentation ve ViewModel katmanlari Firebase SDK ayrintisi bilmemelidir.
+  - Messaging service uzun yasamli isi mevcut `ApplicationScope` ile repository
+    sinirina devretmelidir.
+- Temizlik karari:
+  - Kanitlanmis 12 kullanilmayan import, dokuz kullanilmayan string resource,
+    `ChatConversation.containsUser()`, erisilemeyen eski SDK kontrolu ve iki bos
+    test klasoru kaldirilmalidir.
+  - `plurals` donusumu ve Compose `Modifier` parametre sirasi bu kapsamda
+    degistirilmeyecektir.
+- Test karari:
+  - Oturumlu kullanicida callback FID'sinin backend request'ine tasindigi ve
+    oturum yokken cihaz kaydi istegi atilmadigi repository unit testleriyle
+    korunmalidir.
+  - Firebase SDK callback'i icin gereksiz sahte framework katmani veya kirilgan
+    UI testi yazilmamalidir; manifest, derleme ve lint ile dogrulanmalidir.
+- Uygulama sonucu:
+  - Manifest FID modu, guvenli FCM kaydi ve `onRegistered()` callback akisi
+    tamamlandi.
+  - Oturum kontrolu ile callback FID'sini kullanan idempotent backend cihaz
+    kaydi kuruldu; backend kodu degistirilmedi.
+  - Kanitlanmis kullanilmayan kod/resource/import ve bos klasorler temizlendi.
+  - `ktfmtCheck`, 160 JVM testi, Android test kaynak derlemesi, `lintDebug` ve
+    `assembleDebug` basarili tamamlandi; lintte error, unused resource, eski SDK
+    ve FCM token callback uyarisi kalmadi.
+- Kullanici dogrulamasi:
+  - Firebase yapilandirmali backend ve bildirim izni verilmis fiziksel cihazla
+    uygulama acik, arka planda ve normal sekilde kapaliyken push teslimi
+    denenmelidir.
+  - Bildirime dokununca ilgili typed ekrana gidildigi ve uygulama ici okunmamis
+    sayisinin yenilendigi dogrulanmalidir.
+
 ## Toplu Uygulama Kontrol Noktasi
 
-- Son kaydedilen madde: `DEG-012`
-- Uygulama izni: DEG-012 icin VERILMEDI
-- Kod degisikligi: DEG-001 - DEG-011 YAPILDI; DEG-012 YAPILMADI
+- Son kaydedilen madde: `DEG-013`
+- Uygulama izni: DEG-013 icin VERILDI ve uygulama tamamlandi.
+- Kod degisikligi: DEG-001 - DEG-013 YAPILDI.
 - Otomatik dogrulama: ktfmt, JVM testleri, Android test kaynak derlemesi, lint
-  ve debug APK uretimi DEG-001 - DEG-011 icin basarili.
-- Kullanici dogrulamasi: DEG-001 - DEG-011 tamamlandi.
-- Kapanis: Ilk degisim listesi kapsami kodsal ve kullanici testi acisindan
-  tamamlandi.
-- Siradaki is: Yeni kullanici bulgularini DEG-013'ten itibaren sirayla
-  kaydetmek; toplu uygulama komutundan once bu dosyadaki Altin Kural ve Test
-  Altin Kurali'ni yeniden okumak.
+  ve debug APK uretimi DEG-001 - DEG-013 icin basarili.
+- Kullanici dogrulamasi: DEG-001 - DEG-011 tamamlandi; DEG-012 avatar ve medya
+  hata gorunumleri ile DEG-013 gercek push teslimi icin manuel kullanici
+  dogrulamasi bekliyor.
+- Kapanis: Degisim listesi kodsal olarak tamamlandi; DEG-012 ve DEG-013 manuel
+  dogrulamalari sonrasi `DOGRULANDI` yapilacak.
+- Siradaki is: DEG-012 ve DEG-013 kullanici dogrulamalarini yapmak ve yeni
+  kullanici bulgularini DEG-014'ten itibaren sirayla kaydetmek; her toplu uygulama
+  komutundan once bu dosyadaki Altin Kural ve Test Altin Kurali'ni yeniden
+  okumak.
 - Baglam yenilenirse bu dosya okunur ve yalniz `BEKLIYOR`, `NETLESTIRILECEK`
   veya `ONAYLANDI` durumundaki maddeler uzerinden devam edilir.

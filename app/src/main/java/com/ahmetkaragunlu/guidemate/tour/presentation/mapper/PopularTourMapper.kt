@@ -16,7 +16,7 @@ fun TourSearchItem.toPopularTourCardUiModel(
     return PopularTourCardUiModel(
         id = sessionId,
         title = title,
-        imageResId = R.drawable.example,
+        imageResId = R.drawable.ic_image_unavailable,
         imageUrl = cover.imageUrl,
         rating = averageRating?.toRatingText(locale) ?: "-",
         reviewCount = "($reviewCount)",
@@ -24,7 +24,7 @@ fun TourSearchItem.toPopularTourCardUiModel(
         languagesFlag = languages.joinToString(separator = " ") { it.flagEmoji },
         languagesText = languages.joinToString(separator = ", ") { it.shortCode },
         guideName = guide.displayName,
-        guideImageResId = R.drawable.unnamed,
+        guideImageResId = R.drawable.ic_default_avatar,
         guideImageUrl = guide.profileImageUrl,
     )
 }
@@ -39,7 +39,7 @@ fun TourSearchItem.toSearchResultUiModel(
     return TourSearchResultUiModel(
         sessionId = sessionId,
         title = title,
-        imageResId = R.drawable.example,
+        imageResId = R.drawable.ic_image_unavailable,
         imageUrl = cover.imageUrl,
         rating = averageRating,
         reviewCount = reviewCount,
@@ -50,7 +50,7 @@ fun TourSearchItem.toSearchResultUiModel(
         languagesText = languages.joinToString(separator = ", ") { it.shortCode },
         availableCapacity = availableCapacity,
         guideName = guide.displayName,
-        guideImageResId = R.drawable.unnamed,
+        guideImageResId = R.drawable.ic_default_avatar,
         guideImageUrl = guide.profileImageUrl,
     )
 }

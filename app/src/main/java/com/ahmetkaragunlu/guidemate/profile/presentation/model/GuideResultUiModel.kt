@@ -8,6 +8,6 @@ data class GuideResultUiModel(
     val displayName: String,
     val specialtyTitle: String,
     val avatarUrl: String?,
-    @param:DrawableRes val fallbackAvatarResId: Int = R.drawable.unnamed,
+    @param:DrawableRes val fallbackAvatarResId: Int = R.drawable.ic_default_avatar,
     val averageRating: Double,
 )
