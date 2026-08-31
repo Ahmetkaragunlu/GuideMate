@@ -64,6 +64,10 @@
 
     <string name="no">Hayır</string>
 
+    <string name="logout_confirmation_title">Çıkış Yap</string>
+
+    <string name="logout_confirmation_message">Çıkmak istiyor musunuz?</string>
+
     <string name="edit_tour">Turu Düzenle</string>
 
     <string name="error_invalid_language_code">Seçilen dillerden biri desteklenmiyor.</string>

@@ -83,6 +83,86 @@ class TouristExploreViewModelTest {
             assertFalse(viewModel.uiState.value.tours.canLoadMore)
         }
 
+    @Test
+    fun filterEditing_canBeCancelledOrAppliedWithoutLosingCanonicalFilters() =
+        runTest {
+            val viewModel = createViewModel()
+            runCurrent()
+            val turkey = CountryOption("TR", "Turkiye")
+
+            viewModel.beginFilterEditing()
+            viewModel.updateSelectedCountry(turkey)
+            viewModel.cancelFilterEditing()
+
+            assertEquals(null, viewModel.uiState.value.draftFilters.selectedCountry)
+            assertEquals(null, viewModel.uiState.value.appliedFilters.selectedCountry)
+
+            viewModel.beginFilterEditing()
+            viewModel.updateSelectedCountry(turkey)
+            viewModel.applyFilters()
+            viewModel.beginFilterEditing()
+            viewModel.updateSelectedCategory(TourCategory.CULTURE)
+            viewModel.cancelFilterEditing()
+
+            assertEquals(turkey, viewModel.uiState.value.appliedFilters.selectedCountry)
+            assertEquals(turkey, viewModel.uiState.value.draftFilters.selectedCountry)
+            assertEquals(null, viewModel.uiState.value.draftFilters.selectedCategory)
+        }
+
+    @Test
+    fun clearSearchAndFilters_resetsStateAndReloadsFirstPage() =
+        runTest {
+            val repository =
+                FakeTourDiscoveryRepository().apply {
+                    repeat(3) {
+                        searchResults +=
+                            DataResult.Success(tourSearchPage(page = 0, isLast = true))
+                    }
+                }
+            val viewModel =
+                TouristExploreViewModel(
+                    tourRepository = repository,
+                    profileRepository = FakeGuideProfileRepository(),
+                    reviewRepository = FakeReviewRepository(),
+                )
+            advanceTimeBy(351)
+            runCurrent()
+
+            viewModel.updateToursSearchQuery("museum")
+            viewModel.beginFilterEditing()
+            viewModel.updateSelectedCountry(CountryOption("TR", "Turkiye"))
+            viewModel.updateSelectedCategory(TourCategory.CULTURE)
+            viewModel.applyFilters()
+            advanceTimeBy(351)
+            runCurrent()
+
+            viewModel.clearSearchAndFilters()
+            advanceTimeBy(351)
+            runCurrent()
+
+            val clearedRequest = repository.searchRequests.last()
+            assertEquals("", viewModel.uiState.value.tours.searchQuery)
+            assertEquals(null, viewModel.uiState.value.draftFilters.selectedCountry)
+            assertEquals(null, viewModel.uiState.value.appliedFilters.selectedCountry)
+            assertEquals("", clearedRequest.query.text)
+            assertEquals(null, clearedRequest.query.countryCode)
+            assertEquals(null, clearedRequest.query.categoryCode)
+            assertEquals(0, clearedRequest.page)
+        }
+
+    private fun createViewModel(): TouristExploreViewModel =
+        TouristExploreViewModel(
+            tourRepository =
+                FakeTourDiscoveryRepository().apply {
+                    repeat(2) {
+                        searchResults +=
+                            DataResult.Success(tourSearchPage(page = 0, isLast = true))
+                    }
+                },
+            profileRepository = FakeGuideProfileRepository(),
+            reviewRepository = FakeReviewRepository(),
+        )
+
     private class FakeReviewRepository : ReviewRepository {
         override val reviewChanges: Flow<Unit> = MutableSharedFlow()
 

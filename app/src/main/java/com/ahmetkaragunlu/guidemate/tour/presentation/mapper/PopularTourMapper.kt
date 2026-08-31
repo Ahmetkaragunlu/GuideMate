@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.tour.presentation.mapper
 
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toRatingText
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
 import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiModel
@@ -17,7 +18,7 @@ fun TourSearchItem.toPopularTourCardUiModel(
         title = title,
         imageResId = R.drawable.example,
         imageUrl = cover.imageUrl,
-        rating = averageRating?.toString() ?: "-",
+        rating = averageRating?.toRatingText(locale) ?: "-",
         reviewCount = "($reviewCount)",
         priceMinor = priceMinor,
         languagesFlag = languages.joinToString(separator = " ") { it.flagEmoji },

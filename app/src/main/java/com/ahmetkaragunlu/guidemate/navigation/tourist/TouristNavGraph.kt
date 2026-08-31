@@ -45,9 +45,11 @@ internal fun NavGraphBuilder.touristNavGraph(
         )
     }
     composable<TouristDestination.Explore> { backStackEntry ->
+        val exploreViewModel = hiltViewModel<TouristExploreViewModel>(backStackEntry)
         TouristExploreScreen(
-            viewModel = hiltViewModel(backStackEntry),
+            viewModel = exploreViewModel,
             onNavigateToFilter = {
+                exploreViewModel.beginFilterEditing()
                 touristNavController.navigateTo(TouristDestination.Filter)
             },
             onNavigateToTourDetail = { sessionId ->
@@ -94,6 +96,7 @@ internal fun NavGraphBuilder.touristNavGraph(
         TouristFilterScreen(
             viewModel = hiltViewModel<TouristExploreViewModel>(exploreBackStackEntry),
             onApplyFilters = touristNavController::navigateUp,
+            onNavigateBack = touristNavController::navigateUp,
         )
     }
     composable<ChatDestination.Detail> {
@@ -103,6 +106,9 @@ internal fun NavGraphBuilder.touristNavGraph(
         TouristTourDetailScreen(
             onBookTour = { sessionId ->
                 touristNavController.navigateTo(TouristPaymentDestination.Checkout(sessionId))
+            },
+            onNavigateToGuideProfile = { guideId ->
+                touristNavController.navigateTo(TouristDestination.GuideProfile(guideId))
             },
         )
     }

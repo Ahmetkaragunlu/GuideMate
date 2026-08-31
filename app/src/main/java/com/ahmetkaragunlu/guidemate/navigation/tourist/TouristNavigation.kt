@@ -30,6 +30,7 @@ import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.notification.toTouristDestination
 import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
+import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristExploreViewModel
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
 import com.ahmetkaragunlu.guidemate.payment.presentation.recovery.PaymentRecoveryViewModel
@@ -62,6 +63,14 @@ fun TouristNavigation(
     val context = LocalContext.current
     val navBackStackEntry by touristNavController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val filterExploreViewModel =
+        if (currentDestination?.hasRoute<TouristDestination.Filter>() == true) {
+            touristNavController.previousBackStackEntry?.let { backStackEntry ->
+                hiltViewModel<TouristExploreViewModel>(backStackEntry)
+            }
+        } else {
+            null
+        }
     val navigationUiConfig = currentDestination.touristNavigationUiConfig()
     val userName by homeViewModel.userName.collectAsStateWithLifecycle()
     val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
@@ -112,7 +121,12 @@ fun TouristNavigation(
                         chatAvatarUrl = activeChat?.avatarUrl,
                     ),
                 userName = userName,
-                onBackClick = touristNavController::navigateUp,
+                    onBackClick = {
+                        if (currentDestination?.hasRoute<TouristDestination.Filter>() == true) {
+                            filterExploreViewModel?.cancelFilterEditing()
+                        }
+                        touristNavController.navigateUp()
+                    },
                     onLogoutClick = onLogoutClick,
                     unreadNotificationCount = notificationUiState.unreadCount,
                     onNotificationClick = { showNotifications = true },

@@ -44,4 +44,6 @@ interface PaymentRepository {
     suspend fun cancelPayment(paymentId: String): DataResult<Payment>
 
     suspend fun clearPendingPayment(paymentId: String)
+
+    suspend fun clearPendingPayment()
 }

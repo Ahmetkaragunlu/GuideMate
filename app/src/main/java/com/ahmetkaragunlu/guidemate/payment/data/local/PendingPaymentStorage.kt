@@ -18,6 +18,8 @@ interface PendingPaymentStorage {
     suspend fun save(paymentId: String)
 
     suspend fun clear(paymentId: String)
+
+    suspend fun clear()
 }
 
 @Singleton
@@ -42,8 +44,11 @@ class DataStorePendingPaymentStorage @Inject constructor(
         }
     }
 
+    override suspend fun clear() {
+        dataStore.edit { preferences -> preferences.remove(PENDING_PAYMENT_ID) }
+    }
+
     private companion object {
         val PENDING_PAYMENT_ID = stringPreferencesKey("pending_payment_id")
     }
 }
-

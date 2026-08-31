@@ -22,7 +22,7 @@ class TourBookingAvailabilityTest {
                 tour =
                     Tour(
                         id = "tour-1",
-                        guide = GuidePublicSummary("guide-1", "Test Guide"),
+                        guide = GuidePublicSummary(1L, "Test Guide"),
                         title = "Test Tour",
                         description = "Test description",
                         country = "Türkiye",

@@ -19,4 +19,8 @@ class NotificationNavigationCoordinator @Inject constructor() {
     fun consume(target: NotificationNavigationTarget) {
         mutablePendingTarget.compareAndSet(target, null)
     }
+
+    fun clear() {
+        mutablePendingTarget.value = null
+    }
 }

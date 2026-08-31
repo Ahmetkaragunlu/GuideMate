@@ -157,6 +157,8 @@ class TourCheckoutViewModelTest {
 
         override suspend fun clearPendingPayment(paymentId: String) = Unit
 
+        override suspend fun clearPendingPayment() = Unit
+
         private fun quote(): PaymentQuote =
             PaymentQuote(
                 id = "quote-1",
@@ -257,7 +259,7 @@ class TourCheckoutViewModelTest {
                 tour =
                     Tour(
                         id = "tour-1",
-                        guide = GuidePublicSummary("guide-1", "Guide Name"),
+                        guide = GuidePublicSummary(1L, "Guide Name"),
                         title = "City Walk",
                         description = "Description",
                         country = "Turkiye",

@@ -69,6 +69,16 @@ class PaymentRepositoryImplTest {
     }
 
     @Test
+    fun `logout cleanup clears any pending payment`() = runBlocking {
+        val storage = FakePendingPaymentStorage(initialPaymentId = "payment-1")
+        val repository = createRepository(FakePaymentApi(), storage)
+
+        repository.clearPendingPayment()
+
+        assertNull(storage.value.value)
+    }
+
+    @Test
     fun `maps backend currency and quote without recalculating on Android`() = runBlocking {
         val repository = createRepository(FakePaymentApi(), FakePendingPaymentStorage())
 
@@ -104,6 +114,10 @@ class PaymentRepositoryImplTest {
 
         override suspend fun clear(paymentId: String) {
             if (value.value == paymentId) value.value = null
+        }
+
+        override suspend fun clear() {
+            value.value = null
         }
     }
 

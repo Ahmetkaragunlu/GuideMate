@@ -12,6 +12,7 @@ import com.ahmetkaragunlu.guidemate.navigation.auth.AuthStartDestination
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
+import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,7 @@ class RootNavigationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val onboardingRepository: OnboardingRepository,
+    private val paymentRepository: PaymentRepository,
     private val notificationRepository: NotificationRepository,
     private val notificationNavigationCoordinator: NotificationNavigationCoordinator,
 ) : ViewModel() {
@@ -56,8 +58,10 @@ class RootNavigationViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
+            notificationNavigationCoordinator.clear()
             authRepository.logout()
             notificationRepository.clearLocalState()
+            paymentRepository.clearPendingPayment()
         }
     }
 

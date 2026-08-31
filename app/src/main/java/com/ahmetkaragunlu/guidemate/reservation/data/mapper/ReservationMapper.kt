@@ -75,7 +75,7 @@ private fun ReservationSnapshotResponseDto.toDomain(): TouristReservationSnapsho
         tourId = tourId,
         guide =
             GuidePublicSummary(
-                id = guide.guideId.toString(),
+                id = guide.guideId,
                 displayName = guide.displayName,
                 profileImageUrl = guide.avatar?.imageUrl,
             ),

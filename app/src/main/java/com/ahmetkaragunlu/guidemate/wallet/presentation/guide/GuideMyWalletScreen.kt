@@ -104,7 +104,10 @@ fun GuideMyWalletScreen(
                 onWithdrawAllClick = {
                     withdrawAmount = uiState.availableBalanceMinor.toCurrencyInput()
                 },
-                onDismiss = { showBottomSheet = false },
+                onDismiss = {
+                    withdrawAmount = ""
+                    showBottomSheet = false
+                },
                 onConfirm = { amountMinor ->
                     if (amountMinor > uiState.availableBalanceMinor) {
                         showInsufficientBalanceDialog = true

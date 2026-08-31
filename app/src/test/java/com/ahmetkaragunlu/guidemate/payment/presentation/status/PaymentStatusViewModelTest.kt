@@ -161,6 +161,8 @@ class PaymentStatusViewModelTest {
             clearedPaymentIds += paymentId
         }
 
+        override suspend fun clearPendingPayment() = Unit
+
         override suspend fun getCheckoutCurrencies(): DataResult<CheckoutCurrencies> =
             error("Not used")
 

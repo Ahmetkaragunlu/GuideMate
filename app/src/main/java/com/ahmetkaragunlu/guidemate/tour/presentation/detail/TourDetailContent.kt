@@ -33,6 +33,7 @@ fun TourDetailContent(
     onPrimaryAction: () -> Unit,
     modifier: Modifier = Modifier,
     topContent: (@Composable () -> Unit)? = null,
+    onGuideProfileClick: (() -> Unit)? = null,
     isPrimaryActionLoading: Boolean = false,
     isPrimaryActionEnabled: Boolean = true,
 ) {
@@ -57,6 +58,7 @@ fun TourDetailContent(
                 uiState = uiState,
                 mode = mode,
                 topContent = topContent,
+                onGuideProfileClick = onGuideProfileClick,
             )
             GuideMateTabRow(
                 tabs = TourDetailTab.entries,

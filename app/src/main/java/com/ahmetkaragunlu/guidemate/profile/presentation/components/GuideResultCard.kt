@@ -34,9 +34,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toRatingText
 import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideResultUiModel
-import java.util.Locale
 
 @Composable
 fun GuideResultCard(
@@ -110,7 +110,7 @@ fun GuideResultCard(
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                     Text(
-                        text = String.format(Locale.getDefault(), "%.1f", guide.averageRating),
+                        text = guide.averageRating.toRatingText(),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary,

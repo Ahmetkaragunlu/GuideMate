@@ -42,6 +42,8 @@ class PaymentRecoveryViewModelTest {
 
         override suspend fun clearPendingPayment(paymentId: String) = Unit
 
+        override suspend fun clearPendingPayment() = Unit
+
         override suspend fun getCheckoutCurrencies(): DataResult<CheckoutCurrencies> =
             error("Not used")
 

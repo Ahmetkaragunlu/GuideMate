@@ -194,7 +194,7 @@ fun testTourDetails(
             Tour(
                 id = "tour-1",
                 version = 3,
-                guide = GuidePublicSummary("guide-1", "Ada Guide"),
+                guide = GuidePublicSummary(1L, "Ada Guide"),
                 title = "City Walk",
                 description = "Historic city walk",
                 countryCode = "TR",

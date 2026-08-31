@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.discovery.presentation.tourist
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,10 +50,16 @@ fun TouristFilterScreen(
     modifier: Modifier = Modifier,
     viewModel: TouristExploreViewModel = hiltViewModel(),
     onApplyFilters: () -> Unit = {},
+    onNavigateBack: () -> Unit = {},
 ) {
     val categories = viewModel.categories
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var activePicker by rememberSaveable { mutableStateOf<TouristFilterPicker?>(null) }
+
+    BackHandler {
+        viewModel.cancelFilterEditing()
+        onNavigateBack()
+    }
 
     TouristFilterContent(
         uiState = uiState,

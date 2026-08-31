@@ -16,8 +16,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.components.EditAlertDialog
 import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 import compose.icons.TablerIcons
 import compose.icons.tablericons.ArrowLeft
@@ -54,6 +60,8 @@ fun AppTopBar(
     unreadNotificationCount: Int = 0,
     onNotificationClick: () -> Unit = {},
 ) {
+    var showLogoutConfirmation by rememberSaveable { mutableStateOf(false) }
+
     if (config.isHome) {
         TopAppBar(
             title = {
@@ -128,7 +136,7 @@ fun AppTopBar(
             },
             actions = {
                 if (config.showLogoutButton) {
-                    IconButton(onClick = onLogoutClick) {
+                    IconButton(onClick = { showLogoutConfirmation = true }) {
                         Icon(
                             imageVector = TablerIcons.Logout,
                             contentDescription = null,
@@ -136,6 +144,32 @@ fun AppTopBar(
                     }
                 }
             },
+        )
+    }
+
+    if (showLogoutConfirmation) {
+        EditAlertDialog(
+            title = R.string.logout_confirmation_title,
+            text = R.string.logout_confirmation_message,
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutConfirmation = false
+                        onLogoutClick()
+                    },
+                ) {
+                    Text(
+                        text = stringResource(R.string.yes),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutConfirmation = false }) {
+                    Text(text = stringResource(R.string.no))
+                }
+            },
+            onDismissRequest = { showLogoutConfirmation = false },
         )
     }
 }

@@ -111,8 +111,11 @@ fun PopularTourCard(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = tour.languagesText,
+                        modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {

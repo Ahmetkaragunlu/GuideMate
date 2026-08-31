@@ -23,7 +23,7 @@ fun NavGraphBuilder.authNavGraph(
             OnboardingScreen(
                 onboardingCompleted = {
                     onOnboardingCompleted()
-                    navController.navigate(AuthDestination.SignIn) {
+                    navController.navigate(AuthDestination.SignUp) {
                         popUpTo(AuthDestination.Onboarding) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -42,12 +42,7 @@ fun NavGraphBuilder.authNavGraph(
         }
         composable<AuthDestination.SignUp> {
             SignUpScreen(
-                onNavigateToSignIn = {
-                    navController.popBackStack(
-                        route = AuthDestination.SignIn,
-                        inclusive = false,
-                    )
-                },
+                onNavigateToSignIn = navController::returnToSignIn,
             )
         }
         composable<AuthDestination.ForgotPassword> {
@@ -60,6 +55,12 @@ fun NavGraphBuilder.authNavGraph(
                 },
             )
         }
+    }
+}
+
+private fun NavController.returnToSignIn() {
+    if (!popBackStack(route = AuthDestination.SignIn, inclusive = false)) {
+        navigateTo(AuthDestination.SignIn)
     }
 }
 

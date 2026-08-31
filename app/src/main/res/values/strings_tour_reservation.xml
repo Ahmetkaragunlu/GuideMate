@@ -35,7 +35,7 @@
 
     <string name="category_adventure">Macera</string>
 
-    <string name="best_guides_in_region">Bu Bölgedeki En İyi Rehberler</string>
+    <string name="best_guides">En İyi Rehberler</string>
 
     <string name="popular_experiences">Popüler Deneyimler</string>
 
@@ -187,7 +187,7 @@
 
     <string name="search_guide">Rehber Ara</string>
 
-    <string name="rating">Puan</string>
+    <string name="rating">En Az Puan</string>
 
     <string name="language">Dil Seç</string>
 
@@ -330,8 +330,6 @@
     <string name="tour_search_result_count">%1$d tur bulundu</string>
 
     <string name="tour_search_empty_title">Aramanıza uygun tur bulunamadı.</string>
-
-    <string name="tour_search_clear_filters">Aramayı ve Filtreleri Temizle</string>
 
     <string name="secure_payment_provider_short">Güvenli ödeme sağlayıcısı üzerinden ödeyin.</string>
 

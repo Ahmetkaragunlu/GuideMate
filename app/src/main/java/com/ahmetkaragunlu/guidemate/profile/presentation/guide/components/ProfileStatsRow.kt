@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toRatingText
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Flag
 
@@ -60,7 +61,7 @@ fun ProfileStatsRow(
 
         StatCard(
             icon = Icons.Rounded.Star,
-            title = stringResource(R.string.rating_format, rating.toString()),
+            title = stringResource(R.string.rating_format, rating.toRatingText()),
         )
 
         StatCard(

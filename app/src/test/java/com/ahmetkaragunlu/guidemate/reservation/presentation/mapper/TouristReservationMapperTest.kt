@@ -78,7 +78,7 @@ class TouristReservationMapperTest {
                     tourId = "tour-1",
                     guide =
                         GuidePublicSummary(
-                            id = "10",
+                            id = 10L,
                             displayName = "Ahmet Yılmaz",
                         ),
                     title = "Kapadokya Turu",

@@ -107,6 +107,10 @@ class PaymentRepositoryImpl @Inject constructor(
         pendingPaymentStorage.clear(paymentId)
     }
 
+    override suspend fun clearPendingPayment() {
+        pendingPaymentStorage.clear()
+    }
+
     private suspend fun executeTrackedPayment(
         request: suspend () -> Response<com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentResponseDto>,
     ): DataResult<Payment> =

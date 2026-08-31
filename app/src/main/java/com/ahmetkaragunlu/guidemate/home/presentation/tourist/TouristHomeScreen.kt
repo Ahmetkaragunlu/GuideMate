@@ -177,7 +177,7 @@ private fun LazyListScope.bestGuidesSection(
 ) {
     item {
         Text(
-            text = stringResource(id = R.string.best_guides_in_region),
+            text = stringResource(id = R.string.best_guides),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             modifier =

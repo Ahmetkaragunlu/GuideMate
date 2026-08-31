@@ -142,6 +142,14 @@ class TouristExploreViewModel
             _uiState.update { it.copy(draftFilters = TourFilterUiState()) }
         }
 
+        fun beginFilterEditing() {
+            _uiState.update { it.copy(draftFilters = it.appliedFilters) }
+        }
+
+        fun cancelFilterEditing() {
+            _uiState.update { it.copy(draftFilters = it.appliedFilters) }
+        }
+
         fun applyFilters() {
             _uiState.update { it.copy(appliedFilters = it.draftFilters) }
         }

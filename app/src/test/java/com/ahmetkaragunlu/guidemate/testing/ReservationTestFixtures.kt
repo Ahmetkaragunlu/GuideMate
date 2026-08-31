@@ -66,7 +66,7 @@ fun testReservation(
         snapshot =
             TouristReservationSnapshot(
                 tourId = "tour-1",
-                guide = GuidePublicSummary("guide-1", "Ada Guide"),
+                guide = GuidePublicSummary(1L, "Ada Guide"),
                 title = "City Walk",
                 description = "Historic route",
                 countryCode = "TR",

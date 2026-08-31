@@ -17,6 +17,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailSta
 @Composable
 fun TouristTourDetailScreen(
     onBookTour: (String) -> Unit,
+    onNavigateToGuideProfile: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TouristTourDetailViewModel = hiltViewModel(),
 ) {
@@ -42,6 +43,7 @@ fun TouristTourDetailScreen(
                 onPrimaryAction = {
                     if (bookingAvailability.isBookable) onBookTour(detail.sessionId)
                 },
+                onGuideProfileClick = { onNavigateToGuideProfile(detail.guideId) },
                 modifier = modifier,
                 topContent =
                     resolveDetailNoticeResId(

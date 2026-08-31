@@ -3,10 +3,13 @@ package com.ahmetkaragunlu.guidemate.navigation
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.navigation.auth.AuthStartDestination
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
 import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeOnboardingRepository
+import com.ahmetkaragunlu.guidemate.testing.FakePaymentRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
 import com.ahmetkaragunlu.guidemate.testing.authenticatedUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,7 +44,7 @@ class RootNavigationViewModelTest {
         }
 
     @Test
-    fun storedGuideSession_restoresGuideDestinationAndLogoutClearsNotificationState() =
+    fun storedGuideSession_logoutClearsAllUserScopedLocalState() =
         runTest {
             val guide = authenticatedUser(role = UserRole.GUIDE)
             val authRepository =
@@ -51,11 +54,22 @@ class RootNavigationViewModelTest {
                 }
             val userRepository = FakeUserRepository(guide).apply { restoredUser = guide }
             val notificationRepository = FakeNotificationRepository()
+            val paymentRepository = FakePaymentRepository()
+            val navigationCoordinator = NotificationNavigationCoordinator()
+            navigationCoordinator.offer(
+                NotificationNavigationTarget(
+                    notificationId = "notification-1",
+                    type = NotificationType.CHAT_MESSAGE,
+                    chatId = "chat-1",
+                ),
+            )
             val viewModel =
                 createViewModel(
                     authRepository = authRepository,
                     userRepository = userRepository,
                     notificationRepository = notificationRepository,
+                    paymentRepository = paymentRepository,
+                    notificationNavigationCoordinator = navigationCoordinator,
                 )
 
             runCurrent()
@@ -66,6 +80,8 @@ class RootNavigationViewModelTest {
 
             assertEquals(1, authRepository.logoutCalls)
             assertEquals(1, notificationRepository.clearLocalStateCalls)
+            assertEquals(1, paymentRepository.clearAllPendingPaymentCalls)
+            assertEquals(null, navigationCoordinator.pendingTarget.value)
         }
 
     private fun createViewModel(
@@ -73,12 +89,16 @@ class RootNavigationViewModelTest {
         userRepository: FakeUserRepository = FakeUserRepository(),
         onboardingRepository: FakeOnboardingRepository = FakeOnboardingRepository(),
         notificationRepository: FakeNotificationRepository = FakeNotificationRepository(),
+        paymentRepository: FakePaymentRepository = FakePaymentRepository(),
+        notificationNavigationCoordinator: NotificationNavigationCoordinator =
+            NotificationNavigationCoordinator(),
     ): RootNavigationViewModel =
         RootNavigationViewModel(
             authRepository = authRepository,
             userRepository = userRepository,
             onboardingRepository = onboardingRepository,
+            paymentRepository = paymentRepository,
             notificationRepository = notificationRepository,
-            notificationNavigationCoordinator = NotificationNavigationCoordinator(),
+            notificationNavigationCoordinator = notificationNavigationCoordinator,
         )
 }

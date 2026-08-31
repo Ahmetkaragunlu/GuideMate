@@ -159,9 +159,8 @@ private fun TourSearchEmptyState(onClearFilters: () -> Unit) {
             color = colorResource(R.color.text_color),
         )
         EditButton(
-            text = R.string.tour_search_clear_filters,
+            text = R.string.clear,
             onClick = onClearFilters,
-            modifier = Modifier.fillMaxWidth(0.7f),
         )
     }
 }

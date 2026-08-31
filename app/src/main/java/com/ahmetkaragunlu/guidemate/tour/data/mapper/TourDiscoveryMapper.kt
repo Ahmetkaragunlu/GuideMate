@@ -42,7 +42,7 @@ fun TourSearchItemResponseDto.toDomain(): TourSearchItem =
         reviewCount = reviewCount,
         guide =
             GuidePublicSummary(
-                id = guide.guideId.toString(),
+                id = guide.guideId,
                 displayName = guide.displayName,
                 profileImageUrl = guide.avatar?.imageUrl,
             ),

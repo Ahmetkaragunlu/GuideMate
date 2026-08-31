@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ internal fun TourDetailSummary(
     uiState: TourDetailUiState,
     mode: TourDetailMode,
     topContent: (@Composable () -> Unit)?,
+    onGuideProfileClick: (() -> Unit)?,
 ) {
     topContent?.invoke()
     if (mode.showPreviewBanner) PreviewBanner()
@@ -61,7 +63,10 @@ internal fun TourDetailSummary(
     PriceRow(uiState = uiState)
     if (mode.showGuideInfo) {
         TourDetailSectionDivider()
-        GuideInfoRow(uiState = uiState)
+        GuideInfoRow(
+            uiState = uiState,
+            onGuideProfileClick = onGuideProfileClick,
+        )
     }
 }
 
@@ -303,7 +308,10 @@ private fun PriceRow(uiState: TourDetailUiState) {
 }
 
 @Composable
-private fun GuideInfoRow(uiState: TourDetailUiState) {
+private fun GuideInfoRow(
+    uiState: TourDetailUiState,
+    onGuideProfileClick: (() -> Unit)?,
+) {
     Row(
         modifier =
             Modifier
@@ -341,6 +349,12 @@ private fun GuideInfoRow(uiState: TourDetailUiState) {
         }
         Text(
             text = stringResource(R.string.guide_tour_publish_step4_view_profile),
+            modifier =
+                if (onGuideProfileClick != null) {
+                    Modifier.clickable(onClick = onGuideProfileClick)
+                } else {
+                    Modifier
+                },
             style = MaterialTheme.typography.bodyMedium,
             color = colorResource(R.color.brand_color),
             fontWeight = FontWeight.SemiBold,

@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.home.presentation.guide.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toRatingText
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Flag
@@ -28,7 +29,7 @@ fun GuideDashboard.toDashboardStatistics(): List<GuideStatistic> =
         ),
         GuideStatistic(
             icon = TablerIcons.Star,
-            value = averageRating.toString(),
+            value = averageRating.toRatingText(),
             description = R.string.average_rating,
         ),
     )

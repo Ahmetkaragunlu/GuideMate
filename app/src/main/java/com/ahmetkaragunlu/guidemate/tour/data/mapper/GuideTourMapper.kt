@@ -84,7 +84,7 @@ fun TourDetailResponseDto.toDomain(): TourDetails {
                 version = version,
                 guide =
                     GuidePublicSummary(
-                        id = guide.guideId.toString(),
+                        id = guide.guideId,
                         displayName = guide.displayName,
                         profileImageUrl = guide.avatar?.imageUrl,
                     ),

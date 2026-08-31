@@ -73,7 +73,7 @@ fun testTourSearchItem(
         cover = MediaReference("media-$tourId", "https://example.com/$tourId.jpg"),
         averageRating = 4.8,
         reviewCount = 20,
-        guide = GuidePublicSummary("guide-1", "Ada Guide"),
+        guide = GuidePublicSummary(1L, "Ada Guide"),
     )
 
 fun tourSearchPage(

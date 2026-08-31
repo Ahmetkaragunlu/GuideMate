@@ -26,7 +26,7 @@ data class TourDetailUiState(
     val meetingPoint: String = "",
     val sessionStatus: TourDetailStatus? = null,
     val cancellationReason: String? = null,
-    val guideId: String = "",
+    val guideId: Long = 0L,
     val guideName: String = "",
     val guideImageResId: Int = R.drawable.unnamed,
     val guideImageUrl: String? = null,
