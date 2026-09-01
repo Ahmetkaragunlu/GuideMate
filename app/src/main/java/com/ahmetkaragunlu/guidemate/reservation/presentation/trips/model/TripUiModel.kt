@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
 import java.time.Instant
@@ -18,12 +19,8 @@ data class TripUiModel(
     val languagesFlag: String,
     val languagesText: String,
     val totalPriceMinor: Long,
-    val rating: Double? = null,
-    val reviewCount: Long? = null,
     val startsAt: Instant,
     val sessionStatus: TourDetailStatus? = null,
+    @param:StringRes val cancellationTitleResId: Int? = null,
     val cancellationReason: String? = null,
-) {
-    val isPast: Boolean
-        get() = sessionStatus != null
-}
+)

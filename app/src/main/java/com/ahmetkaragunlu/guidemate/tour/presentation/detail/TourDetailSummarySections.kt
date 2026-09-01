@@ -278,7 +278,10 @@ private fun PriceRow(uiState: TourDetailUiState) {
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.brand_color),
         )
-        if (uiState.reservedParticipantCount != null || uiState.capacity > 0) {
+        if (
+            uiState.sessionStatus != TourDetailStatus.CANCELLED &&
+                (uiState.reservedParticipantCount != null || uiState.capacity > 0)
+        ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
                 verticalAlignment = Alignment.CenterVertically,

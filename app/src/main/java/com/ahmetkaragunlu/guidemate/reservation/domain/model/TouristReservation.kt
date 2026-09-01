@@ -20,5 +20,9 @@ data class TouristReservation(
     val refundEligibility: ReservationRefundEligibility = ReservationRefundEligibility.NOT_APPLICABLE,
     val cancellationPolicyCode: String,
     val cancellationPolicyVersion: Int,
+    val averageRating: Double,
+    val reviewCount: Long,
+    val bookedCount: Int,
+    val capacity: Int,
     val review: SubmittedReview? = null,
 )

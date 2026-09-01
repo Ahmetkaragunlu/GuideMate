@@ -197,7 +197,6 @@ class TouristReservationDetailViewModel
                     detail =
                         reservation.toTourDetailUiState(
                             publicReviews = reviews?.items.orEmpty(),
-                            publicReviewCount = reviews?.totalElements ?: 0,
                         ),
                     reservationStatus = reservation.status,
                     canSubmitReview = reservation.canSubmitReview(),

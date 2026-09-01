@@ -4,22 +4,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.res.colorResource
@@ -32,7 +28,6 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.tour.presentation.components.InfoRow
 import com.ahmetkaragunlu.guidemate.tour.presentation.components.TourBaseCard
-import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripUiModel
 import compose.icons.TablerIcons
 import compose.icons.tablericons.MapPin
@@ -74,9 +69,9 @@ fun PastTripCard(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    if (trip.sessionStatus == TourDetailStatus.CANCELLED) {
+                    trip.cancellationTitleResId?.let { titleResId ->
                         Text(
-                            text = stringResource(R.string.tour_status_cancelled),
+                            text = stringResource(titleResId),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.error,
@@ -84,10 +79,16 @@ fun PastTripCard(
                     }
                     InfoRow(icon = Icons.Default.CalendarMonth, text = trip.date)
                     InfoRow(icon = TablerIcons.MapPin, text = trip.location)
-                    InfoRow(
-                        icon = TablerIcons.Users,
-                        text = stringResource(R.string.participant_count, trip.participantCount),
-                    )
+                    if (trip.cancellationTitleResId == null) {
+                        InfoRow(
+                            icon = TablerIcons.Users,
+                            text =
+                                stringResource(
+                                    R.string.reservation_participant_count,
+                                    trip.participantCount,
+                                ),
+                        )
+                    }
                 }
 
                 Icon(
@@ -119,23 +120,6 @@ fun PastTripCard(
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.brand_color),
                 )
-
-                if (trip.rating != null && trip.reviewCount != null) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = Color(0xFFFFC107),
-                            modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium)),
-                        )
-                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
-                        Text(
-                            text = stringResource(R.string.rating_review_format, trip.rating, trip.reviewCount),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = colorResource(R.color.text_color),
-                        )
-                    }
-                }
             }
         }
     }

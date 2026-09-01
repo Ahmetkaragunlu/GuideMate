@@ -1121,6 +1121,13 @@ Bir test icin gerekirse su kanit eklenir:
 - [ ] `TRIPS-009` Buyuk listede pagination duplicate/kayip/gecersiz sira
   uretmez.
 - [ ] `TRIPS-010` Kart tiklamasi typed ReservationDetail route'una gider.
+- [ ] `TRIPS-011` Upcoming ve tamamlanmis Past karti
+  `Rezervasyonunuz: X kisi` gosterir; detail ayni session icin
+  `bookedCount/capacity` gosterir. Iptal karti ve detail yaniltici doluluk
+  gostermez.
+- [ ] `TRIPS-012` Upcoming/Past reservation detail canonical tur ortalama puani
+  ve toplam yorum sayisini normal tur detail ile ayni gosterir; yeni yorumdan
+  sonra iki deger backend sonucuyla yenilenir.
 
 #### Reservation Snapshot Detail
 
@@ -1402,6 +1409,9 @@ Bir test icin gerekirse su kanit eklenir:
   mesaj gonderemez.
 - [ ] `CHAT-034` Chat FCM bildirimi tiklaninca auth/root hazir olduktan sonra
   dogru `chatId` detail'ine gider.
+- [ ] `CHAT-035` Tourist chat detail topbar'inda rehber avatar/adi birlikte
+  tiklaninca dogru public rehber profili acilir ve geri ayni sohbete doner;
+  Guide chat topbar'i public tourist profil olmadigi icin tiklanabilir olmaz.
 
 ### 18. Notification History, FCM ve Semantic Navigation
 
@@ -2211,6 +2221,9 @@ alinir; bu belgeye yazilmaz.
   tour sorgusu olmadan dogru gorunur.
 - [ ] `DEMO-030` Empty, az veri, tek sayfa ve cok sayfa hesaplarinda UI ayni
   componentleri dogru state ile kullanir.
+- [ ] `DEMO-031` Baslamamis CONFIRMED demo rezervasyonu eski politika kodu
+  kaynakli `DATA_CONFLICT` vermeden iptal edilir; 48 saat sinirina gore
+  FULL_REFUND veya NO_REFUND sonucu dogru doner.
 
 ### 27. Bilincli Kapsam Sinirlari ve Yanlis Hata Kaydi Acmayacak Kararlar
 

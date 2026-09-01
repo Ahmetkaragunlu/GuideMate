@@ -131,6 +131,14 @@ fun TouristNavigation(
                     onLogoutClick = onLogoutClick,
                     unreadNotificationCount = notificationUiState.unreadCount,
                     onNotificationClick = { showNotifications = true },
+                    onChatProfileClick =
+                        activeChat?.let { chat ->
+                            {
+                                touristNavController.navigateTo(
+                                    TouristDestination.GuideProfile(chat.remoteUserId),
+                                )
+                            }
+                        },
                 )
             },
             bottomBar = {

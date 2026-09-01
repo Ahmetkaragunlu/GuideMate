@@ -34,6 +34,10 @@ class ReservationRepositoryImplTest {
         val reservation = (result as DataResult.Success).data.items.single()
         assertEquals("reservation-1", reservation.id)
         assertEquals(ReservationRefundEligibility.NOT_APPLICABLE, reservation.refundEligibility)
+        assertEquals(4.8, reservation.averageRating, 0.0)
+        assertEquals(17L, reservation.reviewCount)
+        assertEquals(6, reservation.bookedCount)
+        assertEquals(10, reservation.capacity)
     }
 
     @Test
@@ -136,8 +140,12 @@ class ReservationRepositoryImplTest {
                 cancellationReason = null,
                 cancelledAt = null,
                 cancellationRefundEligibility = null,
-                cancellationPolicyCode = "STANDARD",
+                cancellationPolicyCode = "FULL_REFUND_48_HOURS",
                 cancellationPolicyVersion = 1,
+                averageRating = 4.8,
+                reviewCount = 17,
+                bookedCount = 6,
+                capacity = 10,
                 snapshot =
                     ReservationSnapshotResponseDto(
                         tourId = "tour-1",

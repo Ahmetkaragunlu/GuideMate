@@ -84,8 +84,12 @@ fun testReservation(
                 unitPriceMinor = 10_000,
             ),
         status = status,
-        cancellationPolicyCode = "STANDARD",
+        cancellationPolicyCode = "FULL_REFUND_48_HOURS",
         cancellationPolicyVersion = 1,
+        averageRating = 4.8,
+        reviewCount = 17,
+        bookedCount = 6,
+        capacity = 10,
     )
 
 fun reservationPage(

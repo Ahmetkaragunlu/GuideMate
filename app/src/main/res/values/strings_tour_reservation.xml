@@ -307,6 +307,8 @@
 
     <string name="participant_count">%1$d Katılımcı</string>
 
+    <string name="reservation_participant_count">Rezervasyonunuz: %1$d kişi</string>
+
     <string name="tour_duration_format">%1$d dk</string>
 
     <string name="tour_participant_capacity_format">%1$d/%2$d</string>
@@ -348,6 +350,8 @@
     <string name="reservation_cancellation_success_title">Rezervasyon İptal Edildi</string>
 
     <string name="reservation_cancelled_success">Rezervasyonunuz iptal edildi.</string>
+
+    <string name="tour_cancelled_status">Tur iptal edildi.</string>
 
     <string name="reservation_cancelled_refund_started">Rezervasyonunuz iptal edildi ve tam iade işleminiz başlatıldı.</string>
 

@@ -10,14 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -90,33 +87,12 @@ fun UpcomingTripCard(
                     }
                     InfoRow(
                         icon = TablerIcons.Users,
-                        text = stringResource(R.string.participant_count, trip.participantCount),
+                        text =
+                            stringResource(
+                                R.string.reservation_participant_count,
+                                trip.participantCount,
+                            ),
                     )
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_medium)),
-                ) {
-                    if (trip.rating != null && trip.reviewCount != null) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = null,
-                                tint = Color(0xFFFFC107),
-                            )
-                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
-                            Text(
-                                text = stringResource(
-                                    R.string.rating_review_format,
-                                    trip.rating,
-                                    trip.reviewCount
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = colorResource(R.color.text_color),
-                            )
-                        }
-                    }
                 }
             }
 

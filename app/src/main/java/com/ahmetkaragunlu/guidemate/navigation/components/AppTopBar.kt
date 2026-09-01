@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.navigation.components
 
 import androidx.annotation.StringRes
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -59,6 +60,7 @@ fun AppTopBar(
     onLogoutClick: () -> Unit,
     unreadNotificationCount: Int = 0,
     onNotificationClick: () -> Unit = {},
+    onChatProfileClick: (() -> Unit)? = null,
 ) {
     var showLogoutConfirmation by rememberSaveable { mutableStateOf(false) }
 
@@ -97,7 +99,13 @@ fun AppTopBar(
         CenterAlignedTopAppBar(
             title = {
                 if (config.isChatDetail) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier =
+                            onChatProfileClick?.let { onClick ->
+                                Modifier.clickable(onClick = onClick)
+                            } ?: Modifier,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         GuideMateImage(
                             fallbackImageResId = config.chatAvatarResId,
                             imageUrl = config.chatAvatarUrl,

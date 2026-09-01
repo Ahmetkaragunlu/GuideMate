@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.mapper
 
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationActor
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
@@ -11,7 +12,6 @@ import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
 import java.time.Instant
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TouristReservationMapperTest {
@@ -30,7 +30,11 @@ class TouristReservationMapperTest {
         assertEquals(trip.languagesText, detail.languagesText)
         assertEquals(reservation.unitPriceMinor, detail.priceMinor)
         assertEquals(reservation.totalPriceMinor, trip.totalPriceMinor)
-        assertEquals(reservation.participantCount, detail.reservedParticipantCount)
+        assertEquals(null, detail.reservedParticipantCount)
+        assertEquals(reservation.averageRating, detail.rating ?: 0.0, 0.0)
+        assertEquals(reservation.reviewCount, detail.reviewCount)
+        assertEquals(reservation.bookedCount, detail.bookedCount)
+        assertEquals(reservation.capacity, detail.capacity)
         assertEquals(reservation.snapshot.guide.id, detail.guideId)
     }
 
@@ -46,9 +50,21 @@ class TouristReservationMapperTest {
 
         val trip = reservation.toTripUiModel()
 
-        assertTrue(trip.isPast)
         assertEquals(TourDetailStatus.CANCELLED, trip.sessionStatus)
+        assertEquals(R.string.tour_cancelled_status, trip.cancellationTitleResId)
         assertEquals("Olumsuz hava koşulları", trip.cancellationReason)
+    }
+
+    @Test
+    fun `tourist cancellation is labelled as own reservation cancellation`() {
+        val trip =
+            reservation()
+                .copy(
+                    status = TouristReservationStatus.CANCELLED,
+                    cancellationActor = ReservationCancellationActor.TOURIST,
+                ).toTripUiModel()
+
+        assertEquals(R.string.reservation_cancelled_success, trip.cancellationTitleResId)
     }
 
     @Test
@@ -72,8 +88,12 @@ class TouristReservationMapperTest {
             totalPriceMinor = 20_000,
             currencyCode = "USD",
             status = TouristReservationStatus.CONFIRMED,
-            cancellationPolicyCode = "STANDARD_48_HOURS",
+            cancellationPolicyCode = "FULL_REFUND_48_HOURS",
             cancellationPolicyVersion = 1,
+            averageRating = 4.7,
+            reviewCount = 12,
+            bookedCount = 5,
+            capacity = 8,
             snapshot =
                 TouristReservationSnapshot(
                     tourId = "tour-1",

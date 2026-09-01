@@ -55,6 +55,10 @@ fun ReservationResponseDto.toDomain(): TouristReservation =
                 ?: ReservationRefundEligibility.NOT_APPLICABLE,
         cancellationPolicyCode = cancellationPolicyCode,
         cancellationPolicyVersion = cancellationPolicyVersion,
+        averageRating = averageRating,
+        reviewCount = reviewCount,
+        bookedCount = bookedCount,
+        capacity = capacity,
         review = review?.toDomain(),
     )
 

@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.reservation.presentation.mapper
 
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationActor
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripUiModel
@@ -27,13 +28,13 @@ fun TouristReservation.toTripUiModel(): TripUiModel {
         totalPriceMinor = totalPriceMinor,
         startsAt = snapshot.startsAt,
         sessionStatus = detail.sessionStatus,
+        cancellationTitleResId = cancellationTitleResId(),
         cancellationReason = detail.cancellationReason,
     )
 }
 
 fun TouristReservation.toTourDetailUiState(
     publicReviews: List<TourReview> = emptyList(),
-    publicReviewCount: Long = 0,
 ): TourDetailUiState =
     TourDetailUiState(
         sessionId = tourSessionId,
@@ -41,7 +42,8 @@ fun TouristReservation.toTourDetailUiState(
         title = snapshot.title,
         imageResId = R.drawable.ic_image_unavailable,
         imageUrl = snapshot.coverImageUrl,
-        reviewCount = publicReviewCount,
+        rating = averageRating.takeIf { reviewCount > 0 },
+        reviewCount = reviewCount,
         date = snapshot.startsAt.formatTourDateTime(snapshot.timeZoneId),
         durationMinutes = snapshot.durationMinutes,
         location =
@@ -52,7 +54,8 @@ fun TouristReservation.toTourDetailUiState(
         languagesText = snapshot.languages.joinToString(separator = ", ") { it.shortCode },
         category = snapshot.category,
         priceMinor = unitPriceMinor,
-        reservedParticipantCount = participantCount,
+        bookedCount = bookedCount,
+        capacity = capacity,
         description = snapshot.description,
         meetingPoint = snapshot.meetingPoint,
         sessionStatus = status.toDetailStatus(),
@@ -73,6 +76,15 @@ private fun TouristReservationStatus.toDetailStatus(): TourDetailStatus? =
         TouristReservationStatus.EXPIRED,
         -> null
     }
+
+private fun TouristReservation.cancellationTitleResId(): Int? {
+    if (status != TouristReservationStatus.CANCELLED) return null
+    return if (cancellationActor == ReservationCancellationActor.TOURIST) {
+        R.string.reservation_cancelled_success
+    } else {
+        R.string.tour_cancelled_status
+    }
+}
 
 private fun TourReview.toDetailReviewUiModel(): TourDetailReviewUiModel =
     TourDetailReviewUiModel(

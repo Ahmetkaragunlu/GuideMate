@@ -19,6 +19,10 @@ data class ReservationResponseDto(
     @SerializedName("cancellationRefundEligibility") val cancellationRefundEligibility: String?,
     @SerializedName("cancellationPolicyCode") val cancellationPolicyCode: String,
     @SerializedName("cancellationPolicyVersion") val cancellationPolicyVersion: Int,
+    @SerializedName("averageRating") val averageRating: Double,
+    @SerializedName("reviewCount") val reviewCount: Long,
+    @SerializedName("bookedCount") val bookedCount: Int,
+    @SerializedName("capacity") val capacity: Int,
     @SerializedName("snapshot") val snapshot: ReservationSnapshotResponseDto,
     @SerializedName("review") val review: ReservationReviewResponseDto?,
 )

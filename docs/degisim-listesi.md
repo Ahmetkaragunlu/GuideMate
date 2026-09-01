@@ -1022,7 +1022,7 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ### DEG-019 - Gezilerim Rezervasyon Detayinda Tur Puani ve Yorum Sayisi
 
-- Durum: `BEKLIYOR`
+- Durum: `UYGULANDI`
 - Dogrulanan mevcut davranis:
   - Popular/Kesfet akisi ile acilan normal turist tur detayinda ortalama puan ve
     toplam yorum sayisi gosteriliyor.
@@ -1056,10 +1056,16 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   - Android mapper/ViewModel testi ortalama puan ile yorum sayisinin rezervasyon
     detayina tasindigini ve yorum sonrasi yenilendigini korumalidir.
   - Salt metin gorunumu icin kirilgan Compose UI testi eklenmeyecektir.
+- Uygulama sonucu:
+  - Backend rezervasyon cevabi tur aggregate degerlerini ve session dolulugunu
+    toplu sorgularla donuyor; Android bunlari tek canonical kaynaktan detail
+    modeline tasiyor.
+  - Yorum sonrasi rezervasyon yeniden yuklenerek guncel ortalama ve toplam yorum
+    sayisi gosteriliyor.
 
 ### DEG-020 - Rezervasyon Kisi Sayisi ve Tur Dolulugu Sunumu
 
-- Durum: `ONAYLANDI`
+- Durum: `UYGULANDI`
 - Kullanici deneyimi karari:
   - Popular tur kartinin mevcut kompakt tasarimi korunacak ve kartta kontenjan
     bilgisi eklenmeyecektir. Karta basilarak acilan normal tur detayinda mevcut
@@ -1082,10 +1088,15 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   - Android mapper testi Gezilerim kartindaki rezervasyon kisi sayisi ile
     detaydaki tur dolulugunun birbirine karismadigini korumalidir.
   - Salt metin ve yerlesim icin kirilgan Compose UI testi yazilmayacaktir.
+- Uygulama sonucu:
+  - Gezilerim kartlari yalniz `Rezervasyonunuz: %d kisi`, rezervasyon detayi ise
+    backend session `bookedCount/capacity` degerini gosteriyor.
+  - Iptal kartlari turist ve tur iptalini actor'a gore ayiriyor; iptal karti ve
+    detayinda yaniltici doluluk bilgisi gizleniyor.
 
 ### DEG-021 - Turist Sohbetinden Rehber Profiline Gitme
 
-- Durum: `ONAYLANDI`
+- Durum: `UYGULANDI`
 - Dogrulanan mevcut davranis:
   - Turist sohbet detayinin topbar'inda karsi taraf olan rehberin backend'den
     gelen adi, profil fotografi ve `remoteUserId` degeri mevcut.
@@ -1110,10 +1121,13 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
     eklenecektir; kapsaniyorsa tekrar test yazilmayacaktir.
   - Basit Compose tiklama ve ileri/geri gorunumu kullanici testinde
     dogrulanacak; kirilgan UI testi eklenmeyecektir.
+- Uygulama sonucu:
+  - Turist sohbet topbar kimligi mevcut `remoteUserId` ile typed public rehber
+    profiline gidiyor; rehber sohbet topbar davranisi degismedi.
 
 ### DEG-022 - Demo Rezervasyon Iptal Politikasi Uyumu
 
-- Durum: `ONAYLANDI`
+- Durum: `UYGULANDI`
 - Dogrulanan mevcut davranis:
   - Backend turist iptalinde `FULL_REFUND_48_HOURS` kodlu mevcut politikayi
     destekliyor.
@@ -1136,26 +1150,29 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
     tarafindan iptal edilebildigini dogrulamalidir.
   - Production iptal politikasini tekrar test eden gereksiz Android testi
     eklenmeyecektir.
+- Uygulama sonucu:
+  - Seed ve verifier canonical politika koduna guncellendi. Mevcut
+    `guidemate_demo` icindeki 1300 rezervasyonun kolon ve JSON snapshot degeri
+    hedefli olarak esitlendi; diger demo verileri ve `guidemate_db` korunuyor.
 
 ## Toplu Uygulama Kontrol Noktasi
 
 - Son kaydedilen madde: `DEG-022`
-- Uygulama izni: DEG-018 icin VERILDI ve uygulama tamamlandi.
-- Kod degisikligi: DEG-001 - DEG-018 YAPILDI.
-- Otomatik dogrulama: Android `ktfmtCheck`, 166 JVM testi, Android test kaynak
-  derlemesi, `lintDebug` ve `assembleDebug` basarili. Backend PostgreSQL
-  Testcontainers testleri dahil 212 test basarili; hata, failure veya skip yok.
+- Uygulama izni: DEG-019 - DEG-022 icin VERILDI ve uygulama tamamlandi.
+- Kod degisikligi: DEG-001 - DEG-022 YAPILDI.
+- Otomatik dogrulama: Android `ktfmtCheck`, 168 JVM testi,
+  `compileDebugKotlin` ve `lintDebug` basarili. Backend PostgreSQL
+  Testcontainers testleri dahil 214 test basarili; hata, failure veya skip yok.
   DEG-014 mapper/resolver ve push whitelist, DEG-015 sayfalama, DEG-016 nullable
   rezervasyon sozlesmesi, DEG-017 Android okundu davranisi ve backend
   eszamanlilik senaryosu odakli testlerle korunuyor.
 - Kullanici dogrulamasi: DEG-001 - DEG-013 tamamlandi.
-- Kapanis: DEG-014 - DEG-018 kodsal ve otomatik test olarak tamamlandi. DEG-018
-  kullanici testi bekliyor. Degisen
-  kapsamin kullanilmayan kod/import/resource ve bos paket taramasi temiz.
-  DEG-014 - DEG-017'nin gercek cihaz ve kullanici gorunumu kontrolleri manuel
-  kullanici testinde ayrica dogrulanacak.
-- Siradaki is: DEG-019 - DEG-022 icin acik uygulama komutunu beklemek; ardindan
-  kullanici testlerine devam etmek. Her yeni kod
+- Kapanis: DEG-014 - DEG-022 kodsal ve otomatik test olarak tamamlandi. Bu
+  maddelerin gercek cihaz, navigation ve kullanici gorunumu kontrolleri manuel
+  kullanici testinde ayrica dogrulanacak. Degisen kapsamin kullanilmayan
+  kod/import/resource ve bos paket taramasi temiz.
+- Siradaki is: Kullanici testlerine devam etmek ve yeni bulgulari sirayla bu
+  listeye eklemek. Her yeni kod
   degisikliginden once bu dosyadaki Altin Kural ve Test Altin Kurali yeniden
   okunmalidir.
 - Baglam yenilenirse bu dosya okunur ve yalniz `BEKLIYOR`, `NETLESTIRILECEK`
