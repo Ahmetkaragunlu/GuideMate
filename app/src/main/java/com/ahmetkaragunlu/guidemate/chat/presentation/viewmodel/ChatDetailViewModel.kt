@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
+import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.chat.domain.repository.ChatRepository
 import com.ahmetkaragunlu.guidemate.chat.presentation.model.ChatDetailUiState
 import com.ahmetkaragunlu.guidemate.chat.presentation.mapper.toMessageUiModel
@@ -124,8 +125,18 @@ constructor(
 
     private fun observeIncomingMessages() {
         viewModelScope.launch {
-            chatRepository.observeMessages(chatId)
-                .map { it.messages.lastOrNull()?.messageId }
+            combine(
+                chatRepository.observeMessages(chatId),
+                userRepository.userState,
+            ) { history, userState ->
+                userState.userId?.let { currentUserId ->
+                    history.messages
+                        .lastOrNull { message ->
+                            message.senderId != currentUserId &&
+                                message.deliveryStatus == ChatMessageDeliveryStatus.SENT
+                        }?.messageId
+                }
+            }
                 .distinctUntilChanged()
                 .collect { messageId ->
                     if (messageId != null) chatRepository.markRead(chatId)

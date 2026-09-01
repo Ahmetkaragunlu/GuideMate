@@ -67,8 +67,8 @@ constructor(
                 contentIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
-        val title = textResolver.title(target.type)
-        val body = textResolver.body(target.type)
+        val title = textResolver.title(target)
+        val body = textResolver.body(target)
         val notification =
             NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_app)

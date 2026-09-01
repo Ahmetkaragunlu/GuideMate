@@ -19,6 +19,7 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailMod
 
 @Composable
 fun TouristReservationDetailScreen(
+    onNavigateToGuideProfile: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TouristReservationDetailViewModel = hiltViewModel(),
 ) {
@@ -49,6 +50,7 @@ fun TouristReservationDetailScreen(
                         -> TourDetailMode.TOURIST_UNAVAILABLE
                     },
                 onPrimaryAction = viewModel::showReviewForm,
+                onGuideProfileClick = { onNavigateToGuideProfile(detail.guideId) },
                 modifier = modifier,
                 topContent =
                     uiState.noticeResId?.let { messageResId ->

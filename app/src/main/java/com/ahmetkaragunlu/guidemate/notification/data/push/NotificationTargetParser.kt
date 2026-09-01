@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.notification.data.push
 
 import android.content.Intent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,6 +18,7 @@ class NotificationTargetParser @Inject constructor() {
             sessionId = data[KEY_SESSION_ID],
             reservationId = data[KEY_RESERVATION_ID],
             paymentId = data[KEY_PAYMENT_ID],
+            securityEvent = data[KEY_SECURITY_EVENT],
         )
 
     fun consumeIntent(intent: Intent?): NotificationNavigationTarget? {
@@ -30,6 +32,7 @@ class NotificationTargetParser @Inject constructor() {
                 sessionId = intent.getStringExtra(KEY_SESSION_ID),
                 reservationId = intent.getStringExtra(KEY_RESERVATION_ID),
                 paymentId = intent.getStringExtra(KEY_PAYMENT_ID),
+                securityEvent = intent.getStringExtra(KEY_SECURITY_EVENT),
             )
         clearNotificationExtras(intent)
         return target
@@ -48,6 +51,7 @@ class NotificationTargetParser @Inject constructor() {
             putExtra(KEY_SESSION_ID, target.sessionId)
             putExtra(KEY_RESERVATION_ID, target.reservationId)
             putExtra(KEY_PAYMENT_ID, target.paymentId)
+            putExtra(KEY_SECURITY_EVENT, target.securityEvent.name)
         }
 
     private fun createTarget(
@@ -58,6 +62,7 @@ class NotificationTargetParser @Inject constructor() {
         sessionId: String?,
         reservationId: String?,
         paymentId: String?,
+        securityEvent: String?,
     ): NotificationNavigationTarget? {
         if (notificationId.isNullOrBlank() && type.isNullOrBlank()) return null
         return NotificationNavigationTarget(
@@ -68,6 +73,7 @@ class NotificationTargetParser @Inject constructor() {
             sessionId = sessionId,
             reservationId = reservationId,
             paymentId = paymentId,
+            securityEvent = NotificationSecurityEvent.fromApiValue(securityEvent),
         )
     }
 
@@ -84,6 +90,7 @@ class NotificationTargetParser @Inject constructor() {
         const val KEY_SESSION_ID = "sessionId"
         const val KEY_RESERVATION_ID = "reservationId"
         const val KEY_PAYMENT_ID = "paymentId"
+        const val KEY_SECURITY_EVENT = "securityEvent"
 
         val NOTIFICATION_EXTRA_KEYS =
             listOf(
@@ -95,6 +102,7 @@ class NotificationTargetParser @Inject constructor() {
                 KEY_SESSION_ID,
                 KEY_RESERVATION_ID,
                 KEY_PAYMENT_ID,
+                KEY_SECURITY_EVENT,
             )
     }
 }

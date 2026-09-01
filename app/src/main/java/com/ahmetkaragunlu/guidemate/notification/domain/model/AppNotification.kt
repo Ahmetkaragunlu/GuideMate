@@ -19,5 +19,6 @@ data class AppNotification(
             sessionId = payload.sessionId,
             reservationId = payload.reservationId,
             paymentId = payload.paymentId,
+            securityEvent = payload.securityEvent,
         )
 }

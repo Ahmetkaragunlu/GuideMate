@@ -17,4 +17,5 @@ internal fun AppNotification.toUiModel(): NotificationUiModel =
         commentPreview = payload.commentPreview,
         messagePreview = payload.messagePreview,
         rejectionReason = payload.rejectionReason,
+        securityEvent = payload.securityEvent,
     )

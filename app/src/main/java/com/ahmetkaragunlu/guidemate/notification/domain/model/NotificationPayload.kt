@@ -15,4 +15,5 @@ data class NotificationPayload(
     val rating: Int? = null,
     val amountMinor: Long? = null,
     val currencyCode: String? = null,
+    val securityEvent: NotificationSecurityEvent = NotificationSecurityEvent.UNKNOWN,
 )

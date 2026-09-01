@@ -49,7 +49,10 @@ fun ReservationResponseDto.toDomain(): TouristReservation =
         cancellationActor = cancellationActor?.let(ReservationCancellationActor::valueOf),
         cancellationReason = cancellationReason,
         cancelledAt = cancelledAt?.let(Instant::parse),
-        refundEligibility = ReservationRefundEligibility.valueOf(cancellationRefundEligibility),
+        refundEligibility =
+            cancellationRefundEligibility
+                ?.let(ReservationRefundEligibility::valueOf)
+                ?: ReservationRefundEligibility.NOT_APPLICABLE,
         cancellationPolicyCode = cancellationPolicyCode,
         cancellationPolicyVersion = cancellationPolicyVersion,
         review = review?.toDomain(),

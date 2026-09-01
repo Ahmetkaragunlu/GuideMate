@@ -52,6 +52,7 @@ fun GuideProfileContent(
     modifier: Modifier = Modifier,
     onMessageClick: () -> Unit = {},
     onTourClick: (String) -> Unit = {},
+    onSeeAllToursClick: (() -> Unit)? = null,
 ) {
     var isAboutExpanded by rememberSaveable { mutableStateOf(false) }
     var showGuideLevelInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -87,6 +88,7 @@ fun GuideProfileContent(
             PopularToursSection(
                 popularTours = uiState.popularTours,
                 onTourClick = onTourClick,
+                onSeeAllToursClick = onSeeAllToursClick,
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
         }
@@ -230,6 +232,7 @@ private fun LanguagesSection(
 private fun PopularToursSection(
     popularTours: List<PopularTourCardUiModel>,
     onTourClick: (String) -> Unit,
+    onSeeAllToursClick: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -237,17 +240,20 @@ private fun PopularToursSection(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = stringResource(R.string.preview_popular_tours_title),
+            text = stringResource(R.string.guide_tours),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
-        Text(
-            text = stringResource(R.string.preview_see_all),
-            color = colorResource(R.color.brand_color),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-        )
+        onSeeAllToursClick?.let { onClick ->
+            Text(
+                text = stringResource(R.string.preview_see_all),
+                color = colorResource(R.color.brand_color),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable(onClick = onClick),
+            )
+        }
     }
     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
     Row(
@@ -257,7 +263,7 @@ private fun PopularToursSection(
                 .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
-        popularTours.forEach { tour ->
+        popularTours.take(PROFILE_TOUR_PREVIEW_SIZE).forEach { tour ->
             PopularTourCard(
                 tour = tour,
                 onClick = { onTourClick(tour.id) },
@@ -265,6 +271,8 @@ private fun PopularToursSection(
         }
     }
 }
+
+private const val PROFILE_TOUR_PREVIEW_SIZE = 3
 
 @Composable
 private fun MessageButtonSection(onClick: () -> Unit) {

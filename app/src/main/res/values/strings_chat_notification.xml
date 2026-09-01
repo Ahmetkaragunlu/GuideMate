@@ -85,6 +85,8 @@
     <string name="notification_upcoming_tour_reminder">Yaklaşan turunuz için hatırlatma var.</string>
 
     <string name="notification_security_alert">Hesabınızla ilgili bir güvenlik uyarısı var.</string>
+    <string name="notification_security_password_changed">Şifreniz değiştirildi. Bu işlem size ait değilse hesabınızı güvene alın.</string>
+    <string name="notification_security_password_reset">Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz.</string>
 
     <string name="notification_generic_update">Hesabınızla ilgili yeni bir güncelleme var.</string>
 

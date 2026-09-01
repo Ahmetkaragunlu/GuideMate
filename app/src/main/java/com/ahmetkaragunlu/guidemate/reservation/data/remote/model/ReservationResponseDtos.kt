@@ -16,7 +16,7 @@ data class ReservationResponseDto(
     @SerializedName("cancellationActor") val cancellationActor: String?,
     @SerializedName("cancellationReason") val cancellationReason: String?,
     @SerializedName("cancelledAt") val cancelledAt: String?,
-    @SerializedName("cancellationRefundEligibility") val cancellationRefundEligibility: String,
+    @SerializedName("cancellationRefundEligibility") val cancellationRefundEligibility: String?,
     @SerializedName("cancellationPolicyCode") val cancellationPolicyCode: String,
     @SerializedName("cancellationPolicyVersion") val cancellationPolicyVersion: Int,
     @SerializedName("snapshot") val snapshot: ReservationSnapshotResponseDto,

@@ -87,7 +87,7 @@ class GuidePublicProfileViewModel
                     tourRepository.getPopularToursForGuide(
                         guideId = guideId,
                         page = 0,
-                        size = 20,
+                        size = PROFILE_TOUR_PREVIEW_SIZE,
                     )
             ) {
                 is DataResult.Success ->
@@ -115,3 +115,5 @@ class GuidePublicProfileViewModel
                 }
         }
     }
+
+private const val PROFILE_TOUR_PREVIEW_SIZE = 3

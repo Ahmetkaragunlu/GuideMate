@@ -23,6 +23,7 @@ fun GuidePublicProfileScreen(
     viewModel: GuidePublicProfileViewModel = hiltViewModel(),
     onNavigateToChat: (String) -> Unit = {},
     onTourClick: (String) -> Unit = {},
+    onSeeAllToursClick: (() -> Unit)? = null,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -47,6 +48,7 @@ fun GuidePublicProfileScreen(
                 modifier = modifier,
                 onMessageClick = { viewModel.startChat(guideId) },
                 onTourClick = onTourClick,
+                onSeeAllToursClick = onSeeAllToursClick,
             )
         }
         SnackbarHost(

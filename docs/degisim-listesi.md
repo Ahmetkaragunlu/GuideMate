@@ -596,7 +596,7 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ### DEG-012 - MVP Ornek Gorsellerini Kaldirma ve Anlamli Placeholder Kullanimi
 
-- Durum: `UYGULANDI`
+- Durum: `DOGRULANDI`
 - Dogrulanan mevcut davranis:
   - `example.jpg` MVP asamasinda gecici gorsel olarak eklenmis; turist profil
     fotografi, tur kapagi ve sohbet avatari dahil farkli anlamlara sahip
@@ -681,7 +681,7 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ### DEG-013 - FCM FID Kaydi ve Kanitlanmis Kullanilmayan Kod Temizligi
 
-- Durum: `UYGULANDI`
+- Durum: `DOGRULANDI`
 - FCM davranis karari:
   - Android manifestte FID tabanli Firebase Messaging modu acilmalidir.
   - Firebase yapilandirmasi bulunan uygulama sureci FCM'e `register()` ile
@@ -730,21 +730,433 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   - Bildirime dokununca ilgili typed ekrana gidildigi ve uygulama ici okunmamis
     sayisinin yenilendigi dogrulanmalidir.
 
+### DEG-014 - Sifre Guvenlik Bildirimlerini Olaya Ozel Gostermek
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Backend sifre degistirme icin `PASSWORD_CHANGED`, sifre sifirlama icin
+    `PASSWORD_RESET` degerini notification payload icindeki `securityEvent`
+    alaninda ayri ayri uretiyor.
+  - Android notification payload modeli ve mapper'i `securityEvent` alanini
+    okumuyor. Bu nedenle uygulama ici bildirimde iki olay da
+    `Hesabinizla ilgili bir guvenlik uyarisi var.` genel metnine dusuyor.
+  - Backend FCM data payload'ina su anda yalniz notification type ve `Id` ile
+    biten hedef alanlarini koyuyor. `securityEvent` telefonun sistem
+    bildirimine tasinmadigi icin bildirim cubugunda da ayni genel metin cikiyor.
+- Kullanici deneyimi karari:
+  - `PASSWORD_CHANGED` olayi sifrenin degistirildigini acikca soylemelidir.
+  - `PASSWORD_RESET` olayi sifrenin sifirlandigini ve yeni sifreyle giris
+    yapilabilecegini acikca soylemelidir.
+  - Taninmayan veya gelecekte eklenecek bir guvenlik olayi mevcut genel
+    guvenlik metnine duserek guvenli fallback davranisini korumalidir.
+  - Uygulama ici notification listesi ile FCM sistem bildirimi ayni olaya ayni
+    anlami veren metni gostermelidir.
+- Metin ve yerellestirme karari:
+  - Kullaniciya gorunen baslik ve govde metinleri Kotlin veya Java icine sabit
+    yazilmayacak; Android XML string resource'larindan alinacaktir.
+  - Onerilen govdeler:
+    - Sifre degistirme: `Sifreniz degistirildi. Bu islem size ait degilse
+      hesabinizi guvene alin.`
+    - Sifre sifirlama: `Sifreniz basariyla sifirlandi. Yeni sifrenizle giris
+      yapabilirsiniz.`
+  - Mevcut genel `Guvenlik uyarisi` basligi ve genel govde yalniz fallback icin
+    korunacaktir.
+- Backend siniri:
+  - Yeni tablo veya endpoint acilmayacak; mevcut `securityEvent` payload alani
+    korunacak ve FCM data payload'ina kontrollu/whitelist edilmis alan olarak
+    eklenecektir.
+  - Diger notification payload alanlari gereksiz yere FCM'e acilmayacak ve
+    hassas hesap bilgisi push verisine eklenmeyecektir.
+- Android siniri:
+  - `securityEvent` notification data mapper ve domain modelinde tip guvenli
+    bicimde ele alinacak; bilinmeyen deger fallback'e dusmelidir.
+  - Uygulama ici notification ve push text resolver ayni anlam eslemesini
+    kullanmali; iki ayri yerde farkli business karari uretilmemelidir.
+  - Diger tur, rezervasyon, odeme, chat ve yorum bildirimlerinin tipi,
+    navigasyonu, okunma durumu ve metinleri bu degisiklikten etkilenmemelidir.
+- Test karari:
+  - Android mapper/resolver testleri `PASSWORD_CHANGED`, `PASSWORD_RESET` ve
+    bilinmeyen deger fallback'ini korumalidir.
+  - Backend push data testi `securityEvent` alaninin tasindigini, alakasiz veya
+    hassas payload alanlarinin kendiliginden push'a sizmadigini dogrulamalidir.
+  - Salt XML metninin noktalama veya kelime secimi icin kirilgan UI testi
+    yazilmayacaktir.
+- Uygulama sonucu:
+  - `PASSWORD_CHANGED` ve `PASSWORD_RESET` degerleri Android domain modelinde
+    tip guvenli hale getirildi; bilinmeyen degerler `UNKNOWN` fallback'ine
+    dusuyor.
+  - Uygulama ici bildirim ve sistem bildirimi ayni XML metinlerini kullanarak
+    olaya ozel aciklama gosteriyor. Diger bildirim tipleri ve navigation
+    davranislari degismedi.
+  - Backend push verisine yalniz `securityEvent` anahtari whitelist ile eklendi;
+    diger serbest metin ve hassas alanlar push verisine sizmiyor.
+  - Android mapper/resolver testleri ile backend PostgreSQL push teslim testi
+    odakli olarak basarili tamamlandi.
+
+### DEG-015 - Rehber Profilinde Turlarim On Izlemesi ve Tum Turlar Ekrani
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Turistin gordugu public rehber profilinde bolum basligi `Populer Turlar`
+    olarak gosteriliyor.
+  - Public profil ViewModel'i yalniz uc tur degil, ilk sayfada en fazla 20 tur
+    indiriyor; yatay satir nedeniyle ekranda ayni anda yaklasik uc kart
+    gorunuyor.
+  - `Tumunu Gor` metni tiklanabilir bir aksiyon veya navigation callback'i
+    tasimiyor.
+  - Profil kartlari mevcut backend `/api/v1/tours/popular` endpoint'ine
+    `guideId`, `page` ve `size` gonderilerek canonical tur/session verisinden
+    uretiliyor.
+- Kullanici deneyimi karari:
+  - Rehber profilindeki bolum basligi, profilin mevcut `Hakkimda` anlatimiyla
+    uyumlu olacak sekilde `Turlarim` olarak degistirilmelidir.
+  - Profilde en fazla ilk uc uygun tur yatay on izleme olarak gosterilmelidir.
+  - `Tumunu Gor` gercek ve erisilebilir bir tiklama aksiyonu olmalidir.
+  - Aksiyon, secili rehberin turist tarafindan satin alinabilir butun turlarini
+    alt alta gosteren yeni bir ekrana gitmelidir.
+  - Liste kartina basinca mevcut typed tur detay destination'ina session ID ile
+    gidilmeli; geri donuste public rehber profili korunmalidir.
+  - Rehberin uygun turu yoksa sahte kayit uretilmeden mevcut tasarim diliyle
+    uyumlu bos durum gosterilmelidir.
+- Yeni ekran ve navigation karari:
+  - Yeni ekran tur feature'ina ait turist sunumu olarak
+    `tour/presentation/tourist/guide` altinda konumlandirilmalidir.
+  - Ekran, ViewModel ve UI state adlari rehbere gore tur listeleme amacini
+    acikca anlatmalidir; profile veya discovery paketine kopya tur business
+    mantigi yazilmamalidir.
+  - Typed tourist navigation'a yalniz `guideId` tasiyan bir destination
+    eklenmelidir. Yeni NavHost veya ayri navigation graph acilmamalidir.
+  - Geri donus normal back stack semantigiyle `navigateUp`/sistem geri davranisi
+    uzerinden public profile donmelidir; profile yeniden root olarak
+    olusturulmamali veya `switchRoot` kullanilmamalidir.
+- Ortak kart, veri ve katman karari:
+  - Alt alta liste, turist kesfet ekraninda kullanilan mevcut
+    `TourSearchResultCard` tasarimini yeniden kullanmalidir; ikinci bir tur karti
+    kopyasi yazilmamalidir.
+  - Kart verileri mevcut `TourSearchItem` domain modeli ve
+    `toSearchResultUiModel()` mapper'i ile uretilmelidir.
+  - Mevcut `TourDiscoveryRepository` ve sayfali backend sonucu kullanilmalidir;
+    yeni store, paralel veri listesi veya UI tarafinda sahte tur uretilmemelidir.
+  - Fiyat, puan, yorum sayisi, tarih, dil, kapak, rehber ve kontenjan bilgileri
+    ayni canonical backend tur/session kaynagindan gelmelidir.
+  - Liste `LazyColumn` ve backend pagination ile calismali; butun sayfalar tek
+    istekte indirilmemelidir.
+- Backend ve demo veri siniri:
+  - Mevcut `/api/v1/tours/popular?guideId=...&page=...&size=...` sozlesmesi
+    rehberin onayli, gelecekteki, satin almaya acik ve bos kontenjani bulunan
+    turlarini sayfali dondurdugu icin yeni backend endpoint'i, DTO, tablo veya
+    service degisikligi gerekmemektedir.
+  - Demo veritabanina yeni tur veya kullanici eklenmeyecektir. Mevcut demo tur,
+    session, review ve reservation kayitlari ekran tarafindan aynen okunur.
+  - Backend datasource'u ileride `guidemate_demo` yerine normal `guidemate_db`
+    olarak calistirildiginda Android kodu degismemelidir. Bos normal veritabaninda
+    bos durum; gercek onayli ve acik turlar olustukca gercek liste gorunmelidir.
+  - Demo medya kayitlari normal veritabanina tasinmayacak; normal ortamda
+    kullanici tarafindan yuklenen canonical medya URL'leri kullanilacaktir.
+- Metin karari:
+  - `Turlarim`, `Tumunu Gor`, ekran basligi ve bos durum dahil kullaniciya
+    gorunen yeni veya degisen butun metinler Android XML string resource'larindan
+    gelmelidir.
+- Test karari:
+  - ViewModel pagination davranisi, ilk sayfa/son sayfa, append hata ve bos
+    sonuc icin odakli unit testlerle korunmalidir.
+  - Repository veya mapper davranisi zaten ayni seviyede kapsaniyorsa ayni
+    testi tekrar eden gereksiz test yazilmamalidir.
+  - `guideId` typed destination aktarimi ve karttan dogru session detayina
+    yonlendirme gercek regresyon riski tasidigi olcude mevcut navigation/mapper
+    testlerine eklenmelidir.
+  - Kartin salt gorunumu icin kirilgan ekran goruntusu testi yazilmayacak;
+    kesfet kartiyla tasarim esligi ve geri donus kullanici testinde
+    dogrulanacaktir.
+- Uygulama sonucu:
+  - Public rehber profilindeki bolum `Turlarim` olarak adlandirildi ve canonical
+    endpoint'ten yalniz uc turluk on izleme istiyor.
+  - `Tumunu Gor`, guide ID tasiyan typed tourist destination ile yeni
+    `TouristGuideToursScreen` ekranina baglandi. Yeni graph veya scaffold
+    olusturulmadi; normal geri yigini ve mevcut tourist shell korundu.
+  - Tum turlar ekrani ayni `TourDiscoveryRepository`, `TourSearchItem`, ortak
+    mapper ve `TourSearchResultCard` uzerinden sayfali calisiyor. Karttan mevcut
+    session ID tabanli tur detayina gidiliyor; paralel store, mock liste veya
+    kopya kart yazilmadi.
+  - Ilk/son sayfa, append hata ve bos sonuc davranislari odakli
+    `TouristGuideToursViewModelTest` ile Robolectric altinda basarili
+    dogrulandi.
+
+### DEG-016 - Gezilerim Rezervasyonlarinda Nullable Iade Uygunlugu Sozlesmesi
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Backend hem `UPCOMING` hem `PAST` rezervasyon listesi isteklerine basarili
+    `200` cevabi donuyor.
+  - Iptal edilmemis rezervasyonlarda `cancellationRefundEligibility` alani
+    backend sozlesmesine uygun olarak `null` gelebiliyor.
+  - Android DTO'su bu alani zorunlu `String` kabul ediyor ve mapper
+    `ReservationRefundEligibility.valueOf(...)` islemini kosulsuz yapiyor.
+  - Bos rezervasyon listesinde map edilecek kayit olmadigi icin dogru bos durum
+    gosteriliyor; gercek veya demo rezervasyon bulunan hesapta ilk hatali kayit
+    butun sayfayi `Tekrar Dene` durumuna dusurebiliyor.
+- Uygulama karari:
+  - Android remote DTO backend'in nullable sozlesmesiyle birebir uyumlu hale
+    getirilecektir.
+  - Iptal edilmemis rezervasyondaki `null` deger domain modelinde mevcut
+    `ReservationRefundEligibility.NOT_APPLICABLE` degerine map edilecektir.
+  - Iptal edilmis rezervasyonlarda backend'in gonderdigi gercek
+    `FULL_REFUND`/`NO_REFUND` degeri korunacak; sahte iade sonucu uretilmeyecektir.
+  - Kullaniciya gorunen Gezilerim tasarimi, sekmeler, bos durum ve retry
+    gorunumu degistirilmeyecektir.
+- Backend siniri:
+  - Backend'in iptal edilmemis rezervasyonda nullable deger dondurmesi gecerlidir;
+    yeni endpoint, tablo veya business kural degisikligi gerekmemektedir.
+  - OpenAPI/DTO nullable sozlesmesi mevcut davranisla tutarli kalmalidir.
+- Test karari:
+  - Android mapper testi, iptal edilmemis ve nullable iade uygunluguna sahip
+    rezervasyonun `NOT_APPLICABLE` olarak basariyla map edildigini dogrulamalidir.
+  - Iptal edilmis rezervasyonda gercek iade uygunlugu degerinin kaybolmadigi
+    mevcut testle kapsanmiyorsa ayni mapper test grubuna odakli senaryo
+    eklenmelidir.
+  - Bos liste ve dolu liste icin ayni repository/ViewModel davranisini tekrar
+    test eden gereksiz test yazilmayacaktir.
+- Uygulama sonucu:
+  - Android remote DTO nullable backend sozlesmesiyle eslestirildi ve `null`
+    deger domain katmaninda `NOT_APPLICABLE` olarak map edildi.
+  - Iptal edilmis rezervasyonun gercek iade uygunlugu korunuyor.
+  - Odakli `ReservationRepositoryImplTest` JDK 21 ile basarili tamamlandi.
+
+### DEG-017 - Ilk Mesaj Gonderiminde Send ve Mark-Read Yarisini Giderme
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Yeni veya ilk kez mesaj gonderilen bir sohbette Android yerel
+    `PENDING` mesaji listeye ekliyor.
+  - `ChatDetailViewModel`, son mesaj kimligindeki her degisikligi gelen mesaj
+    gibi yorumladigi icin kullanicinin kendi `PENDING` mesaji ile ayni anda
+    `markRead` istegi gonderiyor.
+  - Canli HTTP logunda ilk `POST /messages` ile `POST /read` istegi ayni anda
+    calisiyor; ilk mesaj `500`, read istegi `200` donebiliyor. Ayni
+    `clientMessageId` ile retry edildiginde mesaj `200` donuyor ve sonraki
+    gonderimler calisiyor.
+  - Bu davranis demo verisine ozel degildir; gercek veritabaninda da ayni
+    eszamanlilik kosulunda olusabilir.
+- Android uygulama karari:
+  - Kullanici tarafindan gonderilen yerel `PENDING`, `FAILED` veya canonical
+    kendi mesajlari `markRead` tetiklememelidir.
+  - Okundu istegi yalniz karsi taraftan gelen ve backend tarafindan taninmis
+    mesaja gore gonderilmelidir.
+  - Mevcut optimistic `PENDING -> SENT/FAILED`, ayni `clientMessageId` ile retry
+    ve mesaj tasarimi korunacaktir.
+  - STOMP ile gelen mesaj, ilk gecmis yuklemesi ve sohbet ekrani acikken okundu
+    davranisi bozulmayacaktir.
+- Backend uygulama karari:
+  - Gecerli iki cihazdan ayni sohbet icin gercekten eszamanli send ve mark-read
+    istekleri gelebilecegi icin backend bu durumu `500` ile sonlandirmamalidir.
+  - Mevcut conversation sahipligi, idempotent `clientMessageId`, transaction ve
+    locking kurallari korunarak lock sirasi/transaction kapsami incelenecek ve
+    en kucuk guvenli duzeltme yapilacaktir.
+  - Android'in gereksiz read istegini kaldirmasi backend dayanikliliginin yerine
+    gecmez; iki taraf birbirinden bagimsiz olarak dogru davranmalidir.
+- Test karari:
+  - Android ViewModel testi, kullanicinin kendi yerel veya canonical mesajinin
+    `markRead` cagirmadigini ve karsi taraftan gelen yeni mesajin tam bir kez
+    cagirdigini dogrulamalidir.
+  - Android repository testi mevcut retry'nin ayni `clientMessageId` degerini
+    korudugunu zaten kapsamiyorsa bu kritik idempotency davranisi eklenmelidir;
+    kapsiyorsa tekrar test yazilmayacaktir.
+  - Backend entegrasyon/concurrency testi ayni sohbette eszamanli send ve
+    mark-read isteklerinin ikisinin de basarili oldugunu, tek mesaj olustugunu ve
+    okunmamis sayisinin tutarli kaldigini dogrulamalidir.
+  - Salt mesaj balonu gorunumu icin kirilgan UI testi eklenmeyecektir.
+- Uygulama sonucu:
+  - Android okundu gozlemcisi yalniz karsi taraftan gelen canonical `SENT`
+    mesajlari izler hale getirildi; kullanicinin kendi `PENDING`, `FAILED` veya
+    `SENT` mesaji artik `markRead` istegi uretmiyor.
+  - Backend mesaj gonderme servisi kullaniciyi ayri bir satir kilidiyle
+    yuklemek yerine conversation kilidiyle yuklenen guncel katilimciyi
+    kullaniyor. Conversation sahipligi, hesap/rol/token-version kontrolleri ve
+    idempotent `clientMessageId` davranisi korundu.
+  - Android `ChatDetailViewModelTest` ve PostgreSQL Testcontainers tabanli
+    `ChatPersistenceTest` odakli olarak basarili tamamlandi. Eszamanli ilk
+    gonderim/okundu istekleri tek mesaj, gonderende sifir ve alicida bir
+    okunmamis mesaj ile sonuclaniyor.
+
+### DEG-018 - Gezilerim Rezervasyon Detayindan Rehber Profiline Gitme
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Yaklasan ve gecmis gezi kartlari ayni typed `ReservationDetail` ekranini
+    aciyor.
+  - Ortak `TourDetailContent`, `Profili Goruntule` metnini gosteriyor; ancak
+    rezervasyon detay ekrani rehber profili callback'ini iletmedigi icin metin
+    tiklanabilir degildi.
+  - Ana sayfa, Kesfet ve normal turist tur detayinda mevcut typed rehber profili
+    navigasyonu dogru baglanmis. Rehberin kendi tur detayi ve yayin on izlemesi
+    icin profil navigasyonu olmamasi bilincli davranistir.
+- Kullanici deneyimi karari:
+  - Turist hem Yaklasan hem Gecmis karttan rezervasyon detayina girdiginde
+    snapshot'taki gercek rehberin profiline gidebilmelidir.
+  - Profil geri aksiyonu yeni rezervasyon detayi olusturmadan ayni detay ekranina
+    donmelidir.
+- Mimari ve navigation karari:
+  - Mevcut `TourDetailContent` callback sozlesmesi ve typed
+    `TouristDestination.GuideProfile(guideId)` hedefi kullanilacaktir.
+  - Ileri geciste mevcut `navigateTo`, geri donuste normal `navigateUp`/sistem
+    geri yigini kullanilacaktir. `switchRoot`, yeni destination, graph veya
+    navigation extension eklenmeyecektir.
+  - Rehber kimligi rezervasyonun satin alma snapshot'indan gelen canonical
+    `guideId` degeridir; UI sahte rehber veya ikinci veri kaynagi uretmeyecektir.
+- Uygulama sonucu:
+  - `TouristReservationDetailScreen`, rehber kimligini callback ile tourist
+    graph'a iletiyor ve graph mevcut public rehber profiline yonlendiriyor.
+  - Yaklasan ve gecmis sekmeleri ortak rezervasyon detayini kullandigi icin iki
+    akis tek degisiklikle duzeldi; ortak detail tasarimi ve snapshot verisi
+    korunuyor.
+- Test karari:
+  - Rezervasyon snapshot mapper testi, canonical rehber kimliginin detay UI
+    modeline kaybolmadan tasindigini dogrulamalidir.
+  - Basit Compose callback baglantisi icin kirilgan UI testi yazilmayacak;
+    ileri/geri davranisi kullanici testinde dogrulanacaktir.
+- Otomatik dogrulama:
+  - `TouristReservationMapperTest`, rezervasyon snapshot rehber kimliginin detay
+    UI modelinde korundugunu dogruladi.
+  - `ktfmtFormat`, odakli JVM testi, `compileDebugKotlin` ve `lintDebug`
+    basarili tamamlandi.
+
+### DEG-019 - Gezilerim Rezervasyon Detayinda Tur Puani ve Yorum Sayisi
+
+- Durum: `BEKLIYOR`
+- Dogrulanan mevcut davranis:
+  - Popular/Kesfet akisi ile acilan normal turist tur detayinda ortalama puan ve
+    toplam yorum sayisi gosteriliyor.
+  - Yaklasan veya Gecmis gezi kartindan acilan rezervasyon detayinda ayni ortak
+    detail tasarimi kullanilmasina ragmen puan ve yorum sayisi gosterilmiyor.
+  - Rezervasyon detay mapper'i public yorum listesinin toplam sayisini tasiyor,
+    ancak turun ortalama puanini tasimiyor. Ortak detail gorunumu puan ve yorum
+    sayisini birlikte bekledigi icin alan tamamen gizleniyor.
+  - Yorum gonderimi backend'de turun canonical puan/yorum toplamini guncelliyor;
+    ancak rezervasyon response sozlesmesi bu aggregate degerleri Android'e
+    tasimadigi icin kullanicinin yeni yorumu da rezervasyon detay basligina
+    yansimiyor.
+- Kullanici deneyimi karari:
+  - Ayni tur, hangi turist rotasindan acilirsa acilsin ayni canonical ortalama
+    puani ve toplam yorum sayisini gostermelidir.
+  - Rezervasyonun kullaniciya ait tekil `review` verisi ile turun butun
+    rezervasyonlarindan hesaplanan `averageRating`/`reviewCount` birbirine
+    karistirilmamalidir.
+- Mimari ve veri sozlesmesi karari:
+  - Backend rezervasyon cevaplarina tur bazli `averageRating` ve `reviewCount`
+    eklemeli; mevcut toplu review aggregate sorgusu kullanilarak listelemede
+    kart basina ayri istek/N+1 uretilmemelidir.
+  - Android DTO, domain model ve mapper bu alanlari mevcut ortak
+    `TourDetailUiState` sozlesmesine tasimali; sahte ortalama veya ikinci veri
+    kaynagi olusturmamalidir.
+  - Yorum basariyla gonderildikten sonra rezervasyon detayi canonical backend
+    verisiyle yenilenerek yeni ortalama ve yorum sayisini gostermelidir.
+- Test karari:
+  - Backend mapper/service testi rezervasyon cevabinda toplu aggregate degerini
+    ve yorumsuz tur davranisini dogrulamalidir.
+  - Android mapper/ViewModel testi ortalama puan ile yorum sayisinin rezervasyon
+    detayina tasindigini ve yorum sonrasi yenilendigini korumalidir.
+  - Salt metin gorunumu icin kirilgan Compose UI testi eklenmeyecektir.
+
+### DEG-020 - Rezervasyon Kisi Sayisi ve Tur Dolulugu Sunumu
+
+- Durum: `ONAYLANDI`
+- Kullanici deneyimi karari:
+  - Popular tur kartinin mevcut kompakt tasarimi korunacak ve kartta kontenjan
+    bilgisi eklenmeyecektir. Karta basilarak acilan normal tur detayinda mevcut
+    `bookedCount/capacity` doluluk bilgisi gosterilecektir.
+  - Kesfet/arama sonuc kartinda turist icin karar vermeyi kolaylastiran
+    `availableCapacity` degeri `%d kisilik yer kaldi` biciminde gosterilmeye
+    devam edecektir. Detaya girildiginde ayni session'in
+    `bookedCount/capacity` bilgisi gosterilecektir.
+  - Gezilerim Yaklasan ve Gecmis liste kartlarinda turun toplam dolulugu yerine
+    kullanicinin kendi rezervasyonu acikca `Rezervasyonunuz: %d kisi` olarak
+    gosterilecektir.
+  - Yaklasan veya tamamlanmis Gecmis rezervasyon detayinda ise normal tur detay
+    mantigiyla session'in gercek `bookedCount/capacity` dolulugu
+    gosterilecektir.
+  - Iptal edilmis turda doluluk yerine `Tur iptal edildi`; turistin kendi
+    rezervasyonu iptal edilmisse `Rezervasyonunuz iptal edildi` durumu oncelikli
+    olacaktir. Bu durumlarda doluluk kullaniciyi yaniltacak bicimde ana bilgi
+    olarak gosterilmeyecektir.
+- Test karari:
+  - Android mapper testi Gezilerim kartindaki rezervasyon kisi sayisi ile
+    detaydaki tur dolulugunun birbirine karismadigini korumalidir.
+  - Salt metin ve yerlesim icin kirilgan Compose UI testi yazilmayacaktir.
+
+### DEG-021 - Turist Sohbetinden Rehber Profiline Gitme
+
+- Durum: `ONAYLANDI`
+- Dogrulanan mevcut davranis:
+  - Turist sohbet detayinin topbar'inda karsi taraf olan rehberin backend'den
+    gelen adi, profil fotografi ve `remoteUserId` degeri mevcut.
+  - Fotograf ve isim yalniz gorsel olarak ciziliyor; tiklama callback'i olmadigi
+    icin rehber profiline gidilemiyor.
+- Kullanici deneyimi karari:
+  - Turist sohbet detayinda topbar'daki rehber fotografi ve adi birlikte
+    tiklanabilir olmali ve ilgili public rehber profilini acmalidir.
+  - Geri aksiyonu ayni sohbet detayina donmelidir.
+  - Rehber sohbetinde turist icin public profil ekrani bulunmadigindan mevcut
+    topbar davranisi degismeyecektir.
+- Mimari ve navigation karari:
+  - Yeni ekran, destination, graph veya backend endpoint'i eklenmeyecektir.
+  - Ortak `AppTopBar` yalniz opsiyonel profil tiklama callback'i alacak;
+    navigation karari turist shell/graph sinirinda kalacaktir.
+  - Mevcut `ChatUiModel.remoteUserId` ve typed
+    `TouristDestination.GuideProfile` kullanilacak; ileri geciste `navigateTo`,
+    geri donuste mevcut `navigateUp`/geri yigini korunacaktir.
+- Test karari:
+  - Kimligin backend chat cevabindan `ChatUiModel.remoteUserId` alanina
+    tasinmasi mevcut mapper testlerinde kapsanmiyorsa odakli mapper testi
+    eklenecektir; kapsaniyorsa tekrar test yazilmayacaktir.
+  - Basit Compose tiklama ve ileri/geri gorunumu kullanici testinde
+    dogrulanacak; kirilgan UI testi eklenmeyecektir.
+
+### DEG-022 - Demo Rezervasyon Iptal Politikasi Uyumu
+
+- Durum: `ONAYLANDI`
+- Dogrulanan mevcut davranis:
+  - Backend turist iptalinde `FULL_REFUND_48_HOURS` kodlu mevcut politikayi
+    destekliyor.
+  - Demo seed, rezervasyon kolonuna ve purchase snapshot'a eski
+    `STANDARD_48_HOUR` kodunu yaziyor. Bu nedenle demo hesaptaki onayli yaklasan
+    rezervasyon iptalinde backend guvenli bicimde `DATA_CONFLICT` donuyor.
+  - Android guncel rezervasyon `version` degerini dogru gonderiyor; turistin
+    iptal yetkisinde ve gercek iptal servisinde hata bulunmuyor.
+- Duzeltme karari:
+  - Demo seed icindeki iki eski politika kodu canonical
+    `FULL_REFUND_48_HOURS` degeriyle eslestirilecektir.
+  - Mevcut `guidemate_demo` veritabanindaki ilgili kolon ve JSON snapshot
+    degerleri hedefli olarak guncellenecek; demo kullanicilari, mesajlari,
+    yorumlari ve diger veriler silinmeyecektir.
+  - Normal `guidemate_db`, Android kodu ve backend business/production kodu
+    degismeyecektir. Normal veritabanina donuldugunde uygulama davranisi ayni
+    kalacaktir.
+- Test karari:
+  - Demo contract kontrolu, onayli ve baslamamis bir demo rezervasyonunun turist
+    tarafindan iptal edilebildigini dogrulamalidir.
+  - Production iptal politikasini tekrar test eden gereksiz Android testi
+    eklenmeyecektir.
+
 ## Toplu Uygulama Kontrol Noktasi
 
-- Son kaydedilen madde: `DEG-013`
-- Uygulama izni: DEG-013 icin VERILDI ve uygulama tamamlandi.
-- Kod degisikligi: DEG-001 - DEG-013 YAPILDI.
-- Otomatik dogrulama: ktfmt, JVM testleri, Android test kaynak derlemesi, lint
-  ve debug APK uretimi DEG-001 - DEG-013 icin basarili.
-- Kullanici dogrulamasi: DEG-001 - DEG-011 tamamlandi; DEG-012 avatar ve medya
-  hata gorunumleri ile DEG-013 gercek push teslimi icin manuel kullanici
-  dogrulamasi bekliyor.
-- Kapanis: Degisim listesi kodsal olarak tamamlandi; DEG-012 ve DEG-013 manuel
-  dogrulamalari sonrasi `DOGRULANDI` yapilacak.
-- Siradaki is: DEG-012 ve DEG-013 kullanici dogrulamalarini yapmak ve yeni
-  kullanici bulgularini DEG-014'ten itibaren sirayla kaydetmek; her toplu uygulama
-  komutundan once bu dosyadaki Altin Kural ve Test Altin Kurali'ni yeniden
-  okumak.
+- Son kaydedilen madde: `DEG-022`
+- Uygulama izni: DEG-018 icin VERILDI ve uygulama tamamlandi.
+- Kod degisikligi: DEG-001 - DEG-018 YAPILDI.
+- Otomatik dogrulama: Android `ktfmtCheck`, 166 JVM testi, Android test kaynak
+  derlemesi, `lintDebug` ve `assembleDebug` basarili. Backend PostgreSQL
+  Testcontainers testleri dahil 212 test basarili; hata, failure veya skip yok.
+  DEG-014 mapper/resolver ve push whitelist, DEG-015 sayfalama, DEG-016 nullable
+  rezervasyon sozlesmesi, DEG-017 Android okundu davranisi ve backend
+  eszamanlilik senaryosu odakli testlerle korunuyor.
+- Kullanici dogrulamasi: DEG-001 - DEG-013 tamamlandi.
+- Kapanis: DEG-014 - DEG-018 kodsal ve otomatik test olarak tamamlandi. DEG-018
+  kullanici testi bekliyor. Degisen
+  kapsamin kullanilmayan kod/import/resource ve bos paket taramasi temiz.
+  DEG-014 - DEG-017'nin gercek cihaz ve kullanici gorunumu kontrolleri manuel
+  kullanici testinde ayrica dogrulanacak.
+- Siradaki is: DEG-019 - DEG-022 icin acik uygulama komutunu beklemek; ardindan
+  kullanici testlerine devam etmek. Her yeni kod
+  degisikliginden once bu dosyadaki Altin Kural ve Test Altin Kurali yeniden
+  okunmalidir.
 - Baglam yenilenirse bu dosya okunur ve yalniz `BEKLIYOR`, `NETLESTIRILECEK`
   veya `ONAYLANDI` durumundaki maddeler uzerinden devam edilir.

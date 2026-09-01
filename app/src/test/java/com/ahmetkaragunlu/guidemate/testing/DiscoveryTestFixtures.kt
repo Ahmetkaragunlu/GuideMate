@@ -17,6 +17,8 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
     val searchRequests = mutableListOf<SearchRequest>()
     var popularForGuideResult: DataResult<PagedResult<TourSearchItem>> =
         DataResult.Success(tourSearchPage(page = 0, isLast = true))
+    val popularForGuideResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
+    val popularForGuideRequests = mutableListOf<GuidePopularRequest>()
 
     override suspend fun searchTours(
         query: TourSearchQuery,
@@ -36,7 +38,14 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
         guideId: Long,
         page: Int,
         size: Int,
-    ): DataResult<PagedResult<TourSearchItem>> = popularForGuideResult
+    ): DataResult<PagedResult<TourSearchItem>> {
+        popularForGuideRequests += GuidePopularRequest(guideId, page, size)
+        return if (popularForGuideResults.isEmpty()) {
+            popularForGuideResult
+        } else {
+            popularForGuideResults.removeFirst()
+        }
+    }
 
     override suspend fun getTour(tourId: String): DataResult<TourDetails> =
         error("Not required by this test fixture")
@@ -47,6 +56,12 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
 
 data class SearchRequest(
     val query: TourSearchQuery,
+    val page: Int,
+    val size: Int,
+)
+
+data class GuidePopularRequest(
+    val guideId: Long,
     val page: Int,
     val size: Int,
 )

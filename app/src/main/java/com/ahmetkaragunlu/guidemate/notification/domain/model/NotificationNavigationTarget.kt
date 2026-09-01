@@ -8,4 +8,5 @@ data class NotificationNavigationTarget(
     val sessionId: String? = null,
     val reservationId: String? = null,
     val paymentId: String? = null,
+    val securityEvent: NotificationSecurityEvent = NotificationSecurityEvent.UNKNOWN,
 )

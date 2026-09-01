@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.notification.data.mapper
 
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationResponseDto
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import java.time.Instant
 import org.junit.Assert.assertEquals
@@ -60,6 +61,22 @@ class NotificationMapperTest {
     }
 
     @Test
+    fun `security events map known and unknown values safely`() {
+        assertEquals(
+            NotificationSecurityEvent.PASSWORD_CHANGED,
+            securityNotification("PASSWORD_CHANGED").payload.securityEvent,
+        )
+        assertEquals(
+            NotificationSecurityEvent.PASSWORD_RESET,
+            securityNotification("PASSWORD_RESET").payload.securityEvent,
+        )
+        assertEquals(
+            NotificationSecurityEvent.UNKNOWN,
+            securityNotification("FUTURE_SECURITY_EVENT").payload.securityEvent,
+        )
+    }
+
+    @Test
     fun `preference update sends only explicitly changed fields`() {
         val dto =
             NotificationPreferenceUpdate(
@@ -73,4 +90,17 @@ class NotificationMapperTest {
         assertNull(dto.upcomingTourRemindersEnabled)
         assertNull(dto.reservationUpdatesEnabled)
     }
+
+    private fun securityNotification(securityEvent: String) =
+        NotificationResponseDto(
+                id = "security-notification",
+                type = "SECURITY_ALERT",
+                actorId = null,
+                actorDisplayName = null,
+                payload = mapOf("securityEvent" to securityEvent),
+                isRead = false,
+                readAt = null,
+                createdAt = Instant.parse("2026-09-01T12:00:00Z"),
+            )
+            .toDomain()
 }

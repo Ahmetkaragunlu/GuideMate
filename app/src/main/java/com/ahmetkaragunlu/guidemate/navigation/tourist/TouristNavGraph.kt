@@ -26,6 +26,7 @@ import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.TouristPr
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.TouristTripsScreen
 import com.ahmetkaragunlu.guidemate.reservation.presentation.detail.TouristReservationDetailScreen
 import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.detail.TouristTourDetailScreen
+import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.guide.TouristGuideToursScreen
 
 internal fun NavGraphBuilder.touristNavGraph(
     touristNavController: NavController,
@@ -113,7 +114,11 @@ internal fun NavGraphBuilder.touristNavGraph(
         )
     }
     composable<TouristDestination.ReservationDetail> {
-        TouristReservationDetailScreen()
+        TouristReservationDetailScreen(
+            onNavigateToGuideProfile = { guideId ->
+                touristNavController.navigateTo(TouristDestination.GuideProfile(guideId))
+            },
+        )
     }
     composable<TouristDestination.GuideProfile> { backStackEntry ->
         val destination = backStackEntry.toRoute<TouristDestination.GuideProfile>()
@@ -122,6 +127,18 @@ internal fun NavGraphBuilder.touristNavGraph(
             onNavigateToChat = { chatId ->
                 touristNavController.navigateTo(ChatDestination.Detail(chatId))
             },
+            onTourClick = { sessionId ->
+                touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
+            },
+            onSeeAllToursClick = {
+                touristNavController.navigateTo(TouristDestination.GuideTours(destination.guideId))
+            },
+        )
+    }
+    composable<TouristDestination.GuideTours> { backStackEntry ->
+        val destination = backStackEntry.toRoute<TouristDestination.GuideTours>()
+        TouristGuideToursScreen(
+            guideId = destination.guideId,
             onTourClick = { sessionId ->
                 touristNavController.navigateTo(TouristDestination.TourDetail(sessionId))
             },

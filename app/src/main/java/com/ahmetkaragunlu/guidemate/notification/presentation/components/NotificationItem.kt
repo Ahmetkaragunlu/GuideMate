@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.presentation.mapper.notificationIcon
 import com.ahmetkaragunlu.guidemate.notification.presentation.model.NotificationUiModel
@@ -195,7 +196,8 @@ fun notificationMessage(notification: NotificationUiModel): String =
         NotificationType.CHAT_MESSAGE -> stringResource(R.string.notification_chat_message)
         NotificationType.UPCOMING_TOUR_REMINDER ->
             stringResource(R.string.notification_upcoming_tour_reminder)
-        NotificationType.SECURITY_ALERT -> stringResource(R.string.notification_security_alert)
+        NotificationType.SECURITY_ALERT ->
+            stringResource(notification.securityEvent.bodyResource())
         NotificationType.UNKNOWN -> stringResource(R.string.notification_generic_update)
     }
 
@@ -226,3 +228,12 @@ fun notificationRelativeTime(occurredAtMillis: Long): String =
             DateUtils.FORMAT_ABBREV_RELATIVE,
         )
         .toString()
+
+private fun NotificationSecurityEvent.bodyResource(): Int =
+    when (this) {
+        NotificationSecurityEvent.PASSWORD_CHANGED ->
+            R.string.notification_security_password_changed
+        NotificationSecurityEvent.PASSWORD_RESET ->
+            R.string.notification_security_password_reset
+        NotificationSecurityEvent.UNKNOWN -> R.string.notification_security_alert
+    }

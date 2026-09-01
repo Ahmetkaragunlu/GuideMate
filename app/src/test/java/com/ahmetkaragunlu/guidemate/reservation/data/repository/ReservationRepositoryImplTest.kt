@@ -11,6 +11,7 @@ import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationRes
 import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationSnapshotResponseDto
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.CancelReservationInput
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationListType
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundStatus
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -30,7 +31,9 @@ class ReservationRepositoryImplTest {
         assertEquals("PAST", api.listStatus)
         assertEquals(2, api.listPage)
         assertEquals(15, api.listSize)
-        assertEquals("reservation-1", (result as DataResult.Success).data.items.single().id)
+        val reservation = (result as DataResult.Success).data.items.single()
+        assertEquals("reservation-1", reservation.id)
+        assertEquals(ReservationRefundEligibility.NOT_APPLICABLE, reservation.refundEligibility)
     }
 
     @Test
@@ -53,6 +56,10 @@ class ReservationRepositoryImplTest {
         assertEquals(
             ReservationRefundStatus.REQUESTED,
             (result as DataResult.Success).data.refundStatus,
+        )
+        assertEquals(
+            ReservationRefundEligibility.FULL_REFUND,
+            result.data.reservation.refundEligibility,
         )
     }
 
@@ -105,6 +112,7 @@ class ReservationRepositoryImplTest {
                             cancellationActor = "TOURIST",
                             cancellationReason = request.reason,
                             cancelledAt = "2026-08-25T12:00:00Z",
+                            cancellationRefundEligibility = "FULL_REFUND",
                         ),
                     refundEligibility = "FULL_REFUND",
                     refundId = "refund-1",
@@ -127,7 +135,7 @@ class ReservationRepositoryImplTest {
                 cancellationActor = null,
                 cancellationReason = null,
                 cancelledAt = null,
-                cancellationRefundEligibility = "FULL_REFUND",
+                cancellationRefundEligibility = null,
                 cancellationPolicyCode = "STANDARD",
                 cancellationPolicyVersion = 1,
                 snapshot =

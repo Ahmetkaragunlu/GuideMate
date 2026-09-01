@@ -31,6 +31,7 @@ class TouristReservationMapperTest {
         assertEquals(reservation.unitPriceMinor, detail.priceMinor)
         assertEquals(reservation.totalPriceMinor, trip.totalPriceMinor)
         assertEquals(reservation.participantCount, detail.reservedParticipantCount)
+        assertEquals(reservation.snapshot.guide.id, detail.guideId)
     }
 
     @Test

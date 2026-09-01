@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.notification.presentation.model
 
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 
 data class NotificationUiModel(
@@ -16,4 +17,5 @@ data class NotificationUiModel(
     val commentPreview: String? = null,
     val messagePreview: String? = null,
     val rejectionReason: String? = null,
+    val securityEvent: NotificationSecurityEvent = NotificationSecurityEvent.UNKNOWN,
 )

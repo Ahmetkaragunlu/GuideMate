@@ -2,6 +2,8 @@ package com.ahmetkaragunlu.guidemate.notification.data.push
 
 import android.content.Context
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -13,10 +15,11 @@ class NotificationPushTextResolver
 constructor(
     @param:ApplicationContext private val context: Context,
 ) {
-    fun title(type: NotificationType): String = context.getString(type.titleResource())
+    fun title(target: NotificationNavigationTarget): String =
+        context.getString(target.type.titleResource())
 
-    fun body(type: NotificationType): String =
-        context.getString(type.bodyResource())
+    fun body(target: NotificationNavigationTarget): String =
+        context.getString(target.type.bodyResource(target.securityEvent))
 }
 
 private fun NotificationType.titleResource(): Int =
@@ -54,7 +57,7 @@ private fun NotificationType.titleResource(): Int =
         NotificationType.UNKNOWN -> R.string.notification_title_general
     }
 
-private fun NotificationType.bodyResource(): Int =
+private fun NotificationType.bodyResource(securityEvent: NotificationSecurityEvent): Int =
     when (this) {
         NotificationType.TOUR_APPROVED -> R.string.notification_tour_approved_generic
         NotificationType.TOUR_REJECTED -> R.string.notification_tour_rejected_generic
@@ -79,6 +82,15 @@ private fun NotificationType.bodyResource(): Int =
             R.string.notification_withdrawal_completed_generic
         NotificationType.CHAT_MESSAGE -> R.string.notification_chat_message
         NotificationType.UPCOMING_TOUR_REMINDER -> R.string.notification_upcoming_tour_reminder
-        NotificationType.SECURITY_ALERT -> R.string.notification_security_alert
+        NotificationType.SECURITY_ALERT -> securityEvent.bodyResource()
         NotificationType.UNKNOWN -> R.string.notification_generic_update
+    }
+
+private fun NotificationSecurityEvent.bodyResource(): Int =
+    when (this) {
+        NotificationSecurityEvent.PASSWORD_CHANGED ->
+            R.string.notification_security_password_changed
+        NotificationSecurityEvent.PASSWORD_RESET ->
+            R.string.notification_security_password_reset
+        NotificationSecurityEvent.UNKNOWN -> R.string.notification_security_alert
     }
