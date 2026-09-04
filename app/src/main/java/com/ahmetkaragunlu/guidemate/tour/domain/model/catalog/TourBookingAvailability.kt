@@ -2,7 +2,6 @@ package com.ahmetkaragunlu.guidemate.tour.domain.model.catalog
 
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.effectiveStatus
 import java.time.Instant
 
 enum class TourBookingAvailability {
@@ -14,6 +13,7 @@ enum class TourBookingAvailability {
     STARTED,
     COMPLETED,
     CANCELLED,
+    EXPIRED,
     UNAVAILABLE,
     ;
 
@@ -33,10 +33,10 @@ fun TourWithSession?.resolveBookingAvailability(
         }
     }
 
-    val effectiveStatus = session.effectiveStatus(now)
     return when {
-        effectiveStatus == TourSessionStatus.CANCELLED -> TourBookingAvailability.CANCELLED
-        effectiveStatus == TourSessionStatus.COMPLETED -> TourBookingAvailability.COMPLETED
+        session.status == TourSessionStatus.CANCELLED -> TourBookingAvailability.CANCELLED
+        session.status == TourSessionStatus.COMPLETED -> TourBookingAvailability.COMPLETED
+        session.status == TourSessionStatus.EXPIRED -> TourBookingAvailability.EXPIRED
         hasReservation -> TourBookingAvailability.ALREADY_RESERVED
         !session.startsAt.isAfter(now) -> TourBookingAvailability.STARTED
         tour.approvalStatus != TourApprovalStatus.APPROVED ->

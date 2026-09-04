@@ -50,7 +50,9 @@ class FakeGuideTourRepository : GuideTourRepository {
         )
     var listResult: DataResult<PagedResult<GuideTourCard>>? = null
     val listResults = ArrayDeque<DataResult<PagedResult<GuideTourCard>>>()
+    val dashboardResults = ArrayDeque<DataResult<GuideDashboard>>()
     val listRequests = mutableListOf<Pair<GuideTourListType, Int>>()
+    var dashboardRequests = 0
     var createInput: CreateGuideTourInput? = null
     var submitChangeInput: SubmitTourChangeInput? = null
     var updateSessionInput: UpdateTourSessionInput? = null
@@ -118,8 +120,11 @@ class FakeGuideTourRepository : GuideTourRepository {
     override suspend fun archiveTour(tourId: String): DataResult<TourDetails> =
         error("Not required by this test fixture")
 
-    override suspend fun getDashboard(): DataResult<GuideDashboard> =
-        error("Not required by this test fixture")
+    override suspend fun getDashboard(): DataResult<GuideDashboard> {
+        dashboardRequests++
+        return dashboardResults.removeFirstOrNull()
+            ?: error("No dashboard result configured")
+    }
 }
 
 class FakeMediaRepository : MediaRepository {

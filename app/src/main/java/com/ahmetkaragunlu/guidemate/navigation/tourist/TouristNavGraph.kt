@@ -33,6 +33,7 @@ internal fun NavGraphBuilder.touristNavGraph(
     routeNavController: NavController,
     homeViewModel: TouristHomeViewModel,
     chatListViewModel: ChatListViewModel,
+    onBackActionChanged: ((() -> Unit)?) -> Unit,
 ) {
     composable<TouristDestination.Home> {
         TouristHomeScreen(
@@ -148,6 +149,7 @@ internal fun NavGraphBuilder.touristNavGraph(
     touristPaymentNavGraph(
         touristNavController = touristNavController,
         routeNavController = routeNavController,
+        onBackActionChanged = onBackActionChanged,
     )
 }
 

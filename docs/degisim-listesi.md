@@ -1155,25 +1155,694 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
     `guidemate_demo` icindeki 1300 rezervasyonun kolon ve JSON snapshot degeri
     hedefli olarak esitlendi; diger demo verileri ve `guidemate_db` korunuyor.
 
+### DEG-023 - Rol Secimi RadioButton Ic Gostergesi Rengi
+
+- Durum: `UYGULANDI`
+- Kullanici deneyimi karari:
+  - Rol secimi ekraninda bir secenek isaretlendiginde RadioButton'in merkezinde
+    beliren dolu secim noktasi `BrandColor` olmalidir.
+  - Degisiklik dis cemberi hedeflemez. Secilmemis RadioButton gorunumu, metinler,
+    bosluklar ve ekranin mevcut tasarimi korunmalidir.
+- Uygulama siniri:
+  - Yalniz rol secimi ekranindaki mevcut RadioButton renk sozlesmesi en kucuk
+    kapsamda duzenlenecektir; ortak component veya tema davranisi gereksiz yere
+    degistirilmeyecektir.
+  - Yeni component, katman veya soyutlama eklenmeyecektir.
+- Test karari:
+  - Salt renk degisikligi icin kirilgan otomatik Compose testi yazilmayacaktir.
+  - Derleme/lint ve rol seciminin gercek cihazdaki secili-secimsiz gorunum
+    kontrolu yeterlidir.
+
+### DEG-024 - Rehber Hakkimda Metninde Kosullu Devamini Gor
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Ortak rehber profil icerigi biyografinin gercek uzunluguna bakmadan
+    `Devamini Gor` aksiyonunu gosteriyor.
+  - Hakkimda yuzeyine kapali ve acik durumlarda sabit yukseklik verildigi icin
+    kisa biyografide aksiyon gereksiz yere gorunuyor; tiklandiginda metnin
+    doldurmadigi buyuk bir bos alan olusuyor.
+  - Ayni ortak `GuideProfileContent` hem rehber profil on izlemesinde hem
+    turistin gordugu public rehber profilinde kullaniliyor.
+- Kullanici deneyimi karari:
+  - `Devamini Gor` yalniz daraltilmis biyografi belirlenen satir sinirini
+    gercekten asiyorsa gosterilmelidir.
+  - Kisa biyografi dogal yuksekligiyle gosterilmeli; aksiyon ve gereksiz bosluk
+    olusmamalidir.
+  - Uzun biyografi acildiginda metnin tamami dogal yuksekligiyle gosterilmeli;
+    mevcut profil tasarimi, renkleri ve metin stilleri korunmalidir.
+- Mimari ve uygulama siniri:
+  - Duzeltme ortak `GuideProfileContent` icindeki Hakkimda bolumunde tek kez
+    yapilarak on izleme ve public profil birlikte duzeltilmelidir.
+  - Sabit metin alani yuksekligi yerine Compose metin tasmasi sonucu esas
+    alinmali; ayri ekran kodu, backend degisikligi veya yeni soyutlama
+    eklenmemelidir.
+- Test karari:
+  - Salt olcum ve metin gorunumu icin kirilgan otomatik UI testi yazilmayacaktir.
+  - Derleme/lint sonrasinda kisa ve uzun biyografiyle iki ortak profil yuzeyi
+    manuel olarak dogrulanmalidir.
+
+### DEG-025 - Kontrollu Dunya Dilleri Katalogu ve Yerellestirilmis Dil Adlari
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Android dil seceneklerini `Locale.getAvailableLocales()` uzerinden otomatik
+    uretiyor ve bayragi ICU'nun tahmin ettigi bolgeden aliyor.
+  - Bu nedenle Baskca ve Katalanca gibi urun kapsaminda istenmeyen bolgesel
+    diller listelenebiliyor; Portekizce gibi dillerde temsilci bayrak cihaz
+    verisine gore Brezilya gibi istenmeyen bir bolgeye kayabiliyor.
+  - Hakkimda, tur yayinlama/duzenleme ve Kesfet filtreleri ortak dil seciciyi
+    kullansa da kart, profil, tur ve rezervasyon gorunumleri ayni kodlar icin
+    katalogdan etiket ve bayrak uretiyor.
+- Urun ve kullanici deneyimi karari:
+  - GuideMate, dunyada yaygin veya ulke duzeyinde kullanilan ana dilleri genis
+    fakat kontrollu bir katalogda sunmalidir. Hirvatca ve Rusca gibi ana diller
+    korunmali; urun kapsaminda istenmeyen bolgesel/ozel dil ve locale
+    varyantlari listelenmemelidir.
+  - Her dil yalniz bir canonical dil koduyla bir kez bulunmalidir. ABD
+    Ingilizcesi, Brezilya Portekizcesi veya Meksika Ispanyolcasi gibi ayni dilin
+    ulke varyantlari ayri secenek olmamalidir.
+  - Her dil icin urun tarafindan belirlenen sabit bir temsilci bayrak
+    kullanilmalidir. Ornegin Portekizce `PT`, Ispanyolca `ES` ve Ingilizce `GB`
+    bayragiyla gosterilmeli; cihaz/ICU bayrak tahmini kullanilmamalidir.
+  - Ayni katalog dilin kullanildigi tum Android yuzeylerinin tek kaynagi
+    olmalidir: rehber Hakkimda, tur yayinlama ve duzenleme, Kesfet filtresi,
+    rehber profili, tur kartlari/detaylari ve rezervasyon gorunumleri.
+- Yerellestirme karari:
+  - Backend ve domain yalniz standart dil kodunu tasimalidir; yerellestirilmis
+    dil adi veya bayrak saklamamalidir.
+  - Gorunen dil adi, ortak katalogdaki koddan Android `Locale/ICU` ile aktif
+    cihaz/uygulama diline gore otomatik uretilmelidir. Ornegin `en`, Turkce
+    ortamda `Ingilizce`, Ingilizce ortamda `English` olarak gorunmelidir.
+  - Yuzlerce dil adi XML'e tek tek yazilmayacaktir. Bu otomatik dil adi
+    yerellestirmesi normal UI metinlerini cevirmez; buton ve basliklarin
+    Ingilizcelesmesi icin ileride yine `values-en` kaynaklari gerekir.
+- Mimari ve uygulama siniri:
+  - Mevcut ortak `LocaleSelectionCatalog` urun kontrollu canonical dil/bayrak
+    kaynagi olacak sekilde duzenlenmeli; ekranlara ayri listeler veya mapperlara
+    tekrar eden bayrak tablolari eklenmemelidir.
+  - Android'in gonderecegi kodlar backend `LanguageCodePolicy` tarafindan kabul
+    edilen standart kodlarla uyumlu kalmalidir. Sozlesme uyumsuzlugu yoksa
+    backend is kurali veya veritabani degistirilmemelidir.
+  - Mevcut kayitlarda katalog disi bir kodla karsilasilirsa uygulama cokmemeli;
+    guvenli kod/varsayilan ikon fallback'i korunmalidir.
+- Test karari:
+  - Ortak katalog testi canonical kodlarin benzersizligini, bos/uygunsuz kod
+    bulunmadigini ve sabit temsilci bayraklarin kararlililigini dogrulamalidir.
+  - Turkce ve Ingilizce locale icin secili orneklerin yerellestirilmis dil
+    adlari odakli olarak dogrulanmalidir; her dil icin tekrar eden test
+    yazilmamalidir.
+  - Dil secici ve kartlarin salt gorunumu manuel kullanici testinde kontrol
+    edilmelidir.
+
+### DEG-026 - Tur Yayinlama Alan Dogrulamalarinin Backend ile Uyumu
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Android tur yayinlama adimlarinda konum/zaman, kategori/dil/fiyat/kapasite
+    ve tur icerigi icin yerel kontrol yapiyor; ancak bazi metin alanlarinda
+    yalniz bos olup olmadigina bakiyor.
+  - Backend tur adi icin `3-120`, tur aciklamasi icin `20-3000`, bulusma
+    noktasi icin en fazla `500` karakter gibi daha ayrintili kurallari son
+    otorite olarak uyguluyor.
+  - Bu nedenle Android'de dolu gorunen bir alan backend sozlesmesine uymadigi
+    halde kullanici son on izleme adimina gecebilir.
+  - Backend `VALIDATION_FAILED` cevabinda alan bazli `fieldErrors` donduruyor ve
+    ortak Android parser bu bilgiyi koruyor; yayinlama akisi ise ayrintiyi
+    kullanmadan genel `Lutfen girdiginiz bilgileri kontrol edin` mesajini
+    gosteriyor.
+- Kullanici deneyimi karari:
+  - Android'deki kullanici tarafindan girilebilen alan kontrolleri backend
+    sozlesmesiyle uyumlu olmalidir. Gecersiz alan varsa kullanici ilgili
+    adimdan sonraki adima, dolayisiyla son on izlemeye gecememelidir.
+  - Hata ilgili alan veya adimda acik ve XML kaynakli metinle gosterilmelidir;
+    ornegin `Tur aciklamasi en az 20 karakter olmalidir.`
+  - Backend ayni kontrolleri guvenlik ve veri butunlugu icin koruyacak ve son
+    otorite olmaya devam edecektir. Android kontrolu backend kontrolunun yerine
+    gecmeyecektir.
+  - Backend yine reddederse `fieldErrors` icindeki alan bilgisi ilgili yayinlama
+    adimina ve kullanicinin anlayacagi XML mesajina eslenmelidir. Teknik alan
+    yolu veya backend exception metni dogrudan UI'a yazilmamalidir.
+  - Kullanici serbest dil/ulke kodu yazmadigi icin teknik kod dogrulamalari UI'da
+    gereksiz yere tekrar edilmeyecektir. Android secim zorunlulugu ve urun
+    limitini uygular; backend kod formati ve izinli katalog icin savunma
+    kontrolunu korur.
+- Mimari ve uygulama siniri:
+  - Dogrulama yayinlama feature'inin gercek form sorumlulugunda kalmali; ortak
+    hata altyapisi feature'a ozel tur form kurallarini bilmemelidir.
+  - Ayni kural adim gecisi ve son yayinlama oncesi kontrolde tek kaynaktan
+    kullanilmali; iki farkli kosul listesi olusturulmamalidir.
+  - Yeni use-case, genel validation framework'u veya gereksiz katman
+    eklenmemelidir. Mevcut state/ViewModel ve `AppError.fieldErrors` sozlesmesi
+    en kucuk kapsamda kullanilmalidir.
+  - Backend sozlesmesi zaten dogru oldugu icin backend kurali gevsetilmeyecek;
+    yalniz canli alan adlari/kodlari Android eslemesiyle dogrulanacaktir.
+- Test karari:
+  - Adim 1-3 icin sinir degerleri, ozellikle tur adi ve aciklama minimum/maksimum
+    uzunluklari, ViewModel veya saf form dogrulama testleriyle korunmalidir.
+  - Backend `fieldErrors` cevabinin dogru yayinlama adimina ve mesaja eslenmesi
+    odakli olarak test edilmelidir.
+  - Salt hata metninin rengi veya yerlesimi icin kirilgan UI testi
+    yazilmayacaktir; gorunum manuel kullanici testinde dogrulanacaktir.
+
+### DEG-027 - Tur Yayinlama Sonrasi Inceleme Sekmesine Donus
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Backend yeni turu `PENDING_REVIEW` durumunda olusturuyor; bu tur Aktif
+    degil, Turlarim ekranindaki Inceleme sekmesine aittir.
+  - Yayinlama graph'i basari sonrasinda `GuideTourTab.REVIEW` sonucunu yazip
+    Turlarim destination'ina geri donmeyi amacliyor.
+  - Sonuc navigation back-stack entry'nin `SavedStateHandle` alanina yazilirken
+    `GuideMyToursViewModel` kendi enjekte edilen `SavedStateHandle` ornegini
+    dinliyor. Sonuc ayni kanaldan tuketilmediginde varsayilan `ACTIVE` sekmesi
+    ekranda kalabiliyor.
+- Kullanici deneyimi karari:
+  - `Onaya Gonder` islemi backend tarafinda basariyla tamamlandiginda Turlarim
+    ekrani acilmali ve `Inceleme` sekmesi secili olmalidir.
+  - Inceleme listesi yenilenerek yeni gonderilen tur backend'den gorunmelidir.
+  - Basarisiz yayinlama isteginde kullanici Turlarim ekranina
+    yonlendirilmemeli; acik hata mesaji ile yayinlama ekraninda kalmalidir.
+- Mimari ve navigation karari:
+  - Destination/navigation sonucu Turlarim composable sinirinda dogru
+    back-stack entry'den okunup ViewModel'e acik bir sekme secme olayi olarak
+    iletilmelidir.
+  - Sonuc bir kez tuketilip temizlenmeli; ekran yeniden olustugunda veya geri
+    donuldugunde eski `REVIEW` komutu tekrar calismamalidir.
+  - Yayinlama, tur duzenleme ve tur detayindan donus ayni sonuc iletim
+    yaklasimiyla tutarli olmali; yeni global navigation store, yeni graph veya
+    dorduncu genel navigate extension'i eklenmemelidir.
+  - Mevcut typed destination ve geri-yigin davranisi korunmalidir.
+- Test karari:
+  - Yayinlama basari sonucunun `REVIEW` sekmesini sectigi, ilgili listeyi
+    yeniledigi ve sonucu yalniz bir kez tukettigi odakli state/navigation
+    testiyle korunmalidir.
+  - Yayinlama hatasinda yonlendirme olmadigi mevcut ViewModel testiyle
+    kapsanmiyorsa eklenmelidir; ayni davranisi tekrar eden kirilgan tam UI testi
+    yazilmayacaktir.
+
+### DEG-028 - Rehber Bildirimleri ve Ana Sayfa Canli State Uyumu
+
+- Durum: `UYGULANDI`
+- Canli veriyle dogrulanan mevcut davranis:
+  - Admin onayi backend'de dogru rehber icin `TOUR_APPROVED` bildirimi
+    olusturuyor. Bildirim veritabaninda kalici ve topbar REST yenilemesinde
+    gorunuyor.
+  - Demo profilinde `DEMO_FCM_ENABLED=false` oldugu icin backend gercek Firebase
+    gondericisi yerine no-op push gondericisi kullaniyor. Uygulama acikken
+    notification refresh tetigi gelmiyor; cikis-giris veya lifecycle resume
+    sonrasinda REST yenilemesiyle bildirim gorunuyor.
+  - `GuideNavigation` topbar ve bottom sheet icin canli
+    `NotificationUiState` degerini okuyor. Buna karsilik `guideNavGraph`, graph
+    ilk kurulurken bos olan `recentNotifications` listesini destination
+    closure'inda tutuyor. Repository sonradan guncellense bile rehber ana
+    sayfasindaki Son Hareketler ilk bos listeyi gostermeye devam edebiliyor.
+  - Okunmus bildirim backend'den veya Son Hareketler'den silinmiyor. Topbar
+    rozeti yalniz okunmamis sayisini, topbar listesi ve Son Hareketler ise okunmus
+    bildirimler dahil guncel gecmisi gostermelidir.
+  - Rehber dashboard yenileme tetikleri tur onayi ve reddini kapsamiyor.
+    `PENDING_REVIEW` ile aktif oturum sayilari degistigi halde ana sayfa
+    sayaclari eski kalabilir.
+- Kullanici deneyimi karari:
+  - Yeni bildirim geldiginde topbar listesi, okunmamis rozeti ve rehber ana
+    sayfasindaki en son dort hareket ayni repository kaynagindan ve ayni anda
+    guncellenmelidir.
+  - `TOUR_APPROVED` ve `TOUR_REJECTED` bildirimleri Son Hareketler'de XML
+    kaynakli mevcut metin ve tur ikonu ile gorunmelidir.
+  - Okundu islemi yalniz okunmamis sayisini azaltmali; bildirimi Son
+    Hareketler'den veya bildirim gecmisinden kaldirmamalidir.
+  - Tur yayinlama, onay ve red sonrasinda dashboard `Incelemede`/`Aktif`
+    sayaclari canonical backend projection'iyla yenilenmelidir; Android manuel
+    `+1/-1` yapmamalidir.
+- Android mimari ve uygulama siniri:
+  - Degisebilen bildirim listesi navigation graph builder'a snapshot `List`
+    olarak verilmemelidir. Home destination canli ve lifecycle-aware state'i
+    gozlemlemeli; navigation dinamik UI verisini eski closure'da tutmamalidir.
+  - Var olan `NotificationRepository` tek kaynak olarak korunacak; ana sayfa
+    icin ikinci store, kopya bildirim listesi, polling sistemi veya notification
+    STOMP kanali eklenmeyecektir.
+  - FCM olayi geldiginde mevcut `onPushReceived -> REST refresh` akisi
+    korunacak. REST cevabi bildirim gecmisinin ve okunmamis sayisinin canonical
+    kaynagi olmaya devam edecektir.
+  - Dashboard yenilemesi yalniz gercekten dashboard projection'ini etkileyen
+    tur karar olaylarina eklenecek; tum bildirimler gereksiz yere dashboard
+    istegi baslatmayacaktir.
+- Yerel demo yapilandirma karari:
+  - Demo ortaminda anlik ve arka plan push kullanici testi yapilacagi zaman
+    local/Git disi ayarda `DEMO_FCM_ENABLED=true` kullanilacak ve backend yeniden
+    baslatilacaktir.
+  - Mevcut Firebase service-account dosyasi ve Android device registration
+    sozlesmesi korunacak; secret source control'e eklenmeyecektir.
+  - Normal local/production FCM ayarlari demo veritabani seciminden bagimsizdir;
+    demo veya gercek veritabani tek basina anlik teslim davranisini belirlemez.
+- Backend siniri:
+  - `TOUR_APPROVED`/`TOUR_REJECTED` notification olusturma kodu ve kalici
+    notification modeli dogru calistigi icin sirf bu hata icin yeni bildirim
+    turu, tablo, endpoint veya backend business akisi eklenmeyecektir.
+  - Backend kodu yalniz canli dogrulamada ayrica bir sozlesme hatasi bulunursa
+    degistirilecektir; mevcut bulgu Android state aktarimi ve demo dis
+    yapilandirmasiyla sinirlidir.
+- Test karari:
+  - Repository bildirimleri bos durumdan dolu duruma gectiginde rehber ana sayfa
+    son hareketlerinin guncellenmesi odakli state testiyle korunmalidir.
+  - Okunmus bildirimin listede kalmasi ve yalniz unread count'un azalmasi mevcut
+    repository/ViewModel testlerinde kapsanmiyorsa tek odakli test eklenmelidir.
+  - Tur onay/red olaylarinin dashboard refresh tetigini calistirmasi test
+    edilmelidir; salt Compose metin/ikon yerlesimi icin kirilgan UI testi
+    yazilmayacaktir.
+  - FCM gercek teslimi otomatik unit testle taklit edilmeyecek; demo backend,
+    gercek emulator/telefon ve Firebase ile manuel E2E kullanici testinde
+    dogrulanacaktir.
+
+### DEG-029 - Rehber Dashboard Tur Yasam Dongusu Yenilemesi
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut backend davranisi:
+  - Rehber ana sayfasindaki `Yayinda` sayisi yalniz onayli, gelecekte baslayacak
+    ve `OPEN_FOR_BOOKING` durumundaki oturumlardan hesaplanir.
+  - Rehber bir oturumu iptal ettiginde backend durumu `CANCELLED` yapar. Bu
+    oturum dashboard aktif sorgusundan hemen cikar; yeniden okunan canonical
+    dashboard sonucunda `Yayinda 1` degeri `Yayinda 0` olmalidir.
+  - Iptal edilen oturum tamamlanmis sayilmaz. `Tamamlanan Tur` sayisini
+    artirmaz, ancak terminal `CANCELLED` durumu nedeniyle Turlarim `Gecmis`
+    sekmesinde gorunur.
+  - Normal bir turun baslangic ani gelince artik gelecekte ve satin alinabilir
+    aktif oturum sayilmaz; `Yayinda` sayisindan cikar. Turun planlanan suresi
+    bitene kadar devam eden turdur ve henuz `Tamamlanan Tur` sayisini artirmaz.
+  - Turun planlanan bitis zamani gectiginde backend lifecycle scheduler'i en
+    gec yaklasik bir dakikalik normal gecikmeyle oturumu `COMPLETED` yapar,
+    ilgili rezervasyonlari tamamlar ve `TOUR_COMPLETED` bildirimi olusturur.
+    Bundan sonra oturum Turlarim `Gecmis` sekmesinde gorunmeli ve rehberin
+    `Tamamlanan Tur` sayisi artmalidir.
+- Dogrulanan Android eksikligi:
+  - Basarili iptal, tur detayini kapatip Turlarim `Gecmis` sekmesini yeniliyor;
+    ancak yasamaya devam eden `GuideHomeViewModel` icin dashboard refresh
+    tetiklemiyor. Bu nedenle backend dogru olarak `0` dondurecek olsa bile ana
+    sayfa bellekteki eski `Yayinda 1` degerini gosterebiliyor.
+  - Dogal tamamlanmada `TOUR_COMPLETED` dashboard yenileme olaylari arasinda
+    bulunuyor. Bunun anlik calismasi DEG-028'deki FCM ve canli state
+    duzeltmesiyle birlikte korunmalidir; REST dashboard her durumda canonical
+    kaynak olmaya devam etmelidir.
+- Kullanici deneyimi karari:
+  - Iptal istegi basarili oldugunda Turlarim listesi ile rehber dashboard'u ayni
+    backend sonucuyla uyumlu hale gelmelidir: `Yayinda` hemen azalir, iptal
+    edilen oturum Gecmis'e gider ve `Tamamlanan Tur` artmaz.
+  - Normal tur tamamlandiginda `Yayinda` azalir, `Tamamlanan Tur` artar ve tur
+    Gecmis'e gider. Iptal edilen tur ile tamamlanan tur ayni istatistik olarak
+    degerlendirilmez.
+  - Android sayaçlara elle `+1/-1` uygulamaz; iptal, yeni oturum ve backend
+    lifecycle sonucu sonrasinda gerekli projection'i yeniden okuyarak gercek
+    degeri gosterir.
+- Mimari karar:
+  - Sadece bu is icin global store, ikinci dashboard kaynagi veya yeni genel
+    navigation extension'i eklenmeyecektir.
+  - Basarili oturum komutunun sonucu, ilgili feature sinirindan mevcut
+    graph-scope `GuideHomeViewModel` icin acik ve tek seferlik bir yenileme
+    tetigine donusturulecek. UI katmani backend tur durumunu tahmin etmeyecek.
+  - DEG-028 ile birlikte ele alinarak bildirim kaynakli ve rehberin kendi
+    aksiyonundan kaynakli yenilemeler tek canonical dashboard repository
+    cagrisinda birlesmelidir.
+- Test karari:
+  - Basarili iptal sonucunun dashboard yenilemesini tetikledigi ve yeni backend
+    projection'inin `activeCount` degerine yansidigi odakli Android state testi
+    yazilmalidir.
+  - Backend aktif sorgusunun `CANCELLED` oturumu dislamasi, iptalin tamamlanan
+    sayisini artirmamasi ve lifecycle tamamlanmasinin Gecmis/tamamlanan
+    projection'ina yansimasi mevcut testlerde kapsanmiyorsa yalniz eksik kalan
+    business davranisi icin odakli backend testi eklenmelidir.
+  - Scheduler'in gercek bir dakika beklemesi otomatik test edilmeyecek; testte
+    kontrol edilebilir `Clock` ve dogrudan lifecycle calistirmasi kullanilacak.
+
+### DEG-030 - Rehber Tur Islemleri Sonrasi Dogru Sekmeye Donus
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Gecmis tur detayindan yeni tarihli oturum olusturuldugunda backend yeni
+    oturumu `OPEN_FOR_BOOKING` olarak dogru bicimde kaydediyor ve Android
+    ViewModel hedef sekmeyi `ACTIVE` olarak belirliyor.
+  - Buna ragmen navigation sonucu onceki back-stack entry'nin
+    `SavedStateHandle` alanina yaziliyor. Sonucun tuketilmesi onceki ekranin
+    gercekten Turlarim olmasina ve ayni handle'in dinlenmesine bagli oldugu icin
+    kullanici yeniden yayinlama sonrasinda Gecmis sekmesinde kalabiliyor.
+  - Ayni kirilgan sonuc kanali iptal sonrasi `PAST`, tur/oturum duzenleme
+    sonrasi `ACTIVE` veya `REVIEW` secimlerinde de kullaniliyor. Tur detayi
+    bildirim ya da baska bir giris noktasindan acilirsa onceki destination
+    Turlarim olmayabilir.
+  - Yeni tur yayinlama sonrasi `REVIEW` hedefi DEG-027 kapsaminda zaten
+    kayitlidir; bu madde ayni navigation sonucunun diger rehber tur islemleriyle
+    tutarli hale getirilmesini kapsar.
+- Kullanici deneyimi karari:
+  - Gecmis turdan yeni tarihli oturum basariyla olusturulunca Turlarim acilmali,
+    `Aktif` sekmesi secilmeli ve liste backend'den yenilenerek yeni oturum
+    gorunmelidir.
+  - Aktif oturum iptal edilince Turlarim `Gecmis` sekmesine donmeli ve iptal
+    edilen oturum orada gorunmelidir.
+  - Yalniz oturum bilgileri degistirildiyse `Aktif`; tur icerigi yeniden admin
+    onayi gerektiriyorsa `Inceleme` sekmesine donulmalidir.
+  - Yeni tur yayinlama basarisi `Inceleme` sekmesine donmeye devam etmelidir.
+  - Basarisiz islemde herhangi bir sekmeye yonlendirme yapilmamali; kullanici
+    mevcut ekranda acik hata mesaji almalidir.
+- Navigation ve mimari karari:
+  - Sonuc iletimi, Turlarim ekraninin navigation gecmisinde tesadufen onceki
+    entry olmasina bagli kalmamalidir. Mevcut typed destination kullanilarak
+    varsa Turlarim entry'sine donulecek, yoksa Turlarim guvenli bicimde acilacak
+    ve hedef sekme tek seferlik sonuc olarak tuketilecektir.
+  - Yeni ekran, global navigation store, yeni genel navigate extension'i veya
+    ViewModel'de `NavController` bagimliligi eklenmeyecektir.
+  - Hedef sekme secimi tek bir rehber tur navigation sonuc sozlesmesinde
+    tutulacak; yayinlama, iptal, yeniden yayinlama ve duzenleme icin kopya
+    back-stack kodu olusturulmayacaktir.
+  - DEG-027 ve DEG-029 ile birlikte uygulanarak liste sekmesi, dashboard
+    projection'i ve backend tur durumu ayni basarili islem sonrasinda tutarli
+    yenilenmelidir.
+- Benzer akis taramasi sonucu:
+  - Reddedilen taslagi arsivleme ayni `Inceleme` listesinde yerel olarak
+    kaldirdigi icin yeni destination gerektirmez.
+  - Aktif oturumun rezervasyona acik/kapali switch'i ayni kart uzerinde
+    guncellendigi icin sekme degistirmemelidir.
+  - Normal geri ikonlari islem sonucu degildir; mevcut `navigateUp()` davranisi
+    korunmalidir.
+- Test karari:
+  - Yeni oturum basarisinin `ACTIVE`, iptal basarisinin `PAST`, yeniden onay
+    gerektiren duzenlemenin `REVIEW` sonucunu urettigi mevcut ViewModel
+    testlerinde eksik kalan senaryolarla korunmalidir.
+  - Sonucun Turlarim entry'si onceki ekran olmadiginda da dogru destination ve
+    sekmeye ulastigi odakli navigation sonucu testiyle korunmalidir.
+  - Salt tab gorunumu icin tekrarlayan kirilgan Compose testi yazilmayacak;
+    gercek geri-yigin davranisi manuel kullanici testinde de dogrulanacaktir.
+
+### DEG-031 - Bildirim Bottom Sheet Okundu Aksiyonu Yerlesimi
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut gorunum:
+  - `Tumunu okundu yap` aksiyonu `Bildirimler` basligiyla ayni header satirinda
+    ve sag ustte gosteriliyor.
+- Tasarim karari:
+  - `Bildirimler` basligi mevcut merkez konumunda tek basina kalacak.
+  - `Tumunu okundu yap` aksiyonu bildirim listesinin disinda, bottom sheet'in
+    sag altinda yer alan sabit bir footer aksiyonu olarak gosterilecek.
+  - Uzun bildirim listesinde aksiyon liste item'i olarak scroll icine
+    alinmayacak; bottom sheet acikken erisilebilir kalacak.
+  - Aksiyon yalniz okunmamis bildirim varsa gorunecek, devam eden istek
+    sirasinda devre disi kalacak ve mevcut brand color/metin stili korunacak.
+  - Bildirim listesi, pagination, okundu davranisi, bottom sheet yuksekligi ve
+    diger tasarim ogeleri degistirilmeyecek.
+- Mimari ve backend siniri:
+  - Bu yalniz Compose yerlesim degisikligidir. Mevcut `onMarkAllRead` callback'i
+    ve `NotificationViewModel` kullanilacak; yeni state, repository veya
+    backend degisikligi eklenmeyecektir.
+- Test karari:
+  - Is kurali degismedigi icin salt konum icin kirilgan UI testi
+    yazilmayacaktir. Derleme/lint ve bottom sheet'in okunmamis, islemde ve tumu
+    okunmus durumlari manuel kullanici testiyle dogrulanacaktir.
+
+### DEG-032 - Yeni Tur Yayinlama Sonrasi Onay Bekleyen Sayaci
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - Backend yeni turu `PENDING_REVIEW` durumunda kaydediyor ve rehber dashboard
+    projection'i bu turu `pendingReviewCount` hesabina dogru bicimde dahil
+    ediyor.
+  - Android yayinlama basarisinda Turlarim ekranina donuyor, ancak yasamaya
+    devam eden `GuideHomeViewModel` icin dashboard yenilemesi tetiklemiyor.
+    Bu nedenle backend'deki gercek deger `1` oldugu halde ana sayfa bellekteki
+    eski `Onay Bekliyor 0` degerini gosterebiliyor.
+  - Rehberin kendi gonderimi icin ayrica FCM bildirimi beklemek dogru senkron
+    mekanizmasi degildir; basarili komut sonucu dashboard'u gecersiz kilmalidir.
+- Kullanici deneyimi karari:
+  - Yeni tur basariyla onaya gonderildiginde Turlarim `Inceleme` sekmesine
+    donulecek ve ana sayfadaki `Onay Bekliyor` sayisi backend projection'i
+    yeniden okunarak ayni anda guncellenecektir.
+  - Ornek olarak once bekleyen tur yoksa basarili yayinlama sonrasinda deger
+    `0 -> 1` olmalidir. Birden fazla bekleyen tur varsa Android elle artirma
+    yapmayacak, backend'in toplam degerini gosterecektir.
+  - Admin onayi veya reddi sonrasinda ayni projection yeniden okunarak
+    `Onay Bekliyor` azaltilacak; onaylanan gelecekteki acik oturum `Yayinda`
+    sayisina backend kurallarina gore dahil edilecektir.
+- Mimari karar:
+  - DEG-027'deki dogru `Inceleme` sekmesine donus, DEG-028'deki admin karar
+    bildirimi ve DEG-029'daki dashboard lifecycle yenilemesiyle tek tutarli
+    sonuc akisi olarak uygulanacaktir.
+  - Var olan `GuideTourRepository.getDashboard()` canonical kaynak olarak
+    korunacak; ikinci sayaç state'i, global store, polling veya Android tarafli
+    `+1/-1` hesabi eklenmeyecektir.
+  - Yayinlama basari olayi mevcut graph-scope `GuideHomeViewModel` icin acik ve
+    tek seferlik refresh tetigi uretmelidir. ViewModel navigation veya backend
+    DTO ayrintisini bilmemelidir.
+- Backend siniri:
+  - `PENDING_REVIEW` kaydi ve dashboard sorgusu dogru oldugu icin yeni endpoint,
+    tablo veya backend business degisikligi gerekmemektedir.
+- Test karari:
+  - Basarili yayinlama sonucunun `REVIEW` sekmesiyle birlikte dashboard
+    yenilemesini tetikledigi ve backend'den donen `pendingCount` degerinin ana
+    sayfa state'ine yansidigi odakli Android testiyle korunmalidir.
+  - Salt sayac metni icin kirilgan Compose testi yazilmayacak; `0 -> 1`, admin
+    onayi sonrasi bekleyen sayinin azalmasi ve Yayinda degerinin guncellenmesi
+    manuel kullanici testinde de dogrulanacaktir.
+
+### DEG-033 - Katilimcisiz Tur Oturumunun EXPIRED Olmasi
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut risk:
+  - Backend lifecycle scheduler'i planlanan suresi biten `OPEN_FOR_BOOKING` ve
+    `CLOSED` oturumlari katilimci bulunup bulunmadigina bakmadan `COMPLETED`
+    yapiyor.
+  - Bu nedenle hic satin alinmamis veya tum rezervasyonlari iptal edilmis bir
+    oturum, yalniz tarihi gectigi icin rehberin `Tamamlanan Tur` sayisini ve
+    seviye/performans projection'larini haksiz bicimde artirabilir.
+  - Sorun turun gizli olmasi degildir. `CLOSED`, yeni satin alimi durdurur;
+    mevcut gecerli rezervasyonlari ve turun gerceklesmesini iptal etmez.
+- Backend yasam dongusu karari:
+  - Planlanan bitis zamani gecen oturumda en az bir gecerli
+    `CONFIRMED`/tamamlanabilir rezervasyon varsa mevcut akis korunarak oturum
+    `COMPLETED` yapilacak ve rezervasyonlar tamamlanacaktir.
+  - Gecerli rezervasyon yoksa oturum `CANCELLED` veya `COMPLETED` yerine yeni
+    terminal `EXPIRED` durumuna gecirilecektir. Bu durum rehber ya da turist
+    iptali anlamina gelmez ve iptal nedeni/aktoru uydurulmayacaktir.
+  - `EXPIRED` oturum rehber Turlarim `Gecmis` sorgusuna dahil edilecek; aktif ve
+    turist kesif/satin alma sorgularindan dislanacaktir.
+  - `EXPIRED` oturum tamamlanan tur, toplam katilimci, ortalama puan, rozet/seviye
+    ilerlemesi veya kazanc hesaplarini artirmayacaktir. Yorum ve puan olusturma
+    yetkisi vermeyecek, iade veya kazanc kaydi uretmeyecektir.
+  - Gizlenmis fakat en az bir gecerli rezervasyonu bulunan oturum, planlanan
+    suresi bittiginde normal `COMPLETED` olmaya devam edecektir.
+- Android sozlesmesi ve tasarim karari:
+  - Android session status enum/DTO mapper/detail status eslemesi `EXPIRED`
+    degerini tip guvenli bicimde destekleyecektir; bilinmeyen string fallback'i
+    ile gizlenmeyecektir.
+  - Yeni ekran veya yeni kart tasarimi yapilmayacak. Mevcut Gecmis karti ve tur
+    detay yerlesimi korunacaktir.
+  - Mevcut durum alaninda XML kaynakli `Gerceklesmedi` metni, detayda ise
+    `Katilimci olmadigi icin gerceklesmedi` aciklamasi gosterilecektir.
+  - `EXPIRED` kart ve detayinda kazanc, puan verme ve yorum yapma aksiyonlari
+    gosterilmeyecektir. Salt yerlesim, renk ve tipografi degistirilmeyecektir.
+  - Dashboard ve liste state'i Android tarafinda tahmin edilmeyecek; DEG-029
+    kapsamindaki canonical backend refresh davranisi kullanilacaktir.
+- Bildirim karari:
+  - `TOUR_COMPLETED` bildirimi yalniz gercekten `COMPLETED` olan oturum icin
+    uretilmelidir. `EXPIRED` oturum icin tamamlandi veya yorum yapabilirsiniz
+    bildirimi gonderilmemelidir.
+  - Sirf bu durum icin yeni push bildirimi zorunlu degildir; rehber Gecmis
+    sekmesinde sonucu gorebilir. Ileride urun karari olmadan yeni notification
+    tipi eklenmeyecektir.
+- Veritabani ve migration siniri:
+  - Backend enum/check constraint mevcutsa `EXPIRED` degerini ekleyen kontrollu
+    Flyway migration yazilacaktir. Mevcut kayitlar topluca yeniden
+    siniflandirilmayacak; yalniz kanitlanabilen test/demo kayitlari ayri ele
+    alinacaktir.
+- Test karari:
+  - Gecerli rezervasyonu olan gizli oturumun `COMPLETED`, rezervasyonsuz acik
+    veya gizli oturumun `EXPIRED` oldugu kontrollu `Clock` ile backend lifecycle
+    testlerinde korunmalidir.
+  - `EXPIRED` oturumun Gecmis'te yer alip tamamlanan/katilimci/puan/kazanc
+    projection'larini etkilemedigi odakli integration testleri yazilmalidir.
+  - Android enum/DTO mapper ve detay modu `EXPIRED` eslemesi test edilmelidir;
+    salt metin konumu icin kirilgan Compose testi yazilmayacaktir.
+
+### DEG-034 - Hosted Odeme Dili ve Guvenli Geri/Iptal Akisi
+
+- Durum: `UYGULANDI`
+- Dogrulanan mevcut davranis:
+  - iyzico hosted sayfasindaki `Sandbox`, kart sahibi ve odeme butonu gibi
+    alanlar GuideMate Compose UI'i degil, provider tarafindan uretilen WebView
+    icerigidir.
+  - `Sandbox` test ortami gostergesidir; uygulama tarafindan DOM/CSS/JavaScript
+    mudahalesiyle gizlenmeyecek ve production iyzico ortaminda kendiliginden
+    kaybolacaktir.
+  - Android odeme dilini su anda `Locale.getDefault()` ile cihaz dilinden
+    belirliyor. GuideMate yalniz Turkce XML kaynaklari kullandigi icin uygulama
+    Turkce gorunurken cihaz dili Ingilizceyse iyzico'ya `EN` gonderilebiliyor ve
+    hosted alanlar `Card holder` gibi Ingilizce gorunuyor.
+  - Hosted sayfanin altindaki `Odemeyi Iptal Et` GuideMate'in `EditButton`
+    bilesenidir. iyzico'nun kendi tutarli `Odeme Yap` butonuyla alt alta gelerek
+    gereksiz gorsel agirlik olusturuyor.
+- Dil karari:
+  - Mevcut GuideMate surumu yalniz Turkce oldugu icin hosted checkout
+    baslatilirken merkezi olarak `CheckoutLocale.TR` gonderilecektir;
+    `Locale.getDefault()` odeme provider dili icin kullanilmayacaktir.
+  - Backend mevcut locale sozlesmesiyle `TR` degerini iyzico'ya `tr` olarak
+    iletmeye devam edecektir; yeni endpoint veya tablo gerekmemektedir.
+  - Ileride gercek `values-en` kaynaklari ve uygulama dili secimi eklendiginde
+    sabit `TR`, cihaz diline degil secilen uygulama diline bagli `TR/EN`
+    eslemesiyle degistirilecektir.
+  - Dil yeni checkout oturumu olusturulurken belirlenir. Daha once olusturulmus
+    Ingilizce hosted URL sonradan Turkcelestirilmeyecek; yeni odeme denemesiyle
+    dogrulanacaktir.
+- Tasarim ve kullanici akisi karari:
+  - Hosted sayfanin altindaki GuideMate `Odemeyi Iptal Et` butonu tamamen
+    kaldirilacak; iyzico sayfasinin kendi `Odeme Yap` butonuna mudahale
+    edilmeyecektir.
+  - Mevcut `Guvenli Odeme` topbar'inda geri ikonu gosterilecektir.
+  - Topbar geri ikonu ve telefonun sistem geri tusu ayni davranisi kullanacak:
+    mevcut ortak dialog ile `Odemeyi iptal etmek istiyor musunuz?` onayi
+    istenecektir.
+  - Kullanici vazgecerse hosted sayfada kalacak. Onaylarsa mevcut
+    `cancelPayment(paymentId)` backend istegi calisacak; basarili sonucta mevcut
+    payment status dogrulama akisi acilacak, hata halinde hosted ekranda kalinip
+    merkezi hata mesaji gosterilecektir.
+  - Geri ikonu yalniz `navigateUp()` yapmayacak; backend'deki pending odemeyi
+    sahipsiz birakmayacaktir. Iptal devam ederken tekrar tiklama engellenecektir.
+  - WebView yatay/dikey gorunumde mevcut kendi dikey kaydirma davranisini
+    koruyacak; yeni yerlesim veya provider icerigine mudahale eklenmeyecektir.
+- Navigation ve mimari sinir:
+  - Yeni ekran, destination, NavGraph, genel navigate extension'i, global odeme
+    store'u veya ViewModel icinde `NavController` bagimliligi eklenmeyecektir.
+  - Mevcut `TouristPaymentNavGraph`, hosted destination, topbar config ve
+    `HostedPaymentViewModel.cancelPayment()` akisi en kucuk gerekli callback
+    siniriyla kullanilacaktir.
+  - Topbar ve sistem geri olayi ayni tek iptal talebi/dialog state'ini
+    kullanacak; iki ayri iptal implementasyonu yazilmayacaktir.
+- Test karari:
+  - Mevcut uygulama dil sozlesmesinin checkout icin `TR` urettigi ve hem tur
+    satin alma hem wallet top-up isteklerinin bu degeri gonderdigi odakli
+    Android testleriyle korunmalidir.
+  - Geri isteginin dogrudan navigation yapmadigi, onaydan sonra tek iptal istegi
+    baslattigi, vazgecmede odeme ekraninda kaldigi ve backend hatasinda cikis
+    yapmadigi mevcut ViewModel/state sinirinda test edilmelidir.
+  - iyzico'nun hosted HTML metinleri veya `Sandbox` etiketi unit/UI testle
+    taklit edilmeyecek; Turkce alanlar gercek sandbox checkout kullanici
+    testinde dogrulanacaktir.
+
+### DEG-035 - Sohbet Detayinda Katilimci Profil Fotografini Yenileme
+
+- Durum: `BEKLIYOR`
+- Dogrulanan sorun:
+  - Sohbet detayindaki topbar fotografi `ChatDetailViewModel` mesaj state'inden
+    degil, navigation shell icindeki `ChatListViewModel` sohbet listesinden
+    gelir.
+  - Karsi kullanici profil fotografini degistirdiginde sohbet listesi yeniden
+    cekilmedigi icin eski `avatarUrl` bellekte kalir.
+  - Cikis-giris sonrasinda sohbet listesi yeniden yuklendigi icin fotograf
+    guncel gorunur.
+- Kullanici deneyimi karari:
+  - Sohbet detayina girildiginde veya uygulama tekrar one geldiginde mevcut
+    sohbet katilimcisi bilgisi yenilenmeli; kullanici cikis-giris yapmak zorunda
+    kalmamalidir.
+  - Sohbet ekrani acikken karsi taraf fotografini degistirirse, gercek anlik
+    guncelleme STOMP profil guncelleme olayi ile saglanmalidir.
+- Mimari ve uygulama siniri:
+  - Mevcut `ChatRepository` ve `ChatListViewModel` ortak kaynagi korunacak;
+    ikinci profil kaynagi, yeni graph veya duplicate sohbet state'i
+    eklenmeyecektir.
+  - Ilk duzeltme sohbet acilis/lifecycle yenilemesiyle en kucuk kapsamda
+    yapilabilir. Gercek ekran-ici anlik davranis gerekiyorsa backend profil
+    guncelleme olayini STOMP ile ilgili bagli cihazlara iletecek ve Android
+    mevcut sohbet kaynagini yenileyecektir.
+  - Surekli polling, gorunur yeni bildirim tipi veya topbar icinde dogrudan
+    profil API cagrisi eklenmeyecektir.
+- Test karari:
+  - Sohbet acildiginda eski cache'e ragmen guncel profil fotografiyle topbarin
+    yenilendigi odakli state/repository testi yazilmalidir.
+  - STOMP ile baska cihazdan gelen profil guncellemesinin gercek anlik etkisi
+    manuel coklu cihaz testinde dogrulanacaktir.
+
+### DEG-036 - Ilgili Detay Acilisinda Bildirimi Okundu Yapma
+
+- Durum: `BEKLIYOR`
+- Dogrulanan sorun:
+  - Kullanici bir `CHAT_MESSAGE` bildirimine bildirim kartindan degil, bottom
+    bar sohbet sekmesinden ulasirsa sohbet mesaji okunur; fakat ayni mesaja ait
+    uygulama bildirimi okunmamis kalabilir.
+  - Ayni kopukluk, bildirim kartina basmadan ilgili tur, rezervasyon, odeme veya
+    iade detayina baska bir uygulama akisindan gidildiginde de olusabilir.
+- Kullanici deneyimi karari:
+  - Kullanici ilgili detay ekranini basariyla actiginda yalniz o detayla
+    iliskili bildirimler okunmus yapilmalidir.
+  - Sohbet acilisinda ilgili `chatId` bildirimleri; tur, rezervasyon, odeme ve
+    iade akislarinda ilgili `tourId`, `reservationId` veya `paymentId`
+    bildirimleri hedeflenmelidir.
+  - Ilgisiz bildirimler okunmamis kalmalidir. Sadece bottom bar sekmesine veya
+    bildirim listesinin kendisine girmek tum bildirimleri okumamalidir.
+  - Detay verisi yuklenemez veya yetki/kimlik kontrolu basarisiz olursa ilgili
+    bildirim okunmus sayilmamalidir.
+- Mimari ve uygulama siniri:
+  - Android mevcut typed navigation target kimliklerini kullanacak; yeni
+    bildirim kaynagi veya topbar icinde dogrudan domain API cagrisi
+    eklenmeyecektir.
+  - Backend, kullanicinin sahip oldugu ve gonderilen hedef kimligiyle eslesen
+    okunmamis bildirimleri atomik ve idempotent bicimde guncellemelidir.
+  - Mevcut tekil `notificationId` ile okuma ve `Tümünü Okundu Yap` akislarinin
+    anlami korunacak; yeni akis yalniz ilgili hedefe gore toplu okumadir.
+  - Android tarafinda bildirim sayisi elle azaltmak yerine backend sonucuyla
+    canonical `unreadCount` yenilenecektir.
+- Test karari:
+  - Sohbet bottom bar yoluyla acildiginda ilgili bildirimlerin okundu oldugu,
+    sohbet ve topbar rozetlerinin birlikte guncellendigi state/repository
+    testi yazilmalidir.
+  - Tur, rezervasyon ve odeme detaylarinda hedef kimlige gore yalniz ilgili
+    bildirimlerin okundugu odakli backend/API testi yazilmalidir.
+  - Ilgisiz bildirimlerin kaldigi, basarisiz detay yuklemesinde bildirimin
+    okunmadigi ve tekrarli istegin idempotent oldugu test edilmelidir.
+  - Salt bildirim ikonunun veya rozet yerlesiminin gorunumu icin kirilgan UI
+    testi yazilmayacak; ilgili davranis manuel kullanici testinde de
+    dogrulanacaktir.
+
+### TEST-001 - Admin Onayi Sonrasi 12 Maddelik Son Kontrol
+
+- Durum: `BEKLIYOR`
+- Kapsam:
+  - `DEG-023` - `DEG-034` arasindaki 12 degisikligin manuel kullanici testi
+    basarili tamamlandi. Yalniz admin onayi sonrasi dashboard ve sekme sonucu
+    ayri olarak kontrol edilecek.
+- Manuel test adimlari:
+  - Rehber hesabinda `Onay Bekliyor` sayacinda bekleyen tur bulunmalidir.
+  - Admin, Erdem hesabinin `PENDING_REVIEW` turunu onaylamalidir.
+  - Rehber tarafinda `Onay Bekliyor` sayisi azalip `Yayinda` sayisi artmalidir.
+  - Onaylanan tur `Aktif` sekmesinde gorunmeli ve `TOUR_APPROVED` bildirimi
+    topbar/son hareketlerde yer almalidir.
+  - Sayaclar cikis-giris yapmadan, canonical backend dashboard sonucu ile
+    guncellenmelidir. FCM kapali bir demo ortaminda lifecycle/manuel yenileme
+    sonrasinda ayni dogru deger gorulmelidir.
+- Basari kriteri:
+  - Bekleyen tur `1 -> 0`, yayinlanan tur `0 -> 1` olarak dogru guncellenir;
+    tur Aktif sekmesinde gorunur ve bildirim kaybolmazsa test tamamlanir.
+- Test siniri:
+  - Bu manuel kontrolde yeni kod yazilmayacak; yalniz mevcut admin onayi,
+    bildirim, dashboard projection ve navigation sonucu dogrulanacaktir.
+
 ## Toplu Uygulama Kontrol Noktasi
 
-- Son kaydedilen madde: `DEG-022`
-- Uygulama izni: DEG-019 - DEG-022 icin VERILDI ve uygulama tamamlandi.
-- Kod degisikligi: DEG-001 - DEG-022 YAPILDI.
-- Otomatik dogrulama: Android `ktfmtCheck`, 168 JVM testi,
-  `compileDebugKotlin` ve `lintDebug` basarili. Backend PostgreSQL
-  Testcontainers testleri dahil 214 test basarili; hata, failure veya skip yok.
-  DEG-014 mapper/resolver ve push whitelist, DEG-015 sayfalama, DEG-016 nullable
-  rezervasyon sozlesmesi, DEG-017 Android okundu davranisi ve backend
-  eszamanlilik senaryosu odakli testlerle korunuyor.
-- Kullanici dogrulamasi: DEG-001 - DEG-013 tamamlandi.
-- Kapanis: DEG-014 - DEG-022 kodsal ve otomatik test olarak tamamlandi. Bu
-  maddelerin gercek cihaz, navigation ve kullanici gorunumu kontrolleri manuel
-  kullanici testinde ayrica dogrulanacak. Degisen kapsamin kullanilmayan
-  kod/import/resource ve bos paket taramasi temiz.
-- Siradaki is: Kullanici testlerine devam etmek ve yeni bulgulari sirayla bu
-  listeye eklemek. Her yeni kod
-  degisikliginden once bu dosyadaki Altin Kural ve Test Altin Kurali yeniden
-  okunmalidir.
+- Son kaydedilen kod maddesi: `DEG-034`
+- Son kaydedilen bekleyen madde: `DEG-036`
+- Son kaydedilen manuel test: `TEST-001`
+- Uygulama izni: DEG-023 - DEG-034 icin VERILDI ve uygulama tamamlandi.
+- Kod degisikligi: DEG-001 - DEG-034 YAPILDI; DEG-035 ve DEG-036 henuz
+  uygulanmadi.
+- Otomatik dogrulama: Android 180 JVM testi, `ktfmtCheck`, `lintDebug` ve
+  `assembleDebug` basarili. Backend PostgreSQL 18 Testcontainers ve Flyway V15
+  migration dogrulamasi dahil 215 test basarili; hata, failure veya skip yok.
+  DEG-023 - DEG-034 kapsamindaki publish validasyonu, canonical dil katalogu,
+  navigation sekme sonucu, canli dashboard yenilemesi, `EXPIRED` yasam dongusu
+  ve hosted odeme iptal/locale davranislari odakli testlerle korunuyor.
+- Kullanici dogrulamasi: DEG-001 - DEG-013 ve DEG-023 - DEG-034 kapsamindaki
+  manuel kontroller basarili; yalniz `TEST-001` bekliyor.
+- Kapanis: DEG-014 - DEG-034 kodsal ve otomatik test olarak tamamlandi. Bu
+  maddelerin gercek cihaz, demo FCM, iyzico Sandbox, navigation ve kullanici
+  gorunumu kontrolleri manuel kullanici testinde ayrica dogrulanacak. Degisen
+  kapsamin kullanilmayan kod/import/resource ve bos paket taramasi temiz.
+- Siradaki is: `TEST-001` admin onayi sonrasi dashboard/sekme kontrolu; ardindan
+  `DEG-035` ve `DEG-036` maddeleri kullanici karariyla uygulanacaktir.
+  Her yeni kod degisikliginden once bu dosyadaki Altin Kural ve Test Altin
+  Kurali yeniden okunmalidir.
 - Baglam yenilenirse bu dosya okunur ve yalniz `BEKLIYOR`, `NETLESTIRILECEK`
   veya `ONAYLANDI` durumundaki maddeler uzerinden devam edilir.

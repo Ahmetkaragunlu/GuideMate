@@ -6,25 +6,12 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateT
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourCardUiModel
-import java.time.Instant
 import java.util.Locale
 
-fun GuideTourCard.toGuideTourCardUiModel(
-    now: Instant = Instant.now(),
-): GuideTourCardUiModel {
+fun GuideTourCard.toGuideTourCardUiModel(): GuideTourCardUiModel {
     val locale = Locale.getDefault()
     val country = LocaleSelectionCatalog.country(countryCode, locale)?.displayName ?: countryCode
     val languages = languageCodes.mapNotNull { LocaleSelectionCatalog.language(it, locale) }
-    val effectiveStatus =
-        if (
-            sessionStatus != TourSessionStatus.CANCELLED &&
-                sessionStatus != TourSessionStatus.COMPLETED &&
-                !startsAt.plusSeconds(durationMinutes * 60L).isAfter(now)
-        ) {
-            TourSessionStatus.COMPLETED
-        } else {
-            sessionStatus
-        }
     return GuideTourCardUiModel(
         id = sessionId,
         tourId = tourId,
@@ -42,7 +29,7 @@ fun GuideTourCard.toGuideTourCardUiModel(
         rating = averageRating.takeIf { reviewCount > 0 },
         reviewCount = reviewCount.takeIf { it > 0 },
         approvalStatus = approvalStatus,
-        sessionStatus = effectiveStatus,
+        sessionStatus = sessionStatus,
         rejectionReason = rejectionReason,
         canArchive = canArchive,
         earningsMinor = netEarningsMinor,

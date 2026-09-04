@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
@@ -18,17 +17,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-internal const val GUIDE_MY_TOURS_SELECTED_TAB_RESULT = "guideMyToursSelectedTab"
 
 @HiltViewModel
 class GuideMyToursViewModel
     @Inject
     constructor(
-        savedStateHandle: SavedStateHandle,
         private val repository: GuideTourRepository,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
@@ -40,22 +35,15 @@ class GuideMyToursViewModel
 
         init {
             refresh()
-            viewModelScope.launch {
-                savedStateHandle
-                    .getStateFlow(GUIDE_MY_TOURS_SELECTED_TAB_RESULT, "")
-                    .filter(String::isNotBlank)
-                    .collect { tabName ->
-                        GuideTourTab.entries.firstOrNull { it.name == tabName }?.let { tab ->
-                            _uiState.update { it.copy(selectedTab = tab) }
-                            refresh()
-                        }
-                        savedStateHandle[GUIDE_MY_TOURS_SELECTED_TAB_RESULT] = ""
-                    }
-            }
         }
 
         fun changeTab(tab: GuideTourTab) {
             if (tab == _uiState.value.selectedTab) return
+            _uiState.update { it.copy(selectedTab = tab) }
+            refresh()
+        }
+
+        fun applyNavigationResult(tab: GuideTourTab) {
             _uiState.update { it.copy(selectedTab = tab) }
             refresh()
         }

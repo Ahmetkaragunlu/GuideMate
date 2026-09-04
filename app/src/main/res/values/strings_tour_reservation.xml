@@ -126,6 +126,9 @@
     <string name="error_capacity_below_booked_count">Kontenjan mevcut katılımcı sayısından düşük olamaz.</string>
 
     <string name="error_session_status_not_manageable">Turun mevcut durumu bu işlem için uygun değil.</string>
+    <string name="tour_status_expired">Gerçekleşmedi</string>
+    <string name="tour_expired_no_participants">Katılımcı olmadığı için gerçekleşmedi.</string>
+    <string name="checkout_error_tour_expired">Bu tur katılımcı olmadığı için gerçekleşmedi.</string>
 
     <string name="error_schedule_conflict">Seçilen tarih ve saatte başka bir turunuz bulunuyor.</string>
 
@@ -166,6 +169,22 @@
     <string name="error_tour_step2_invalid">Kategori, en az bir hizmet dili, pozitif ücret ve kapasite gereklidir.</string>
 
     <string name="error_tour_step3_invalid">Tur adı, kapak fotoğrafı, açıklama ve buluşma noktası alanlarını doldurun.</string>
+
+    <string name="error_tour_title_required">Tur adı boş bırakılamaz.</string>
+
+    <string name="error_tour_title_length">Tur adı 3 ile 120 karakter arasında olmalıdır.</string>
+
+    <string name="error_tour_cover_required">Tur kapak fotoğrafını seçin.</string>
+
+    <string name="error_tour_description_required">Tur açıklaması boş bırakılamaz.</string>
+
+    <string name="error_tour_description_length">Tur açıklaması 20 ile 3000 karakter arasında olmalıdır.</string>
+
+    <string name="error_tour_meeting_point_required">Buluşma noktası boş bırakılamaz.</string>
+
+    <string name="error_tour_meeting_point_length">Buluşma noktası en fazla 500 karakter olabilir.</string>
+
+    <string name="error_tour_languages_too_many">Bir tur için en fazla 20 hizmet dili seçebilirsiniz.</string>
 
     <string name="error_session_creation">Tarih, saat, süre, fiyat ve kapasiteyi kontrol edin. Başka bir turunuzla saat çakışması da olabilir.</string>
 

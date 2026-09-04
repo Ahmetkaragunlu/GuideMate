@@ -18,25 +18,27 @@ import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewMode
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.GuideEarningsViewModel
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeScreen
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeViewModel
-import com.ahmetkaragunlu.guidemate.notification.presentation.model.NotificationUiModel
+import com.ahmetkaragunlu.guidemate.notification.presentation.model.NotificationUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.GuideProfileScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.preview.GuideProfilePreviewScreen
+import kotlinx.coroutines.flow.StateFlow
 
 internal fun NavGraphBuilder.guideNavGraph(
     guideNavController: NavController,
     routeNavController: NavController,
     homeViewModel: GuideHomeViewModel,
     earningsViewModel: GuideEarningsViewModel,
-    recentNotifications: List<NotificationUiModel>,
+    notificationState: StateFlow<NotificationUiState>,
     chatListViewModel: ChatListViewModel,
     onBackActionChanged: ((() -> Unit)?) -> Unit,
 ) {
     composable<GuideDestination.Home> {
         val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+        val notificationUiState by notificationState.collectAsStateWithLifecycle()
         GuideHomeScreen(
             uiState = homeUiState,
-            recentNotifications = recentNotifications,
+            recentNotifications = notificationUiState.recentNotifications,
             onNavigateToEarnings = {
                 guideNavController.navigateTo(GuideWalletDestination.Earnings)
             },

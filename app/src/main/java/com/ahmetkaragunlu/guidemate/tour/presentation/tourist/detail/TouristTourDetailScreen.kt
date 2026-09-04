@@ -33,8 +33,7 @@ fun TouristTourDetailScreen(
                 uiState = detail,
                 mode =
                     when {
-                        detail.sessionStatus == TourDetailStatus.COMPLETED ||
-                            detail.sessionStatus == TourDetailStatus.CANCELLED ->
+                        detail.sessionStatus != null ->
                             TourDetailMode.TOURIST_PAST
                         bookingAvailability.isBookable -> TourDetailMode.TOURIST_BOOKABLE
                         else -> TourDetailMode.TOURIST_UNAVAILABLE

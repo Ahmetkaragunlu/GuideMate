@@ -99,6 +99,12 @@ private fun TourStatusSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = colorResource(R.color.text_color),
             )
+        } else if (status == TourDetailStatus.EXPIRED) {
+            Text(
+                text = stringResource(R.string.tour_expired_no_participants),
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorResource(R.color.text_color),
+            )
         }
     }
 }

@@ -96,7 +96,7 @@ class TourBookingAvailabilityTest {
     }
 
     @Test
-    fun `cancelled and completed sessions keep their terminal reason`() {
+    fun `terminal sessions keep backend reason`() {
         assertEquals(
             TourBookingAvailability.CANCELLED,
             availableTour
@@ -109,10 +109,16 @@ class TourBookingAvailabilityTest {
                 .copy(session = availableTour.session.copy(status = TourSessionStatus.COMPLETED))
                 .resolveBookingAvailability(hasReservation = false, now = NOW),
         )
+        assertEquals(
+            TourBookingAvailability.EXPIRED,
+            availableTour
+                .copy(session = availableTour.session.copy(status = TourSessionStatus.EXPIRED))
+                .resolveBookingAvailability(hasReservation = false, now = NOW),
+        )
     }
 
     @Test
-    fun `expired open session is treated as completed`() {
+    fun `ended open session is started until backend closes its lifecycle`() {
         val expiredSession =
             availableTour.session.copy(
                 startsAt = NOW.minusSeconds(7_200),
@@ -120,7 +126,7 @@ class TourBookingAvailabilityTest {
             )
 
         assertEquals(
-            TourBookingAvailability.COMPLETED,
+            TourBookingAvailability.STARTED,
             availableTour
                 .copy(session = expiredSession)
                 .resolveBookingAvailability(hasReservation = false, now = NOW),

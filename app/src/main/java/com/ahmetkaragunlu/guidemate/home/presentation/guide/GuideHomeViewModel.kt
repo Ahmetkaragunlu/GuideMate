@@ -92,7 +92,9 @@ class GuideHomeViewModel
     }
 
 private fun NotificationType.affectsGuideDashboard(): Boolean =
-    this == NotificationType.TOUR_PURCHASED ||
+    this == NotificationType.TOUR_APPROVED ||
+        this == NotificationType.TOUR_REJECTED ||
+        this == NotificationType.TOUR_PURCHASED ||
         this == NotificationType.RESERVATION_CANCELLED ||
         this == NotificationType.TOUR_COMPLETED ||
         this == NotificationType.RATING_RECEIVED ||

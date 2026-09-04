@@ -8,4 +8,5 @@ enum class TourSessionStatus(
     CLOSED(canToggleBookingAvailability = true, isTerminal = false),
     COMPLETED(canToggleBookingAvailability = false, isTerminal = true),
     CANCELLED(canToggleBookingAvailability = false, isTerminal = true),
+    EXPIRED(canToggleBookingAvailability = false, isTerminal = true),
 }

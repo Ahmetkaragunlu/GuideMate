@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.common.location.model.LocationOption
+import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.isValidCurrencyInput
@@ -165,29 +166,21 @@ class GuideTourPublishViewModel
             updateDraft { copy(session = session.copy(meetingPoint = value)) }
 
         fun validateStep1(): Boolean =
-            validateStep(
-                isValid = draftState.value.isStep1Valid(),
-                step = GuideTourPublishStep.LOCATION_AND_TIME,
-                errorResId = R.string.error_tour_step1_invalid,
-            )
+            validateStep(GuideTourPublishStep.LOCATION_AND_TIME)
 
         fun validateStep2(): Boolean =
-            validateStep(
-                isValid = draftState.value.isStep2Valid(),
-                step = GuideTourPublishStep.TECHNICAL_DETAILS,
-                errorResId = R.string.error_tour_step2_invalid,
-            )
+            validateStep(GuideTourPublishStep.TECHNICAL_DETAILS)
 
         fun validateStep3(): Boolean =
-            validateStep(
-                isValid = draftState.value.isStep3Valid(),
-                step = GuideTourPublishStep.CONTENT_AND_MEDIA,
-                errorResId = R.string.error_tour_step3_invalid,
-            )
+            validateStep(GuideTourPublishStep.CONTENT_AND_MEDIA)
 
         fun onPublishClick() {
             val form = draftState.value
             if (form.isPublishing || form.publishSucceeded) return
+            form.firstValidationError()?.let { error ->
+                showValidationError(error.messageResId, error.step)
+                return
+            }
             val inputWithoutCover = form.toCreateInputOrNull(coverMediaId = null)
             val imageUri = form.selectedCoverImageUri
             if (inputWithoutCover == null || imageUri == null) {
@@ -231,7 +224,7 @@ class GuideTourPublishViewModel
                             }
                             is DataResult.Error -> {
                                 mediaRepository.deleteUnreferenced(upload.data.mediaAssetId)
-                                finishWithError(result.error.toMessage(resourceProvider))
+                                finishWithError(result.error)
                             }
                         }
                     }
@@ -245,12 +238,10 @@ class GuideTourPublishViewModel
             }
         }
 
-        private fun validateStep(
-            isValid: Boolean,
-            step: GuideTourPublishStep,
-            @StringRes errorResId: Int,
-        ): Boolean {
-            if (!isValid) return showValidationError(errorResId, step)
+        private fun validateStep(step: GuideTourPublishStep): Boolean {
+            draftState.value.findValidationError(step)?.let { error ->
+                return showValidationError(error.messageResId, step)
+            }
             draftState.update {
                 it.copy(
                     submission =
@@ -288,6 +279,24 @@ class GuideTourPublishViewModel
             }
         }
 
+        private fun finishWithError(error: AppError) {
+            error.toTourPublishValidationError()?.let { validationError ->
+                draftState.update {
+                    it.copy(
+                        submission =
+                            it.submission.copy(
+                                isPublishing = false,
+                                errorMessage = null,
+                                validationErrorStep = validationError.step,
+                                validationErrorResId = validationError.messageResId,
+                            ),
+                    )
+                }
+                return
+            }
+            finishWithError(error.toMessage(resourceProvider))
+        }
+
         private fun updateDraft(transform: GuideTourPublishUiState.() -> GuideTourPublishUiState) {
             draftState.update { state ->
                 state.transform().copy(
@@ -302,29 +311,133 @@ class GuideTourPublishViewModel
         }
     }
 
-private fun GuideTourPublishUiState.isStep1Valid(): Boolean =
-    countryCode.isNotBlank() &&
-        country.isNotBlank() &&
-        cityPlaceId.isNotBlank() &&
-        city.isNotBlank() &&
-        timeZoneId.isNotBlank() &&
-        toStartInstant()?.isAfter(Instant.now()) == true &&
-        durationMinutes?.let { it > 0 } == true
+private data class TourPublishValidationError(
+    val step: GuideTourPublishStep,
+    @param:StringRes val messageResId: Int,
+)
 
-private fun GuideTourPublishUiState.isStep2Valid(): Boolean =
-    category != null &&
-        spokenLanguages.isNotEmpty() &&
-        price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } == true &&
-        capacity.toIntOrNull()?.let { it > 0 } == true
+private fun GuideTourPublishUiState.firstValidationError(): TourPublishValidationError? =
+    PUBLISH_INPUT_STEPS.firstNotNullOfOrNull(::findValidationError)
 
-private fun GuideTourPublishUiState.isStep3Valid(): Boolean =
-    tourName.isNotBlank() &&
-        selectedCoverImageUri != null &&
-        tourDescription.isNotBlank() &&
-        meetingPoint.isNotBlank()
+private fun GuideTourPublishUiState.findValidationError(
+    step: GuideTourPublishStep,
+): TourPublishValidationError? =
+    when (step) {
+        GuideTourPublishStep.LOCATION_AND_TIME ->
+            if (
+                countryCode.isBlank() ||
+                    country.isBlank() ||
+                    cityPlaceId.isBlank() ||
+                    city.isBlank() ||
+                    timeZoneId.isBlank() ||
+                    toStartInstant()?.isAfter(Instant.now()) != true ||
+                    durationMinutes?.let { it > 0 } != true
+            ) {
+                TourPublishValidationError(step, R.string.error_tour_step1_invalid)
+            } else {
+                null
+            }
+        GuideTourPublishStep.TECHNICAL_DETAILS ->
+            when {
+                spokenLanguages.size > MAX_TOUR_LANGUAGE_COUNT ->
+                    TourPublishValidationError(step, R.string.error_tour_languages_too_many)
+                category == null ||
+                    spokenLanguages.isEmpty() ||
+                    price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } != true ||
+                    capacity.toIntOrNull()?.let { it > 0 } != true ->
+                    TourPublishValidationError(step, R.string.error_tour_step2_invalid)
+                else -> null
+            }
+        GuideTourPublishStep.CONTENT_AND_MEDIA -> contentValidationError()
+        GuideTourPublishStep.PREVIEW -> firstValidationError()
+    }
+
+private fun GuideTourPublishUiState.contentValidationError(): TourPublishValidationError? {
+    val step = GuideTourPublishStep.CONTENT_AND_MEDIA
+    val trimmedTitle = tourName.trim()
+    val trimmedDescription = tourDescription.trim()
+    val trimmedMeetingPoint = meetingPoint.trim()
+    return when {
+        trimmedTitle.isEmpty() ->
+            TourPublishValidationError(step, R.string.error_tour_title_required)
+        trimmedTitle.length !in TOUR_TITLE_MIN_LENGTH..TOUR_TITLE_MAX_LENGTH ->
+            TourPublishValidationError(step, R.string.error_tour_title_length)
+        selectedCoverImageUri == null ->
+            TourPublishValidationError(step, R.string.error_tour_cover_required)
+        trimmedDescription.isEmpty() ->
+            TourPublishValidationError(step, R.string.error_tour_description_required)
+        trimmedDescription.length !in TOUR_DESCRIPTION_MIN_LENGTH..TOUR_DESCRIPTION_MAX_LENGTH ->
+            TourPublishValidationError(step, R.string.error_tour_description_length)
+        trimmedMeetingPoint.isEmpty() ->
+            TourPublishValidationError(step, R.string.error_tour_meeting_point_required)
+        trimmedMeetingPoint.length > TOUR_MEETING_POINT_MAX_LENGTH ->
+            TourPublishValidationError(step, R.string.error_tour_meeting_point_length)
+        else -> null
+    }
+}
+
+private fun AppError.toTourPublishValidationError(): TourPublishValidationError? {
+    val backendError = this as? AppError.Backend ?: return null
+    return backendError.fieldErrors.firstNotNullOfOrNull { fieldError ->
+        when (fieldError.field.substringAfterLast('.')) {
+            "title" ->
+                TourPublishValidationError(
+                    GuideTourPublishStep.CONTENT_AND_MEDIA,
+                    if (fieldError.code == FIELD_REQUIRED_CODE) {
+                        R.string.error_tour_title_required
+                    } else {
+                        R.string.error_tour_title_length
+                    },
+                )
+            "description" ->
+                TourPublishValidationError(
+                    GuideTourPublishStep.CONTENT_AND_MEDIA,
+                    if (fieldError.code == FIELD_REQUIRED_CODE) {
+                        R.string.error_tour_description_required
+                    } else {
+                        R.string.error_tour_description_length
+                    },
+                )
+            "meetingPoint" ->
+                TourPublishValidationError(
+                    GuideTourPublishStep.CONTENT_AND_MEDIA,
+                    if (fieldError.code == FIELD_REQUIRED_CODE) {
+                        R.string.error_tour_meeting_point_required
+                    } else {
+                        R.string.error_tour_meeting_point_length
+                    },
+                )
+            "languageCodes" ->
+                TourPublishValidationError(
+                    GuideTourPublishStep.TECHNICAL_DETAILS,
+                    if (fieldError.code == INVALID_SIZE_CODE) {
+                        R.string.error_tour_languages_too_many
+                    } else {
+                        R.string.error_tour_step2_invalid
+                    },
+                )
+            "countryCode", "cityPlaceId", "cityName", "timeZoneId", "startsAt", "durationMinutes" ->
+                TourPublishValidationError(
+                    GuideTourPublishStep.LOCATION_AND_TIME,
+                    R.string.error_tour_step1_invalid,
+                )
+            "categoryCode", "priceMinor", "capacity" ->
+                TourPublishValidationError(
+                    GuideTourPublishStep.TECHNICAL_DETAILS,
+                    R.string.error_tour_step2_invalid,
+                )
+            "coverMediaId" ->
+                TourPublishValidationError(
+                    GuideTourPublishStep.CONTENT_AND_MEDIA,
+                    R.string.error_tour_cover_required,
+                )
+            else -> null
+        }
+    }
+}
 
 private fun GuideTourPublishUiState.toCreateInputOrNull(coverMediaId: String?): CreateGuideTourInput? {
-    if (!isStep1Valid() || !isStep2Valid() || !isStep3Valid()) return null
+    if (firstValidationError() != null) return null
     val selectedCategory = category ?: return null
     val startsAt = toStartInstant() ?: return null
     val duration = durationMinutes ?: return null
@@ -362,3 +475,19 @@ private fun GuideTourPublishUiState.toStartInstant(): Instant? {
 
 private fun String.toZoneId(): ZoneId =
     runCatching { ZoneId.of(this) }.getOrDefault(ZoneId.systemDefault())
+
+private const val TOUR_TITLE_MIN_LENGTH = 3
+private const val TOUR_TITLE_MAX_LENGTH = 120
+private const val TOUR_DESCRIPTION_MIN_LENGTH = 20
+private const val TOUR_DESCRIPTION_MAX_LENGTH = 3_000
+private const val TOUR_MEETING_POINT_MAX_LENGTH = 500
+private const val MAX_TOUR_LANGUAGE_COUNT = 20
+private const val FIELD_REQUIRED_CODE = "FIELD_REQUIRED"
+private const val INVALID_SIZE_CODE = "INVALID_SIZE"
+
+private val PUBLISH_INPUT_STEPS =
+    listOf(
+        GuideTourPublishStep.LOCATION_AND_TIME,
+        GuideTourPublishStep.TECHNICAL_DETAILS,
+        GuideTourPublishStep.CONTENT_AND_MEDIA,
+    )

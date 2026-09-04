@@ -17,7 +17,6 @@ import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.isEffectivelyTerminal
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.mapper.toTourDetailUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailMode
@@ -74,18 +73,17 @@ class GuideTourDetailViewModel
                             }
                         } else {
                             details = result.data
-                            val now = Instant.now()
                             _uiState.update {
                                 it.copy(
                                     detail =
                                         TourWithSession(result.data.tour, session)
-                                            .toTourDetailUiState(now),
+                                            .toTourDetailUiState(),
                                     mode =
                                         when {
                                             result.data.tour.approvalStatus !=
                                                 TourApprovalStatus.APPROVED ->
                                                 TourDetailMode.GUIDE_REVIEW
-                                            session.isEffectivelyTerminal(now) ->
+                                            session.status.isTerminal ->
                                                 TourDetailMode.GUIDE_PAST
                                             else -> TourDetailMode.GUIDE_ACTIVE
                                         },

@@ -25,13 +25,3 @@ data class TourSession(
     val endsAt: Instant
         get() = startsAt.plusSeconds(durationMinutes * 60L)
 }
-
-fun TourSession.effectiveStatus(now: Instant): TourSessionStatus =
-    when {
-        status == TourSessionStatus.CANCELLED -> TourSessionStatus.CANCELLED
-        status == TourSessionStatus.COMPLETED || !endsAt.isAfter(now) ->
-            TourSessionStatus.COMPLETED
-        else -> status
-    }
-
-fun TourSession.isEffectivelyTerminal(now: Instant): Boolean = effectiveStatus(now).isTerminal

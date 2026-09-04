@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage
 
-import androidx.lifecycle.SavedStateHandle
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
@@ -8,6 +7,7 @@ import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.testGuideTourCard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourListType
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -48,7 +48,6 @@ class GuideMyToursViewModelTest {
                 }
             val viewModel =
                 GuideMyToursViewModel(
-                    savedStateHandle = SavedStateHandle(),
                     repository = repository,
                     resourceProvider = FakeResourceProvider(),
                 )
@@ -64,6 +63,42 @@ class GuideMyToursViewModelTest {
             assertFalse(viewModel.uiState.value.canLoadMore)
             assertEquals(
                 listOf(GuideTourListType.ACTIVE to 0, GuideTourListType.ACTIVE to 1),
+                repository.listRequests,
+            )
+        }
+
+    @Test
+    fun navigationResultSelectsRequestedTabAndRefreshesItsFirstPage() =
+        runTest {
+            val repository =
+                FakeGuideTourRepository().apply {
+                    listResults +=
+                        DataResult.Success(
+                            guideTourPage(page = 0, isLast = true)
+                        )
+                    listResults +=
+                        DataResult.Success(
+                            guideTourPage(
+                                page = 0,
+                                isLast = true,
+                                testGuideTourCard("tour-review", "session-review"),
+                            )
+                        )
+                }
+            val viewModel =
+                GuideMyToursViewModel(
+                    repository = repository,
+                    resourceProvider = FakeResourceProvider(),
+                )
+            runCurrent()
+
+            viewModel.applyNavigationResult(GuideTourTab.REVIEW)
+            runCurrent()
+
+            assertEquals(GuideTourTab.REVIEW, viewModel.uiState.value.selectedTab)
+            assertEquals(listOf("session-review"), viewModel.uiState.value.tours.map { it.id })
+            assertEquals(
+                listOf(GuideTourListType.ACTIVE to 0, GuideTourListType.REVIEW to 0),
                 repository.listRequests,
             )
         }

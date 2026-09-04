@@ -49,12 +49,20 @@ fun GuideMyToursScreen(
     onNavigateToTourPublish: () -> Unit,
     onNavigateToTourDetail: (tourId: String, sessionId: String) -> Unit,
     onNavigateToTourEdit: (tourId: String, sessionId: String) -> Unit,
+    requestedTab: GuideTourTab? = null,
+    onRequestedTabConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: GuideMyToursViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var tourIdPendingArchive by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(requestedTab) {
+        requestedTab?.let { tab ->
+            viewModel.applyNavigationResult(tab)
+            onRequestedTabConsumed()
+        }
+    }
     LaunchedEffect(uiState.userMessage) {
         uiState.userMessage?.let { message ->
             snackbarHostState.showSnackbar(message)

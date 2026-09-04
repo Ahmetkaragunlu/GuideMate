@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.profile.presentation.components
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +33,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
@@ -57,7 +58,6 @@ fun GuideProfileContent(
     var isAboutExpanded by rememberSaveable { mutableStateOf(false) }
     var showGuideLevelInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
     val screenScrollState = rememberScrollState()
-    val aboutScrollState = rememberScrollState()
 
     Column(
         modifier = modifier
@@ -79,7 +79,6 @@ fun GuideProfileContent(
             biography = uiState.biography,
             isAboutExpanded = isAboutExpanded,
             onExpandAboutClick = { isAboutExpanded = true },
-            aboutScrollState = aboutScrollState,
         )
         Spacer(modifier = Modifier.height(24.dp))
         LanguagesSection(languages = uiState.spokenLanguages)
@@ -142,8 +141,10 @@ private fun AboutSection(
     biography: String,
     isAboutExpanded: Boolean,
     onExpandAboutClick: () -> Unit,
-    aboutScrollState: ScrollState,
 ) {
+    val aboutText = biography.ifBlank { stringResource(R.string.preview_about_text) }
+    var canExpand by remember(aboutText) { mutableStateOf(false) }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.about),
@@ -152,25 +153,28 @@ private fun AboutSection(
             modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
         Surface(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(if (isAboutExpanded) 140.dp else 88.dp),
+            modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium,
             color = Color.Transparent,
         ) {
             Text(
-                text = biography.ifBlank { stringResource(R.string.preview_about_text) },
+                text = aboutText,
                 style = MaterialTheme.typography.bodyMedium,
                 color = colorResource(R.color.text_color),
+                maxLines = if (isAboutExpanded) Int.MAX_VALUE else ABOUT_COLLAPSED_MAX_LINES,
+                overflow = TextOverflow.Ellipsis,
+                onTextLayout = { result ->
+                    if (!isAboutExpanded) {
+                        canExpand = result.hasVisualOverflow
+                    }
+                },
                 modifier =
                     Modifier
-                        .fillMaxSize()
-                        .verticalScroll(aboutScrollState)
+                        .fillMaxWidth()
                         .padding(dimensionResource(R.dimen.spacing_small)),
             )
         }
-        if (!isAboutExpanded) {
+        if (!isAboutExpanded && canExpand) {
             Text(
                 text = stringResource(R.string.preview_read_more),
                 color = colorResource(R.color.brand_color),
@@ -273,6 +277,7 @@ private fun PopularToursSection(
 }
 
 private const val PROFILE_TOUR_PREVIEW_SIZE = 3
+private const val ABOUT_COLLAPSED_MAX_LINES = 4
 
 @Composable
 private fun MessageButtonSection(onClick: () -> Unit) {

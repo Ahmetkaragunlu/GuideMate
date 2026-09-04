@@ -181,7 +181,8 @@
 
     <string name="payment_return_home">ANA SAYFAYA DÖN</string>
 
-    <string name="cancel_payment">Ödemeyi İptal Et</string>
+    <string name="cancel_payment_confirmation_title">Ödemeyi İptal Et</string>
+    <string name="cancel_payment_confirmation_message">Ödemeyi iptal etmek istiyor musunuz?</string>
 
     <string name="bank_accounts">Banka Hesaplarım</string>
 

@@ -7,12 +7,8 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiS
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
-import com.ahmetkaragunlu.guidemate.tour.domain.model.session.effectiveStatus
-import java.time.Instant
 
-fun TourWithSession.toTourDetailUiState(
-    now: Instant = Instant.now(),
-): TourDetailUiState =
+fun TourWithSession.toTourDetailUiState(): TourDetailUiState =
     TourDetailUiState(
         sessionId = session.id,
         tourId = tour.id,
@@ -33,9 +29,10 @@ fun TourWithSession.toTourDetailUiState(
         description = tour.description,
         meetingPoint = session.meetingPoint,
         sessionStatus =
-            when (session.effectiveStatus(now)) {
+            when (session.status) {
                 TourSessionStatus.CANCELLED -> TourDetailStatus.CANCELLED
                 TourSessionStatus.COMPLETED -> TourDetailStatus.COMPLETED
+                TourSessionStatus.EXPIRED -> TourDetailStatus.EXPIRED
                 else -> null
             },
         cancellationReason = session.cancellationReason,

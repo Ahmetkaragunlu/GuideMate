@@ -77,6 +77,12 @@ fun GuideNavigation(
     var showNotifications by rememberSaveable { mutableStateOf(false) }
     var customBackAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
+    LaunchedEffect(currentDestination) {
+        if (currentDestination?.hasRoute<GuideDestination.Home>() == true) {
+            homeViewModel.refreshDashboard()
+        }
+    }
+
     LaunchedEffect(pendingNotificationTarget) {
         pendingNotificationTarget?.let { target ->
             target.notificationId?.let(notificationViewModel::markRead)
@@ -143,7 +149,7 @@ fun GuideNavigation(
                     routeNavController = routeNavController,
                     homeViewModel = homeViewModel,
                     earningsViewModel = earningsViewModel,
-                    recentNotifications = notificationsUiState.recentNotifications,
+                    notificationState = notificationViewModel.uiState,
                     chatListViewModel = chatListViewModel,
                     onBackActionChanged = { customBackAction = it },
                 )

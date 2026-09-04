@@ -8,4 +8,5 @@ enum class TourDetailStatus(
 ) {
     COMPLETED(R.string.tour_status_completed),
     CANCELLED(R.string.tour_status_cancelled),
+    EXPIRED(R.string.tour_status_expired),
 }

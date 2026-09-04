@@ -42,6 +42,22 @@ class GuideTourMapperTest {
     }
 
     @Test
+    fun `maps backend expired session without inferring completion`() {
+        val page =
+            ApiPageResponse(
+                content = listOf(cardResponse().copy(sessionStatus = "EXPIRED")),
+                page = 0,
+                size = 20,
+                totalElements = 1,
+                totalPages = 1,
+                isFirst = true,
+                isLast = true,
+            )
+
+        assertEquals(TourSessionStatus.EXPIRED, page.toDomain().items.single().sessionStatus)
+    }
+
+    @Test
     fun `maps owned detail and selected session canonical data`() {
         val result = detailResponse().toDomain()
 

@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -158,6 +159,10 @@ private fun RoleSelectionCard(
             RadioButton(
                 selected = selected,
                 onClick = onClick,
+                colors =
+                    RadioButtonDefaults.colors(
+                        selectedColor = colorResource(R.color.brand_color),
+                    ),
             )
         }
     }

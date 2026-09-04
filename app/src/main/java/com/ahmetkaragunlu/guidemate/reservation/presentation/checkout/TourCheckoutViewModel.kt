@@ -61,7 +61,7 @@ class TourCheckoutViewModel
 
         val uiState: StateFlow<TourCheckoutUiState> =
             combine(currentTour, actionState) { tourWithSession, action ->
-                val detail = tourWithSession?.toTourDetailUiState(Instant.now())
+                val detail = tourWithSession?.toTourDetailUiState()
                 val availableCapacity = tourWithSession?.session?.availableCapacity ?: 0
 
                 action.copy(

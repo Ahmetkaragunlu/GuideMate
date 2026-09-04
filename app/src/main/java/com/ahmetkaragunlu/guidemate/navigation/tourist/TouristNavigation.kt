@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -84,6 +85,7 @@ fun TouristNavigation(
             ?.chatId
     val activeChat = chatListUiState.chats.firstOrNull { it.chatId == activeChatId }
     var showNotifications by rememberSaveable { mutableStateOf(false) }
+    var customBackAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     LaunchedEffect(pendingNotificationTarget) {
         pendingNotificationTarget?.let { target ->
@@ -123,10 +125,15 @@ fun TouristNavigation(
                     ),
                 userName = userName,
                     onBackClick = {
-                        if (currentDestination?.hasRoute<TouristDestination.Filter>() == true) {
-                            filterExploreViewModel?.cancelFilterEditing()
+                        val backAction = customBackAction
+                        if (backAction != null) {
+                            backAction()
+                        } else {
+                            if (currentDestination?.hasRoute<TouristDestination.Filter>() == true) {
+                                filterExploreViewModel?.cancelFilterEditing()
+                            }
+                            touristNavController.navigateUp()
                         }
-                        touristNavController.navigateUp()
                     },
                     onLogoutClick = onLogoutClick,
                     unreadNotificationCount = notificationUiState.unreadCount,
@@ -143,35 +150,36 @@ fun TouristNavigation(
             },
             bottomBar = {
                 if (navigationUiConfig.showBottomBar) {
-                val selectedDestination = currentDestination.touristBottomBarDestination()
-                AppBottomBar(
-                    selectedDestination = selectedDestination,
-                    items = touristBottomBarItems,
-                    badgeCounts =
-                        mapOf(
-                            TouristBottomBarDestination.CHAT to
-                                chatListUiState.totalUnreadCount,
-                        ),
-                    onDestinationClick = { destination ->
-                        touristNavController.navigateBottomBar(
-                            destination = destination.toRoute(),
-                            startDestination = TouristDestination.Home,
-                        )
-                    },
-                )
+                    val selectedDestination = currentDestination.touristBottomBarDestination()
+                    AppBottomBar(
+                        selectedDestination = selectedDestination,
+                        items = touristBottomBarItems,
+                        badgeCounts =
+                            mapOf(
+                                TouristBottomBarDestination.CHAT to
+                                    chatListUiState.totalUnreadCount,
+                            ),
+                        onDestinationClick = { destination ->
+                            touristNavController.navigateBottomBar(
+                                destination = destination.toRoute(),
+                                startDestination = TouristDestination.Home,
+                            )
+                        },
+                    )
                 }
             },
         ) { innerPadding ->
             NavHost(
-            navController = touristNavController,
-            startDestination = TouristDestination.Home,
-            modifier = Modifier.padding(innerPadding),
+                navController = touristNavController,
+                startDestination = TouristDestination.Home,
+                modifier = Modifier.padding(innerPadding),
             ) {
                 touristNavGraph(
-                touristNavController = touristNavController,
-                routeNavController = routeNavController,
-                homeViewModel = homeViewModel,
-                chatListViewModel = chatListViewModel,
+                    touristNavController = touristNavController,
+                    routeNavController = routeNavController,
+                    homeViewModel = homeViewModel,
+                    chatListViewModel = chatListViewModel,
+                    onBackActionChanged = { customBackAction = it },
                 )
             }
         }

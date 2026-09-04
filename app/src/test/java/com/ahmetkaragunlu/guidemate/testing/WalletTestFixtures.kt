@@ -75,6 +75,7 @@ class FakePaymentRepository : PaymentRepository {
     var checkoutIdempotencyKey: String? = null
     val paymentResults = ArrayDeque<DataResult<Payment>>()
     var cancelResult: DataResult<Payment> = DataResult.Success(testTopUpPayment())
+    var cancelledPaymentId: String? = null
     var clearAllPendingPaymentCalls = 0
 
     override suspend fun getCheckoutCurrencies(): DataResult<CheckoutCurrencies> = currenciesResult
@@ -115,7 +116,10 @@ class FakePaymentRepository : PaymentRepository {
     override suspend fun getPayment(paymentId: String): DataResult<Payment> =
         paymentResults.removeFirst()
 
-    override suspend fun cancelPayment(paymentId: String): DataResult<Payment> = cancelResult
+    override suspend fun cancelPayment(paymentId: String): DataResult<Payment> {
+        cancelledPaymentId = paymentId
+        return cancelResult
+    }
 
     override suspend fun clearPendingPayment(paymentId: String) = Unit
 

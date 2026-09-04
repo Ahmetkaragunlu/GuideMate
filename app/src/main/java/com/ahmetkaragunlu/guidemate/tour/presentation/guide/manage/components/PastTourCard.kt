@@ -78,10 +78,10 @@ fun PastTourCard(
                     Text(
                         text =
                             stringResource(
-                                if (tour.sessionStatus == TourSessionStatus.CANCELLED) {
-                                    R.string.tour_status_cancelled
-                                } else {
-                                    R.string.tour_status_completed
+                                when (tour.sessionStatus) {
+                                    TourSessionStatus.CANCELLED -> R.string.tour_status_cancelled
+                                    TourSessionStatus.EXPIRED -> R.string.tour_status_expired
+                                    else -> R.string.tour_status_completed
                                 },
                             ),
                         style = MaterialTheme.typography.labelMedium,
@@ -125,19 +125,22 @@ fun PastTourCard(
                             .fillMaxWidth()
                             .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
                     horizontalArrangement =
-                        if (tour.sessionStatus == TourSessionStatus.CANCELLED) {
+                        if (tour.sessionStatus != TourSessionStatus.COMPLETED) {
                             Arrangement.End
                         } else {
                             Arrangement.SpaceBetween
                         },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (tour.sessionStatus != TourSessionStatus.CANCELLED) {
+                    if (
+                        tour.sessionStatus == TourSessionStatus.COMPLETED &&
+                            tour.earningsMinor != null
+                    ) {
                         Text(
                             text =
                                 stringResource(
                                     R.string.earnings_format,
-                                    (tour.earningsMinor ?: 0).toPlatformCurrencyFromMinorUnit(),
+                                    tour.earningsMinor.toPlatformCurrencyFromMinorUnit(),
                                 ),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.Green,

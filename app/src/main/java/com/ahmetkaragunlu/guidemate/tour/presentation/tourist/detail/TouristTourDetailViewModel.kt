@@ -62,7 +62,7 @@ class TouristTourDetailViewModel
                             _uiState.value =
                                 TouristTourDetailScreenState(
                                     loadState = ContentLoadState.CONTENT,
-                                    detail = tourWithReviews.toTourDetailUiState(now),
+                                    detail = tourWithReviews.toTourDetailUiState(),
                                     bookingAvailability =
                                         tourWithReviews.resolveBookingAvailability(
                                             hasReservation = false,

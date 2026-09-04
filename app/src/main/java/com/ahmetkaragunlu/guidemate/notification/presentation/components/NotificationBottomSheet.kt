@@ -64,11 +64,7 @@ fun NotificationBottomSheet(
                     .padding(bottom = dimensionResource(R.dimen.spacing_large)),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            NotificationSheetHeader(
-                showMarkAllRead = uiState.unreadCount > 0,
-                isMarkingAllRead = uiState.isMarkingAllRead,
-                onMarkAllRead = onMarkAllRead,
-            )
+            NotificationSheetHeader()
             Text(
                 text = stringResource(R.string.notifications_subtitle),
                 style = MaterialTheme.typography.bodySmall,
@@ -93,16 +89,29 @@ fun NotificationBottomSheet(
                     onLoadMore = onLoadMore,
                 )
             }
+            if (uiState.unreadCount > 0) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    TextButton(
+                        onClick = onMarkAllRead,
+                        enabled = !uiState.isMarkingAllRead,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.notification_mark_all_read),
+                            color = colorResource(R.color.brand_color),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun NotificationSheetHeader(
-    showMarkAllRead: Boolean,
-    isMarkingAllRead: Boolean,
-    onMarkAllRead: () -> Unit,
-) {
+private fun NotificationSheetHeader() {
     Box(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.notifications),
@@ -110,19 +119,6 @@ private fun NotificationSheetHeader(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Center),
         )
-        if (showMarkAllRead) {
-            TextButton(
-                onClick = onMarkAllRead,
-                enabled = !isMarkingAllRead,
-                modifier = Modifier.align(Alignment.CenterEnd),
-            ) {
-                Text(
-                    text = stringResource(R.string.notification_mark_all_read),
-                    color = colorResource(R.color.brand_color),
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            }
-        }
     }
 }
 

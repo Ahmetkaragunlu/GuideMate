@@ -5,6 +5,10 @@ import com.ahmetkaragunlu.guidemate.common.location.model.CityOption
 import com.ahmetkaragunlu.guidemate.common.location.model.CountryOption
 import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.common.location.model.LocationOption
+import com.ahmetkaragunlu.guidemate.common.result.AppError
+import com.ahmetkaragunlu.guidemate.common.result.AppFieldError
+import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
@@ -53,23 +57,7 @@ class GuideTourPublishViewModelTest {
             val collection = backgroundScope.launch { viewModel.uiState.collect {} }
             runCurrent()
 
-            viewModel.onLocationSelected(
-                LocationOption(
-                    country = CountryOption("TR", "Turkiye"),
-                    city = CityOption("istanbul-place-id", "Istanbul", "TR"),
-                )
-            )
-            viewModel.onTourDateSelected(LocalDate.of(2099, 1, 1))
-            viewModel.onStartTimeSelected(LocalTime.of(12, 0))
-            viewModel.onDurationSelected(120)
-            viewModel.onCategorySelected(TourCategory.CULTURE)
-            viewModel.onLanguagesSelected(listOf(LanguageOption("en", "English", "")))
-            viewModel.onPriceChange("100")
-            viewModel.onCapacityChange("10")
-            viewModel.onTourNameChange("  City Walk  ")
-            viewModel.onTourDescriptionChange("  Historic route  ")
-            viewModel.onMeetingPointChange("  Main square  ")
-            viewModel.onCoverImageSelected("content://cover")
+            viewModel.fillValidDraft()
 
             viewModel.onPublishClick()
             runCurrent()
@@ -83,6 +71,86 @@ class GuideTourPublishViewModelTest {
             assertFalse(viewModel.uiState.value.isPublishing)
             collection.cancel()
         }
+
+    @Test
+    fun shortTitleStopsPublishOnContentStep() =
+        runTest {
+            val viewModel = createViewModel()
+            val collection = backgroundScope.launch { viewModel.uiState.collect {} }
+            runCurrent()
+
+            viewModel.onTourNameChange("AB")
+
+            assertFalse(viewModel.validateStep3())
+            runCurrent()
+            assertEquals(
+                GuideTourPublishStep.CONTENT_AND_MEDIA,
+                viewModel.uiState.value.validationErrorStep,
+            )
+            assertEquals(R.string.error_tour_title_length, viewModel.uiState.value.validationErrorResId)
+            collection.cancel()
+        }
+
+    @Test
+    fun backendFieldErrorReturnsUserToItsPublishStep() =
+        runTest {
+            val tourRepository =
+                FakeGuideTourRepository().apply {
+                    createResult =
+                        DataResult.Error(
+                            AppError.Backend(
+                                code = null,
+                                fallbackMessage = null,
+                                fieldErrors =
+                                    listOf(
+                                        AppFieldError(
+                                            field = "content.description",
+                                            code = "INVALID_SIZE",
+                                            fallbackMessage = null,
+                                        )
+                                    ),
+                            )
+                        )
+                }
+            val viewModel = createViewModel(tourRepository = tourRepository)
+            val collection = backgroundScope.launch { viewModel.uiState.collect {} }
+            runCurrent()
+            viewModel.fillValidDraft()
+
+            viewModel.onPublishClick()
+            runCurrent()
+
+            assertEquals(
+                GuideTourPublishStep.CONTENT_AND_MEDIA,
+                viewModel.uiState.value.validationErrorStep,
+            )
+            assertEquals(
+                R.string.error_tour_description_length,
+                viewModel.uiState.value.validationErrorResId,
+            )
+            assertFalse(viewModel.uiState.value.isPublishing)
+            collection.cancel()
+        }
+
+    private fun GuideTourPublishViewModel.fillValidDraft() {
+        onLocationSelected(
+            LocationOption(
+                country = CountryOption("TR", "Turkiye"),
+                city = CityOption("istanbul-place-id", "Istanbul", "TR"),
+            )
+        )
+        onTourDateSelected(LocalDate.of(2099, 1, 1))
+        onStartTimeSelected(LocalTime.of(12, 0))
+        onDurationSelected(120)
+        onCategorySelected(TourCategory.CULTURE)
+        onLanguagesSelected(listOf(LanguageOption("en", "English", "")))
+        onPriceChange("100")
+        onCapacityChange("10")
+        onTourNameChange("  City Walk  ")
+        onTourDescriptionChange("  Historic route through the old city  ")
+        onMeetingPointChange("  Main square  ")
+        onCoverImageSelected("content://cover")
+    }
 
     private fun createViewModel(
         tourRepository: FakeGuideTourRepository = FakeGuideTourRepository(),

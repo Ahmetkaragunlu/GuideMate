@@ -20,6 +20,7 @@ import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.transactions.Tou
 internal fun NavGraphBuilder.touristPaymentNavGraph(
     touristNavController: NavController,
     routeNavController: NavController,
+    onBackActionChanged: ((() -> Unit)?) -> Unit,
 ) {
     val returnToTouristHome: () -> Unit = {
         touristNavController.navigateBottomBar(
@@ -95,6 +96,7 @@ internal fun NavGraphBuilder.touristPaymentNavGraph(
                     launchSingleTop = true
                 }
             },
+            onBackActionChanged = onBackActionChanged,
         )
     }
     composable<TouristPaymentDestination.Status> {

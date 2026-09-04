@@ -84,6 +84,7 @@ internal fun NavDestination?.touristNavigationUiConfig(): NavigationUiConfig =
         hasRoute<TouristPaymentDestination.Hosted>() ->
             touristNavigationUiConfig(
                 titleResId = R.string.secure_payment_title,
+                showBackButton = true,
                 showBottomBar = false,
             )
         hasRoute<TouristPaymentDestination.Status>() ||

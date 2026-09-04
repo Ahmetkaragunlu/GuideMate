@@ -17,6 +17,7 @@ val TourBookingAvailability.detailMessageResId: Int?
             TourBookingAvailability.ALREADY_RESERVED,
             TourBookingAvailability.COMPLETED,
             TourBookingAvailability.CANCELLED,
+            TourBookingAvailability.EXPIRED,
             -> null
         }
 
@@ -31,6 +32,7 @@ val TourBookingAvailability.checkoutErrorResId: Int
             TourBookingAvailability.STARTED -> R.string.tour_booking_started
             TourBookingAvailability.COMPLETED -> R.string.checkout_error_tour_completed
             TourBookingAvailability.CANCELLED -> R.string.checkout_error_tour_cancelled
+            TourBookingAvailability.EXPIRED -> R.string.checkout_error_tour_expired
             TourBookingAvailability.UNAVAILABLE -> R.string.tour_booking_unavailable
             TourBookingAvailability.AVAILABLE -> error("Available tours do not have a checkout error")
         }
