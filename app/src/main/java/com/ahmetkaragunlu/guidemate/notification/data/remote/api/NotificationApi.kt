@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.notification.data.remote.api
 
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.MarkRelatedNotificationsReadRequestDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationPreferencesResponseDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationResponseDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.RegisterDeviceRequestDto
@@ -33,6 +34,11 @@ interface NotificationApi {
     @POST("api/v1/notifications/read-all")
     suspend fun markAllRead(): Response<UnreadCountResponseDto>
 
+    @POST("api/v1/notifications/read-related")
+    suspend fun markRelatedRead(
+        @Body request: MarkRelatedNotificationsReadRequestDto,
+    ): Response<UnreadCountResponseDto>
+
     @GET("api/v1/notifications/preferences")
     suspend fun getPreferences(): Response<NotificationPreferencesResponseDto>
 
@@ -45,5 +51,4 @@ interface NotificationApi {
     suspend fun registerDevice(
         @Body request: RegisterDeviceRequestDto,
     ): Response<ResponseBody>
-
 }

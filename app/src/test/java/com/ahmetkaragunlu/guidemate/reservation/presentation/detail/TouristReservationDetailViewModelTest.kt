@@ -5,6 +5,7 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
 import com.ahmetkaragunlu.guidemate.testing.FakeReservationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeReviewRepository
 import com.ahmetkaragunlu.guidemate.testing.testReservation
 import com.ahmetkaragunlu.guidemate.testing.testSubmittedReview
@@ -35,16 +36,22 @@ class TouristReservationDetailViewModelTest {
                         )
                 }
             val reviewRepository = FakeReviewRepository()
+            val notificationRepository = FakeNotificationRepository()
             val viewModel =
                 TouristReservationDetailViewModel(
                     savedStateHandle = SavedStateHandle(mapOf("reservationId" to "reservation-1")),
                     reservationRepository = reservationRepository,
                     reviewRepository = reviewRepository,
+                    notificationRepository = notificationRepository,
                     resourceProvider = FakeResourceProvider(),
                 )
             runCurrent()
 
             assertTrue(viewModel.uiState.value.canSubmitReview)
+            assertEquals(
+                "reservation-1",
+                notificationRepository.markedRelatedTargets.single().targetId,
+            )
             viewModel.showReviewForm()
             viewModel.updateReviewRating(5)
             viewModel.updateReviewComment("Excellent tour")

@@ -5,6 +5,7 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferences
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -20,6 +21,7 @@ interface NotificationRepository {
     suspend fun refreshUnreadCount(): DataResult<Int>
     suspend fun markRead(notificationId: String): DataResult<AppNotification>
     suspend fun markAllRead(): DataResult<Int>
+    suspend fun markRelatedRead(target: NotificationTargetReference): DataResult<Int>
     suspend fun refreshPreferences(): DataResult<NotificationPreferences>
     suspend fun updatePreferences(update: NotificationPreferenceUpdate): DataResult<NotificationPreferences>
     suspend fun registerDevice(pushInstallationId: String? = null): DataResult<Unit>

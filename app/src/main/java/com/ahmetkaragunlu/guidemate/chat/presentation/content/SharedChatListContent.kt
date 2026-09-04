@@ -8,6 +8,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,15 +20,24 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.chat.presentation.components.ChatListItem
+import com.ahmetkaragunlu.guidemate.chat.presentation.components.SwipeRevealChatItem
 import com.ahmetkaragunlu.guidemate.chat.presentation.model.ChatUiModel
 
 @Composable
 fun SharedChatListContent(
     chatList: List<ChatUiModel>,
     onChatClick: (String) -> Unit,
+    onClearRequest: (ChatUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var revealedChatId by rememberSaveable { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(chatList, revealedChatId) {
+        if (revealedChatId != null && chatList.none { it.chatId == revealedChatId }) {
+            revealedChatId = null
+        }
+    }
+
     if (chatList.isEmpty()) {
         Box(
             modifier = modifier.fillMaxSize(),
@@ -43,9 +57,18 @@ fun SharedChatListContent(
             items = chatList,
             key = ChatUiModel::chatId,
         ) { chatItem ->
-            ChatListItem(
+            SwipeRevealChatItem(
                 chatItem = chatItem,
-                onClick = { onChatClick(chatItem.chatId) },
+                isRevealed = revealedChatId == chatItem.chatId,
+                onRevealChanged = { isRevealed ->
+                    if (isRevealed) {
+                        revealedChatId = chatItem.chatId
+                    } else if (revealedChatId == chatItem.chatId) {
+                        revealedChatId = null
+                    }
+                },
+                onChatClick = { onChatClick(chatItem.chatId) },
+                onClearRequest = { onClearRequest(chatItem) },
             )
             HorizontalDivider(
                 thickness = 0.5.dp,

@@ -14,6 +14,9 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -35,12 +38,15 @@ constructor(
     savedStateHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
     private val userRepository: UserRepository,
+    private val notificationRepository: NotificationRepository,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
     private val chatId = savedStateHandle.toRoute<ChatDestination.Detail>().chatId
     private val inputText = MutableStateFlow("")
     private val requestState = MutableStateFlow(ChatDetailRequestState())
     private var loadJob: Job? = null
+    private var participantRefreshJob: Job? = null
+    private var markReadJob: Job? = null
 
     val uiState: StateFlow<ChatDetailUiState> =
         combine(
@@ -78,17 +84,26 @@ constructor(
         loadJob =
             viewModelScope.launch {
                 requestState.value = ChatDetailRequestState()
-                requestState.value =
-                    when (val result = chatRepository.loadInitialMessages(chatId)) {
-                        is DataResult.Success ->
+                when (val result = chatRepository.loadInitialMessages(chatId)) {
+                    is DataResult.Success -> {
+                        requestState.value =
                             ChatDetailRequestState(loadState = ContentLoadState.CONTENT)
-                        is DataResult.Error ->
+                        markConversationAndNotificationsRead()
+                    }
+                    is DataResult.Error -> {
+                        requestState.value =
                             ChatDetailRequestState(
                                 loadState = ContentLoadState.ERROR,
                                 errorMessage = result.error.toMessage(resourceProvider),
                             )
                     }
+                }
             }
+    }
+
+    fun refreshParticipant() {
+        if (participantRefreshJob?.isActive == true) return
+        participantRefreshJob = viewModelScope.launch { chatRepository.refreshConversations() }
     }
 
     fun loadOlderMessages() {
@@ -139,9 +154,23 @@ constructor(
             }
                 .distinctUntilChanged()
                 .collect { messageId ->
-                    if (messageId != null) chatRepository.markRead(chatId)
+                    if (messageId != null) markConversationAndNotificationsRead()
                 }
         }
+    }
+
+    private fun markConversationAndNotificationsRead() {
+        if (markReadJob?.isActive == true) return
+        markReadJob =
+            viewModelScope.launch {
+                chatRepository.markRead(chatId)
+                notificationRepository.markRelatedRead(
+                    NotificationTargetReference(
+                        type = NotificationTargetType.CHAT,
+                        targetId = chatId,
+                    ),
+                )
+            }
     }
 
     private data class ChatDetailRequestState(

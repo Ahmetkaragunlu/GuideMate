@@ -28,15 +28,19 @@ class MediaRepositoryImpl @Inject constructor(
         localUri: String,
         purpose: MediaPurpose,
     ): DataResult<MediaAsset> {
-        val filePart =
+        val preparedPart =
             try {
                 multipartFactory.create(localUri)
             } catch (exception: MediaPreparationException) {
                 return DataResult.Error(exception.error, exception)
             }
 
-        return execute {
-            api.upload(file = filePart, purpose = purpose.name).toMediaResult(purpose)
+        return try {
+            execute {
+                api.upload(file = preparedPart.part, purpose = purpose.name).toMediaResult(purpose)
+            }
+        } finally {
+            preparedPart.close()
         }
     }
 

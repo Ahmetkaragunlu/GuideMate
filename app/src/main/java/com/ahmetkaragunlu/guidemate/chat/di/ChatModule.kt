@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.chat.di
 
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeClient
-import com.ahmetkaragunlu.guidemate.chat.data.realtime.OkHttpChatRealtimeClient
+import com.ahmetkaragunlu.guidemate.chat.data.realtime.DefaultChatRealtimeClient
 import com.ahmetkaragunlu.guidemate.chat.data.remote.api.ChatApi
 import com.ahmetkaragunlu.guidemate.chat.data.repository.ChatRepositoryImpl
 import com.ahmetkaragunlu.guidemate.chat.domain.repository.ChatRepository
@@ -23,7 +23,7 @@ abstract class ChatModule {
     @Binds
     @Singleton
     abstract fun bindChatRealtimeClient(
-        implementation: OkHttpChatRealtimeClient,
+        implementation: DefaultChatRealtimeClient,
     ): ChatRealtimeClient
 
     companion object {

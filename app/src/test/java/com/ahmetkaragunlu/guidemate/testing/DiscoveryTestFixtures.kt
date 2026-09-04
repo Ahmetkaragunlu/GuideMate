@@ -19,6 +19,10 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
         DataResult.Success(tourSearchPage(page = 0, isLast = true))
     val popularForGuideResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
     val popularForGuideRequests = mutableListOf<GuidePopularRequest>()
+    var sessionResult: DataResult<TourWithSession> =
+        testTourDetails().let { details ->
+            DataResult.Success(TourWithSession(details.tour, details.sessions.first()))
+        }
 
     override suspend fun searchTours(
         query: TourSearchQuery,
@@ -51,7 +55,7 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
         error("Not required by this test fixture")
 
     override suspend fun getSession(sessionId: String): DataResult<TourWithSession> =
-        error("Not required by this test fixture")
+        sessionResult
 }
 
 data class SearchRequest(

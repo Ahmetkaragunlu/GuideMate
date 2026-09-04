@@ -35,6 +35,7 @@ import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.GuideEarn
 import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeViewModel
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.notification.toGuideDestination
+import com.ahmetkaragunlu.guidemate.navigation.notification.marksNotificationAfterSuccessfulLoad
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationViewModel
 import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationSyncEffect
@@ -85,8 +86,11 @@ fun GuideNavigation(
 
     LaunchedEffect(pendingNotificationTarget) {
         pendingNotificationTarget?.let { target ->
-            target.notificationId?.let(notificationViewModel::markRead)
-            guideNavController.navigateTo(target.toGuideDestination())
+            val destination = target.toGuideDestination()
+            if (!destination.marksNotificationAfterSuccessfulLoad()) {
+                target.notificationId?.let(notificationViewModel::markRead)
+            }
+            guideNavController.navigateTo(destination)
             onNotificationNavigationHandled(target)
         }
     }
@@ -162,8 +166,11 @@ fun GuideNavigation(
             onDismiss = { showNotifications = false },
             onNotificationClick = { target ->
                 showNotifications = false
-                target.notificationId?.let(notificationViewModel::markRead)
-                guideNavController.navigateTo(target.toGuideDestination())
+                val destination = target.toGuideDestination()
+                if (!destination.marksNotificationAfterSuccessfulLoad()) {
+                    target.notificationId?.let(notificationViewModel::markRead)
+                }
+                guideNavController.navigateTo(destination)
             },
             onMarkAllRead = notificationViewModel::markAllRead,
             onRefresh = notificationViewModel::refresh,

@@ -6,14 +6,18 @@ import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeClient
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeEvent
 import com.ahmetkaragunlu.guidemate.chat.data.remote.api.ChatApi
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatConversationResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ClearChatRequestDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessagePageResponseDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessageResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantProfileUpdatedResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantResponseDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.SendChatMessageRequestDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.UnreadCountResponseDto
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import java.time.Instant
+import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -126,6 +130,56 @@ class ChatRepositoryImplTest {
     }
 
     @Test
+    fun `clear removes conversation and cached history after canonical success`() = runBlocking {
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
+        try {
+            val api =
+                FakeChatApi().apply {
+                    conversationResponses = listOf(conversation("https://example.com/avatar.jpg"))
+                    clearUnreadCount = 2
+                }
+            val repository = createRepository(api, FakeUserRepository(), scope)
+            repository.refreshConversations()
+            repository.loadInitialMessages(CHAT_ID)
+
+            val result = repository.clearConversation(CHAT_ID)
+
+            assertTrue(result is DataResult.Success)
+            assertEquals(2, repository.totalUnreadCount.value)
+            assertTrue(repository.conversations.value.isEmpty())
+            assertTrue(repository.observeMessages(CHAT_ID).first().messages.isEmpty())
+            assertEquals(CHAT_ID, api.lastClearedChatId)
+            UUID.fromString(requireNotNull(api.lastClearRequest).clientRequestId)
+            Unit
+        } finally {
+            scope.cancel()
+        }
+    }
+
+    @Test
+    fun `clear failure keeps conversation and cached history`() = runBlocking {
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
+        try {
+            val api =
+                FakeChatApi().apply {
+                    conversationResponses = listOf(conversation("https://example.com/avatar.jpg"))
+                    failClear = true
+                }
+            val repository = createRepository(api, FakeUserRepository(), scope)
+            repository.refreshConversations()
+            repository.loadInitialMessages(CHAT_ID)
+
+            val result = repository.clearConversation(CHAT_ID)
+
+            assertTrue(result is DataResult.Error)
+            assertEquals(CHAT_ID, repository.conversations.value.single().chatId)
+            assertEquals(2, repository.observeMessages(CHAT_ID).first().messages.size)
+        } finally {
+            scope.cancel()
+        }
+    }
+
+    @Test
     fun `unexpected disconnect reconnects with backoff and resyncs canonical state`() = runTest {
         val api = FakeChatApi()
         val userRepository = FakeUserRepository()
@@ -147,6 +201,35 @@ class ChatRepositoryImplTest {
         assertEquals(2, realtimeClient.connectCalls)
         assertTrue(api.conversationCalls >= 2)
         assertTrue(api.unreadCountCalls >= 2)
+    }
+
+    @Test
+    fun `participant profile event updates the existing conversation source`() = runTest {
+        val api = FakeChatApi().apply {
+            conversationResponses = listOf(conversation("https://example.com/old-avatar.jpg"))
+        }
+        val realtimeClient = FakeRealtimeClient()
+        val userRepository = FakeUserRepository().apply {
+            state.value = UserState(userId = 42, email = "tourist@example.com")
+        }
+        val repository =
+            createRepository(api, userRepository, backgroundScope, realtimeClient)
+        runCurrent()
+
+        realtimeClient.emit(
+            ChatRealtimeEvent.ParticipantProfileUpdated(
+                ChatParticipantProfileUpdatedResponseDto(
+                    userId = 99,
+                    avatarUrl = "https://example.com/new-avatar.jpg",
+                ),
+            ),
+        )
+        runCurrent()
+
+        assertEquals(
+            "https://example.com/new-avatar.jpg",
+            repository.conversations.value.single().guide.avatarUrl,
+        )
     }
 
     private fun createRepository(
@@ -194,13 +277,18 @@ class ChatRepositoryImplTest {
         var lastSendRequest: SendChatMessageRequestDto? = null
         var failNextSend = false
         var markReadUnreadCount = 0L
+        var clearUnreadCount = 0L
+        var failClear = false
         var lastMarkedReadChatId: String? = null
+        var lastClearedChatId: String? = null
+        var lastClearRequest: ClearChatRequestDto? = null
         var conversationCalls = 0
         var unreadCountCalls = 0
+        var conversationResponses: List<ChatConversationResponseDto> = emptyList()
 
         override suspend fun getConversations(): Response<List<ChatConversationResponseDto>> {
             conversationCalls++
-            return Response.success(emptyList())
+            return Response.success(conversationResponses)
         }
 
         override suspend fun findOrCreate(
@@ -254,6 +342,19 @@ class ChatRepositoryImplTest {
             return Response.success(UnreadCountResponseDto(markReadUnreadCount))
         }
 
+        override suspend fun clearConversation(
+            chatId: String,
+            request: ClearChatRequestDto,
+        ): Response<UnreadCountResponseDto> {
+            lastClearedChatId = chatId
+            lastClearRequest = request
+            return if (failClear) {
+                Response.error(503, "temporary".toResponseBody())
+            } else {
+                Response.success(UnreadCountResponseDto(clearUnreadCount))
+            }
+        }
+
         override suspend fun getUnreadCount(): Response<UnreadCountResponseDto> {
             unreadCountCalls++
             return Response.success(UnreadCountResponseDto(0))
@@ -273,6 +374,17 @@ class ChatRepositoryImplTest {
                 body = body,
                 sentAt = Instant.ofEpochSecond(epochSecond),
                 deliveryStatus = "SENT",
+            )
+
+        fun conversation(avatarUrl: String): ChatConversationResponseDto =
+            ChatConversationResponseDto(
+                chatId = CHAT_ID,
+                guide = ChatParticipantResponseDto(99, "Guide", avatarUrl),
+                tourist = ChatParticipantResponseDto(42, "Tourist", null),
+                lastMessage = null,
+                unreadCount = 0,
+                createdAt = Instant.parse("2026-09-01T12:00:00Z"),
+                lastActivityAt = Instant.parse("2026-09-01T12:00:00Z"),
             )
     }
 

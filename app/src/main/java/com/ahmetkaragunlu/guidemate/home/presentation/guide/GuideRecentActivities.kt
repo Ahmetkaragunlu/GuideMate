@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -36,6 +38,15 @@ internal fun RecentActivities(
     notifications: List<NotificationUiModel>,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+    val newestNotificationId = notifications.firstOrNull()?.id
+
+    LaunchedEffect(newestNotificationId) {
+        if (newestNotificationId != null) {
+            listState.scrollToItem(0)
+        }
+    }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
@@ -44,6 +55,7 @@ internal fun RecentActivities(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.spacing_medium)),
         ) {
             if (notifications.isEmpty()) {

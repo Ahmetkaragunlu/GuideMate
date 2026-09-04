@@ -86,3 +86,10 @@ private fun NotificationNavigationTarget.guideTourDestinationOrFallback(): Any =
     } else {
         GuideTourDestination.MyTours
     }
+
+internal fun Any.marksNotificationAfterSuccessfulLoad(): Boolean =
+    this is ChatDestination.Detail ||
+        this is GuideTourDestination.Detail ||
+        this is TouristDestination.TourDetail ||
+        this is TouristDestination.ReservationDetail ||
+        this is TouristPaymentDestination.Status

@@ -33,5 +33,7 @@ interface ChatRepository {
 
     suspend fun markRead(chatId: String): DataResult<Int>
 
+    suspend fun clearConversation(chatId: String): DataResult<Int>
+
     suspend fun findOrCreate(remoteUserId: Long): DataResult<ChatConversation>
 }

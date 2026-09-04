@@ -7,6 +7,9 @@ import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristDestination
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.review.domain.repository.ReviewRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.resolveBookingAvailability
@@ -29,6 +32,7 @@ class TouristTourDetailViewModel
         savedStateHandle: SavedStateHandle,
         private val tourRepository: TourDiscoveryRepository,
         private val reviewRepository: ReviewRepository,
+        private val notificationRepository: NotificationRepository,
     ) : ViewModel() {
         private val sessionId = savedStateHandle.toRoute<TouristDestination.TourDetail>().sessionId
         private val _uiState = MutableStateFlow(TouristTourDetailScreenState())
@@ -69,6 +73,12 @@ class TouristTourDetailViewModel
                                             now = now,
                                         ),
                                 )
+                            notificationRepository.markRelatedRead(
+                                NotificationTargetReference(
+                                    type = NotificationTargetType.TOUR,
+                                    targetId = tourWithReviews.tour.id,
+                                ),
+                            )
                         }
                         is DataResult.Error -> {
                             _uiState.value =

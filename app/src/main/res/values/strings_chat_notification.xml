@@ -7,6 +7,14 @@
 
     <string name="chat_message_retry">Gönderilemedi. Tekrar dene</string>
 
+    <string name="clear_chat_title">Sohbeti Sil</string>
+
+    <string name="clear_chat_message">%1$s ile olan sohbetiniz silinecektir. Devam etmek istiyor musunuz?</string>
+
+    <string name="clear_chat_confirm">Sil</string>
+
+    <string name="clear_chat_cancel">Vazgeç</string>
+
     <string name="error_chat_not_found">Sohbet bulunamadı veya bu sohbete erişiminiz yok.</string>
 
     <string name="error_chat_participant_invalid">Bu kullanıcıyla sohbet başlatılamıyor.</string>

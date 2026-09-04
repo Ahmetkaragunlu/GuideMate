@@ -7,4 +7,5 @@ data class ChatListUiState(
     val totalUnreadCount: Int = 0,
     val loadState: ContentLoadState = ContentLoadState.LOADING,
     val errorMessage: String? = null,
+    val userMessage: String? = null,
 )

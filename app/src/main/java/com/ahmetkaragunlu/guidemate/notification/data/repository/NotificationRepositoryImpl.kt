@@ -8,13 +8,16 @@ import com.ahmetkaragunlu.guidemate.common.result.mapSuccess
 import com.ahmetkaragunlu.guidemate.common.storage.installation.InstallationIdDataSource
 import com.ahmetkaragunlu.guidemate.notification.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.notification.data.mapper.toDto
+import com.ahmetkaragunlu.guidemate.notification.data.realtime.NotificationRealtimeClient
 import com.ahmetkaragunlu.guidemate.notification.data.remote.api.NotificationApi
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.MarkRelatedNotificationsReadRequestDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.RegisterDeviceRequestDto
 import com.ahmetkaragunlu.guidemate.notification.domain.device.PushInstallationIdProvider
 import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferences
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,6 +42,7 @@ class NotificationRepositoryImpl
 @Inject
 constructor(
     private val api: NotificationApi,
+    private val realtimeClient: NotificationRealtimeClient,
     private val installationIdDataSource: InstallationIdDataSource,
     private val pushInstallationIdProvider: PushInstallationIdProvider,
     private val userRepository: UserRepository,
@@ -68,6 +72,7 @@ constructor(
     private var currentPage = -1
 
     init {
+        observeRealtimeEvents()
         observeAuthenticatedUser()
     }
 
@@ -143,6 +148,33 @@ constructor(
             unreadCount
         }
 
+    override suspend fun markRelatedRead(
+        target: NotificationTargetReference,
+    ): DataResult<Int> =
+        apiCallExecutor.execute(
+            request = {
+                api.markRelatedRead(
+                    MarkRelatedNotificationsReadRequestDto(
+                        targetType = target.type.name,
+                        targetId = target.targetId,
+                    ),
+                )
+            },
+            transform = { it.unreadCount.toSafeInt() },
+        ).mapSuccess { unreadCount ->
+            mutableNotifications.update { notifications ->
+                notifications.map { notification ->
+                    if (!notification.isRead && target.matches(notification.payload)) {
+                        notification.copy(isRead = true)
+                    } else {
+                        notification
+                    }
+                }
+            }
+            mutableUnreadCount.value = unreadCount
+            unreadCount
+        }
+
     override suspend fun refreshPreferences(): DataResult<NotificationPreferences> =
         apiCallExecutor.execute(
             request = api::getPreferences,
@@ -201,8 +233,24 @@ constructor(
                 .distinctUntilChanged()
                 .collect { userId ->
                     clearLocalState()
-                    if (userId != null) registerDevice()
+                    if (userId == null) {
+                        realtimeClient.disconnect()
+                    } else {
+                        realtimeClient.connect()
+                        registerDevice()
+                    }
                 }
+        }
+    }
+
+    private fun observeRealtimeEvents() {
+        applicationScope.launch {
+            realtimeClient.events.collect {
+                if (userRepository.userState.value.isAuthenticated) {
+                    refreshNotifications()
+                    refreshUnreadCount()
+                }
+            }
         }
     }
 }

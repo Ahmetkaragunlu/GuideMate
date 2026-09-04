@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,10 +27,12 @@ class GuideTourDetailViewModelTest {
     fun cancellationRequiresReasonThenUsesIdempotentRequestAndFinishesInPast() =
         runTest {
             val repository = FakeGuideTourRepository()
-            val viewModel = createViewModel(repository)
+            val notificationRepository = FakeNotificationRepository()
+            val viewModel = createViewModel(repository, notificationRepository)
             runCurrent()
 
             assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.loadState)
+            assertEquals("tour-1", notificationRepository.markedRelatedTargets.single().targetId)
             viewModel.cancelSession()
             assertNull(repository.cancelSessionRequest)
 
@@ -43,7 +46,10 @@ class GuideTourDetailViewModelTest {
             assertEquals(GuideTourTab.PAST, viewModel.uiState.value.finishedTab)
         }
 
-    private fun createViewModel(repository: FakeGuideTourRepository) =
+    private fun createViewModel(
+        repository: FakeGuideTourRepository,
+        notificationRepository: FakeNotificationRepository,
+    ) =
         GuideTourDetailViewModel(
             savedStateHandle =
                 SavedStateHandle(
@@ -53,6 +59,7 @@ class GuideTourDetailViewModelTest {
                     )
                 ),
             repository = repository,
+            notificationRepository = notificationRepository,
             resourceProvider = FakeResourceProvider(),
         )
 }

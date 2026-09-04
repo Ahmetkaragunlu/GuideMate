@@ -3,6 +3,8 @@ package com.ahmetkaragunlu.guidemate.common.image
 import java.io.InputStream
 
 const val MAX_IMAGE_UPLOAD_BYTES = 5L * 1024 * 1024
+const val MAX_IMAGE_UPLOAD_DIMENSION_PX = 2048
+const val IMAGE_UPLOAD_JPEG_QUALITY = 85
 const val IMAGE_SIGNATURE_LENGTH = 12
 
 fun detectSupportedImageMimeType(signature: ByteArray): String? =

@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.chat.data.realtime
+package com.ahmetkaragunlu.guidemate.common.network.realtime
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

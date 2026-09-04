@@ -10,6 +10,9 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristDestination
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
@@ -35,6 +38,7 @@ class TouristReservationDetailViewModel
         savedStateHandle: SavedStateHandle,
         private val reservationRepository: ReservationRepository,
         private val reviewRepository: ReviewRepository,
+        private val notificationRepository: NotificationRepository,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val reservationId =
@@ -56,7 +60,15 @@ class TouristReservationDetailViewModel
                     _uiState.value =
                         TouristReservationDetailUiState(loadState = ContentLoadState.LOADING)
                     when (val result = reservationRepository.getReservation(reservationId)) {
-                        is DataResult.Success -> showReservation(result.data)
+                        is DataResult.Success -> {
+                            showReservation(result.data)
+                            notificationRepository.markRelatedRead(
+                                NotificationTargetReference(
+                                    type = NotificationTargetType.RESERVATION,
+                                    targetId = reservationId,
+                                ),
+                            )
+                        }
                         is DataResult.Error -> {
                             _uiState.value =
                                 TouristReservationDetailUiState(loadState = ContentLoadState.ERROR)

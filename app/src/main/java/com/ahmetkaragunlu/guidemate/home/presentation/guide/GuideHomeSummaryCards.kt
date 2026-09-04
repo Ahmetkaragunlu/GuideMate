@@ -44,7 +44,6 @@ internal fun GuideStatCard(
     stat: GuideStatistic,
     modifier: Modifier = Modifier,
 ) {
-    val isStarIcon = stat.description == R.string.average_rating
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
@@ -60,19 +59,44 @@ internal fun GuideStatCard(
             Icon(
                 imageVector = stat.icon,
                 contentDescription = null,
-                tint = if (isStarIcon) Color(0xFFFFC107) else colorResource(R.color.brand_color),
+                tint =
+                    if (stat.usesRatingTint) {
+                        Color(0xFFFFC107)
+                    } else {
+                        colorResource(R.color.brand_color)
+                    },
             )
             Text(text = stat.value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text(
-                text = stringResource(id = stat.description),
-                style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                color = colorResource(R.color.text_color),
+            StatisticTitle(
+                lineOne = stringResource(stat.titleLineOneResId),
+                lineTwo = stat.titleLineTwoResId?.let { stringResource(it) },
             )
         }
     }
+}
+
+@Composable
+private fun StatisticTitle(
+    lineOne: String,
+    lineTwo: String?,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        StatisticTitleLine(lineOne)
+        lineTwo?.let { StatisticTitleLine(it) }
+    }
+}
+
+@Composable
+private fun StatisticTitleLine(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        softWrap = false,
+        color = colorResource(R.color.text_color),
+    )
 }
 
 @Composable

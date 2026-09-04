@@ -13,6 +13,9 @@ import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyMinorUnitsOrN
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
@@ -42,6 +45,7 @@ class GuideTourDetailViewModel
     constructor(
         savedStateHandle: SavedStateHandle,
         private val repository: GuideTourRepository,
+        private val notificationRepository: NotificationRepository,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val route = savedStateHandle.toRoute<GuideTourDestination.Detail>()
@@ -90,6 +94,12 @@ class GuideTourDetailViewModel
                                     loadState = ContentLoadState.CONTENT,
                                 )
                             }
+                            notificationRepository.markRelatedRead(
+                                NotificationTargetReference(
+                                    type = NotificationTargetType.TOUR,
+                                    targetId = route.tourId,
+                                ),
+                            )
                         }
                     }
                     is DataResult.Error -> {

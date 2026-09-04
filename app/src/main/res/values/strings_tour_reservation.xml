@@ -1,11 +1,15 @@
 <resources>
     <string name="error_session_expired">Oturum süreniz doldu, lütfen tekrar giriş yapın.</string>
 
-    <string name="completed_tours">Tamamlanan Tur</string>
+    <string name="stat_completed">Tamamlanan</string>
+
+    <string name="stat_tour">Tur</string>
 
     <string name="total_participants">Katılımcı</string>
 
-    <string name="average_rating">Ortalama Puan</string>
+    <string name="stat_average">Ortalama</string>
+
+    <string name="stat_rating">Puan</string>
 
     <string name="tour_status">Tur Durumu</string>
 

@@ -40,10 +40,19 @@ data class SendChatMessageRequestDto(
     @SerializedName("body") val body: String,
 )
 
+data class ClearChatRequestDto(
+    @SerializedName("clientRequestId") val clientRequestId: String,
+)
+
 data class UnreadCountResponseDto(
     @SerializedName("unreadCount") val unreadCount: Long,
 )
 
 data class ChatRealtimeErrorResponseDto(
     @SerializedName("code") val code: String?,
+)
+
+data class ChatParticipantProfileUpdatedResponseDto(
+    @SerializedName("userId") val userId: Long,
+    @SerializedName("avatarUrl") val avatarUrl: String,
 )

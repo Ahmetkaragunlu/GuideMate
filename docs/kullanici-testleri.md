@@ -7,7 +7,7 @@
 - Son tamamlanan tarama: Final handoff/fazlar, backend rules/implementation,
   demo verisi, guncel Android ekran/navigation/ViewModel/repository/API/DTO,
   backend controller/endpoint/hata/guvenlik/dis servis sozlesmeleri ve acik
-  kullanici kararlari capraz kontrol edildi. 33 bolum, 1.080 kimlikli test,
+  kullanici kararlari capraz kontrol edildi. 33 bolum, 1.078 kimlikli test,
   82/82 backend endpoint ve 42/42 Android Screen kapsami yazildi.
 - Siradaki is: `RUN-A01` ile ortam hazirligini kanitlayip manuel kabul turunu
   sirayla uygulamak; her sonucu bu dosyada isaretlemek.
@@ -542,6 +542,18 @@ Bir test icin gerekirse su kanit eklenir:
 - [ ] `MEDIA-031` Guncel avatar yorum/rezervasyon snapshot urun kuralina uygun
   canonical veya satin alma snapshot'i olarak gorunur.
 - [ ] `MEDIA-032` Avatar degisimi diger hesabin avatarini etkilemez.
+
+#### Upload Normalizasyonu ve Cihaz Kabulu
+
+- [ ] `MEDIA-033` Tam cozunurlukte `1x` kamera fotografi ham dosya 5 MB'i assa
+  bile secilebilir; yukleme icin normalize edilmis kopya uretilir ve istek
+  basarili olur.
+- [ ] `MEDIA-034` Galeriden secilen desteklenen buyuk JPEG, PNG ve WebP profil
+  fotografi/tur kapagi dogru EXIF yonuyla gorunur ve normalize cikti backend'in
+  5 MB sinirini asmaz.
+- [ ] `MEDIA-035` Normalizasyon kaynak kamera/galeri gorselini degistirmez;
+  upload basari, hata veya iptalinden sonra gecici normalize dosya sonraki
+  yuklemelere birikmez.
 
 ### 6. Ortak Profil, Hesap ve Statik Icerikler
 
@@ -1221,6 +1233,9 @@ Bir test icin gerekirse su kanit eklenir:
   tasarim ve pagination davranisina uyar.
 - [ ] `TOURIST-WALLET-009` Wallet refresh basarili top-up/purchase/refund
   sonrasi canonical bakiye ve hareketleri birlikte yeniler.
+- [ ] `TOURIST-WALLET-010` Dar fiziksel cihaz, buyuk yazi olcegi ve yatay/dikey
+  gorunumde `Yonet` tek satirda kalir; soldaki kart bilgisi tasma olmadan
+  ellipsis uygular ve aksiyon dogru ekrani acar.
 
 #### Top-Up Girisi ve Quote
 
@@ -1412,6 +1427,17 @@ Bir test icin gerekirse su kanit eklenir:
 - [ ] `CHAT-035` Tourist chat detail topbar'inda rehber avatar/adi birlikte
   tiklaninca dogru public rehber profili acilir ve geri ayni sohbete doner;
   Guide chat topbar'i public tourist profil olmadigi icin tiklanabilir olmaz.
+- [ ] `CHAT-036` Rehber ve turist sohbet listesinde satir sola kaydirilinca
+  yalniz silme aksiyonu kadar acilir; sohbet karti tamamen ekran disina cikmaz.
+- [ ] `CHAT-037` Acik aksiyonda yalniz kirmizi cop ikonu gorunur; kirmizi arka
+  plan veya `Sil` metni eklenmez ve kart kendi rengini korur.
+- [ ] `CHAT-038` Cop ikonuna basinca ortak silme onayi acilir; vazgecince sohbet
+  silinmez ve satir kapali konumuna doner.
+- [ ] `CHAT-039` Bir sohbet satiri acikken baska satir sola kaydirilinca onceki
+  kapanir; onayli silme sonrasi alttaki sohbetler dogal sirayla yukari gelir.
+- [ ] `CHAT-040` Silme onay dialogu sohbet edilen kullanicinin guncel adini
+  dinamik olarak gosterir ve teknik hesap detayi icermeden acik bir onay metni
+  sunar.
 
 ### 18. Notification History, FCM ve Semantic Navigation
 

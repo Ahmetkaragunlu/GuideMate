@@ -19,6 +19,7 @@ import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservationStatu
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentUiStatus
+import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransaction
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
@@ -64,7 +65,8 @@ class PaymentStatusViewModelTest {
                         reservationStatus = PaymentReservationStatus.CONFIRMED,
                     ),
                 )
-            val viewModel = createViewModel(repository)
+            val notificationRepository = FakeNotificationRepository()
+            val viewModel = createViewModel(repository, notificationRepository = notificationRepository)
 
             runCurrent()
             assertEquals(PaymentUiStatus.VERIFYING, viewModel.uiState.value.payment?.status)
@@ -75,6 +77,8 @@ class PaymentStatusViewModelTest {
 
             assertEquals(PaymentUiStatus.SUCCEEDED, viewModel.uiState.value.payment?.status)
             assertEquals(listOf("payment-1"), repository.clearedPaymentIds)
+            assertEquals(1, notificationRepository.markedRelatedTargets.size)
+            assertEquals("payment-1", notificationRepository.markedRelatedTargets.single().targetId)
         }
 
     @Test
@@ -101,6 +105,7 @@ class PaymentStatusViewModelTest {
     private fun createViewModel(
         repository: PaymentRepository,
         openHostedIfRequired: Boolean = false,
+        notificationRepository: FakeNotificationRepository = FakeNotificationRepository(),
     ): PaymentStatusViewModel =
         PaymentStatusViewModel(
             savedStateHandle =
@@ -112,6 +117,7 @@ class PaymentStatusViewModelTest {
                 ),
             paymentRepository = repository,
             walletRepository = SuccessfulWalletRepository(),
+            notificationRepository = notificationRepository,
             resourceProvider = FakeResourceProvider(),
         )
 

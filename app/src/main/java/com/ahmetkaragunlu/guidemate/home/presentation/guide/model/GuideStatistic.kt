@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.home.presentation.guide.model
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toRatingText
@@ -12,7 +13,9 @@ import compose.icons.tablericons.Star
 data class GuideStatistic(
     val icon: ImageVector,
     val value: String,
-    val description: Int,
+    @param:StringRes val titleLineOneResId: Int,
+    @param:StringRes val titleLineTwoResId: Int? = null,
+    val usesRatingTint: Boolean = false,
 )
 
 fun GuideDashboard.toDashboardStatistics(): List<GuideStatistic> =
@@ -20,16 +23,19 @@ fun GuideDashboard.toDashboardStatistics(): List<GuideStatistic> =
         GuideStatistic(
             icon = TablerIcons.Flag,
             value = completedSessionCount.toString(),
-            description = R.string.completed_tours,
+            titleLineOneResId = R.string.stat_completed,
+            titleLineTwoResId = R.string.stat_tour,
         ),
         GuideStatistic(
             icon = TablerIcons.Friends,
             value = totalParticipantCount.toString(),
-            description = R.string.total_participants,
+            titleLineOneResId = R.string.total_participants,
         ),
         GuideStatistic(
             icon = TablerIcons.Star,
             value = averageRating.toRatingText(),
-            description = R.string.average_rating,
+            titleLineOneResId = R.string.stat_average,
+            titleLineTwoResId = R.string.stat_rating,
+            usesRatingTint = true,
         ),
     )

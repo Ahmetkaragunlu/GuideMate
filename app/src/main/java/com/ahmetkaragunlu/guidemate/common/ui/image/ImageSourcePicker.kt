@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.image.MAX_IMAGE_UPLOAD_BYTES
 import com.ahmetkaragunlu.guidemate.common.image.detectSupportedImageMimeType
 import com.ahmetkaragunlu.guidemate.common.image.readImageSignature
 import java.io.File
@@ -187,14 +186,6 @@ private fun Context.createPendingCameraImage(): PendingCameraImage {
 @StringRes
 private fun Context.validateSelectedImage(uri: Uri): Int? =
     runCatching {
-            val sizeBytes =
-                contentResolver.openAssetFileDescriptor(uri, "r")?.use { descriptor ->
-                    descriptor.length
-                } ?: return@runCatching R.string.error_image_source_unavailable
-            if (sizeBytes > MAX_IMAGE_UPLOAD_BYTES) {
-                return@runCatching R.string.error_image_too_large
-            }
-
             val signature =
                 contentResolver.openInputStream(uri)?.use { input ->
                     input.readImageSignature()

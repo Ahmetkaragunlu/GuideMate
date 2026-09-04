@@ -5,6 +5,7 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferences
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,8 @@ class FakeNotificationRepository : NotificationRepository {
     var updatePreferencesResult: DataResult<NotificationPreferences> =
         DataResult.Success(defaultNotificationPreferences())
     var lastPreferenceUpdate: NotificationPreferenceUpdate? = null
+    val markedRelatedTargets = mutableListOf<NotificationTargetReference>()
+    var markRelatedResult: DataResult<Int> = DataResult.Success(0)
     var clearLocalStateCalls = 0
 
     override val notifications: StateFlow<List<AppNotification>> = notificationState
@@ -43,6 +46,13 @@ class FakeNotificationRepository : NotificationRepository {
         error("Not required by this test fixture")
 
     override suspend fun markAllRead(): DataResult<Int> = DataResult.Success(0)
+
+    override suspend fun markRelatedRead(target: NotificationTargetReference): DataResult<Int> {
+        markedRelatedTargets += target
+        val result = markRelatedResult
+        if (result is DataResult.Success) unreadState.value = result.data
+        return result
+    }
 
     override suspend fun refreshPreferences(): DataResult<NotificationPreferences> {
         val result = refreshPreferencesResult

@@ -4,6 +4,8 @@ import com.ahmetkaragunlu.guidemate.BuildConfig
 import com.ahmetkaragunlu.guidemate.auth.data.remote.session.AuthInterceptor
 import com.ahmetkaragunlu.guidemate.auth.data.remote.session.TokenAuthenticator
 import com.ahmetkaragunlu.guidemate.common.network.ApiBaseUrl
+import com.ahmetkaragunlu.guidemate.common.network.realtime.OkHttpRealtimeClient
+import com.ahmetkaragunlu.guidemate.common.network.realtime.RealtimeClient
 import com.ahmetkaragunlu.guidemate.common.network.serialization.InstantTypeAdapter
 import com.ahmetkaragunlu.guidemate.common.network.serialization.LocalDateTypeAdapter
 import com.google.gson.Gson
@@ -26,6 +28,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+    @Provides
+    @Singleton
+    fun provideRealtimeClient(implementation: OkHttpRealtimeClient): RealtimeClient =
+        implementation
+
     @Provides
     @Singleton
     @ApiBaseUrl

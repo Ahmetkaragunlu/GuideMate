@@ -41,3 +41,8 @@ data class RegisterDeviceRequestDto(
 data class UnreadCountResponseDto(
     @SerializedName("unreadCount") val unreadCount: Long,
 )
+
+data class MarkRelatedNotificationsReadRequestDto(
+    @SerializedName("targetType") val targetType: String,
+    @SerializedName("targetId") val targetId: String,
+)

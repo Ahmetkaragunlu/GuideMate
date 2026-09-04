@@ -34,10 +34,11 @@ import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 fun ChatListItem(
     chatItem: ChatUiModel,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .height(80.dp)
                 .clickable { onClick() }

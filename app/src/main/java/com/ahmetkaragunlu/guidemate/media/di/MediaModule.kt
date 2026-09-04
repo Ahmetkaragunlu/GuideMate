@@ -2,8 +2,8 @@ package com.ahmetkaragunlu.guidemate.media.di
 
 import com.ahmetkaragunlu.guidemate.media.data.remote.api.MediaApi
 import com.ahmetkaragunlu.guidemate.media.data.repository.MediaRepositoryImpl
-import com.ahmetkaragunlu.guidemate.media.data.multipart.ContentResolverMediaPartFactory
 import com.ahmetkaragunlu.guidemate.media.data.multipart.MediaPartFactory
+import com.ahmetkaragunlu.guidemate.media.data.multipart.NormalizedImageMediaPartFactory
 import com.ahmetkaragunlu.guidemate.media.domain.repository.MediaRepository
 import dagger.Binds
 import dagger.Module
@@ -23,7 +23,7 @@ abstract class MediaModule {
     @Binds
     @Singleton
     abstract fun bindMediaPartFactory(
-        implementation: ContentResolverMediaPartFactory,
+        implementation: NormalizedImageMediaPartFactory,
     ): MediaPartFactory
 
     companion object {

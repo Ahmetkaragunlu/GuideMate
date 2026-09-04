@@ -5,11 +5,13 @@ import com.ahmetkaragunlu.guidemate.chat.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeClient
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeEvent
 import com.ahmetkaragunlu.guidemate.chat.data.remote.api.ChatApi
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ClearChatRequestDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.SendChatMessageRequestDto
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatConversation
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessage
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageHistory
+import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatParticipant
 import com.ahmetkaragunlu.guidemate.chat.domain.repository.ChatRepository
 import com.ahmetkaragunlu.guidemate.common.coroutines.ApplicationScope
 import com.ahmetkaragunlu.guidemate.common.network.ApiCallExecutor
@@ -179,6 +181,25 @@ constructor(
             }
         }
 
+    override suspend fun clearConversation(chatId: String): DataResult<Int> =
+        apiCallExecutor.execute(
+            request = {
+                api.clearConversation(
+                    chatId = chatId,
+                    request = ClearChatRequestDto(clientRequestId = UUID.randomUUID().toString()),
+                )
+            },
+            transform = { it.unreadCount.toSafeInt() },
+        ).also { result ->
+            if (result is DataResult.Success) {
+                mutableTotalUnreadCount.value = result.data
+                mutableConversations.update { conversations ->
+                    conversations.filterNot { conversation -> conversation.chatId == chatId }
+                }
+                messageHistories.remove(chatId)
+            }
+        }
+
     override suspend fun findOrCreate(remoteUserId: Long): DataResult<ChatConversation> =
         apiCallExecutor.execute(
             request = { api.findOrCreate(remoteUserId) },
@@ -234,6 +255,25 @@ constructor(
                         refreshConversations()
                         refreshUnreadCount()
                     }
+                    is ChatRealtimeEvent.ParticipantProfileUpdated -> {
+                        val participant = event.participant
+                        mutableConversations.update { conversations ->
+                            conversations.map { conversation ->
+                                conversation.copy(
+                                    guide =
+                                        conversation.guide.withUpdatedAvatar(
+                                            participant.userId,
+                                            participant.avatarUrl,
+                                        ),
+                                    tourist =
+                                        conversation.tourist.withUpdatedAvatar(
+                                            participant.userId,
+                                            participant.avatarUrl,
+                                        ),
+                                )
+                            }
+                        }
+                    }
                     is ChatRealtimeEvent.Error -> Unit
                 }
             }
@@ -247,9 +287,10 @@ constructor(
                 .distinctUntilChanged()
                 .collect { userId ->
                     reconnectJob?.cancel()
-                    realtimeClient.disconnect()
                     clearCachedState()
-                    if (userId != null) {
+                    if (userId == null) {
+                        realtimeClient.disconnect()
+                    } else {
                         refreshConversations()
                         refreshUnreadCount()
                         realtimeClient.connect()
@@ -322,3 +363,8 @@ constructor(
     }
     private fun Long.toSafeInt(): Int = coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
 }
+
+private fun ChatParticipant.withUpdatedAvatar(
+    userId: Long,
+    avatarUrl: String,
+) = if (this.userId == userId) copy(avatarUrl = avatarUrl) else this

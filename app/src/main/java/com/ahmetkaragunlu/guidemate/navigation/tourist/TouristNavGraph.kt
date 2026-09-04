@@ -79,6 +79,8 @@ internal fun NavGraphBuilder.touristNavGraph(
                 touristNavController.navigateTo(ChatDestination.Detail(chatId))
             },
             onRetry = chatListViewModel::refresh,
+            onClearChat = chatListViewModel::clearConversation,
+            onMessageShown = chatListViewModel::onMessageShown,
         )
     }
     composable<TouristDestination.Profile> {

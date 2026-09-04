@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.ahmetkaragunlu.guidemate.chat.presentation.content.SharedChatDetailContent
 import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatDetailViewModel
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
@@ -15,6 +16,11 @@ fun ChatDetailScreen(
     viewModel: ChatDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LifecycleResumeEffect(Unit) {
+        viewModel.refreshParticipant()
+        onPauseOrDispose {}
+    }
 
     GuideMateContentState(
         state = uiState.loadState,

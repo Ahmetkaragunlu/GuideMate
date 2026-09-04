@@ -53,6 +53,8 @@ internal fun NavGraphBuilder.guideNavGraph(
                 guideNavController.navigateTo(ChatDestination.Detail(chatId))
             },
             onRetry = chatListViewModel::refresh,
+            onClearChat = chatListViewModel::clearConversation,
+            onMessageShown = chatListViewModel::onMessageShown,
         )
     }
     composable<ChatDestination.Detail> {

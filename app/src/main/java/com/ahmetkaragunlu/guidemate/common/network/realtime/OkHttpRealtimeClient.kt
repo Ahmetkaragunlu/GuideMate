@@ -1,10 +1,7 @@
-package com.ahmetkaragunlu.guidemate.chat.data.realtime
+package com.ahmetkaragunlu.guidemate.common.network.realtime
 
 import com.ahmetkaragunlu.guidemate.auth.domain.session.AccessTokenProvider
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessageResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatRealtimeErrorResponseDto
 import com.ahmetkaragunlu.guidemate.common.network.ApiBaseUrl
-import com.google.gson.Gson
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,18 +16,22 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
 
-private const val MESSAGE_DESTINATION = "/user/queue/chat-messages"
-private const val ERROR_DESTINATION = "/user/queue/chat-errors"
+private val SUBSCRIPTIONS =
+    linkedMapOf(
+        "chat-messages" to RealtimeDestination.CHAT_MESSAGES,
+        "chat-participant-updates" to RealtimeDestination.CHAT_PARTICIPANT_UPDATES,
+        "chat-errors" to RealtimeDestination.CHAT_ERRORS,
+        "notifications" to RealtimeDestination.NOTIFICATIONS,
+    )
 
 @Singleton
-class OkHttpChatRealtimeClient
+class OkHttpRealtimeClient
 @Inject
 constructor(
     okHttpClient: OkHttpClient,
     private val accessTokenProvider: AccessTokenProvider,
     @ApiBaseUrl apiBaseUrl: HttpUrl,
-    private val gson: Gson,
-) : ChatRealtimeClient {
+) : RealtimeClient {
     private val client =
         okHttpClient
             .newBuilder()
@@ -38,35 +39,43 @@ constructor(
             .pingInterval(20, TimeUnit.SECONDS)
             .build()
     private val webSocketUrl = checkNotNull(apiBaseUrl.resolve("/ws"))
-    private val mutableEvents = MutableSharedFlow<ChatRealtimeEvent>(extraBufferCapacity = 64)
-    override val events: Flow<ChatRealtimeEvent> = mutableEvents.asSharedFlow()
+    private val mutableEvents = MutableSharedFlow<RealtimeEvent>(extraBufferCapacity = 64)
+    override val events: Flow<RealtimeEvent> = mutableEvents.asSharedFlow()
 
     private val lock = Any()
     private var webSocket: WebSocket? = null
     private var state = ConnectionState.DISCONNECTED
     private var frameBuffer = ""
     private var disconnectRequested = false
+    private var connectedAccessToken: String? = null
 
     override fun connect() {
         val accessToken = accessTokenProvider.getAccessToken()
         if (accessToken.isNullOrBlank()) {
-            mutableEvents.tryEmit(ChatRealtimeEvent.Disconnected)
+            mutableEvents.tryEmit(RealtimeEvent.Disconnected)
             return
         }
 
-        synchronized(lock) {
-            if (state != ConnectionState.DISCONNECTED) return
-            state = ConnectionState.CONNECTING
-            disconnectRequested = false
-            frameBuffer = ""
-            val request =
-                Request
-                    .Builder()
-                    .url(webSocketUrl)
-                    .header("Sec-WebSocket-Protocol", "v12.stomp")
-                    .build()
-            webSocket = client.newWebSocket(request, listener(accessToken))
-        }
+        val previousSocket =
+            synchronized(lock) {
+                if (state != ConnectionState.DISCONNECTED && connectedAccessToken == accessToken) {
+                    return
+                }
+                val previous = webSocket
+                state = ConnectionState.CONNECTING
+                disconnectRequested = false
+                frameBuffer = ""
+                connectedAccessToken = accessToken
+                val request =
+                    Request
+                        .Builder()
+                        .url(webSocketUrl)
+                        .header("Sec-WebSocket-Protocol", "v12.stomp")
+                        .build()
+                webSocket = client.newWebSocket(request, listener(accessToken))
+                previous
+            }
+        previousSocket?.close(1000, "Session changed")
     }
 
     override fun disconnect() {
@@ -75,6 +84,7 @@ constructor(
                 disconnectRequested = true
                 state = ConnectionState.DISCONNECTED
                 frameBuffer = ""
+                connectedAccessToken = null
                 webSocket.also { webSocket = null }
             }
         socket?.close(1000, "Client disconnected")
@@ -144,32 +154,22 @@ constructor(
                     if (webSocket !== socket) return
                     state = ConnectionState.CONNECTED
                 }
-                socket.send(StompFrameCodec.subscribe("chat-messages", MESSAGE_DESTINATION))
-                socket.send(StompFrameCodec.subscribe("chat-errors", ERROR_DESTINATION))
-                mutableEvents.tryEmit(ChatRealtimeEvent.Connected)
+                SUBSCRIPTIONS.forEach { (id, destination) ->
+                    socket.send(StompFrameCodec.subscribe(id, destination))
+                }
+                mutableEvents.tryEmit(RealtimeEvent.Connected)
             }
-            "MESSAGE" -> handleMessage(frame)
+            "MESSAGE" ->
+                frame.headers["destination"]?.let { destination ->
+                    mutableEvents.tryEmit(
+                        RealtimeEvent.Message(destination = destination, body = frame.body),
+                    )
+                }
             "ERROR" -> {
-                mutableEvents.tryEmit(ChatRealtimeEvent.Error(code = null))
+                mutableEvents.tryEmit(RealtimeEvent.ProtocolError)
                 socket.close(1002, "STOMP protocol error")
             }
         }
-    }
-
-    private fun handleMessage(frame: StompFrame) {
-        runCatching {
-            when (frame.headers["destination"]) {
-                MESSAGE_DESTINATION ->
-                    ChatRealtimeEvent.MessageReceived(
-                        gson.fromJson(frame.body, ChatMessageResponseDto::class.java),
-                    )
-                ERROR_DESTINATION ->
-                    ChatRealtimeEvent.Error(
-                        gson.fromJson(frame.body, ChatRealtimeErrorResponseDto::class.java).code,
-                    )
-                else -> null
-            }
-        }.getOrNull()?.let(mutableEvents::tryEmit)
     }
 
     private fun finishConnection(socket: WebSocket) {
@@ -179,9 +179,10 @@ constructor(
                 webSocket = null
                 state = ConnectionState.DISCONNECTED
                 frameBuffer = ""
+                connectedAccessToken = null
                 !disconnectRequested
             }
-        if (shouldNotify) mutableEvents.tryEmit(ChatRealtimeEvent.Disconnected)
+        if (shouldNotify) mutableEvents.tryEmit(RealtimeEvent.Disconnected)
     }
 
     private enum class ConnectionState {

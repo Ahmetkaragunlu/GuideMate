@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.chat.data.remote.api
 
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatConversationResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ClearChatRequestDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessagePageResponseDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessageResponseDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.SendChatMessageRequestDto
@@ -37,6 +38,12 @@ interface ChatApi {
     @POST("api/v1/chats/{chatId}/read")
     suspend fun markRead(
         @Path("chatId") chatId: String,
+    ): Response<UnreadCountResponseDto>
+
+    @POST("api/v1/chats/{chatId}/clear")
+    suspend fun clearConversation(
+        @Path("chatId") chatId: String,
+        @Body request: ClearChatRequestDto,
     ): Response<UnreadCountResponseDto>
 
     @GET("api/v1/chats/unread-count")

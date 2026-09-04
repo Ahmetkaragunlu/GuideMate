@@ -1,6 +1,8 @@
 package com.ahmetkaragunlu.guidemate.notification.di
 
 import com.ahmetkaragunlu.guidemate.notification.data.device.FirebasePushInstallationIdProvider
+import com.ahmetkaragunlu.guidemate.notification.data.realtime.DefaultNotificationRealtimeClient
+import com.ahmetkaragunlu.guidemate.notification.data.realtime.NotificationRealtimeClient
 import com.ahmetkaragunlu.guidemate.notification.data.remote.api.NotificationApi
 import com.ahmetkaragunlu.guidemate.notification.data.repository.NotificationRepositoryImpl
 import com.ahmetkaragunlu.guidemate.notification.domain.device.PushInstallationIdProvider
@@ -27,6 +29,12 @@ abstract class NotificationModule {
     abstract fun bindPushInstallationIdProvider(
         implementation: FirebasePushInstallationIdProvider,
     ): PushInstallationIdProvider
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationRealtimeClient(
+        implementation: DefaultNotificationRealtimeClient,
+    ): NotificationRealtimeClient
 
     companion object {
         @Provides

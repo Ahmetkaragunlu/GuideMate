@@ -7,20 +7,30 @@ import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.storage.installation.InstallationIdDataSource
 import com.ahmetkaragunlu.guidemate.notification.data.remote.api.NotificationApi
+import com.ahmetkaragunlu.guidemate.notification.data.realtime.NotificationRealtimeClient
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationPreferencesResponseDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationResponseDto
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.MarkRelatedNotificationsReadRequestDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.RegisterDeviceRequestDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.UnreadCountResponseDto
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.UpdateNotificationPreferencesRequestDto
 import com.ahmetkaragunlu.guidemate.notification.domain.device.PushInstallationIdProvider
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -61,6 +71,25 @@ class NotificationRepositoryImplTest {
         assertTrue(repository.notifications.value.first { it.notificationId == "notification-1" }.isRead)
         assertEquals(1, repository.unreadCount.value)
     }
+
+    @Test
+    fun `mark related read applies canonical count and updates only matching cached items`() =
+        runTest {
+            val api = FakeNotificationApi(unreadCount = 1)
+            val repository = createRepository(api, FakeUserRepository(), backgroundScope)
+            repository.refreshNotifications()
+
+            val result =
+                repository.markRelatedRead(
+                    NotificationTargetReference(NotificationTargetType.CHAT, "chat-1"),
+                )
+
+            assertTrue(result is com.ahmetkaragunlu.guidemate.common.result.DataResult.Success)
+            assertEquals(1, repository.unreadCount.value)
+            assertTrue(repository.notifications.value.first().isRead)
+            assertEquals("CHAT", api.relatedReadRequest?.targetType)
+            assertEquals("chat-1", api.relatedReadRequest?.targetId)
+        }
 
     @Test
     fun `authenticated user registers installation and firebase identifiers`() = runTest {
@@ -104,10 +133,34 @@ class NotificationRepositoryImplTest {
         assertEquals(null, api.deviceRequest)
     }
 
+    @Test
+    fun `realtime event refreshes canonical notifications and unread count`() = runTest {
+        val scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
+        try {
+            val api = FakeNotificationApi(unreadCount = 4)
+            val realtimeClient = FakeNotificationRealtimeClient()
+            val userRepository =
+                FakeUserRepository(
+                    UserState(userId = 7, email = "user@example.com"),
+                )
+            val repository = createRepository(api, userRepository, scope, realtimeClient)
+
+            realtimeClient.emit()
+            runCurrent()
+
+            assertEquals(listOf("notification-1"), repository.notifications.value.map { it.notificationId })
+            assertEquals(4, repository.unreadCount.value)
+            assertTrue(realtimeClient.connectCalls > 0)
+        } finally {
+            scope.cancel()
+        }
+    }
+
     private fun createRepository(
         api: NotificationApi,
         userRepository: UserRepository,
         scope: kotlinx.coroutines.CoroutineScope,
+        realtimeClient: NotificationRealtimeClient = FakeNotificationRealtimeClient(),
     ): NotificationRepositoryImpl {
         val dataStore =
             PreferenceDataStoreFactory.create(
@@ -116,6 +169,7 @@ class NotificationRepositoryImplTest {
             )
         return NotificationRepositoryImpl(
             api = api,
+            realtimeClient = realtimeClient,
             installationIdDataSource = InstallationIdDataSource(dataStore),
             pushInstallationIdProvider =
                 object : PushInstallationIdProvider {
@@ -125,6 +179,22 @@ class NotificationRepositoryImplTest {
             apiCallExecutor = testApiCallExecutor(),
             applicationScope = scope,
         )
+    }
+
+    private class FakeNotificationRealtimeClient : NotificationRealtimeClient {
+        private val mutableEvents = MutableSharedFlow<Unit>(replay = 1)
+        override val events: Flow<Unit> = mutableEvents
+        var connectCalls = 0
+
+        override fun connect() {
+            connectCalls++
+        }
+
+        override fun disconnect() = Unit
+
+        fun emit() {
+            mutableEvents.tryEmit(Unit)
+        }
     }
 
     private class FakeUserRepository(initialState: UserState = UserState()) : UserRepository {
@@ -144,6 +214,7 @@ class NotificationRepositoryImplTest {
     ) : NotificationApi {
         val requestedPages = mutableListOf<Int>()
         var deviceRequest: RegisterDeviceRequestDto? = null
+        var relatedReadRequest: MarkRelatedNotificationsReadRequestDto? = null
 
         override suspend fun getNotifications(
             page: Int,
@@ -182,6 +253,13 @@ class NotificationRepositoryImplTest {
 
         override suspend fun markAllRead(): Response<UnreadCountResponseDto> =
             Response.success(UnreadCountResponseDto(0))
+
+        override suspend fun markRelatedRead(
+            request: MarkRelatedNotificationsReadRequestDto,
+        ): Response<UnreadCountResponseDto> {
+            relatedReadRequest = request
+            return Response.success(UnreadCountResponseDto(unreadCount))
+        }
 
         override suspend fun getPreferences(): Response<NotificationPreferencesResponseDto> =
             Response.success(preferences())

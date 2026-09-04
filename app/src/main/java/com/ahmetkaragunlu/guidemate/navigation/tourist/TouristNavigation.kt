@@ -30,6 +30,7 @@ import com.ahmetkaragunlu.guidemate.navigation.chat.ChatDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.notification.toTouristDestination
+import com.ahmetkaragunlu.guidemate.navigation.notification.marksNotificationAfterSuccessfulLoad
 import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristExploreViewModel
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
@@ -89,8 +90,11 @@ fun TouristNavigation(
 
     LaunchedEffect(pendingNotificationTarget) {
         pendingNotificationTarget?.let { target ->
-            target.notificationId?.let(notificationViewModel::markRead)
-            touristNavController.navigateTo(target.toTouristDestination())
+            val destination = target.toTouristDestination()
+            if (!destination.marksNotificationAfterSuccessfulLoad()) {
+                target.notificationId?.let(notificationViewModel::markRead)
+            }
+            touristNavController.navigateTo(destination)
             onNotificationNavigationHandled(target)
         }
     }
@@ -190,8 +194,11 @@ fun TouristNavigation(
             onDismiss = { showNotifications = false },
             onNotificationClick = { target ->
                 showNotifications = false
-                target.notificationId?.let(notificationViewModel::markRead)
-                touristNavController.navigateTo(target.toTouristDestination())
+                val destination = target.toTouristDestination()
+                if (!destination.marksNotificationAfterSuccessfulLoad()) {
+                    target.notificationId?.let(notificationViewModel::markRead)
+                }
+                touristNavController.navigateTo(destination)
             },
             onMarkAllRead = notificationViewModel::markAllRead,
             onRefresh = notificationViewModel::refresh,

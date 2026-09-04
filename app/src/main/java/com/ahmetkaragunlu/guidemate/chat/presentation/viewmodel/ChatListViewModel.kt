@@ -11,6 +11,8 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -27,22 +29,21 @@ class ChatListViewModel
 @Inject
 constructor(
     private val chatRepository: ChatRepository,
-    notificationRepository: NotificationRepository,
+    private val notificationRepository: NotificationRepository,
     userRepository: UserRepository,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
-    private val loadState = MutableStateFlow(ContentLoadState.LOADING)
-    private val errorMessage = MutableStateFlow<String?>(null)
+    private val operationState = MutableStateFlow(ChatListOperationState())
     private var refreshJob: Job? = null
+    private var clearJob: Job? = null
 
     val uiState: StateFlow<ChatListUiState> =
         combine(
             chatRepository.conversations,
             chatRepository.totalUnreadCount,
             userRepository.userState,
-            loadState,
-            errorMessage,
-        ) { conversations, unreadCount, userState, currentLoadState, currentError ->
+            operationState,
+        ) { conversations, unreadCount, userState, operation ->
             val currentUserId = userState.userId
             val chats =
                 if (currentUserId == null) {
@@ -53,8 +54,9 @@ constructor(
             ChatListUiState(
                 chats = chats,
                 totalUnreadCount = unreadCount,
-                loadState = currentLoadState,
-                errorMessage = currentError,
+                loadState = operation.loadState,
+                errorMessage = operation.errorMessage,
+                userMessage = operation.userMessage,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -76,19 +78,54 @@ constructor(
         refreshJob =
             viewModelScope.launch {
                 if (chatRepository.conversations.value.isEmpty()) {
-                    loadState.value = ContentLoadState.LOADING
+                    operationState.value =
+                        operationState.value.copy(loadState = ContentLoadState.LOADING)
                 }
-                errorMessage.value = null
+                operationState.value = operationState.value.copy(errorMessage = null)
                 when (val result = chatRepository.refreshConversations()) {
                     is DataResult.Success -> {
                         chatRepository.refreshUnreadCount()
-                        loadState.value = ContentLoadState.CONTENT
+                        operationState.value =
+                            operationState.value.copy(loadState = ContentLoadState.CONTENT)
                     }
                     is DataResult.Error -> {
-                        errorMessage.value = result.error.toMessage(resourceProvider)
-                        loadState.value = ContentLoadState.ERROR
+                        operationState.value =
+                            operationState.value.copy(
+                                loadState = ContentLoadState.ERROR,
+                                errorMessage = result.error.toMessage(resourceProvider),
+                            )
                     }
                 }
             }
     }
+
+    fun clearConversation(chatId: String) {
+        if (clearJob?.isActive == true) return
+        clearJob =
+            viewModelScope.launch {
+                when (val result = chatRepository.clearConversation(chatId)) {
+                    is DataResult.Success -> {
+                        notificationRepository.markRelatedRead(
+                            NotificationTargetReference(NotificationTargetType.CHAT, chatId),
+                        )
+                    }
+                    is DataResult.Error -> {
+                        operationState.value =
+                            operationState.value.copy(
+                                userMessage = result.error.toMessage(resourceProvider),
+                            )
+                    }
+                }
+            }
+    }
+
+    fun onMessageShown() {
+        operationState.value = operationState.value.copy(userMessage = null)
+    }
 }
+
+private data class ChatListOperationState(
+    val loadState: ContentLoadState = ContentLoadState.LOADING,
+    val errorMessage: String? = null,
+    val userMessage: String? = null,
+)

@@ -11,6 +11,9 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.OPEN_HOSTED_IF_REQUIRED_ARGUMENT
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.PAYMENT_ID_ARGUMENT
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.payment.domain.model.Payment
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentPurpose
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
@@ -36,6 +39,7 @@ class PaymentStatusViewModel
         savedStateHandle: SavedStateHandle,
         private val paymentRepository: PaymentRepository,
         private val walletRepository: WalletRepository,
+        private val notificationRepository: NotificationRepository,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val paymentId: String = checkNotNull(savedStateHandle[PAYMENT_ID_ARGUMENT])
@@ -44,6 +48,7 @@ class PaymentStatusViewModel
         private val mutableUiState = MutableStateFlow(PaymentStatusUiState())
         val uiState: StateFlow<PaymentStatusUiState> = mutableUiState.asStateFlow()
         private var pollingJob: Job? = null
+        private var relatedNotificationsMarkedRead = false
 
         init {
             refresh()
@@ -80,6 +85,7 @@ class PaymentStatusViewModel
                     }
                     is DataResult.Success -> {
                         val payment = result.data
+                        markRelatedNotificationsRead()
                         if (
                             openHostedIfRequired &&
                                 payment.status == PaymentStatus.REQUIRES_ACTION &&
@@ -144,6 +150,18 @@ class PaymentStatusViewModel
             val wallet = walletRepository.getWallet()
             val transactions = walletRepository.getTransactions(page = 0, size = 1)
             return wallet is DataResult.Success && transactions is DataResult.Success
+        }
+
+        private suspend fun markRelatedNotificationsRead() {
+            if (relatedNotificationsMarkedRead) return
+            val result =
+                notificationRepository.markRelatedRead(
+                    NotificationTargetReference(
+                        type = NotificationTargetType.PAYMENT,
+                        targetId = paymentId,
+                    ),
+                )
+            relatedNotificationsMarkedRead = result is DataResult.Success
         }
 
         private companion object {

@@ -7,12 +7,15 @@ import com.ahmetkaragunlu.guidemate.common.result.BackendErrorCode
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.media.data.multipart.MediaPartFactory
 import com.ahmetkaragunlu.guidemate.media.data.multipart.MediaPreparationException
+import com.ahmetkaragunlu.guidemate.media.data.multipart.PreparedMediaPart
 import com.ahmetkaragunlu.guidemate.media.data.remote.api.MediaApi
 import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaDeletionResponse
 import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaUploadResponse
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaStatus
 import com.google.gson.Gson
+import java.io.IOException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -38,6 +41,55 @@ class MediaRepositoryImplTest {
         assertEquals(MediaPurpose.USER_AVATAR, asset.purpose)
         assertEquals(MediaStatus.READY, asset.status)
         assertEquals(MediaPurpose.USER_AVATAR.name, api.lastUploadPurpose)
+    }
+
+    @Test
+    fun `cleans prepared upload after successful request`() = runBlocking {
+        var wasClosed = false
+        val repository =
+            createRepository(
+                api = FakeMediaApi(),
+                partFactory = MediaPartFactory { preparedPart(onClose = { wasClosed = true }) },
+            )
+
+        repository.uploadImage("content://image/1", MediaPurpose.USER_AVATAR)
+
+        assertTrue(wasClosed)
+    }
+
+    @Test
+    fun `cleans prepared upload after failed request`() = runBlocking {
+        var wasClosed = false
+        val repository =
+            createRepository(
+                api = FakeMediaApi(uploadException = IOException("offline")),
+                partFactory = MediaPartFactory { preparedPart(onClose = { wasClosed = true }) },
+            )
+
+        val result = repository.uploadImage("content://image/1", MediaPurpose.USER_AVATAR)
+
+        assertTrue(result is DataResult.Error)
+        assertTrue(wasClosed)
+    }
+
+    @Test
+    fun `cleans prepared upload when request is cancelled`() = runBlocking {
+        var wasClosed = false
+        val repository =
+            createRepository(
+                api = FakeMediaApi(uploadException = CancellationException("cancelled")),
+                partFactory = MediaPartFactory { preparedPart(onClose = { wasClosed = true }) },
+            )
+
+        var wasCancelled = false
+        try {
+            repository.uploadImage("content://image/1", MediaPurpose.USER_AVATAR)
+        } catch (_: CancellationException) {
+            wasCancelled = true
+        }
+
+        assertTrue(wasCancelled)
+        assertTrue(wasClosed)
     }
 
     @Test
@@ -81,14 +133,7 @@ class MediaRepositoryImplTest {
     private fun createRepository(
         api: MediaApi,
         partFactory: MediaPartFactory =
-            MediaPartFactory {
-                MultipartBody.Part.createFormData(
-                    "file",
-                    "image.jpg",
-                    byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte())
-                        .toRequestBody("image/jpeg".toMediaType()),
-                )
-            },
+            MediaPartFactory { preparedPart() },
     ): MediaRepositoryImpl =
         MediaRepositoryImpl(
             api = api,
@@ -97,9 +142,22 @@ class MediaRepositoryImplTest {
             networkExceptionMapper = NetworkExceptionMapper(),
         )
 
+    private fun preparedPart(onClose: () -> Unit = {}): PreparedMediaPart =
+        PreparedMediaPart(
+            part =
+                MultipartBody.Part.createFormData(
+                    "file",
+                    "image.jpg",
+                    byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte())
+                        .toRequestBody("image/jpeg".toMediaType()),
+                ),
+            onClose = onClose,
+        )
+
     private class FakeMediaApi(
         private val deleteShouldFail: Boolean = false,
         private val uploadStatus: String = "READY",
+        private val uploadException: Exception? = null,
     ) : MediaApi {
         var uploadCallCount = 0
         var lastUploadPurpose: String? = null
@@ -110,6 +168,7 @@ class MediaRepositoryImplTest {
         ): Response<MediaUploadResponse> {
             uploadCallCount++
             lastUploadPurpose = purpose
+            uploadException?.let { throw it }
             return Response.success(
                 MediaUploadResponse(
                     mediaAssetId = "media-1",

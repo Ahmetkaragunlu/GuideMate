@@ -29,6 +29,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
@@ -122,10 +123,14 @@ private fun DefaultCardSection(
                     Modifier
                         .fillMaxWidth()
                         .padding(dimensionResource(R.dimen.spacing_medium)),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement =
+                    Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny))) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
+                ) {
                     Text(
                         text =
                             defaultCard
@@ -133,6 +138,8 @@ private fun DefaultCardSection(
                                 ?: stringResource(R.string.no_saved_card),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text =
@@ -148,6 +155,8 @@ private fun DefaultCardSection(
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.brand_color),
+                    maxLines = 1,
+                    softWrap = false,
                 )
             }
         }

@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.chat.data.realtime
+package com.ahmetkaragunlu.guidemate.common.network.realtime
 
 internal data class StompFrame(
     val command: String,

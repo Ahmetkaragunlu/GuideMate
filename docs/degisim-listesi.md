@@ -1725,7 +1725,7 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ### DEG-035 - Sohbet Detayinda Katilimci Profil Fotografini Yenileme
 
-- Durum: `BEKLIYOR`
+- Durum: `DOGRULANDI`
 - Dogrulanan sorun:
   - Sohbet detayindaki topbar fotografi `ChatDetailViewModel` mesaj state'inden
     degil, navigation shell icindeki `ChatListViewModel` sohbet listesinden
@@ -1755,10 +1755,19 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
     yenilendigi odakli state/repository testi yazilmalidir.
   - STOMP ile baska cihazdan gelen profil guncellemesinin gercek anlik etkisi
     manuel coklu cihaz testinde dogrulanacaktir.
+- Uygulama sonucu:
+  - Sohbet detayina giriste ve uygulama yeniden one geldiginde mevcut
+    `ChatRepository` sohbet kaynagi yenilenir; topbar ayri bir profil kaynagi
+    olusturmadan bu canonical state'i izlemeye devam eder.
+  - Profil fotografi degisikligi backend transaction'i tamamlandiktan sonra
+    ilgili sohbet katilimcilarina ozel STOMP olayi olarak iletilir ve Android
+    mevcut sohbet listesindeki katilimci fotografini gunceller.
+  - Acilis yenilemesi ve STOMP avatar olayi odakli Android/backend testleriyle
+    korunur; coklu cihaz gorunumu kullanici testinde basarili dogrulanmistir.
 
 ### DEG-036 - Ilgili Detay Acilisinda Bildirimi Okundu Yapma
 
-- Durum: `BEKLIYOR`
+- Durum: `DOGRULANDI`
 - Dogrulanan sorun:
   - Kullanici bir `CHAT_MESSAGE` bildirimine bildirim kartindan degil, bottom
     bar sohbet sekmesinden ulasirsa sohbet mesaji okunur; fakat ayni mesaja ait
@@ -1796,10 +1805,408 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   - Salt bildirim ikonunun veya rozet yerlesiminin gorunumu icin kirilgan UI
     testi yazilmayacak; ilgili davranis manuel kullanici testinde de
     dogrulanacaktir.
+- Uygulama sonucu:
+  - Backend'e kullanici sahipligiyle sinirli, atomik ve idempotent
+    `POST /api/v1/notifications/read-related` endpoint'i eklendi.
+  - Sohbet, tur, rezervasyon ve odeme detaylari yalniz veri basariyla
+    yuklendikten sonra ilgili hedef bildirimlerini okundu yapar; basarisiz detay
+    yuklemesi bildirim durumunu degistirmez.
+  - Android bildirim listesini hedefe gore gunceller ve okunmamis sayisini
+    backend'in canonical cevabindan alir. Ilgisiz bildirim, sahiplik,
+    idempotency ve basarisiz yukleme davranislari odakli testlerle korunur.
+
+### DEG-037 - Foreground Bildirim Rozetini Anlik Senkronize Etme
+
+- Durum: `UYGULANDI`
+- Dogrulanan sorun:
+  - Yeni mesaj STOMP ile geldiginde `ChatRepository.totalUnreadCount` hemen
+    guncellendigi icin bottom bar mesaj rozeti gorunur.
+  - Topbar, bildirim bottom sheet'i ve ana sayfa bildirimleri ayri olarak
+    `NotificationRepository.unreadCount` ve bildirim listesini izler.
+  - FCM olayi Android'e ulasmaz veya gecikirse notification state yenilenmez;
+    bildirim ikonuna basildiginda bottom sheet'in `refresh()` cagrisi backend
+    verisini cekerek topbar rozetini ancak o anda gorunur yapar.
+- Kullanici deneyimi karari:
+  - Uygulama on plandayken yeni bildirim geldiginde kullanici bildirim ikonuna
+    basmadan topbardaki kirmizi bildirim gostergesi anlik gorunmelidir.
+  - Topbar, bildirim bottom sheet'i ve ana sayfadaki bildirimler ayni canonical
+    `NotificationRepository` state'inden beslenmeye devam etmelidir.
+  - Bottom bar mesaj rozeti okunmamis mesaj sayisini temsil ettigi icin
+    `ChatRepository` kaynaginda kalmalidir. Iki farkli anlamdaki sayac tek bir
+    UI state'ine zorla birlestirilmemeli, ayni backend olayi ile senkronize
+    edilmelidir.
+- Mimari ve uygulama siniri:
+  - Backend, kalici bildirim kaydi transaction'i tamamlandiktan sonra aktif
+    aliciya kullaniciya ozel gercek zamanli bildirim olayi iletmelidir. FCM
+    arka plan sistem bildirimi gorevini korumalidir.
+  - Android notification feature'i gercek zamanli olayi kendi adapter siniri
+    uzerinden alip mevcut `NotificationRepository` state'ini yenilemelidir.
+    `ChatRepository` ile `NotificationRepository` birbirine dogrudan
+    baglanmamalidir.
+  - Yeniden baglanmada canonical bildirim listesi ve okunmamis sayi backend'den
+    dogrulanmalidir. Surekli polling, yeni UI sayaci, duplicate bildirim kaynagi
+    veya navigation/tasarim degisikligi eklenmeyecektir.
+  - Cozum yalniz `CHAT_MESSAGE` icin ozel olmamali; tur, rezervasyon, odeme,
+    guvenlik ve diger backend bildirimleri de ayni notification gercek zamanli
+    kanalindan state'i guncelleyebilmelidir.
+- Test karari:
+  - Backend'de bildirim kaydi basariyla commit edildikten sonra yalniz hedef
+    kullaniciya gercek zamanli olay gonderildigi test edilmelidir.
+  - Android'de gelen notification olayinin canonical listeyi ve okunmamis
+    sayiyi yeniledigi; chat mesaj sayacinin ayri kaynagini korudugu odakli
+    repository testiyle dogrulanmalidir.
+  - Salt kirmizi rozet gorunumu icin kirilgan UI testi yazilmayacak; ikon
+    acilmadan rozetin gorunmesi gercek cihaz kullanici testinde kontrol
+    edilecektir.
+- Uygulama sonucu:
+  - Chat ve notification feature'lari tek bir ortak ham STOMP baglantisini
+    kendi adapter sinirlarindan dinler. Backend commit sonrasi kullaniciya ozel
+    notification olayi gonderir; Android canonical bildirim listesini ve
+    okunmamis sayiyi yeniler. FCM'in arka plan gorevi degistirilmemistir.
+
+### DEG-038 - Kullaniciya Ozel Sohbeti Temizleme
+
+- Durum: `UYGULANDI`
+- Kullanici deneyimi karari:
+  - Rehber ve turist sohbet listesindeki sohbet kartini sola kaydirdiginda
+    kirmizi cop kutusu ve `Sil` eylemi gorunmelidir. Yalniz uzun basma gizli
+    bir etkilesim oldugu icin ana silme yolu olmayacaktir.
+  - `Sil` secildiginde ortak `EditAlertDialog` ile onay alinmalidir. Metin,
+    sohbetin yalniz mevcut kullanicinin hesabindan silinecegini acikca
+    belirtmeli; `Vazgec` gri, `Sil` kirmizi olmalidir.
+  - Islem basarili oldugunda sohbet mevcut kullanicinin listesinden ve mesaj
+    gecmisinden kalkmali; diger katilimcinin sohbeti ve mesajlari
+    etkilenmemelidir.
+  - Yeni mesaj gelirse veya kullanici tekrar mesaj baslatirsa ayni sohbet
+    yeniden gorunmeli, fakat temizleme zamanindan onceki mesajlar temizleyen
+    kullaniciya gosterilmemelidir.
+- Mimari ve uygulama siniri:
+  - Android'de rehber ve turist icin ayri silme kodu yazilmayacak; mevcut ortak
+    sohbet karti, dialog, `ChatRepository` sozlesmesi ve sohbet state'i
+    kullanilacaktir.
+  - Yalniz Android cache'inden silme yapilmayacaktir. Backend sahipligi
+    dogrulayarak kullaniciya ozel temizleme zamanini kalici tutmalidir; diger
+    kullanici adina sohbet silinemez.
+  - Mevcut `chat_read_state` kullanici-sohbet state'inin dogru sahibidir. Yeni
+    bir sohbet/katilimci tablosu acmak yerine kontrollu migration ile
+    kullaniciya ozel `cleared_at` bilgisi bu yapida tutulmalidir.
+  - Backend endpoint'i idempotent olmali; sohbet listesi, mesaj sorgulari ve
+    okunmamis sayaclari `cleared_at` sinirini dikkate almalidir. Yeni mesaj bu
+    sinirdan sonra geldigi icin sohbeti dogal olarak yeniden gorunur
+    yapabilmelidir.
+  - Mesaj kayitlari fiziksel olarak silinmeyecek; guvenlik, destek ve uyusmazlik
+    kayitlari backend saklama politikasina gore korunacaktir.
+  - Basarili temizlemede ilgili `CHAT_MESSAGE` bildirimleri okunmus yapilmali;
+    sohbet ve notification rozetleri canonical backend sonucuyla
+    guncellenmelidir.
+- Test karari:
+  - Backend'de sahiplik, yalniz mevcut kullanicinin gecmisinin temizlenmesi,
+    diger katilimcinin etkilenmemesi, tekrarli istegin idempotentligi ve yeni
+    mesajla sohbetin yeniden gorunmesi test edilmelidir.
+  - Android'de basarili silmede sohbetin cache/listeden kalktigi, backend
+    hatasinda kartin kaldigi ve canonical sayaclarin yenilendigi odakli
+    repository/ViewModel testleri yazilmalidir.
+  - Swipe animasyonunun piksel gorunumu icin kirilgan UI testi yazilmayacak;
+    kaydirma, dialog renk/metni ve iki rol davranisi kullanici testinde
+    dogrulanacaktir.
+- Uygulama sonucu:
+  - Ortak sohbet listesine sola kaydirma ve ortak onay dialogu eklendi.
+    Backend `chat_read_state.cleared_at` sinirini Flyway V16 ile kalici tutar;
+    mesajlari fiziksel silmeden yalniz mevcut kullanicinin liste, gecmis,
+    okunmamis mesaj ve ilgili bildirim gorunumunu temizler.
+
+### DEG-039 - Rehber Istatistik Basliklarini Iki Satirda Gostermek
+
+- Durum: `UYGULANDI`
+- Kullanici deneyimi karari:
+  - Rehber ana sayfasinin ust istatistik kartlarinda `Tamamlanan Tur` ve
+    `Ortalama Puan` basliklari iki satirda gosterilecektir: `Tamamlanan / Tur`
+    ve `Ortalama / Puan`.
+  - Ilk satir karta sigmazsa yalnizca o satir `...` ile kisalacak; ikinci satir
+    sabit kalacaktir. Ornegin `Tamamlan... / Tur`.
+  - Tum basliklar ayni ortak kart bileseninde ayni davranisi kullanacaktir.
+- Mimari ve uygulama siniri:
+  - Degisiklik yalniz rehber ana sayfasindaki `GuideStatCard` gorunumunu
+    etkileyecek; backend, navigation, veri akisi ve diger ekranlar
+    degistirilmeyecektir.
+  - Iki satir icin ayri veri veya yeni ortak katman olusturulmayacaktir.
+- Test karari:
+  - Genis ve dar ekranlarda basliklarin iki satirda kaldigi, sigmayan ilk
+    satirin ellipsis ile kesildigi ve istatistik degerlerinin degismedigi
+    manuel kullanici testinde kontrol edilecektir.
+- Uygulama sonucu:
+  - Ortak rehber istatistik karti basligi acik iki satir kaynagi kullanir;
+    `Tamamlanan / Tur` ve `Ortalama / Puan` duzeni ile ilk satir ellipsis
+    davranisi veri ve navigation akisina dokunmadan uygulanmistir.
+
+### DEG-040 - Foreground Bildirim Kanal Senkronizasyonu
+
+- Durum: `UYGULANDI`
+- Sorun:
+  - Android ortak realtime istemcisi `/user/queue/notifications` ve
+    `/user/queue/chat-participant-updates` kanallarini dinliyor; backend STOMP
+    guvenlik allowlist'i bu kanallari kabul etmedigi icin baglanti yeniden
+    kuruluyor ve foreground bildirim rozeti anlik guncellenemiyor.
+- Uygulama karari:
+  - Backend allowlist'ine yalniz Android'in kullandigi bu iki ozel kanal
+    eklenecek. Mevcut JWT kimlik dogrulamasi ve kullaniciya ozel destination
+    kurali korunacak; genel topic veya wildcard acilmayacak.
+  - NotificationRepository canonical liste/unread state'ini kullanmaya devam
+    edecek. Chat ve notification feature'lari birbirine dogrudan baglanmayacak.
+  - Tasarim, navigation ve bildirim metinleri degismeyecek.
+- Android etkisi:
+  - Android kodunda yeni bildirim kanali veya ek sorgu yazilmayacak; mevcut
+    realtime adapter, repository ve FCM akisina dokunulmayacak.
+- Test karari:
+  - Backend STOMP interceptor testinde bildirim ve participant-update
+    subscription'larinin izinli, yetkisiz destination'in reddedildigi
+    dogrulanacak. Android mevcut realtime/repository testleri korunacak.
+  - Foreground topbar rozeti, ana sayfa son bildirimleri ve bottom bar mesaji
+    gercek cihaz kullanici testinde birlikte kontrol edilecek.
+- Uygulama sonucu:
+  - Backend STOMP guvenlik allowlist'ine notification ve participant-profile
+    kanallari exact destination olarak eklendi. Genel topic veya wildcard
+    acilmadi; mevcut JWT ve kullaniciya ozel kanal siniri korundu.
+  - Interceptor testi izin verilen dort ozel kanali ve yetkisiz destination'in
+    reddedilmesini birlikte dogruluyor.
+
+### DEG-041 - Sohbet Silme Ikonunun Yalnizca Kirmizi Gosterilmesi
+
+- Durum: `UYGULANDI`
+- Kullanici deneyimi karari:
+  - Sohbet karti sola kaydirildiginda kartin tamami veya arka plani kirmiziya
+    donmeyecek; kart kendi mevcut rengini koruyacak.
+  - Silme eylemi yalniz kirmizi cop kutusu ikonu olarak gosterilecek. Ikona
+    dokunulunca mevcut ortak `EditAlertDialog` acilacak; kaydirma esigi tek
+    basina sohbeti silmeyecek ve dialogu otomatik acmayacak.
+  - Dialogda `Vazgec` gri, `Sil` kirmizi kalacak. Onaydan sonra mevcut
+    kullaniciya ozel backend temizleme ve bildirim okuma davranisi korunacak.
+- Mimari ve uygulama siniri:
+  - Rehber ve turist icin ortak sohbet liste composable'i kullanilacak; iki
+    ayri silme UI'i veya yeni navigation grafigi eklenmeyecek.
+  - Backend silme sozlesmesi, `cleared_at`, sahiplik ve diger katilimcinin
+    verisinin korunmasi degistirilmeyecek.
+- Test karari:
+  - Silme isteginin mevcut repository/ViewModel testleri korunacak; yalniz
+    ikon tiklamasi ile dialog acilmasi ve otomatik silme olmamasi davranisi
+    gerekirse odakli Compose testiyle dogrulanacak.
+  - Kart rengi, kirmizi ikon, dialog ve iki rol davranisi kullanici testinde
+    kontrol edilecek; salt piksel gorunumu icin kirilgan test yazilmayacak.
+- Uygulama sonucu:
+  - Ortak sohbet listesinde kirmizi arka plan ve `Sil` metni kaldirildi. Kart
+    mevcut rengini korurken yalniz kirmizi cop kutusu ikonu gorunur.
+  - Kaydirma tek basina silme veya dialog acma islemi baslatmaz; mevcut ortak
+    onay dialogu yalniz ikona dokunuldugunda acilir. Repository ve backend
+    temizleme davranisi degistirilmedi.
+
+### DEG-042 - Sohbet Silme Eylemini Kart Arkasinda Gizlemek
+
+- Durum: `UYGULANDI`
+- Kullanici testiyle bulunan sorun:
+  - Kirmizi cop kutusu sohbet karti hic kaydirilmadan listenin en saginda
+    gorunuyor. Silme eylemi yalniz swipe sirasinda ortaya cikmasi gerekirken
+    normal liste gorunumunun parcasi olmus durumda.
+- Kullanici deneyimi karari:
+  - Sohbet listesi ilk acildiginda cop kutusu hic gorunmeyecek.
+  - Kullanici sohbet kartini sola kaydirdikca kart sola hareket edecek ve
+    kartin arkasinda, yalniz sag tarafta kirmizi cop kutusu ortaya cikacak.
+  - Kartin kendi rengi korunacak; kirmizi arka plan veya `Sil` metni
+    gosterilmeyecek.
+  - Kaydirma tek basina dialog acmayacak ve sohbeti silmeyecek. Yalniz ortaya
+    cikan cop kutusuna dokunulunca mevcut ortak `EditAlertDialog` acilacak.
+  - Vazgecildiginde kart kapali konumuna donecek. Silme onaylandiginda sohbet
+    yalniz mevcut kullanicinin listesinden kalkacak ve alttaki satirlar liste
+    duzeniyle dogal olarak yukari tasinacak.
+- Mimari ve uygulama siniri:
+  - DEG-041'in backend, repository, kullaniciya ozel `cleared_at` ve bildirim
+    temizleme davranislari degistirilmeyecek. Bu madde yalniz ortak sohbet
+    listesi swipe/reveal etkilesimini duzeltecek.
+  - Rehber ve turist icin ayri UI yazilmayacak; mevcut ortak composable
+    korunacak. Yeni navigation, endpoint veya veri modeli eklenmeyecek.
+- Test karari:
+  - Backend ve repository testleri degismeyecek. Ikonun ilk durumda gizli,
+    swipe ile gorunur ve yalniz tiklamayla dialog acilir olmasi kullanici
+    testinde dogrulanacak; salt piksel testi eklenmeyecek.
+- Uygulama sonucu:
+  - Ortak sohbet satiri mevcut ekran yuzeyiyle opak hale getirildi. Kirmizi cop
+    kutusu ilk gorunumde kartin arkasinda kalir ve yalniz kart sola
+    kaydirildiginda sag tarafta gorunur.
+  - Mevcut ikon tiklama, ortak onay dialogu ve kullaniciya ozel sohbet temizleme
+    akisi korunmustur.
+
+### DEG-043 - Son Hareketleri Yeni Bildirimde En Uste Getirmek
+
+- Durum: `UYGULANDI`
+- Kullanici testiyle bulunan sorun:
+  - Rehber ana sayfasindaki `Son Hareketler` listesine yeni bildirim eklense de
+    mevcut `LazyColumn` gorunur satiri koruyor. Yeni bildirim listenin ilk
+    sirasinda bulunmasina ragmen kullanici elle yukari kaydirana kadar
+    gorunmeyebiliyor.
+- Kullanici deneyimi karari:
+  - Yeni bildirimin kimligi degistiginde yalniz ana sayfadaki dort ogelik
+    `Son Hareketler` on izlemesi otomatik olarak ilk satira donecek.
+  - Yeni bildirim 1. siraya, onceki bildirimler sirasiyla 2., 3. ve 4. siraya
+    kayacak. Onceki 4. bildirim ana sayfa on izlemesinden cikacak ancak kalici
+    bildirim listesinden silinmeyecek.
+  - Bildirim bottom sheet'i veya sayfalanan tam liste otomatik yukariya
+    zorlanmayacak; kullanici eski bildirimleri incelerken konumu korunacak.
+- Mimari ve uygulama siniri:
+  - Backend siralamasi, NotificationRepository, bildirim sayisi ve navigation
+    degistirilmeyecek. Duzeltme yalniz rehber ana sayfasindaki presentation
+    list state'inde yapilacak.
+  - Yeni repository, veri modeli veya ortak katman eklenmeyecek.
+- Test karari:
+  - Backend testi gerekmiyor. Ilk bildirim kimligi degistiginde on izlemenin en
+    ustten basladigi, dort oge siniri ve tam bildirim listesinin korunmasi
+    kullanici testinde dogrulanacak; salt kaydirma animasyonu icin kirilgan UI
+    testi yazilmayacak.
+- Uygulama sonucu:
+  - Rehber ana sayfasindaki `Son Hareketler` kendi `LazyListState` degerini
+    kullanir. Listenin ilk bildirim kimligi degistiginde yalniz bu dort ogelik
+    on izleme ilk satira doner.
+  - Bildirim bottom sheet'i, kalici bildirim siralamasi, repository ve backend
+    davranisi degistirilmemistir.
+
+### DEG-044 - Kamera ve Galeri Fotograflarini Yukleme Icin Normalize Etmek
+
+- Durum: `UYGULANDI`
+- Kullanici testiyle bulunan sorun:
+  - Tam cozunurlukte `1x` ana kamerayla cekilen fotograf 5 MB sinirini
+    asabildigi icin secim reddediliyor. `0.5x` cekimin kabul edilmesi zoom icin
+    ayri bir kuraldan degil, uretilen dosyanin tesadufen daha kucuk olmasindan
+    kaynaklaniyor.
+  - Mevcut `TakePicture` akisi kameranin tam dosyasini kaydediyor; Android bu
+    dosyayi yuklemeden once yeniden boyutlandirmiyor veya sikistirmiyor.
+- Kullanici deneyimi karari:
+  - Kullanici `1x` dahil istedigi desteklenen kamerayla fotograf cekebilecek.
+    Uygulama kaynak fotografa dokunmadan yalniz upload icin optimize edilmis
+    ayri bir kopya hazirlayacak.
+  - Yukleme kopyasinin EXIF yonu uygulanacak, uzun kenari en fazla 2048 piksele
+    indirilecek ve fotograf yaklasik yuzde 85 kalitede JPEG olarak yeniden
+    kodlanacak. Konum gibi gereksiz metadata yeni dosyaya aktarilmayacak.
+  - Kamera ve galeri ile secilen profil fotografi ve tur kapagi ayni guvenli
+    normalizasyon sinirini kullanacak. Kullaniciya gorunen mevcut secim ve on
+    izleme tasarimi degismeyecek.
+  - Normalizasyon sonrasi dosya yine 5 MB sinirini asarsa mevcut acik hata
+    mesaji gosterilecek; kaliteyi tekrar tekrar dusuren belirsiz bir dongu
+    kurulmayacak.
+- Mimari ve guvenlik karari:
+  - `MAX_IMAGE_UPLOAD_BYTES` 5 MB olarak kalacak; sorunu gizlemek icin Android,
+    Spring multipart veya veritabani siniri 10 MB'a cikarilmayacak.
+  - Decode islemi tam boyutlu bitmap'i gereksiz yere bellekte tutmayacak;
+    once boyut okunup uygun sample/target boyutuyla islenecek. Normalizasyon
+    Android media/data sinirinda test edilebilir tek bir sorumluluk olacak;
+    ViewModel veya her ekran icinde tekrar yazilmayacak.
+  - Uretilen gecici upload dosyasi basari, hata ve iptal yollarinda kontrollu
+    temizlenecek. Kaynak `content://` veya kamera dosyasi gereksiz yere
+    degistirilmeyecek.
+  - Backend son otorite olarak mevcut 5 MB boyut, MIME, dosya imzasi, sahiplik
+    ve yetki kontrollerini koruyacak. Android'de normalize edilmis olmasi
+    backend dogrulamasini atlama nedeni olmayacak.
+- Test karari:
+  - EXIF yonu, buyuk gorselin 2048 piksel sinirina indirilmesi, cikti dosyasinin
+    5 MB altinda olmasi ve desteklenmeyen/okunamayan gorselin reddedilmesi
+    odakli Android testleriyle korunacak.
+  - Kamera `1x`, galeri, profil fotografi ve tur kapagi gercek cihaz kullanici
+    testinde kontrol edilecek. Salt piksel benzerligi icin kirilgan ekran testi
+    yazilmayacak.
+- Uygulama sonucu:
+  - Kamera ve galeri kaynagi secim aninda yalniz dosya imzasi/okunabilirlik
+    kontrolunden geciyor; ham dosya 5 MB'i astigi icin erkenden reddedilmiyor.
+  - Ortak media data siniri EXIF yonunu uyguluyor, uzun kenari en fazla 2048
+    piksel yapiyor, opak JPEG kopyasini yuzde 85 kalitede uretiyor ve son
+    ciktiya 5 MB sinirini uyguluyor.
+  - Profil fotografi ve tur kapagi ayni `MediaRepository` yukleme yolunu
+    kullaniyor. Gecici kopya basari, hata ve coroutine iptalinde kapatilarak
+    temizleniyor; kaynak URI degistirilmiyor.
+  - Buyuk gorsel, EXIF yonu, gecersiz kaynak ve gecici dosya yasam dongusu
+    odakli testlerle korunuyor.
+
+### DEG-045 - Cuzdandaki Yonet Aksiyonunu Tek Satirda Korumak
+
+- Durum: `UYGULANDI`
+- Kullanici testiyle bulunan sorun:
+  - Turist `Cuzdanim` ekranindaki varsayilan kart satirinda `Yonet` emulatorde
+    tek satir gorunurken daha dar fiziksel telefonda son harfi alt satira
+    dusebiliyor.
+  - Sorun sag padding eksikligi degil; soldaki kart bilgisi ile sagdaki aksiyon
+    metninin Row icinde sinirli genisligi paylasma biciminden kaynaklaniyor.
+- Kullanici deneyimi karari:
+  - `Yonet` aksiyonu desteklenen ekran genisliklerinde tek satirda kalacak;
+    harfleri alt satira bolunmeyecek.
+  - Soldaki kart bilgisi kalan alani kullanacak ve gerektiginde kontrollu
+    bicimde daralacak. Aksiyon ile bilgi arasinda mevcut tasarimla uyumlu bosluk
+    korunacak.
+  - Kartin rengi, fontlari, tiklanabilir alani, navigation davranisi ve genel
+    cüzdan tasarimi degismeyecek.
+- Mimari ve uygulama karari:
+  - Soldaki bilgi sutununa kontrollu `weight`, sagdaki aksiyona tek satir
+    siniri verilecek. Kullanilabilir genisligi daha da azaltan rastgele son
+    padding ile sorun gizlenmeyecek.
+  - Duzeltme yalniz mevcut turist wallet presentation bileseninde yapilacak;
+    yeni ortak composable, model, repository veya backend degisikligi
+    eklenmeyecek.
+- Test karari:
+  - Salt metin sarma ve responsive yerlesim icin kirilgan otomatik UI testi
+    yazilmayacak. Emulator, fiziksel telefon, buyuk yazi olcegi ve yatay/dikey
+    gorunum kullanici testinde kontrol edilecek.
+- Uygulama sonucu:
+  - Sol kart bilgisi kalan alani `weight` ile kullaniyor ve gerekirse tek
+    satirda ellipsis uyguluyor. `Yonet` aksiyonu `softWrap = false` ve tek satir
+    siniriyla korunuyor; renk, tiklama ve navigation davranisi degismedi.
+
+### DEG-046 - Sohbet Kartini Sinirli Swipe Aksiyonuyla Acmak
+
+- Durum: `UYGULANDI`
+- Kullanici testiyle bulunan sorun:
+  - Sohbet karti sola kaydirildiginda mevcut `SwipeToDismissBox` davranisi karti
+    tamamen ekran disina tasiyor. Cop kutusuna basinca kartin geri gelmesi ve
+    silme sonucunun dogru olmasi yeterli degil; kartin kaydirma sirasinda
+    tamamen kaybolmasi kullanici deneyimini bozuyor.
+- Kullanici deneyimi karari:
+  - Sohbet karti yalniz sagdaki silme aksiyonunu gosterecek kadar sola
+    kayacak; kartin buyuk bolumu ekranda kalacak ve tamamen kaybolmayacak.
+  - Kartin arkasinda yalniz kirmizi cop kutusu ikonu bulunacak. Kirmizi arka
+    plan veya `Sil` metni eklenmeyecek ve kart mevcut rengini koruyacak.
+  - Yeterli kaydirmadan sonra kart acik konumda sabitlenecek. Cop ikonuna
+    dokunulunca mevcut ortak `EditAlertDialog` acilacak; swipe tek basina silme
+    veya dialog acma islemi baslatmayacak.
+  - Dialogdan vazgecilince kart kapali konumuna donecek. Silme onaylaninca
+    yalniz mevcut kullanicinin sohbet satiri kalkacak ve alttaki satirlar
+    dogal liste siralamasiyla yukari tasinacak.
+  - Baska bir sohbet satiri kaydirildiginda daha once acik bir satir varsa
+    kapanacak; ayni anda birden fazla silme aksiyonu acik kalmayacak.
+- Mimari ve uygulama karari:
+  - Tam dismiss icin tasarlanan `SwipeToDismissBox` bu davranista
+    kullanilmayacak. Kapali ve sinirli acik konumlari olan kontrollu swipe/reveal
+    state'i ortak `SharedChatListContent` icinde kurulacak.
+  - Rehber ve turist icin ayri UI yazilmayacak. Mevcut ViewModel, repository,
+    backend `cleared_at`, bildirim temizleme ve navigation davranislari
+    degistirilmeyecek.
+  - Yalniz gercek swipe state'ini yonetmek icin gereken en kucuk presentation
+    yapisi kullanilacak; yeni domain modeli, global manager veya gereksiz ortak
+    katman eklenmeyecek.
+- Test karari:
+  - Kullaniciya ozel sohbet temizleme repository/ViewModel testleri korunacak.
+    Sinirli acilma, tek satirin acik kalmasi, ikon tiklamasi ve vazgecince
+    kapanma davranisi gercek regresyon riski nedeniyle uygun seviyede odakli
+    Compose testiyle korunacak; piksel benzerligi testi yazilmayacak.
+  - Rehber ve turist listelerinde kartin tamamen kaybolmadigi, ikonun yalniz
+    swipe ile gorundugu ve onay sonrasi siralamanin dogru kaldigi kullanici
+    testinde dogrulanacak.
+- Uygulama sonucu:
+  - Tam dismiss davranisi kaldirildi. Ortak sohbet satiri kapali ve 72 dp
+    sinirli acik anchor'lari arasinda hareket ediyor; kart ekranda kalirken
+    yalniz tema hata rengindeki cop ikonu aciliyor.
+  - Acik satir kimligi ortak liste tarafindan yonetiliyor; yeni satir acilinca
+    onceki satir kapanacak sekilde tek kaynak kullaniliyor. Cop ikonu mevcut
+    ortak onay dialogunu aciyor, swipe tek basina silme yapmiyor.
+  - Sinirli acilma, kartin gorunur kalmasi ve vazgecme davranisi odakli Compose
+    testiyle emulatorde dogrulandi.
 
 ### TEST-001 - Admin Onayi Sonrasi 12 Maddelik Son Kontrol
 
-- Durum: `BEKLIYOR`
+- Durum: `DOGRULANDI`
 - Kapsam:
   - `DEG-023` - `DEG-034` arasindaki 12 degisikligin manuel kullanici testi
     basarili tamamlandi. Yalniz admin onayi sonrasi dashboard ve sekme sonucu
@@ -1816,32 +2223,69 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 - Basari kriteri:
   - Bekleyen tur `1 -> 0`, yayinlanan tur `0 -> 1` olarak dogru guncellenir;
     tur Aktif sekmesinde gorunur ve bildirim kaybolmazsa test tamamlanir.
+- Kullanici testi sonucu:
+  - Admin onayindan sonra `Onay Bekliyor 1 -> 0`, `Yayinda 0 -> 1`, Aktif
+    sekmesi ve bildirim davranisi basarili dogrulanmistir.
 - Test siniri:
   - Bu manuel kontrolde yeni kod yazilmayacak; yalniz mevcut admin onayi,
     bildirim, dashboard projection ve navigation sonucu dogrulanacaktir.
 
+### DEG-047 - Sohbet Silme Onay Metnini Netlestirmek
+
+- Durum: `UYGULANDI`
+- Kullanici karari:
+  - Sohbet silme dialogu teknik hesap ayrintisi yerine hangi sohbetin
+    silinecegini acikca belirtmeli.
+  - `%1$s` alaninda sohbet edilen kullanicinin dinamik adi gosterilmeli.
+  - Metin `'%1$s ile olan sohbetiniz silinecektir. Devam etmek istiyor
+    musunuz?'` olmali.
+- Uygulama kapsami:
+  - Yalniz mevcut XML string degistirildi. Dialog basligi, `Sil`/`Vazgec`
+    aksiyonlari, silme yetkisi ve yalniz mevcut kullanicinin listesinden
+    kaldirma davranisi degismedi.
+- Test karari:
+  - Salt metin degisikligi icin yeni kirilgan UI testi eklenmedi; mevcut
+    sohbet silme dialogu Compose testi ve derleme kontrolleri kullanildi.
+
 ## Toplu Uygulama Kontrol Noktasi
 
-- Son kaydedilen kod maddesi: `DEG-034`
-- Son kaydedilen bekleyen madde: `DEG-036`
+- Son kaydedilen kod maddesi: `DEG-047`
+- Son kaydedilen bekleyen kod maddesi: YOK
 - Son kaydedilen manuel test: `TEST-001`
-- Uygulama izni: DEG-023 - DEG-034 icin VERILDI ve uygulama tamamlandi.
-- Kod degisikligi: DEG-001 - DEG-034 YAPILDI; DEG-035 ve DEG-036 henuz
-  uygulanmadi.
-- Otomatik dogrulama: Android 180 JVM testi, `ktfmtCheck`, `lintDebug` ve
-  `assembleDebug` basarili. Backend PostgreSQL 18 Testcontainers ve Flyway V15
-  migration dogrulamasi dahil 215 test basarili; hata, failure veya skip yok.
-  DEG-023 - DEG-034 kapsamindaki publish validasyonu, canonical dil katalogu,
-  navigation sekme sonucu, canli dashboard yenilemesi, `EXPIRED` yasam dongusu
-  ve hosted odeme iptal/locale davranislari odakli testlerle korunuyor.
-- Kullanici dogrulamasi: DEG-001 - DEG-013 ve DEG-023 - DEG-034 kapsamindaki
-  manuel kontroller basarili; yalniz `TEST-001` bekliyor.
-- Kapanis: DEG-014 - DEG-034 kodsal ve otomatik test olarak tamamlandi. Bu
-  maddelerin gercek cihaz, demo FCM, iyzico Sandbox, navigation ve kullanici
+- Uygulama izni: DEG-023 - DEG-039 ve DEG-044 - DEG-046 icin VERILDI;
+  uygulama tamamlandi.
+- Kod degisikligi: DEG-001 - DEG-047 YAPILDI.
+- Otomatik dogrulama: Android 197 JVM testi, `ktfmtCheck`, `lintDebug` ve
+  `assembleDebug` basarili. Backend PostgreSQL 18 Testcontainers ve Flyway V16
+  migration dogrulamasi dahil 219 test basarili; hata, failure veya skip yok.
+  DEG-023 - DEG-039 kapsamindaki publish validasyonu, canonical dil katalogu,
+  navigation sekme sonucu, canli dashboard yenilemesi, `EXPIRED` yasam dongusu,
+  hosted odeme iptal/locale davranislari, sohbet avatar yenilemesi, hedefe
+  bagli bildirim okuma, foreground bildirim senkronizasyonu ve kullaniciya ozel
+  sohbet temizleme kurallari odakli testlerle korunuyor.
+- Son odakli dogrulama: Android `ktfmtCheck`, `testDebugUnitTest`, `lintDebug`
+  ve `assembleDebug` basarili. Backend STOMP interceptor ve notification
+  realtime listener testlerinde 4 test basarili; hata, failure veya skip yok.
+- DEG-042 ve DEG-043 sonrasinda Android `ktfmtCheck` ve
+  `:app:compileDebugKotlin` basarili. Kullanici karari geregi toplu otomatik ve
+  manuel testler sonraki ortak test adiminda calistirilacaktir.
+- DEG-044 - DEG-046 sonrasinda media normalizasyonu/repository testleri ve
+  emulatorde iki odakli sohbet swipe Compose testi basarili. Android 197 JVM
+  testi ile 6 instrumentation testi, `ktfmtCheck`, `lintDebug` ve
+  `assembleDebug` kalite kapilari gecti.
+- Kullanici dogrulamasi: DEG-001 - DEG-013, DEG-023 - DEG-036 ve
+  `TEST-001` kapsamindaki manuel kontroller basarili; `DEG-037`, `DEG-038`,
+  `DEG-039`, `DEG-040`, `DEG-041`, `DEG-042`, `DEG-043`, `DEG-044`, `DEG-045`,
+  `DEG-046` ve `DEG-047` kontrolleri bekliyor.
+- Kapanis: DEG-014 - DEG-047 kodsal olarak tamamlandi. Bu maddelerin gercek
+  cihaz, demo FCM, iyzico Sandbox, navigation ve kullanici
   gorunumu kontrolleri manuel kullanici testinde ayrica dogrulanacak. Degisen
   kapsamin kullanilmayan kod/import/resource ve bos paket taramasi temiz.
-- Siradaki is: `TEST-001` admin onayi sonrasi dashboard/sekme kontrolu; ardindan
-  `DEG-035` ve `DEG-036` maddeleri kullanici karariyla uygulanacaktir.
+- Siradaki kod isleri: YOK. `TEST-001`, `DEG-035` ve
+  `DEG-036` manuel kullanici dogrulamalari basarili
+  tamamlanmistir;
+  `DEG-037`, `DEG-038`, `DEG-039`, `DEG-040`, `DEG-041`, `DEG-042` ve
+  `DEG-043` manuel kullanici dogrulamasi beklemektedir.
   Her yeni kod degisikliginden once bu dosyadaki Altin Kural ve Test Altin
   Kurali yeniden okunmalidir.
 - Baglam yenilenirse bu dosya okunur ve yalniz `BEKLIYOR`, `NETLESTIRILECEK`
