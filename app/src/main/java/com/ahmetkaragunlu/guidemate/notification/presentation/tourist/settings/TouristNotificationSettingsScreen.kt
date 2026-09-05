@@ -53,6 +53,7 @@ fun TouristNotificationSettingsScreen(
             onGuideMessagesChanged = viewModel::updateChatMessages,
             onReservationUpdatesChanged = viewModel::updateReservationUpdates,
             onReviewRequestsChanged = viewModel::updateReviewRequests,
+            onPaymentsAndRefundsChanged = viewModel::updatePaymentsAndEarnings,
         )
     }
 }
@@ -65,6 +66,7 @@ private fun TouristNotificationSettingsContent(
     onGuideMessagesChanged: (Boolean) -> Unit,
     onReservationUpdatesChanged: (Boolean) -> Unit,
     onReviewRequestsChanged: (Boolean) -> Unit,
+    onPaymentsAndRefundsChanged: (Boolean) -> Unit,
 ) {
     val preferences = checkNotNull(uiState.preferences)
     Column(
@@ -114,6 +116,13 @@ private fun TouristNotificationSettingsContent(
             subtitle = stringResource(id = R.string.review_requests_desc),
             isChecked = preferences.reviewRequestsEnabled,
             onCheckedChange = onReviewRequestsChanged,
+            enabled = !uiState.isUpdating,
+        )
+        NotificationSettingsSwitchRow(
+            title = stringResource(id = R.string.payments_and_refunds),
+            subtitle = stringResource(id = R.string.payments_and_refunds_desc),
+            isChecked = preferences.paymentsAndEarningsEnabled,
+            onCheckedChange = onPaymentsAndRefundsChanged,
             enabled = !uiState.isUpdating,
         )
         NotificationSettingsSwitchRow(

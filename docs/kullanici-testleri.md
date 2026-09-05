@@ -1459,6 +1459,9 @@ Bir test icin gerekirse su kanit eklenir:
 - [ ] `NOTIFY-008` Logout backend device registration'ini pasiflestirir ve local
   notification/unread state'i temizler.
 - [ ] `NOTIFY-009` Logout kalici app installation ID'yi gereksiz silmez.
+- [ ] `NOTIFY-009A` Uygulama acilisindaki FCM callback'i oturumdan once gelse
+  bile giris sonrasinda cihaz FCM'e yeniden kaydedilir; sonraki bildirimin
+  backend push durumu `SENT` olur ve sistem bildirimi gorunur.
 - [ ] `NOTIFY-010` Hesap degistirince ayni cihaz yeni authenticated kullaniciya
   kaydolur, eski kullanici push'i gelmez.
 
@@ -1488,8 +1491,9 @@ Bir test icin gerekirse su kanit eklenir:
 #### Sistem Bildirimi Tasarimi
 
 - [ ] `NOTIFY-023` Sistem cubugunda uygulama etiketi `GuideMate` gorunur.
-- [ ] `NOTIFY-024` Gecici small icon Android kurallarina uygun tek renk ikon
-  olarak gorunur; default bos/kare ikon olmaz.
+- [ ] `NOTIFY-024` GuideMate pusula/G small icon'u Android kurallarina uygun tek
+  renk ikon olarak gorunur; default bos/kare ikon veya sag kategori large icon
+  bulunmaz.
 - [ ] `NOTIFY-025` TOUR, CHAT, COMMENT, RATING, PAYMENT, SECURITY ve GENERAL
   kategori ikonlari uygulama ici gorunumle anlamsal olarak tutarlidir.
 - [ ] `NOTIFY-026` Sistem ikon rengi notr/kararlastirilan tasarimdadir; rastgele
@@ -1567,6 +1571,40 @@ Bir test icin gerekirse su kanit eklenir:
   baska role ekranina donmez.
 - [ ] `NOTIFY-064` Ayni notification intent configuration change'de tekrar
   tekrar navigate etmez.
+
+#### Tercihler ve Push Siniri
+
+- [ ] `NOTIFY-065` Tourist ayarlari upcoming, guide message, reservation,
+  review request ve payment/refund seceneklerini; guide ayarlari upcoming,
+  tourist message, tour/reservation, payment/earning ve new-review seceneklerini
+  role uygun metinlerle gosterir.
+- [ ] `NOTIFY-066` Security tercihi iki rolde de acik ve disabled gorunur;
+  sifre degisikligi/sifirlama push'i kullanici tarafindan kapatilamaz.
+- [ ] `NOTIFY-067` Bir kategori kapatildiktan sonra o kategoride uretilen yeni
+  olay notification history ve uygulama ici unread'a eklenir fakat sistem
+  cubugunda push gostermez.
+- [ ] `NOTIFY-068` Kapali tercih tekrar acilinca sonraki bildirim push olur;
+  daha once `NOT_REQUESTED` kalan bildirimler topluca yeniden gonderilmez.
+- [ ] `NOTIFY-069` Push once `PENDING` veya `FAILED` iken ilgili switch
+  kapatilirsa scheduler retry FCM cagrisi yapmaz.
+- [ ] `NOTIFY-070` Uygulama switch'i acik olsa bile Android sistem izni veya
+  GuideMate notification channel'i kapaliysa sistem bildirimi gorunmez; in-app
+  history ve unread calismaya devam eder.
+- [ ] `NOTIFY-071` Turkce locale ile calisan backend yeni mesaj, tur, review,
+  payment ve security olaylarinda Firebase Android priority hatasi uretmeden
+  background/closed push teslim eder.
+- [ ] `NOTIFY-072` Kullanici uygulamada ayni sohbet/tur/rezervasyon/odeme
+  hedefini gorurken ilgili push uygulama ici state'i yeniler fakat ikinci bir
+  sistem bildirimi gostermez; farkli hedef bildirimi gorunur.
+- [ ] `NOTIFY-073` Ayni `chatId` icin arka arkaya gelen mesajlar bildirim
+  cubugunda tek kaydi gunceller; farkli sohbetler ayri bildirimler olarak kalir.
+- [ ] `NOTIFY-074` Ilgili hedef normal uygulama akisindan acilinca backend unread,
+  topbar badge ve yalniz o hedefe ait Android sistem bildirimi temizlenir;
+  ilgisiz bildirimler korunur.
+- [ ] `NOTIFY-075` `Tumunu okundu olarak isaretle` basarili oldugunda backend
+  unread sifirlanir ve GuideMate sistem bildirimleri bildirim cubugundan kalkar.
+- [ ] `NOTIFY-076` Logout sonrasi onceki hesabin GuideMate sistem bildirimleri
+  cihazda kalmaz; yeni hesabin notification history kayitlari silinmez.
 
 ### 19. Navigation, Geri Tusu ve Ekran Gecisleri
 

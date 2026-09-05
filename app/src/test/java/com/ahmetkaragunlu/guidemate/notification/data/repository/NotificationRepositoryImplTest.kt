@@ -17,6 +17,8 @@ import com.ahmetkaragunlu.guidemate.notification.data.remote.model.UpdateNotific
 import com.ahmetkaragunlu.guidemate.notification.domain.device.PushInstallationIdProvider
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
 import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +63,14 @@ class NotificationRepositoryImplTest {
     @Test
     fun `mark read updates cached item and decrements unread count once`() = runTest {
         val api = FakeNotificationApi(unreadCount = 2)
-        val repository = createRepository(api, FakeUserRepository(), backgroundScope)
+        val systemNotifications = FakeSystemNotificationController()
+        val repository =
+            createRepository(
+                api,
+                FakeUserRepository(),
+                backgroundScope,
+                systemNotifications = systemNotifications,
+            )
 
         repository.refreshNotifications()
         repository.refreshUnreadCount()
@@ -70,13 +79,21 @@ class NotificationRepositoryImplTest {
 
         assertTrue(repository.notifications.value.first { it.notificationId == "notification-1" }.isRead)
         assertEquals(1, repository.unreadCount.value)
+        assertEquals("notification-1", systemNotifications.dismissedTargets.last().notificationId)
     }
 
     @Test
     fun `mark related read applies canonical count and updates only matching cached items`() =
         runTest {
             val api = FakeNotificationApi(unreadCount = 1)
-            val repository = createRepository(api, FakeUserRepository(), backgroundScope)
+            val systemNotifications = FakeSystemNotificationController()
+            val repository =
+                createRepository(
+                    api,
+                    FakeUserRepository(),
+                    backgroundScope,
+                    systemNotifications = systemNotifications,
+                )
             repository.refreshNotifications()
 
             val result =
@@ -89,7 +106,27 @@ class NotificationRepositoryImplTest {
             assertTrue(repository.notifications.value.first().isRead)
             assertEquals("CHAT", api.relatedReadRequest?.targetType)
             assertEquals("chat-1", api.relatedReadRequest?.targetId)
+            assertEquals(
+                NotificationTargetReference(NotificationTargetType.CHAT, "chat-1"),
+                systemNotifications.dismissedReferences.single(),
+            )
         }
+
+    @Test
+    fun `mark all read clears system notifications`() = runTest {
+        val systemNotifications = FakeSystemNotificationController()
+        val repository =
+            createRepository(
+                FakeNotificationApi(unreadCount = 0),
+                FakeUserRepository(),
+                backgroundScope,
+                systemNotifications = systemNotifications,
+            )
+
+        repository.markAllRead()
+
+        assertEquals(1, systemNotifications.dismissAllCalls)
+    }
 
     @Test
     fun `authenticated user registers installation and firebase identifiers`() = runTest {
@@ -161,6 +198,7 @@ class NotificationRepositoryImplTest {
         userRepository: UserRepository,
         scope: kotlinx.coroutines.CoroutineScope,
         realtimeClient: NotificationRealtimeClient = FakeNotificationRealtimeClient(),
+        systemNotifications: FakeSystemNotificationController = FakeSystemNotificationController(),
     ): NotificationRepositoryImpl {
         val dataStore =
             PreferenceDataStoreFactory.create(
@@ -173,12 +211,35 @@ class NotificationRepositoryImplTest {
             installationIdDataSource = InstallationIdDataSource(dataStore),
             pushInstallationIdProvider =
                 object : PushInstallationIdProvider {
-                    override suspend fun getId(): String = "firebase-installation-1"
+                    override suspend fun registerAndGetId(): String = "firebase-installation-1"
                 },
             userRepository = userRepository,
             apiCallExecutor = testApiCallExecutor(),
+            systemNotificationController = systemNotifications,
             applicationScope = scope,
         )
+    }
+
+    private class FakeSystemNotificationController : SystemNotificationController {
+        val dismissedTargets = mutableListOf<NotificationNavigationTarget>()
+        val dismissedReferences = mutableListOf<NotificationTargetReference>()
+        var dismissAllCalls = 0
+
+        override fun createChannel() = Unit
+
+        override fun show(target: NotificationNavigationTarget) = Unit
+
+        override fun dismiss(target: NotificationNavigationTarget) {
+            dismissedTargets += target
+        }
+
+        override fun dismissRelated(target: NotificationTargetReference) {
+            dismissedReferences += target
+        }
+
+        override fun dismissAll() {
+            dismissAllCalls++
+        }
     }
 
     private class FakeNotificationRealtimeClient : NotificationRealtimeClient {

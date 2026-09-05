@@ -176,9 +176,13 @@
 
     <string name="review_requests_desc">Tur sonrası yorum hatırlatmaları</string>
 
+    <string name="payments_and_refunds">Ödeme ve İade Bildirimleri</string>
+
+    <string name="payments_and_refunds_desc">Ödeme sonuçları ve iade güncellemeleri</string>
+
     <string name="security_alerts">Güvenlik Uyarıları</string>
 
-    <string name="security_alerts_desc">Şifre değişimi, yeni giriş bildirimleri</string>
+    <string name="security_alerts_desc">Şifre değişikliği ve sıfırlama bildirimleri</string>
 
     <string name="guide_notification_tours_and_reservations">Turlar ve Rezervasyonlar</string>
 
@@ -190,15 +194,15 @@
 
     <string name="guide_tourist_messages_desc">Tura katılacak misafirlerinizden gelen anlık mesajlar ve sorular.</string>
 
-    <string name="guide_reservation_updates">Rezervasyon Güncellemeleri</string>
+    <string name="guide_reservation_updates">Tur ve Rezervasyon Güncellemeleri</string>
 
-    <string name="guide_reservation_updates_desc">Turlarınıza yapılan yeni rezervasyonlar ve turist iptalleri.</string>
+    <string name="guide_reservation_updates_desc">Tur onayları, durum değişiklikleri, yeni rezervasyonlar ve iptaller.</string>
 
     <string name="guide_account_and_interaction">Hesap ve Etkileşim</string>
 
     <string name="guide_payments_and_earnings">Ödeme ve Hak Edişler</string>
 
-    <string name="guide_payments_and_earnings_desc">Tamamlanan turların hizmet bedeli banka hesabınıza aktarıldığında.</string>
+    <string name="guide_payments_and_earnings_desc">Kazanç, ödeme ve para çekme hareketleri.</string>
 
     <string name="guide_new_reviews">Yeni Değerlendirmeler</string>
 
@@ -206,6 +210,6 @@
 
     <string name="guide_security_alerts">Güvenlik Uyarıları</string>
 
-    <string name="guide_security_alerts_desc">Şifre değişimi ve yeni giriş bildirimleri.</string>
+    <string name="guide_security_alerts_desc">Şifre değişikliği ve sıfırlama bildirimleri.</string>
 
 </resources>

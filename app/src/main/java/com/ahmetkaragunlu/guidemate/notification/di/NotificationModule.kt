@@ -5,7 +5,9 @@ import com.ahmetkaragunlu.guidemate.notification.data.realtime.DefaultNotificati
 import com.ahmetkaragunlu.guidemate.notification.data.realtime.NotificationRealtimeClient
 import com.ahmetkaragunlu.guidemate.notification.data.remote.api.NotificationApi
 import com.ahmetkaragunlu.guidemate.notification.data.repository.NotificationRepositoryImpl
+import com.ahmetkaragunlu.guidemate.notification.data.push.SystemNotificationDisplayer
 import com.ahmetkaragunlu.guidemate.notification.domain.device.PushInstallationIdProvider
+import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import dagger.Binds
 import dagger.Module
@@ -35,6 +37,12 @@ abstract class NotificationModule {
     abstract fun bindNotificationRealtimeClient(
         implementation: DefaultNotificationRealtimeClient,
     ): NotificationRealtimeClient
+
+    @Binds
+    @Singleton
+    abstract fun bindSystemNotificationController(
+        implementation: SystemNotificationDisplayer,
+    ): SystemNotificationController
 
     companion object {
         @Provides

@@ -692,9 +692,15 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
     gonderilmelidir.
   - Callback oturum acilmadan gelirse yetkisiz backend istegi atilmamalidir.
     Kullanici oturum actiginda mevcut user-state gozlemcisi cihaz kaydini
-    tamamlamaya devam etmelidir.
+    tamamlamaya devam etmelidir. Bu yol ham FID'yi dogrudan gondermemeli;
+    once `FirebaseMessaging.register()` basarisini bekleyip sonra ayni kayitli
+    FID'yi backend'e tasimalidir.
   - Backend'in FID hedefleyen mevcut `setFid()` kullanimi, endpoint'i ve veri
     modeli degistirilmemelidir.
+  - Android Firebase API anahtari `Firebase Installations API` ve
+    `FCM Registration API` servislerine izin vermelidir. Places SDK icin
+    kullanilan anahtar Firebase anahtariyla birlestirilmemeli; iki anahtar kendi
+    Android paket/imza ve API allowlist sinirlariyla ayri tutulmalidir.
 - Katman ve bagimlilik karari:
   - Firebase uygulama kaydi application composition root'ta, Firebase callback'i
     messaging service'te, backend cihaz eslemesi notification repository'de
@@ -718,7 +724,8 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   - Manifest FID modu, guvenli FCM kaydi ve `onRegistered()` callback akisi
     tamamlandi.
   - Oturum kontrolu ile callback FID'sini kullanan idempotent backend cihaz
-    kaydi kuruldu; backend kodu degistirilmedi.
+    kaydi kuruldu. Oturum sonrasi fallback kaydi da FCM registration basarisini
+    bekleyecek sekilde tamamlandi; backend kodu degistirilmedi.
   - Kanitlanmis kullanilmayan kod/resource/import ve bos klasorler temizlendi.
   - `ktfmtCheck`, 160 JVM testi, Android test kaynak derlemesi, `lintDebug` ve
     `assembleDebug` basarili tamamlandi; lintte error, unused resource, eski SDK
@@ -727,6 +734,9 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   - Firebase yapilandirmali backend ve bildirim izni verilmis fiziksel cihazla
     uygulama acik, arka planda ve normal sekilde kapaliyken push teslimi
     denenmelidir.
+  - Firebase istemci kaydinda `BAD CONFIG` veya `API_KEY_SERVICE_BLOCKED`
+    bulunmamali; backend'deki aktif cihaz kaydi ve yeni bildirimin `SENT`
+    durumu birlikte dogrulanmalidir.
   - Bildirime dokununca ilgili typed ekrana gidildigi ve uygulama ici okunmamis
     sayisinin yenilendigi dogrulanmalidir.
 
@@ -2245,19 +2255,137 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
     kaldirma davranisi degismedi.
 - Test karari:
   - Salt metin degisikligi icin yeni kirilgan UI testi eklenmedi; mevcut
-    sohbet silme dialogu Compose testi ve derleme kontrolleri kullanildi.
+  sohbet silme dialogu Compose testi ve derleme kontrolleri kullanildi.
+
+### DEG-048 - Bildirim Tercihlerini ve Arka Plan FCM Teslimatini Tamamlamak
+
+- Durum: `UYGULANDI`
+- Kullanici testiyle bulunan sorunlar:
+  - Tourist ayarlarinda payment/refund push bildirimlerini kapatacak bir secenek
+    yoktur; backend tercihi desteklese de bu rol ilgili alana ulasamamaktadir.
+  - Guide reservation metni tur onay/red ve durum degisikliklerini, finance
+    metni earning/withdrawal hareketlerini tam anlatmamaktadir.
+  - Security aciklamasi backend'in uretmedigi yeni giris bildirimini vaat
+    etmektedir.
+  - Kullanici bir kategoriyi kapattiktan sonra daha once `PENDING`/`FAILED`
+    olmus ayni kategori bildirimi retry sirasinda tercih yeniden okunmadigi icin
+    push olarak gonderilebilmektedir.
+  - Turkce JVM locale'inde Firebase Admin Android priority degeri `HIGH` yerine
+    gecersiz `hıgh` olarak serilestirildigi icin arka plan FCM teslimati
+    `INVALID_ARGUMENT` ile reddedilmektedir.
+- Rol ve secenek karari:
+  - Tourist; upcoming reminder, guide message, reservation update, review
+    request, payment/refund ve zorunlu security seceneklerini gorur.
+  - Guide; upcoming reminder, tourist message, tour/reservation update,
+    payment/earning, new review ve zorunlu security seceneklerini gorur.
+  - Role ait olmayan ayarlar sirf ortak modelde bulundugu icin ekranda
+    gosterilmez. Tourist'e new-review/earning, guide'a review-request secenegi
+    eklenmez.
+  - Security bildirimi iki rolde de kapatilamaz; aciklamasi yalniz mevcut sifre
+    degisikligi ve sifirlama olaylarini anlatir.
+- Bildirim tercihi davranisi:
+  - Switch yalniz sistem push teslimatini yonetir. PostgreSQL notification
+    history, uygulama ici unread, topbar badge, guide son hareketler ve semantic
+    navigation kaydi korunur.
+  - Kapali kategoriyle uretilen yeni bildirim `NOT_REQUESTED` olur. Switch
+    tekrar acilinca yalniz gelecekte uretilen bildirimler push edilir; eski
+    `NOT_REQUESTED` kayitlar sonradan topluca gonderilmez.
+  - Retry her denemeden once guncel tercihi yeniden kontrol eder. Tercih
+    kapatilmissa bildirim `NOT_REQUESTED` yapilir ve FCM cagrisi atilmaz.
+  - Android switch durumu backend canonical sonucundan beslenir; sistem
+    notification izni veya kanal ayari uygulama switch'inden ayri OS siniridir.
+- Mimari ve guvenlik karari:
+  - Android mevcut ortak `NotificationPreferencesViewModel` ve repository
+    sozlesmesini kullanir; yeni ekran, ViewModel veya preference tablosu
+    eklenmez.
+  - Backend tum `NotificationType` degerlerini acik ve exhaustive kategori
+    eslemesiyle yonetir; yeni bir type sessizce reservation grubuna dusmez.
+  - Backend process locale'i `Locale.ROOT` olarak baslatilir. Android dili ve
+    XML yerellestirmesi degismez; backend kullaniciya yerellestirilmis metin
+    uretmez.
+  - Firebase hatasi; FID, token veya payload sizdirilmadan yalniz guvenli hata
+    kodlariyla loglanir.
+- Test karari ve uygulama sonucu:
+  - Backend kategori eslemesi tum enum degerleriyle, preferences bulunmadiginda
+    varsayilan acik davranisla, security zorunluluguyla ve switch kapandiktan
+    sonra retry yapilmamasiyla test edildi.
+  - Turkce process locale'inin startup sirasinda locale-independent degere
+    alinmasi odakli testle korunuyor.
+  - Android'de var olan update metodu ve DTO sozlesmesi kullanildigi icin ayni
+    davranisi tekrar eden yeni ViewModel testi; salt metin/yerlesim icin
+    kirilgan UI testi eklenmedi.
+  - Android `ktfmtCheck` ve `compileDebugKotlin`; backend bes odakli test
+    basariyla tamamlandi. Gercek background/closed FCM teslimi ve OS switch
+    davranisi kullanici testinde ayrica dogrulanacak.
+
+### DEG-049 - Sistem Bildirimi Yasam Dongusu ve Sohbet Gruplama
+
+- Durum: `UYGULANDI`
+- Kullanici karari:
+  - Kullanici ilgili hedefi zaten goruyorsa ayni hedef icin ikinci bir sistem
+    bildirimi gosterilmemeli; uygulama ici canonical state yine guncellenmeli.
+  - Sohbet, tur, rezervasyon veya odeme hedefine uygulama icinden girildiginde
+    yalniz ilgili notification okundu olmali ve Android bildirim cubugundaki
+    karsiligi kaldirilmalidir.
+  - `Tumunu okundu olarak isaretle` GuideMate sistem bildirimlerini de
+    temizlemeli; logout onceki kullaniciya ait sistem bildirimlerini cihazda
+    birakmamalidir.
+  - Ayni `chatId` icin gelen mesajlar bildirim cubugunda alt alta yigilmak yerine
+    ayni bildirimi guncellemelidir. Farkli sohbetler birbirinden ayrilmalidir.
+- Mimari sinir:
+  - Backend notification history ve unread state canonical kaynak olarak
+    korunur. Android NotificationManager yalniz cihazdaki sistem sunumunu
+    yonetir.
+  - Notification kimligi semantic hedeften uretilmeli; metin veya rastgele
+    hash is kurali haline getirilmemelidir.
+- Test karari:
+  - Semantic bildirim kimligi, hedef bazli temizleme, tumunu temizleme ve logout
+    izolasyonu saf davranis testleriyle korunmalidir.
+  - Uygulama sonucu: Foreground gorunurluk durumu typed navigation hedeflerinden
+    besleniyor; ayni hedef acikken yalniz sistem sunumu bastiriliyor. Tekil,
+    iliskili, toplu okundu ve logout islemleri Android bildirimlerini uygun
+    kapsamda temizliyor. Ayni sohbet `chatId` tabanli tek sistem bildirimiyle
+    guncelleniyor.
+  - Odakli notification, repository ve root navigation testleri ile debug
+    derlemesi basariyla tamamlandi. Gercek cihaz kabul kapsami `NOTIFY-072` -
+    `NOTIFY-076` maddeleridir.
+
+### DEG-050 - GuideMate Uygulama ve Bildirim Ikonu
+
+- Durum: `UYGULANDI`
+- Kullanici karari:
+  - Varsayilan Android robot ikonu kaldirilmali.
+  - GuideMate; brand mavi zemin uzerinde pusula ile negatif boslukta `G`
+    hissini birlestiren sade bir marka isareti kullanmalidir.
+  - Launcher ve Play Store ikonu renkli olmali; Android'in zorunlu small
+    notification ikonu ayni sembolun tek renkli silueti olmalidir.
+  - Bildirimin saginda mesaj, odeme veya tur kategori ikonu gosterilmemelidir.
+    Android'in zorunlu small app ikonu korunmalidir.
+- Uygulama sonucu:
+  - Adaptive launcher foreground/background ve monochrome katmani ayni
+    GuideMate sembolune baglandi.
+  - `SystemNotificationDisplayer` yalniz `ic_notification_app` small icon
+    kullaniyor; large kategori bitmap'i ve ona ait sunum kodu kaldirildi.
+  - Ana ve Play Store boyutundaki marka kaynaklari `docs/brand-assets` altinda
+    saklandi.
+- Test karari:
+  - Salt ikon gorunumu icin kirilgan UI testi yazilmadi. Android resource
+    derleme/lint kapilari ve gercek cihaz launcher/bildirim gorunumuyle
+    dogrulanacak.
+  - Java 21 ile `ktfmtCheck`, `lintDebug` ve `assembleDebug` basariyla
+    tamamlandi.
 
 ## Toplu Uygulama Kontrol Noktasi
 
-- Son kaydedilen kod maddesi: `DEG-047`
+- Son kaydedilen kod maddesi: `DEG-050`
 - Son kaydedilen bekleyen kod maddesi: YOK
 - Son kaydedilen manuel test: `TEST-001`
 - Uygulama izni: DEG-023 - DEG-039 ve DEG-044 - DEG-046 icin VERILDI;
   uygulama tamamlandi.
-- Kod degisikligi: DEG-001 - DEG-047 YAPILDI.
+- Kod degisikligi: DEG-001 - DEG-050 YAPILDI.
 - Otomatik dogrulama: Android 197 JVM testi, `ktfmtCheck`, `lintDebug` ve
   `assembleDebug` basarili. Backend PostgreSQL 18 Testcontainers ve Flyway V16
-  migration dogrulamasi dahil 219 test basarili; hata, failure veya skip yok.
+  migration dogrulamasi dahil 223 test basarili; hata, failure veya skip yok.
   DEG-023 - DEG-039 kapsamindaki publish validasyonu, canonical dil katalogu,
   navigation sekme sonucu, canli dashboard yenilemesi, `EXPIRED` yasam dongusu,
   hosted odeme iptal/locale davranislari, sohbet avatar yenilemesi, hedefe
@@ -2273,19 +2401,27 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   emulatorde iki odakli sohbet swipe Compose testi basarili. Android 197 JVM
   testi ile 6 instrumentation testi, `ktfmtCheck`, `lintDebug` ve
   `assembleDebug` kalite kapilari gecti.
+- DEG-048 sonrasinda Android `ktfmtCheck`, 197 JVM testi, `lintDebug` ve
+  `assembleDebug`; backend notification preference, retry ve process-locale
+  kapsamindaki 5 odakli test ile PostgreSQL 18 Testcontainers dahil 223 testin
+  tamami basarili tamamlandi.
+- DEG-049 ve DEG-050 sonrasinda Android 203 JVM testinin tamami, `ktfmtCheck`,
+  `lintDebug` ve `assembleDebug` basariyla tamamlandi. Kullanilmayan eski sistem
+  notification kategori drawable'lari ve large-icon kodu temizlendi.
 - Kullanici dogrulamasi: DEG-001 - DEG-013, DEG-023 - DEG-036 ve
   `TEST-001` kapsamindaki manuel kontroller basarili; `DEG-037`, `DEG-038`,
   `DEG-039`, `DEG-040`, `DEG-041`, `DEG-042`, `DEG-043`, `DEG-044`, `DEG-045`,
-  `DEG-046` ve `DEG-047` kontrolleri bekliyor.
-- Kapanis: DEG-014 - DEG-047 kodsal olarak tamamlandi. Bu maddelerin gercek
+  `DEG-046`, `DEG-047` ve `DEG-048` kontrolleri bekliyor.
+- Kapanis: DEG-014 - DEG-048 kodsal olarak tamamlandi. Bu maddelerin gercek
   cihaz, demo FCM, iyzico Sandbox, navigation ve kullanici
   gorunumu kontrolleri manuel kullanici testinde ayrica dogrulanacak. Degisen
   kapsamin kullanilmayan kod/import/resource ve bos paket taramasi temiz.
-- Siradaki kod isleri: YOK. `TEST-001`, `DEG-035` ve
+- Siradaki kod isi: YOK. `TEST-001`, `DEG-035` ve
   `DEG-036` manuel kullanici dogrulamalari basarili
   tamamlanmistir;
   `DEG-037`, `DEG-038`, `DEG-039`, `DEG-040`, `DEG-041`, `DEG-042` ve
-  `DEG-043` manuel kullanici dogrulamasi beklemektedir.
+  `DEG-043` ile `NOTIFY-072` - `NOTIFY-076` manuel kullanici dogrulamasi
+  beklemektedir.
   Her yeni kod degisikliginden once bu dosyadaki Altin Kural ve Test Altin
   Kurali yeniden okunmalidir.
 - Baglam yenilenirse bu dosya okunur ve yalniz `BEKLIYOR`, `NETLESTIRILECEK`

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -32,6 +33,11 @@ import com.ahmetkaragunlu.guidemate.auth.presentation.roleselection.RoleSelectio
 fun GuideMateNavigation(
     viewModel: RootNavigationViewModel = hiltViewModel(),
 ) {
+    LifecycleResumeEffect(Unit) {
+        viewModel.setAppResumed(true)
+        onPauseOrDispose { viewModel.setAppResumed(false) }
+    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pendingNotificationTarget by
         viewModel.pendingNotificationTarget.collectAsStateWithLifecycle()
@@ -87,6 +93,7 @@ fun GuideMateNavigation(
                 onLogoutClick = viewModel::logout,
                 pendingNotificationTarget = pendingNotificationTarget,
                 onNotificationNavigationHandled = viewModel::onNotificationNavigationHandled,
+                onVisibleNotificationTargetChanged = viewModel::setVisibleNotificationTarget,
             )
         }
 
@@ -96,6 +103,7 @@ fun GuideMateNavigation(
                 onLogoutClick = viewModel::logout,
                 pendingNotificationTarget = pendingNotificationTarget,
                 onNotificationNavigationHandled = viewModel::onNotificationNavigationHandled,
+                onVisibleNotificationTargetChanged = viewModel::setVisibleNotificationTarget,
             )
         }
 

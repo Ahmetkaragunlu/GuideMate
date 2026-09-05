@@ -3607,6 +3607,15 @@ Uygulama sonucu (2026-08-25):
 - Review notification payload'i ilgili guide tur detayina gidebilmek icin
   `sessionId` tasir. Basarili sifre degistirme ve sifre sifirlama islemleri
   backend'de gercek `SECURITY_ALERT` history/push olayi uretir.
+- Notification preference matrisi role gore tamamlanmistir. Tourist upcoming,
+  chat, reservation, review request ve payment/refund; guide upcoming, chat,
+  tour/reservation, payment/earning ve new-review push gruplarini yonetir.
+  Security iki rolde de zorunludur. Switch'ler in-app history/unread kaydini
+  degil yalniz push teslimatini etkiler.
+- Backend retry her denemeden once guncel notification tercihini yeniden okur;
+  kategori kapanmissa eski `PENDING`/`FAILED` push `NOT_REQUESTED` olur. Backend
+  process locale'i `Locale.ROOT` ile sabitlenerek Turkce locale'in Firebase
+  Android priority degerini bozmasi engellenmistir.
 - Eski guide notification mock listesi, local ayar ViewModel'leri, manuel
   unread state'i, sabit actor verileri ve bunlardan kalan bos paketler
   kaldirildi.

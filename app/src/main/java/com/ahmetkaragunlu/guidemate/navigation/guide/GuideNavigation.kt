@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +37,9 @@ import com.ahmetkaragunlu.guidemate.home.presentation.guide.GuideHomeViewModel
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.notification.toGuideDestination
 import com.ahmetkaragunlu.guidemate.navigation.notification.marksNotificationAfterSuccessfulLoad
+import com.ahmetkaragunlu.guidemate.navigation.notification.toGuideVisibleNotificationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationVisibleTarget
 import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationViewModel
 import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationSyncEffect
 import com.ahmetkaragunlu.guidemate.notification.presentation.components.NotificationBottomSheet
@@ -54,6 +57,7 @@ fun GuideNavigation(
     onLogoutClick: () -> Unit,
     pendingNotificationTarget: NotificationNavigationTarget?,
     onNotificationNavigationHandled: (NotificationNavigationTarget) -> Unit,
+    onVisibleNotificationTargetChanged: (NotificationVisibleTarget?) -> Unit,
     homeViewModel: GuideHomeViewModel = hiltViewModel(),
     earningsViewModel: GuideEarningsViewModel = hiltViewModel(),
     notificationViewModel: NotificationViewModel = hiltViewModel(),
@@ -77,6 +81,13 @@ fun GuideNavigation(
     val activeChat = chatListUiState.chats.firstOrNull { it.chatId == activeChatId }
     var showNotifications by rememberSaveable { mutableStateOf(false) }
     var customBackAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    LaunchedEffect(navBackStackEntry) {
+        onVisibleNotificationTargetChanged(navBackStackEntry.toGuideVisibleNotificationTarget())
+    }
+    DisposableEffect(Unit) {
+        onDispose { onVisibleNotificationTargetChanged(null) }
+    }
 
     LaunchedEffect(currentDestination) {
         if (currentDestination?.hasRoute<GuideDestination.Home>() == true) {

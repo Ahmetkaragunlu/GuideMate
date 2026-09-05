@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,12 +32,14 @@ import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
 import com.ahmetkaragunlu.guidemate.navigation.notification.toTouristDestination
 import com.ahmetkaragunlu.guidemate.navigation.notification.marksNotificationAfterSuccessfulLoad
+import com.ahmetkaragunlu.guidemate.navigation.notification.toTouristVisibleNotificationTarget
 import com.ahmetkaragunlu.guidemate.chat.presentation.viewmodel.ChatListViewModel
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.TouristExploreViewModel
 import com.ahmetkaragunlu.guidemate.home.presentation.tourist.TouristHomeViewModel
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
 import com.ahmetkaragunlu.guidemate.payment.presentation.recovery.PaymentRecoveryViewModel
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationVisibleTarget
 import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationViewModel
 import com.ahmetkaragunlu.guidemate.notification.presentation.NotificationSyncEffect
 import com.ahmetkaragunlu.guidemate.notification.presentation.components.NotificationBottomSheet
@@ -54,6 +57,7 @@ fun TouristNavigation(
     onLogoutClick: () -> Unit,
     pendingNotificationTarget: NotificationNavigationTarget?,
     onNotificationNavigationHandled: (NotificationNavigationTarget) -> Unit,
+    onVisibleNotificationTargetChanged: (NotificationVisibleTarget?) -> Unit,
     homeViewModel: TouristHomeViewModel = hiltViewModel(),
     chatListViewModel: ChatListViewModel = hiltViewModel(),
     paymentRecoveryViewModel: PaymentRecoveryViewModel = hiltViewModel(),
@@ -87,6 +91,13 @@ fun TouristNavigation(
     val activeChat = chatListUiState.chats.firstOrNull { it.chatId == activeChatId }
     var showNotifications by rememberSaveable { mutableStateOf(false) }
     var customBackAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    LaunchedEffect(navBackStackEntry) {
+        onVisibleNotificationTargetChanged(navBackStackEntry.toTouristVisibleNotificationTarget())
+    }
+    DisposableEffect(Unit) {
+        onDispose { onVisibleNotificationTargetChanged(null) }
+    }
 
     LaunchedEffect(pendingNotificationTarget) {
         pendingNotificationTarget?.let { target ->

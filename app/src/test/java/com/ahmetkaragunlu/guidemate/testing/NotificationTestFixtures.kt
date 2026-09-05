@@ -27,6 +27,7 @@ class FakeNotificationRepository : NotificationRepository {
     val markedRelatedTargets = mutableListOf<NotificationTargetReference>()
     var markRelatedResult: DataResult<Int> = DataResult.Success(0)
     var clearLocalStateCalls = 0
+    var dismissSystemNotificationsCalls = 0
 
     override val notifications: StateFlow<List<AppNotification>> = notificationState
     override val unreadCount: StateFlow<Int> = unreadState
@@ -73,6 +74,10 @@ class FakeNotificationRepository : NotificationRepository {
         DataResult.Success(Unit)
 
     override fun onPushReceived(target: NotificationNavigationTarget) = Unit
+
+    override fun dismissSystemNotifications() {
+        dismissSystemNotificationsCalls++
+    }
 
     override fun clearLocalState() {
         clearLocalStateCalls++

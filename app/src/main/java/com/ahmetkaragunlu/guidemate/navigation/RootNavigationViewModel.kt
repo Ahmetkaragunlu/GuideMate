@@ -10,7 +10,9 @@ import com.ahmetkaragunlu.guidemate.auth.domain.repository.OnboardingRepository
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.navigation.auth.AuthStartDestination
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationVisibleTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
+import com.ahmetkaragunlu.guidemate.notification.domain.push.NotificationForegroundState
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,6 +44,7 @@ class RootNavigationViewModel @Inject constructor(
     private val paymentRepository: PaymentRepository,
     private val notificationRepository: NotificationRepository,
     private val notificationNavigationCoordinator: NotificationNavigationCoordinator,
+    private val notificationForegroundState: NotificationForegroundState,
 ) : ViewModel() {
     private var authStartDestination = AuthStartDestination.SIGN_IN
     private val _uiState = MutableStateFlow(RootNavigationUiState())
@@ -59,10 +62,19 @@ class RootNavigationViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             notificationNavigationCoordinator.clear()
+            notificationRepository.dismissSystemNotifications()
             authRepository.logout()
             notificationRepository.clearLocalState()
             paymentRepository.clearPendingPayment()
         }
+    }
+
+    fun setAppResumed(isResumed: Boolean) {
+        notificationForegroundState.setAppResumed(isResumed)
+    }
+
+    fun setVisibleNotificationTarget(target: NotificationVisibleTarget?) {
+        notificationForegroundState.setVisibleTarget(target)
     }
 
     fun onNotificationNavigationHandled(target: NotificationNavigationTarget) {

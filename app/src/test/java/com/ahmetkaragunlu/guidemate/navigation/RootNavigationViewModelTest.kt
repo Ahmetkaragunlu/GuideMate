@@ -6,6 +6,7 @@ import com.ahmetkaragunlu.guidemate.navigation.auth.AuthStartDestination
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
+import com.ahmetkaragunlu.guidemate.notification.domain.push.NotificationForegroundState
 import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeOnboardingRepository
@@ -79,6 +80,7 @@ class RootNavigationViewModelTest {
             runCurrent()
 
             assertEquals(1, authRepository.logoutCalls)
+            assertEquals(1, notificationRepository.dismissSystemNotificationsCalls)
             assertEquals(1, notificationRepository.clearLocalStateCalls)
             assertEquals(1, paymentRepository.clearAllPendingPaymentCalls)
             assertEquals(null, navigationCoordinator.pendingTarget.value)
@@ -100,5 +102,6 @@ class RootNavigationViewModelTest {
             paymentRepository = paymentRepository,
             notificationRepository = notificationRepository,
             notificationNavigationCoordinator = notificationNavigationCoordinator,
+            notificationForegroundState = NotificationForegroundState(),
         )
 }

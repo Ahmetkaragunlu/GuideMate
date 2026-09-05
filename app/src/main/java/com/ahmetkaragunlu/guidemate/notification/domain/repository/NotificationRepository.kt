@@ -26,5 +26,6 @@ interface NotificationRepository {
     suspend fun updatePreferences(update: NotificationPreferenceUpdate): DataResult<NotificationPreferences>
     suspend fun registerDevice(pushInstallationId: String? = null): DataResult<Unit>
     fun onPushReceived(target: NotificationNavigationTarget)
+    fun dismissSystemNotifications()
     fun clearLocalState()
 }

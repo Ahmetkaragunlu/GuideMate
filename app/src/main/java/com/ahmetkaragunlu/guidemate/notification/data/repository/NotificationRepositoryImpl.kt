@@ -18,6 +18,7 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNaviga
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferences
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,6 +48,7 @@ constructor(
     private val pushInstallationIdProvider: PushInstallationIdProvider,
     private val userRepository: UserRepository,
     private val apiCallExecutor: ApiCallExecutor,
+    private val systemNotificationController: SystemNotificationController,
     @param:ApplicationScope private val applicationScope: CoroutineScope,
 ) : NotificationRepository {
     private val mutableNotifications = MutableStateFlow<List<AppNotification>>(emptyList())
@@ -133,6 +135,7 @@ constructor(
             if (wasUnread) {
                 mutableUnreadCount.update { count -> (count - 1).coerceAtLeast(0) }
             }
+            systemNotificationController.dismiss(updated.navigationTarget)
             updated
         }
 
@@ -145,6 +148,7 @@ constructor(
                 notifications.map { it.copy(isRead = true) }
             }
             mutableUnreadCount.value = unreadCount
+            systemNotificationController.dismissAll()
             unreadCount
         }
 
@@ -172,6 +176,7 @@ constructor(
                 }
             }
             mutableUnreadCount.value = unreadCount
+            systemNotificationController.dismissRelated(target)
             unreadCount
         }
 
@@ -202,7 +207,7 @@ constructor(
                 RegisterDeviceRequestDto(
                     installationId = installationIdDataSource.getOrCreate(),
                     firebaseInstallationId =
-                        pushInstallationId ?: pushInstallationIdProvider.getId(),
+                        pushInstallationId ?: pushInstallationIdProvider.registerAndGetId(),
                 ),
             )
         }
@@ -216,6 +221,10 @@ constructor(
                 refreshUnreadCount()
             }
         }
+    }
+
+    override fun dismissSystemNotifications() {
+        systemNotificationController.dismissAll()
     }
 
     override fun clearLocalState() {

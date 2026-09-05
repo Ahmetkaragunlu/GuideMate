@@ -8,7 +8,7 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.google.android.libraries.places.api.Places
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
-import com.ahmetkaragunlu.guidemate.notification.data.push.SystemNotificationDisplayer
+import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import okhttp3.OkHttpClient
@@ -16,11 +16,11 @@ import okhttp3.OkHttpClient
 @HiltAndroidApp
 class GuideMateApplication : Application(), SingletonImageLoader.Factory {
     @Inject lateinit var okHttpClient: OkHttpClient
-    @Inject lateinit var notificationDisplayer: SystemNotificationDisplayer
+    @Inject lateinit var systemNotificationController: SystemNotificationController
 
     override fun onCreate() {
         super.onCreate()
-        notificationDisplayer.createChannel()
+        systemNotificationController.createChannel()
         if (FirebaseApp.getApps(this).isNotEmpty()) {
             FirebaseMessaging.getInstance().register()
         }
