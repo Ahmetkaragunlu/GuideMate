@@ -33,9 +33,6 @@ fun SavedCardsContent(
     onShowDeleteDialog: (String) -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onConfirmDeleteCard: () -> Unit,
-    onShowMakeDefaultDialog: (String) -> Unit,
-    onDismissMakeDefaultDialog: () -> Unit,
-    onConfirmMakeDefaultCard: () -> Unit,
     onErrorShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -78,7 +75,6 @@ fun SavedCardsContent(
                 SavedCardItem(
                     card = card,
                     onDeleteClick = { onShowDeleteDialog(card.cardId) },
-                    onMakeDefaultClick = { onShowMakeDefaultDialog(card.cardId) },
                 )
             }
 
@@ -126,33 +122,6 @@ fun SavedCardsContent(
                 }
             },
             onDismissRequest = onDismissDeleteDialog,
-        )
-    }
-
-    if (uiState.showMakeDefaultDialogFor != null) {
-        EditAlertDialog(
-            title = R.string.make_default_title,
-            text = R.string.make_default_desc,
-            confirmButton = {
-                TextButton(
-                    onClick = onConfirmMakeDefaultCard,
-                    enabled = !uiState.isMutationInProgress,
-                ) {
-                    Text(
-                        text = stringResource(R.string.yes),
-                        color = colorResource(id = R.color.brand_color),
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismissMakeDefaultDialog) {
-                    Text(
-                        text = stringResource(R.string.no),
-                        color = Color.Gray,
-                    )
-                }
-            },
-            onDismissRequest = onDismissMakeDefaultDialog,
         )
     }
 }

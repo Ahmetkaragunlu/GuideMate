@@ -33,6 +33,25 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditAlertDialog
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.PaymentStatusContent
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentStatusUiModel
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentUiStatus
+
+internal enum class HostedPaymentBackAction {
+    NAVIGATE_WEB_VIEW_BACK,
+    CONFIRM_CANCELLATION,
+    IGNORE,
+}
+
+internal fun resolveHostedPaymentBackAction(
+    isVerifyingCallback: Boolean,
+    canWebViewGoBack: Boolean,
+): HostedPaymentBackAction =
+    when {
+        isVerifyingCallback -> HostedPaymentBackAction.IGNORE
+        canWebViewGoBack -> HostedPaymentBackAction.NAVIGATE_WEB_VIEW_BACK
+        else -> HostedPaymentBackAction.CONFIRM_CANCELLATION
+    }
 
 @Composable
 fun HostedPaymentScreen(
@@ -43,13 +62,31 @@ fun HostedPaymentScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showCancelConfirmation by remember { mutableStateOf(false) }
+    var webView by remember { mutableStateOf<WebView?>(null) }
     val requestCancellation = remember(uiState.isCancelling) {
         { if (!uiState.isCancelling) showCancelConfirmation = true }
     }
+    val handleBack: () -> Unit = remember(webView, uiState.isVerifyingCallback, requestCancellation) {
+        {
+            when (
+                resolveHostedPaymentBackAction(
+                    isVerifyingCallback = uiState.isVerifyingCallback,
+                    canWebViewGoBack = webView?.canGoBack() == true,
+                )
+            ) {
+                HostedPaymentBackAction.NAVIGATE_WEB_VIEW_BACK -> {
+                    webView?.goBack()
+                    Unit
+                }
+                HostedPaymentBackAction.CONFIRM_CANCELLATION -> requestCancellation()
+                HostedPaymentBackAction.IGNORE -> Unit
+            }
+        }
+    }
 
-    BackHandler(onBack = requestCancellation)
-    DisposableEffect(requestCancellation, onBackActionChanged) {
-        onBackActionChanged(requestCancellation)
+    BackHandler(onBack = handleBack)
+    DisposableEffect(handleBack, onBackActionChanged) {
+        onBackActionChanged(handleBack)
         onDispose { onBackActionChanged(null) }
     }
     LaunchedEffect(uiState.shouldVerifyPayment) {
@@ -68,7 +105,11 @@ fun HostedPaymentScreen(
                 paymentPageUrl = paymentPageUrl,
                 reloadToken = uiState.reloadToken,
                 isPageLoading = uiState.isPageLoading,
+                isVerifyingCallback = uiState.isVerifyingCallback,
+                payment = uiState.payment,
                 pageErrorMessage = uiState.pageErrorMessage,
+                onWebViewChanged = { webView = it },
+                onPageStarted = viewModel::onPageStarted,
                 onPageFinished = viewModel::onPageFinished,
                 onPageError = viewModel::onPageError,
                 onRetryPage = viewModel::retryPage,
@@ -114,8 +155,12 @@ private fun HostedPaymentContent(
     paymentPageUrl: String,
     reloadToken: Int,
     isPageLoading: Boolean,
+    isVerifyingCallback: Boolean,
+    payment: PaymentStatusUiModel?,
     pageErrorMessage: String?,
-    onPageFinished: () -> Unit,
+    onWebViewChanged: (WebView?) -> Unit,
+    onPageStarted: (String?) -> Unit,
+    onPageFinished: (String?) -> Unit,
     onPageError: (String) -> Unit,
     onRetryPage: () -> Unit,
     modifier: Modifier = Modifier,
@@ -132,6 +177,7 @@ private fun HostedPaymentContent(
                 destroy()
             }
             webView = null
+            onWebViewChanged(null)
         }
     }
 
@@ -150,10 +196,12 @@ private fun HostedPaymentContent(
                                 view: WebView?,
                                 url: String?,
                                 favicon: Bitmap?,
-                            ) = Unit
+                            ) {
+                                onPageStarted(url)
+                            }
 
                             override fun onPageFinished(view: WebView?, url: String?) {
-                                onPageFinished()
+                                onPageFinished(url)
                             }
 
                             override fun onReceivedError(
@@ -181,6 +229,7 @@ private fun HostedPaymentContent(
                     tag = reloadToken
                     loadUrl(paymentPageUrl)
                     webView = this
+                    onWebViewChanged(this)
                 }
             },
             update = { view ->
@@ -192,7 +241,15 @@ private fun HostedPaymentContent(
             modifier = Modifier.fillMaxSize(),
         )
 
-        if (isPageLoading) {
+        if (isVerifyingCallback) {
+            PaymentStatusContent(
+                payment = payment?.copy(status = PaymentUiStatus.VERIFYING),
+                statusMessage = null,
+                onPrimaryAction = {},
+                onSecondaryAction = {},
+                modifier = Modifier.fillMaxSize().background(Color.White),
+            )
+        } else if (isPageLoading) {
             GuideMateContentState(
                 state = ContentLoadState.LOADING,
                 onRetry = {},

@@ -51,8 +51,8 @@ internal fun paymentStatusPresentation(status: PaymentUiStatus?): PaymentStatusP
             PaymentStatusPresentation(
                 titleResId = R.string.payment_failed_title,
                 descriptionResId = R.string.payment_failed_description,
-                primaryActionResId = R.string.payment_retry,
-                secondaryActionResId = R.string.payment_exit,
+                primaryActionResId = R.string.payment_exit,
+                secondaryActionResId = null,
                 icon = Icons.Default.Error,
                 color = MaterialTheme.colorScheme.error,
                 isLoading = false,

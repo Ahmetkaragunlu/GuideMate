@@ -11,7 +11,6 @@ data class SavedPaymentCardUiModel(
     val cardHolderName: String?,
     val expiryMonth: Int?,
     val expiryYear: Int?,
-    val isDefault: Boolean,
 ) {
     val maskedCardNumber: String
         get() = "**** **** **** $lastFourDigits"

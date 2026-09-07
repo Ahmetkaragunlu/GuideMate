@@ -7,6 +7,7 @@ import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.FakeUserAvatarRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
+import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -55,5 +56,24 @@ class TouristProfileViewModelTest {
             assertEquals("https://example.com/avatar.jpg", viewModel.uiState.value.avatarUrl)
             assertFalse(viewModel.uiState.value.isAvatarUpdating)
             assertNull(viewModel.uiState.value.selectedAvatarUri)
+        }
+
+    @Test
+    fun canonicalWalletUpdateRefreshesProfileBalance() =
+        runTest {
+            val walletRepository = FakeWalletRepository()
+            val viewModel =
+                TouristProfileViewModel(
+                    userRepository = FakeUserRepository(),
+                    walletRepository = walletRepository,
+                    userAvatarRepository = FakeUserAvatarRepository(),
+                    resourceProvider = FakeResourceProvider(),
+                )
+            runCurrent()
+
+            walletRepository.publishWallet(WalletAccount(72_500, 72_500, "USD"))
+            runCurrent()
+
+            assertEquals(72_500L, viewModel.uiState.value.balanceMinor)
         }
 }

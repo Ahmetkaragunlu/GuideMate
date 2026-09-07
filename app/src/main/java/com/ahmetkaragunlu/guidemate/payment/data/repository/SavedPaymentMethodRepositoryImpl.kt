@@ -24,14 +24,6 @@ class SavedPaymentMethodRepositoryImpl @Inject constructor(
             transform = { cards -> cards.map { it.toDomain() } },
         )
 
-    override suspend fun makeDefault(
-        savedPaymentMethodId: String,
-    ): DataResult<SavedPaymentMethod> =
-        apiCallExecutor.execute(
-            request = { api.makeDefault(savedPaymentMethodId) },
-            transform = { it.toDomain() },
-        ).also(::emitChangeOnSuccess)
-
     override suspend fun delete(savedPaymentMethodId: String): DataResult<Unit> =
         apiCallExecutor.executeUnit { api.delete(savedPaymentMethodId) }
             .also(::emitChangeOnSuccess)

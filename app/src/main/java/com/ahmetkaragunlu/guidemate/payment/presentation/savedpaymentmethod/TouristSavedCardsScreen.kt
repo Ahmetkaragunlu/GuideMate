@@ -21,9 +21,6 @@ fun TouristSavedCardsScreen(
             onShowDeleteDialog = viewModel::onShowDeleteDialog,
             onDismissDeleteDialog = viewModel::onDismissDeleteDialog,
             onConfirmDeleteCard = viewModel::onConfirmDeleteCard,
-            onShowMakeDefaultDialog = viewModel::onShowMakeDefaultDialog,
-            onDismissMakeDefaultDialog = viewModel::onDismissMakeDefaultDialog,
-            onConfirmMakeDefaultCard = viewModel::onConfirmMakeDefaultCard,
             onErrorShown = viewModel::onErrorShown,
         )
     }

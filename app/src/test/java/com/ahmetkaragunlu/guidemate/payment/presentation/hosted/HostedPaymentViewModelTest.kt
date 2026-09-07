@@ -25,7 +25,7 @@ class HostedPaymentViewModelTest {
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun hostedPageStartsPollingAndOnlyBackendStatusTriggersVerification() =
+    fun callbackWaitsForMinimumDurationAndBackendStatusBeforeVerification() =
         runTest {
             val repository =
                 FakePaymentRepository().apply {
@@ -49,8 +49,39 @@ class HostedPaymentViewModelTest {
             )
             assertFalse(viewModel.uiState.value.shouldVerifyPayment)
 
-            viewModel.onPageFinished()
+            viewModel.onPageStarted("https://local.example/api/v1/payments/iyzico/callback")
             advanceTimeBy(2_001)
+            runCurrent()
+
+            assertTrue(viewModel.uiState.value.isVerifyingCallback)
+            assertFalse(viewModel.uiState.value.shouldVerifyPayment)
+
+            advanceTimeBy(999)
+            runCurrent()
+
+            assertTrue(viewModel.uiState.value.shouldVerifyPayment)
+        }
+
+    @Test
+    fun callbackKeepsVerifyingWhenMinimumDurationEndsBeforeBackendResolves() =
+        runTest {
+            val repository =
+                FakePaymentRepository().apply {
+                    paymentResults += DataResult.Success(testTopUpPayment())
+                    paymentResults += DataResult.Success(testTopUpPayment())
+                    paymentResults +=
+                        DataResult.Success(testTopUpPayment().copy(status = PaymentStatus.SUCCEEDED))
+                }
+            val viewModel = createViewModel(repository)
+            runCurrent()
+
+            viewModel.onPageStarted("https://local.example/api/v1/payments/iyzico/callback")
+            advanceTimeBy(3_001)
+            runCurrent()
+
+            assertFalse(viewModel.uiState.value.shouldVerifyPayment)
+
+            advanceTimeBy(1_000)
             runCurrent()
 
             assertTrue(viewModel.uiState.value.shouldVerifyPayment)

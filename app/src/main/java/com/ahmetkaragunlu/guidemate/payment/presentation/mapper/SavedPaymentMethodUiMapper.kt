@@ -17,7 +17,6 @@ fun SavedPaymentMethod.toUiModel(): SavedPaymentCardUiModel =
         cardHolderName = cardHolderName,
         expiryMonth = expiryMonth,
         expiryYear = expiryYear,
-        isDefault = isDefault,
     )
 
 private fun String?.toCardAssociation(): PaymentCardAssociation? =

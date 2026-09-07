@@ -29,23 +29,6 @@ class SavedPaymentMethodRepositoryImplTest {
         assertEquals(12, card.expiryMonth)
         assertEquals(2030, card.expiryYear)
         assertNull(card.cardHolderName)
-        assertTrue(card.isDefault)
-    }
-
-    @Test
-    fun `default mutation forwards id and emits refresh signal`() = runBlocking {
-        val api = FakeSavedPaymentMethodApi()
-        val repository = createRepository(api)
-        val change =
-            async(start = CoroutineStart.UNDISPATCHED) {
-                repository.paymentMethodChanges.first()
-            }
-
-        val result = repository.makeDefault("saved-card-2")
-
-        assertTrue(result is DataResult.Success)
-        assertEquals("saved-card-2", api.defaultCardId)
-        change.await()
     }
 
     @Test
@@ -71,18 +54,10 @@ class SavedPaymentMethodRepositoryImplTest {
         )
 
     private class FakeSavedPaymentMethodApi : SavedPaymentMethodApi {
-        var defaultCardId: String? = null
         var deletedCardId: String? = null
 
         override suspend fun getCards(): Response<List<SavedPaymentMethodResponseDto>> =
             Response.success(listOf(cardResponse()))
-
-        override suspend fun makeDefault(
-            savedPaymentMethodId: String,
-        ): Response<SavedPaymentMethodResponseDto> {
-            defaultCardId = savedPaymentMethodId
-            return Response.success(cardResponse(id = savedPaymentMethodId))
-        }
 
         override suspend fun delete(savedPaymentMethodId: String): Response<Unit> {
             deletedCardId = savedPaymentMethodId
@@ -102,7 +77,6 @@ class SavedPaymentMethodRepositoryImplTest {
                 cardHolderName = null,
                 expiryMonth = 12,
                 expiryYear = 2030,
-                defaultMethod = true,
             )
     }
 }

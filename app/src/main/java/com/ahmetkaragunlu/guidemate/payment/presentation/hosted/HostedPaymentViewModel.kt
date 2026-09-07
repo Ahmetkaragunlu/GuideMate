@@ -11,6 +11,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.PAYMENT_ID_ARGUMENT
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
+import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.toStatusUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -33,6 +34,9 @@ class HostedPaymentViewModel
         private val mutableUiState = MutableStateFlow(HostedPaymentUiState())
         val uiState: StateFlow<HostedPaymentUiState> = mutableUiState.asStateFlow()
         private var pollingJob: Job? = null
+        private var minimumVerificationJob: Job? = null
+        private var minimumVerificationDurationElapsed = false
+        private var canonicalStatusResolved = false
 
         init {
             loadPaymentPage()
@@ -53,6 +57,7 @@ class HostedPaymentViewModel
                             mutableUiState.update {
                                 it.copy(
                                     loadState = ContentLoadState.CONTENT,
+                                    payment = payment.toStatusUiModel(),
                                     shouldVerifyPayment = true,
                                 )
                             }
@@ -68,6 +73,7 @@ class HostedPaymentViewModel
                             mutableUiState.update {
                                 it.copy(
                                     loadState = ContentLoadState.CONTENT,
+                                    payment = payment.toStatusUiModel(),
                                     paymentPageUrl = url,
                                     isPageLoading = true,
                                 )
@@ -78,12 +84,20 @@ class HostedPaymentViewModel
             }
         }
 
-        fun onPageFinished() {
-            mutableUiState.update { it.copy(isPageLoading = false, pageErrorMessage = null) }
+        fun onPageStarted(url: String?) {
+            if (url?.isPaymentCallbackUrl() == true) beginCallbackVerification()
+        }
+
+        fun onPageFinished(url: String?) {
+            if (url?.isPaymentCallbackUrl() == true) beginCallbackVerification()
+            if (!uiState.value.isVerifyingCallback) {
+                mutableUiState.update { it.copy(isPageLoading = false, pageErrorMessage = null) }
+            }
             startPolling()
         }
 
         fun onPageError(message: String) {
+            if (uiState.value.isVerifyingCallback) return
             mutableUiState.update {
                 it.copy(isPageLoading = false, pageErrorMessage = message)
             }
@@ -128,7 +142,11 @@ class HostedPaymentViewModel
                         when (val result = paymentRepository.getPayment(paymentId)) {
                             is DataResult.Success ->
                                 if (result.data.status != PaymentStatus.REQUIRES_ACTION) {
-                                    mutableUiState.update { it.copy(shouldVerifyPayment = true) }
+                                    if (!uiState.value.isVerifyingCallback) {
+                                        beginCallbackVerification()
+                                    }
+                                    canonicalStatusResolved = true
+                                    completeCallbackVerificationIfReady()
                                     return@launch
                                 }
                             is DataResult.Error -> Unit
@@ -137,8 +155,36 @@ class HostedPaymentViewModel
                 }
         }
 
+        private fun beginCallbackVerification() {
+            if (uiState.value.isVerifyingCallback) return
+            minimumVerificationDurationElapsed = false
+            canonicalStatusResolved = false
+            mutableUiState.update {
+                it.copy(
+                    isPageLoading = false,
+                    pageErrorMessage = null,
+                    isVerifyingCallback = true,
+                )
+            }
+            minimumVerificationJob?.cancel()
+            minimumVerificationJob =
+                viewModelScope.launch {
+                    delay(MINIMUM_VERIFICATION_DURATION_MILLIS)
+                    minimumVerificationDurationElapsed = true
+                    completeCallbackVerificationIfReady()
+                }
+            startPolling()
+        }
+
+        private fun completeCallbackVerificationIfReady() {
+            if (minimumVerificationDurationElapsed && canonicalStatusResolved) {
+                mutableUiState.update { it.copy(shouldVerifyPayment = true) }
+            }
+        }
+
         private companion object {
             const val POLL_INTERVAL_MILLIS = 2_000L
+            const val MINIMUM_VERIFICATION_DURATION_MILLIS = 3_000L
         }
     }
 
@@ -147,4 +193,9 @@ internal fun String.isSecureHostedPaymentUrl(): Boolean =
         java.net.URI(this).let { uri ->
             uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()
         }
+    }.getOrDefault(false)
+
+internal fun String.isPaymentCallbackUrl(): Boolean =
+    runCatching {
+        java.net.URI(this).path?.trimEnd('/') == "/api/v1/payments/iyzico/callback"
     }.getOrDefault(false)

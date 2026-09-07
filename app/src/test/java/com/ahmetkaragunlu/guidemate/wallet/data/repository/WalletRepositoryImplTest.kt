@@ -9,6 +9,9 @@ import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WalletTransactionRe
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionDirection
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionType
 import java.time.Instant
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -27,6 +30,19 @@ class WalletRepositoryImplTest {
         assertEquals(125_000L, wallet.balanceMinor)
         assertEquals(110_000L, wallet.availableBalanceMinor)
         assertEquals("USD", wallet.currencyCode)
+    }
+
+    @Test
+    fun `publishes every successfully refreshed canonical wallet`() = runBlocking {
+        val repository = createRepository(FakeWalletApi())
+        val update =
+            async(start = CoroutineStart.UNDISPATCHED) {
+                repository.walletUpdates.first()
+            }
+
+        repository.getWallet()
+
+        assertEquals(125_000L, update.await().balanceMinor)
     }
 
     @Test

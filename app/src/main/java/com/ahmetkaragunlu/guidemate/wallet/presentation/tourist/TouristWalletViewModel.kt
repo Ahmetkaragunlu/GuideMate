@@ -53,6 +53,16 @@ class TouristWalletViewModel
             }
 
         init {
+            viewModelScope.launch {
+                walletRepository.walletUpdates.collect { wallet ->
+                    mutableUiState.update {
+                        it.copy(
+                            balanceMinor = wallet.balanceMinor,
+                            currencyCode = wallet.currencyCode,
+                        )
+                    }
+                }
+            }
             refresh()
             viewModelScope.launch {
                 savedPaymentMethodRepository.paymentMethodChanges.collect { refreshCards() }
@@ -222,10 +232,7 @@ class TouristWalletViewModel
                 is DataResult.Success ->
                     mutableUiState.update { current ->
                         current.copy(
-                            savedCards =
-                                result.data.map { it.toUiModel() }.sortedByDescending {
-                                    it.isDefault
-                                },
+                            savedCards = result.data.map { it.toUiModel() },
                         )
                     }
                 is DataResult.Error ->

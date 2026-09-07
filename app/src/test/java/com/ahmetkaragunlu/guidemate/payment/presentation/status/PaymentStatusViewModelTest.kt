@@ -25,6 +25,7 @@ import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransaction
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -203,6 +204,8 @@ class PaymentStatusViewModelTest {
     }
 
     private class SuccessfulWalletRepository : WalletRepository {
+        override val walletUpdates: Flow<WalletAccount> = emptyFlow()
+
         override suspend fun getWallet(): DataResult<WalletAccount> = error("Not used")
 
         override suspend fun getTransactions(

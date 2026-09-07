@@ -19,8 +19,4 @@ data class TouristWalletUiState(
     val isPaymentActionInProgress: Boolean = false,
     val paymentActionError: String? = null,
     val paymentLaunch: PaymentLaunch? = null,
-) {
-    val defaultCard: SavedPaymentCardUiModel?
-        get() = savedCards.firstOrNull { it.isDefault } ?: savedCards.firstOrNull()
-
-}
+)

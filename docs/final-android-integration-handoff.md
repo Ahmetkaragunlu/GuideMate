@@ -1620,7 +1620,7 @@ olusturulacaktir. Bos veya gelecege donuk repository acilmayacaktir.
 | `ReservationRepository` | `/api/v1/reservations` | Trips, reservation detail/cancel | `TouristReservationStore` |
 | `ReviewRepository` | Reservation review ve public tour reviews | Review form, detail yorumlari, puan refresh | Local review mutation/listeleri |
 | `PaymentRepository` | Quote, checkout, payment status/cancel | Tour checkout, top-up, payment status/WebView | `TouristPaymentStore` |
-| `SavedPaymentMethodRepository` | `/payment-methods/cards` | Kayitli kart listesi/default/delete | Sandbox kart listesi ve algilama |
+| `SavedPaymentMethodRepository` | `/payment-methods/cards` | Kayitli kart listesi/delete | Sandbox kart listesi ve algilama |
 | `WalletRepository` | `/api/v1/wallet` | Tourist wallet ve iki rolde transaction UI | `TouristWalletStore`un wallet kismi |
 | `GuideFinanceRepository` | Earnings, bank account, withdrawal | Guide wallet/earnings/bank/withdrawal | `GuideWalletStore` |
 | `ChatRepository` | Chat REST + STOMP | Ortak chat list/detail, badge | `ChatStore` |
@@ -1933,7 +1933,7 @@ state'i korur ve kullaniciya gorunur mesaj verir.
 | Reservation cancel | Reservation detail/list, public session capacity, payment/refund, wallet/transactions, notification count |
 | Review submit | Reservation detail, tour reviews/detail/popular, guide performance/profile/dashboard |
 | Wallet top-up | Payment status, wallet balance, wallet transactions |
-| Saved method default/delete | Saved method list; acik islemde secim yeniden dogrulanir |
+| Saved method delete | Saved method list; acik islemde secim hosted provider tarafindan yeniden dogrulanir |
 | Bank account/default/delete | Bank account list ve guide wallet default account projection'i |
 | Withdrawal create | Withdrawal list, guide wallet balances, wallet transactions |
 | Chat send/read | Message page, conversation list, chat unread count |
@@ -2687,7 +2687,7 @@ Guncel durumlar:
 | Faz 5 - Tourist discovery ve public tour | `KISMEN TAMAMLANDI` | Repository, home/popular, gercek tour search/filter/pagination, public session detail, read-only yorumlar, public profil turlari, checkout session yenilemesi, mock katalog temizligi ve otomatik kalite kapilari tamam; calisan backend ve cihaz E2E kaniti bekleniyor |
 | Faz 6 - Reservation ve trips | `KISMEN TAMAMLANDI` | Repository, upcoming/past pagination, reservation snapshot detail, typed reservation route, idempotent cancellation, refund sonucu ve mock temizligi tamam; backend/cihaz E2E ile Faz 9 payment baglantisi bekleniyor |
 | Faz 7 - Review | `KISMEN TAMAMLANDI` | Submit repository/DTO, reservation eligibility UI, mevcut review bottom sheet, canonical reservation/review, local tourist projection refresh ve Faz 12 remote guide invalidation kodu tamam; iki cihazli FCM E2E kaniti bekleniyor |
-| Faz 8 - Wallet ve saved payment method | `KISMEN TAMAMLANDI` | Iki rolde canonical wallet/history ve turist saved-method list/default/delete kodu tamam; proje sonu cihaz E2E ile Faz 9 hosted kart kaydetme kaniti bekleniyor |
+| Faz 8 - Wallet ve saved payment method | `KISMEN TAMAMLANDI` | Iki rolde canonical wallet/history ve turist saved-method list/delete kodu tamam; proje sonu cihaz E2E ile Faz 9 hosted kart kaydetme kaniti bekleniyor |
 | Faz 9 - Payment, hosted checkout ve top-up | `KISMEN TAMAMLANDI` | Payment repository/DTO, quote ve currency secimi, hosted WebView, canonical polling/recovery, tour checkout ve wallet top-up kodu tamam; proje sonu iyzico Sandbox/cihaz E2E kaniti bekleniyor |
 | Faz 10 - Guide finance | `KISMEN TAMAMLANDI` | Finance repository/DTO, earnings projection, banka hesabi ve withdrawal kodu tamam; proje sonu backend/cihaz E2E kaniti bekleniyor |
 | Faz 11 - Chat | `KISMEN TAMAMLANDI` | Chat REST repository, optimistic pending/failed/retry, cursor history, read/unread, ortak badge, authenticated STOMP reconnect/resubscribe, REST resync ve Faz 12 semantic FCM chat target kodu tamam; proje sonu iki cihazli REST/STOMP/FCM E2E kaniti bekleniyor |
@@ -2720,7 +2720,7 @@ Capraz-faz takip kaydi su formatta tutulur:
 | RESERVATION-PAYMENT-01 | Faz 6 | Faz 9 | Trips/detail/cancel canonical reservation repository'sine gecti; yeni satin alim hosted veya wallet payment sonucunu canonical backend status'u ve reservation durumu ile dogruluyor | Basarili payment sonrasi reservation'in backend listesinde gorunmesi; cancel/refund sonrasi reservation, payment ve wallet state'lerinin birlikte yenilenmesi | `KOD TAMAMLANDI - SANDBOX/CIHAZ E2E BEKLIYOR` |
 | REVIEW-NOTIFICATION-01 | Faz 7 | Faz 12 | Review submit ayni turist oturumundaki reservation, tour, popular/search ve public guide projection'larini dar review change akisi ile yeniliyor; notification push event'i acik guide dashboard/profile projection'larini canonical backend kaynagindan yeniliyor | Turist yorumu sonrasi guide cihazinda bildirim ve canonical dashboard/profile puaninin uygulamayi yeniden baslatmadan yenilenmesi | `KOD TAMAMLANDI - IKI CIHAZLI FCM E2E BEKLIYOR` |
 | CHAT-NOTIFICATION-01 | Faz 11 | Faz 12 | Uygulama acikken REST/STOMP chat, conversation last-message, read ve unread badge akisi tamamlandi; background/kapali durum semantic `chatId` teslimi typed FCM hedefiyle baglandi | FCM chat bildiriminin canonical `chatId` ile mevcut typed detail destination'ini acmasi, yetkisiz/silinmis hedefte guvenli fallback ve REST resync | `KOD TAMAMLANDI - IKI CIHAZLI REST/STOMP/FCM E2E BEKLIYOR` |
-| WALLET-PAYMENT-01 | Faz 8 | Faz 9 | Saved-method list/default/delete provider metadata repository'sine gecti; gecici FAB kaldirildi ve kart kaydi yalniz hosted iyzico satin alma/top-up akisina baglandi | Hosted checkout'ta kart kaydetme sonrasi kartin saved-method listesinde gorunmesi ve wallet/checkout ekranlarinin canonical listeyi yenilemesi | `KOD TAMAMLANDI - SANDBOX/CIHAZ E2E BEKLIYOR` |
+| WALLET-PAYMENT-01 | Faz 8 | Faz 9 | Saved-method list/delete provider metadata repository'sine gecti; turist varsayilan kart kavrami ve gecici FAB kaldirildi, kart kaydi yalniz hosted iyzico satin alma/top-up akisina baglandi | Hosted checkout'ta kart kaydetme sonrasi kartin saved-method listesinde gorunmesi ve wallet ekraninin canonical listeyi yenilemesi | `KOD TAMAMLANDI - SANDBOX/CIHAZ E2E BEKLIYOR` |
 | WALLET-FINANCE-01 | Faz 8 | Faz 10 | Rehber wallet, banka hesabi, aylik kazanc ve withdrawal akislari `GuideFinanceRepository` ile backend otoritesine baglandi; `GuideWalletStore` ve local bakiye mutasyonu kaldirildi | Banka hesabi islemleri ile idempotent withdrawal sonrasi canonical wallet ve hareketlerin cihazda yenilenmesi | `KOD TAMAMLANDI - BACKEND/CIHAZ E2E BEKLIYOR` |
 
 Bu tablo, faz uygulamalari sirasinda gercek bir bagimlilik ortaya ciktiginda
@@ -3214,9 +3214,9 @@ Yapilacaklar:
   mapper ile kullanir.
 - Transaction tur baglantiliysa backend `referenceTitle`, diger gorunen islem
   metinleri Android string resource'lariyla yerellestirilir.
-- `SavedPaymentMethodRepository`; list/default/delete islemlerini kapsar.
+- `SavedPaymentMethodRepository`; list/delete islemlerini kapsar.
 - Android yalniz internal ID, maskeli metadata, banka/kart ailesi, son dort
-  hane, expiry ve default bilgisini kullanir.
+  hane ve expiry bilgisini kullanir. Kart secimi hosted provider ekranindadir.
 - Para `Long` minor unit ve backend currency code ile tasinir; formatter UI
   sinirinda calisir.
 
@@ -3235,9 +3235,9 @@ Faz 8 dis gereksinim ve dogrulama kapisi:
 - Faz sonunda format, derleme, lint ve temel akisin eski native ham kart formuna
   donmedigi kontrol edilir. Kapsamli manuel/cihaz E2E dogrulamasi kullanici
   karariyla proje sonu test turuna ertelenir.
-- Iki rolde canonical wallet balance ve sayfali transaction history; kayitli
-  kart listesi, default degistirme ve silme senaryolari proje sonu test turunda
-  dogrulanir.
+- Iki rolde canonical wallet balance ve sayfali transaction history; turist
+  kayitli kart listesi ile silme senaryolari proje sonu test turunda
+  dogrulanir. Rehber varsayilan banka hesabi ayri finans kuralidir ve korunur.
 - Hosted kart kaydetme Faz 9 ile kapanir. Bu nedenle Faz 8 kayitli kart dolu
   senaryosu Faz 9 tamamlandiktan sonra yeniden kontrol edilir.
 
@@ -3251,9 +3251,10 @@ Uygulama sonucu:
   repository kaynaklarini kullaniyor. Rehber wallet ve tum hareketler ekranlari
   canonical wallet kaynagina gecti. Faz 10 ile banka hesabi, kazanc ve withdrawal
   akislari da backend otoritesine baglandi; `GuideWalletStore` tamamen kaldirildi.
-- `SavedPaymentMethodRepository`, provider metadata listesini, varsayilan kart
-  degistirmeyi ve silmeyi backend otoritesiyle yapiyor. Mutation sonrasi ortak
-  change akisi wallet ve checkout kart secimlerini yeniden okuyor.
+- `SavedPaymentMethodRepository`, provider metadata listesini ve silmeyi backend
+  otoritesiyle yapiyor. Turist icin varsayilan kart kavrami bulunmuyor; gercek
+  kart secimi iyzico hosted ekraninda kaliyor. Mutation sonrasi ortak change
+  akisi kayitli kart listesini yeniden okuyor.
 - Native kart numarasi/SKT/CVV formu, `SandboxCardCatalog`, bunlarin runtime
   state'i, route'u ve testleri kaldirildi. Faz 8'in gecici bilgilendirme FAB'i
   Faz 9'da kaldirildi; kart kaydi yalniz hosted satin alma veya top-up akisi
@@ -3263,7 +3264,7 @@ Uygulama sonucu:
   gosteriliyor. Yeni ekran veya yeni navigation akisi eklenmedi.
 - JDK 21 ile `ktfmtCheck`, ana/test kaynak derlemesi, `testDebugUnitTest`,
   `lintDebug` ve `assembleDebug` kapilari gecti. Wallet balance/pagination/
-  transaction metadata ile saved-method safe metadata/default/delete/change
+  transaction metadata ile saved-method safe metadata/delete/change
   davranislari hedefli repository testleriyle dogrulandi. Kapsamli manuel
   kullanici, cihaz ve E2E turu proje sonuna ertelendi.
 - Faz 8 kod kapilari gectikten sonra kod kapsami kapanir. Kapsamli manuel cihaz
@@ -3306,19 +3307,23 @@ Yapilacaklar:
   currency/tutar/fx snapshot'i birbirine karistirilmaz.
 - Backend'in hosted URL'si guvenli WebView'da acilir. SSL hatasi atlanmaz,
   `addJavascriptInterface` eklenmez ve callback JSON'u basari sayilmaz.
+- Hosted formun kosullar veya provider alt sayfasinda geri istegi once ayni
+  WebView gecmisine doner; yalniz ana odeme sayfasinda mevcut iptal onayi acilir.
 - WebView lifecycle/callback sonrasinda `paymentId` ile backend status polling
-  yapilir. Yalniz canonical `SUCCEEDED` ve tur aliminda `CONFIRMED` reservation
-  basari ekrani acar.
+  yapilir. Ham callback sayfasi gizlenir; ortak dogrulama gorunumu en az 3
+  saniye ve canonical sonuc gelene kadar kalir. Yalniz canonical `SUCCEEDED` ve
+  tur aliminda `CONFIRMED` reservation basari ekrani acar.
 - `FAILED`, `CANCELLED`, `TIMEOUT`, refund ve `MANUAL_REVIEW` ayri typed UI
   sonucudur.
 - Top-up basarisi yalniz payment sonucu ile degil, yenilenmis wallet balance ve
   transaction ile dogrulanir.
 - Tour checkout basarisinda payment, reservation/trips, public session
   capacity ve wallet yontemiyse wallet kaynaklari yenilenir.
-- Kayitli Kartlar ekrani yalniz provider-backed kartlari listeleme, varsayilan
-  yapma ve silme amaciyla kalir. Faz 8'deki gecici FAB ve bilgilendirme bottom
-  sheet'i kaldirilir; kart kaydi yalniz tur satin alma veya wallet top-up hosted
-  iyzico akisi icindeki provider secenegiyle yapilir.
+- Kayitli Kartlar ekrani yalniz provider-backed kartlari listeleme ve silme
+  amaciyla kalir. Turist varsayilan kart kavrami bulunmaz; kart secimi her
+  odemede hosted provider ekranindadir. Faz 8'deki gecici FAB ve bilgilendirme
+  bottom sheet'i kaldirilir; kart kaydi yalniz tur satin alma veya wallet top-up
+  hosted iyzico akisi icindeki provider secenegiyle yapilir.
 
 Mock temizleme kapisi:
 
@@ -3385,17 +3390,30 @@ Uygulama sonucu:
   ViewModel yeniden olusumu sirasinda `SavedStateHandle` ile korunuyor.
 - Yeni typed hosted payment destination'i HTTPS-only WebView kullaniyor. SSL
   hatalari iptal ediliyor, mixed content/file access kapali, JavaScript bridge
-  bulunmuyor ve WebView kapanisi/callback sayfasi basari sayilmiyor.
+  bulunmuyor ve WebView kapanisi/callback sayfasi basari sayilmiyor. Provider alt
+  sayfalari WebView gecmisiyle forma donuyor; ana sayfadaki geri istegi iptal
+  onayini aciyor. Ham callback cevabi yerine ortak dogrulama UI'i en az 3 saniye
+  ve backend canonical sonucu gelene kadar gosteriliyor.
 - Payment sonucu backend'den polling ile dogrulaniyor. Tour satin alma yalniz
   `SUCCEEDED + CONFIRMED`, top-up ise `SUCCEEDED` sonucuna ek olarak yenilenmis
   wallet ve transaction projection'i okunabildiginde basarili gosteriliyor.
-  Refund ve `MANUAL_REVIEW` ayri UI durumlari olarak korunuyor.
+  Basarili top-up'in canonical wallet sonucu ortak degisim akisiyla acik Cuzdan
+  ve profil state'ine iletiliyor; yerel bakiye toplami yapilmiyor. Refund ve
+  `MANUAL_REVIEW` ayri UI durumlari olarak korunuyor.
+- Imzasi ve payment kimligi dogrulanmis iyzico banka retleri backend'de terminal
+  `FAILED` sonucuna donusuyor; `10051` yetersiz bakiye, bilinmeyen ret ise
+  guvenli genel kart reddi kodu oluyor. Imza, token, conversation veya ag sonucu
+  belirsizse sahte terminal hata uretilmeden recovery/reconciliation korunuyor.
 - Terminal olmayan `paymentId` DataStore'da tutuluyor ve uygulama yeniden
   acildiginda payment flow'a geri donuyor. Terminal sonuc UI tarafinda
   cozuldugunde bekleyen kimlik temizleniyor.
 - `TouristPaymentStore`, local timer/bakiye mutasyonu, Faz 8 gecici kart FAB'i
   ve bilgilendirme bottom sheet'i kaldirildi. Kayitli Kartlar ekrani yalniz
-  provider metadata'sini listeleme, varsayilan yapma ve silme amaciyla kaldi.
+  provider metadata'sini listeleme ve silme amaciyla kaldi. Turist varsayilan
+  kart alani/endpoint/UI'i kaldirildi; backend `V17` mevcut varsayilan
+  isaretlerini temizliyor ve eski sema kolonuna geriye uyumlu false varsayilani
+  veriyor. Kart/provider token verisi ile rehber varsayilan banka hesabi
+  etkilenmedi.
 - Repository request/header/mapper davranisi, payment sonuc kurallari ve HTTPS
   URL siniri hedefli unit testlerle dogrulandi. `ktfmtCheck`, Kotlin ana/test
   derlemesi, `testDebugUnitTest`, `lintDebug` ve `assembleDebug` kalite kapilari
@@ -3921,7 +3939,8 @@ Payment, wallet ve finance:
 - Payment terminal/non-terminal state, refund ve manual-review mapping.
 - Polling timeout/backoff/recovery ve process restart'ta payment ID ile devam.
 - Wallet balance/transaction ve `referenceTitle` mapping.
-- Saved method default/delete ve maskeli provider metadata mapping.
+- Saved method delete ve maskeli provider metadata mapping; turist varsayilan
+  kart modeli bulunmamasi.
 - Aylik earnings projection, bank account ve withdrawal operation sonucu.
 - `Long` minor unit formatter siniri; `Double` ile authoritative para hesabinin
   bulunmamasi.
@@ -4113,8 +4132,8 @@ Zorunlu senaryolar:
   transaction history'de gorulur.
 - Wallet ile tur aliminda payment, reservation ve ledger sonucu birlikte
   yenilenir; yetersiz bakiye local tahminle asilmaya calisilmaz.
-- Saved card list/default/delete yalniz provider/backend maskeli metadata'sini
-  kullanir; native raw-card formu yoktur.
+- Saved card list/delete yalniz provider/backend maskeli metadata'sini kullanir;
+  turist varsayilan kart kavrami ve native raw-card formu yoktur.
 - Refund wallet/payment state ve transaction history'de tek kez gorulur.
 - Guide earning PENDING/AVAILABLE/REVERSED, monthly projection ve session
   earning birbiriyle uyumludur.
@@ -4353,8 +4372,9 @@ durum kalmaz.
   platform USD tutari ile charge TRY/EUR tutarinin birbirine karismamasi,
   secili dilde hosted iyzico WebView, loading/polling/recovery ve SUCCESS/
   FAILED/CANCELLED/TIMEOUT/REFUND/MANUAL_REVIEW sonuc ekranlari kontrol edilir.
-  Saved payment method liste/default/delete gorunumu korunur; standalone kart
-  ekleme FAB'i veya native ham kart formu geri gelmez.
+  Saved payment method liste/delete gorunumu korunur; turist varsayilan kart
+  etiketi/aksiyonu, standalone kart ekleme FAB'i veya native ham kart formu geri
+  gelmez.
 - Wallet ve guide payout: iki rolde bakiye, transaction filtre/listesi,
   reference title, top-up, guide earnings, banka hesabi, varsayilan hesap,
   withdraw bottom sheet, yetersiz bakiye, onay ve sonuc dialoglari canonical

@@ -72,7 +72,7 @@ internal fun TouristWalletContent(
                         uiState.balanceMinor.toCurrencyFromMinorUnit(uiState.currencyCode),
                     onAddMoneyClick = onAddMoneyClick,
                 )
-                DefaultCardSection(
+                SavedCardsSection(
                     uiState = uiState,
                     onManageCardsClick = onManageCardsClick,
                 )
@@ -99,16 +99,16 @@ internal fun TouristWalletContent(
 }
 
 @Composable
-private fun DefaultCardSection(
+private fun SavedCardsSection(
     uiState: TouristWalletUiState,
     onManageCardsClick: () -> Unit,
 ) {
-    val defaultCard = uiState.defaultCard
+    val savedCard = uiState.savedCards.firstOrNull()
 
     Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))) {
         SectionTitle(
             icon = Icons.Default.CreditCard,
-            title = stringResource(R.string.default_payment_card),
+            title = stringResource(R.string.saved_cards),
         )
         Surface(
             modifier =
@@ -133,7 +133,7 @@ private fun DefaultCardSection(
                 ) {
                     Text(
                         text =
-                            defaultCard
+                            savedCard
                                 ?.displayName
                                 ?: stringResource(R.string.no_saved_card),
                         style = MaterialTheme.typography.bodyMedium,
@@ -143,7 +143,7 @@ private fun DefaultCardSection(
                     )
                     Text(
                         text =
-                            defaultCard
+                            savedCard
                                 ?.maskedCardNumber
                                 ?: stringResource(R.string.add_payment_card_hint),
                         style = MaterialTheme.typography.bodySmall,

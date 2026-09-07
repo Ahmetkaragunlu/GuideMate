@@ -7,6 +7,7 @@ import com.ahmetkaragunlu.guidemate.testing.FakePaymentRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.FakeSavedPaymentMethodRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
+import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -50,5 +51,25 @@ class TouristWalletViewModelTest {
             assertNotNull(paymentRepository.checkoutIdempotencyKey)
             assertEquals("payment-1", viewModel.uiState.value.paymentLaunch?.paymentId)
             assertFalse(viewModel.uiState.value.isPaymentActionInProgress)
+        }
+
+    @Test
+    fun canonicalWalletUpdateRefreshesVisibleBalanceWithoutReopeningScreen() =
+        runTest {
+            val walletRepository = FakeWalletRepository()
+            val viewModel =
+                TouristWalletViewModel(
+                    savedStateHandle = SavedStateHandle(),
+                    walletRepository = walletRepository,
+                    savedPaymentMethodRepository = FakeSavedPaymentMethodRepository(),
+                    paymentRepository = FakePaymentRepository(),
+                    resourceProvider = FakeResourceProvider(),
+                )
+            runCurrent()
+
+            walletRepository.publishWallet(WalletAccount(45_000, 45_000, "USD"))
+            runCurrent()
+
+            assertEquals(45_000L, viewModel.uiState.value.balanceMinor)
         }
 }

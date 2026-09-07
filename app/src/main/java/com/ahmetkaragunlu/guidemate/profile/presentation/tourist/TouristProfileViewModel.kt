@@ -44,6 +44,16 @@ class TouristProfileViewModel
                     }
                 }
             }
+            viewModelScope.launch {
+                walletRepository.walletUpdates.collect { wallet ->
+                    mutableUiState.update {
+                        it.copy(
+                            balanceMinor = wallet.balanceMinor,
+                            currencyCode = wallet.currencyCode,
+                        )
+                    }
+                }
+            }
             refresh()
         }
 

@@ -850,8 +850,9 @@ credential yalniz backend secret/environment'ta bulunur.
 - Bir tur icin tek `PENDING` change request olabilir.
 - Idempotency key kullanici + operation scope'unda unique olur.
 - Provider payment, refund ve event kimlikleri tekrar edemez.
-- Kullanici basina tek default saved card ve rehber basina tek default banka
-  hesabi `default_guard` + unique constraint ile korunur.
+- Rehber basina tek default banka hesabi `default_guard` + unique constraint ile
+  korunur. Turist kart secimi hosted iyzico ekraninda kaldigi icin GuideMate
+  varsayilan saved card kavrami tasimaz.
 - Onemli indexler: session `(tour_id)`, `(status, starts_at)`; tour
   `(guide_id, approval_status)`; reservation `(session_id, status)`,
   `(tourist_id, created_at)`; review unique `(reservation_id)` ve
@@ -1380,13 +1381,16 @@ endpoint'i yazilmayacaktir.
   eklenir. Kayitli kartin gercek secimi ve yeni kart girisi yine iyzico hosted
   ekraninda kalir; GuideMate ham kart numarasi, SKT veya CVV islemez.
 - Backend'de `V8` migration'i, entity/repository/service/provider adapter'i ve
-  listeleme, silme, varsayilan kart endpointleri uygulanmistir. Standalone ham
-  kart alan bir `Kart Ekle` endpoint'i yoktur ve eklenmeyecektir.
+  provider-backed listeleme/silme endpointleri uygulanmistir. `V17`, eski
+  semadaki varsayilan kart kolonunu uygulama sozlesmesinden emekli eder; mevcut
+  varsayilan isaretlerini temizler ve geriye uyumlu insert varsayilani saglar.
+  Kart/provider token verisi silinmez. Standalone ham kart alan bir `Kart Ekle`
+  endpoint'i yoktur ve eklenmeyecektir.
 - Ilk karti kaydeden Sandbox Checkout Form odemesi, maskeli listeleme, sonraki
-  checkout'ta kayitli kartla odeme, varsayilan kart, provider-backed silme,
-  duplicate callback idempotency ve gercek imzali webhook E2E senaryolari
-  basariyla dogrulanmistir. Local PostgreSQL semasi `V8`'e gecmis ve Hibernate
-  validate tamamlanmistir.
+  checkout'ta kayitli kartla odeme, provider-backed silme, duplicate callback
+  idempotency ve gercek imzali webhook E2E senaryolari basariyla
+  dogrulanmistir. Kart secimi her odemede hosted provider ekranindadir;
+  GuideMate varsayilan turist karti belirlemez.
 
 #### Android Kart Ekleme Tasarimi ve Gecis Kurali
 
@@ -1406,10 +1410,10 @@ endpoint'i yazilmayacaktir.
   iptal, timeout ve hata durumlari mevcut GuideMate dialog/metin/component
   diliyle, yerellestirilmis ve kullanici dostu bicimde sunulur.
 - Kayitli kart listesi ve kart gorselleri provider-backed veriyle korunur.
-  Android mock listeyi backend'in internal `savedPaymentMethodId` ve maskeli
-  metadata response'uyla degistirir; silme ve varsayilan kart aksiyonlarini
-  backend endpointlerine baglar. Odeme sirasindaki gercek kart secimi iyzico
-  hosted ekraninda kalir.
+  Android backend'in internal `savedPaymentMethodId` ve maskeli metadata
+  response'unu listeler ve silme aksiyonunu backend endpointine baglar. Turist
+  icin varsayilan kart etiketi veya aksiyonu bulunmaz; odeme sirasindaki gercek
+  kart secimi iyzico hosted ekraninda kalir.
 - Bu donusum mevcut ekranlarin tasarimini keyfi bicimde yeniden tasarlama nedeni
   degildir. Yeni buton, durum ve mesajlar var olan GuideMate componentlerini ve
   tasarim olculerini izlemelidir.
@@ -1947,9 +1951,10 @@ runtime'i bu kontrolun parcasidir.
 - Refund
 - Guide earning
 - Bank account ve withdrawal
-- Saved card provider destegi dogrulandi; `V8` semasi, provider-backed
-  listeleme/silme/varsayilan kart API'leri, sonraki hosted checkout ve imzali
-  webhook E2E dogrulamasi tamamlandi
+- Saved card provider destegi dogrulandi; provider-backed listeleme/silme
+  API'leri, sonraki hosted checkout ve imzali webhook E2E dogrulamasi
+  tamamlandi. Turist varsayilan kart sozlesmesi `V17` ile uygulama modelinden
+  emekli edildi.
 
 ### Faz 6 - Bildirim ve Mesajlasma
 

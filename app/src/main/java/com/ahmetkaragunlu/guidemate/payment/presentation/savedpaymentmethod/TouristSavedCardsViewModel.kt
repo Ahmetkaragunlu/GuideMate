@@ -39,10 +39,7 @@ class TouristSavedCardsViewModel
                         mutableUiState.update { current ->
                             current.copy(
                                 loadState = ContentLoadState.CONTENT,
-                                savedCards =
-                                    result.data
-                                        .map { it.toUiModel() }
-                                        .sortedByDescending { it.isDefault },
+                                savedCards = result.data.map { it.toUiModel() },
                             )
                         }
                     is DataResult.Error ->
@@ -64,22 +61,9 @@ class TouristSavedCardsViewModel
             mutableUiState.update { it.copy(showDeleteDialogFor = null) }
         }
 
-        fun onShowMakeDefaultDialog(cardId: String) {
-            mutableUiState.update { it.copy(showMakeDefaultDialogFor = cardId) }
-        }
-
-        fun onDismissMakeDefaultDialog() {
-            mutableUiState.update { it.copy(showMakeDefaultDialogFor = null) }
-        }
-
         fun onConfirmDeleteCard() {
             val cardId = mutableUiState.value.showDeleteDialogFor ?: return
             runMutation { repository.delete(cardId) }
-        }
-
-        fun onConfirmMakeDefaultCard() {
-            val cardId = mutableUiState.value.showMakeDefaultDialogFor ?: return
-            runMutation { repository.makeDefault(cardId) }
         }
 
         fun onErrorShown() {
@@ -93,7 +77,6 @@ class TouristSavedCardsViewModel
                     it.copy(
                         isMutationInProgress = true,
                         showDeleteDialogFor = null,
-                        showMakeDefaultDialogFor = null,
                     )
                 }
                 when (val result = block()) {

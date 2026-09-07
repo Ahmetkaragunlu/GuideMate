@@ -29,14 +29,24 @@ import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class FakeWalletRepository : WalletRepository {
+    private val mutableWalletUpdates = MutableSharedFlow<WalletAccount>(extraBufferCapacity = 1)
+    override val walletUpdates: Flow<WalletAccount> = mutableWalletUpdates.asSharedFlow()
     var walletResult: DataResult<WalletAccount> =
         DataResult.Success(WalletAccount(20_000, 20_000, "USD"))
     var transactionsResult: DataResult<PagedResult<WalletTransaction>> =
         DataResult.Success(emptyPage())
 
-    override suspend fun getWallet(): DataResult<WalletAccount> = walletResult
+    override suspend fun getWallet(): DataResult<WalletAccount> =
+        walletResult.also { result ->
+            if (result is DataResult.Success) mutableWalletUpdates.tryEmit(result.data)
+        }
+
+    fun publishWallet(wallet: WalletAccount) {
+        mutableWalletUpdates.tryEmit(wallet)
+    }
 
     override suspend fun getTransactions(
         page: Int,
@@ -50,10 +60,6 @@ class FakeSavedPaymentMethodRepository : SavedPaymentMethodRepository {
 
     override suspend fun getSavedPaymentMethods(): DataResult<List<SavedPaymentMethod>> =
         methodsResult
-
-    override suspend fun makeDefault(
-        savedPaymentMethodId: String
-    ): DataResult<SavedPaymentMethod> = error("Not required by this test fixture")
 
     override suspend fun delete(savedPaymentMethodId: String): DataResult<Unit> =
         error("Not required by this test fixture")

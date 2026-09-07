@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.payment.presentation.savedpaymentmethod.components
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +11,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,24 +30,10 @@ import compose.icons.tablericons.Trash
 fun SavedCardItem(
     card: SavedPaymentCardUiModel,
     onDeleteClick: () -> Unit,
-    onMakeDefaultClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val cardModifier =
-        if (card.isDefault) {
-            modifier
-                .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = colorResource(id = R.color.brand_color),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                )
-        } else {
-            modifier.fillMaxWidth()
-        }
-
     Card(
-        modifier = cardModifier,
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -69,10 +53,6 @@ fun SavedCardItem(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
                 ) {
-                    if (card.isDefault) {
-                        DefaultBadge()
-                    }
-
                     Text(
                         text = card.bankName,
                         style = MaterialTheme.typography.titleMedium,
@@ -127,20 +107,6 @@ fun SavedCardItem(
                             modifier = Modifier.weight(0.6f),
                         )
                     }
-                }
-            }
-
-            if (!card.isDefault) {
-                OutlinedButton(
-                    onClick = onMakeDefaultClick,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.set_as_default),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = colorResource(R.color.text_color),
-                    )
                 }
             }
         }

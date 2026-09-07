@@ -12,5 +12,4 @@ data class SavedPaymentMethod(
     val cardHolderName: String?,
     val expiryMonth: Int?,
     val expiryYear: Int?,
-    val isDefault: Boolean,
 )

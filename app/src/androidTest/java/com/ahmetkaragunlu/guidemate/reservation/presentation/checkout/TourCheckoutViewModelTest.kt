@@ -35,6 +35,7 @@ import java.time.Instant
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -228,6 +229,8 @@ class TourCheckoutViewModelTest {
     }
 
     private class FakeWalletRepository : WalletRepository {
+        override val walletUpdates: Flow<WalletAccount> = emptyFlow()
+
         override suspend fun getWallet(): DataResult<WalletAccount> =
             DataResult.Success(
                 WalletAccount(

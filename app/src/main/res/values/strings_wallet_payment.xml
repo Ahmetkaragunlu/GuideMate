@@ -11,7 +11,7 @@
 
     <string name="view_all">Tümünü Gör</string>
 
-    <string name="saved_cards_description">Kartlarını görüntüleyebilir, silebilir veya varsayılan kartını değiştirebilirsin.</string>
+    <string name="saved_cards_description">Kartlarını görüntüleyebilir veya silebilirsin. Yeni kartını güvenli ödeme sırasında kaydedebilirsin.</string>
 
     <string name="card_holder_name_placeholder">Ad Soyad</string>
 
@@ -20,8 +20,6 @@
     <string name="expiry_date">Son Kullanma</string>
 
     <string name="set_as_default">Varsayılan Yap</string>
-
-    <string name="default_card">Varsayılan</string>
 
     <string name="delete_card_title">Kartı Sil</string>
 
@@ -32,10 +30,6 @@
     <string name="error_saved_card_sync_failed">Kayıtlı kart bilgileri güncellenemedi. Lütfen tekrar deneyin.</string>
 
     <string name="error_saved_card_provider_unavailable">Kart sağlayıcısına şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.</string>
-
-    <string name="make_default_title">Varsayılan Kart Yap</string>
-
-    <string name="make_default_desc">Bu kartı varsayılan ödeme yönteminiz yapmak istiyor musunuz?</string>
 
     <string name="withdraw_money">PARA ÇEK</string>
 
@@ -91,8 +85,6 @@
 
     <string name="wallet_transactions_empty">Bu filtreye uygun cüzdan hareketi bulunamadı.</string>
 
-    <string name="default_payment_card">Varsayılan Ödeme Kartı</string>
-
     <string name="add_payment_card_hint">Kartınızı güvenli ödeme sırasında kaydedebilirsiniz.</string>
 
     <string name="manage">Yönet</string>
@@ -145,9 +137,9 @@
 
     <string name="payment_topbar_title">Ödeme Durumu</string>
 
-    <string name="payment_verifying_title">Ödemeniz Doğrulanıyor</string>
+    <string name="payment_verifying_title">Ödemeniz doğrulanıyor...</string>
 
-    <string name="payment_verifying_description">İşlem sonucunu güvenli şekilde kontrol ediyoruz. Lütfen bu ekranı kapatmayın.</string>
+    <string name="payment_verifying_description">Lütfen bu ekranı kapatmayın.</string>
 
     <string name="payment_success_title">Ödeme Başarılı</string>
 

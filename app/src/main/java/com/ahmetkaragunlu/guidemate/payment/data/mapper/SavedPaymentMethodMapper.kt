@@ -16,5 +16,4 @@ fun SavedPaymentMethodResponseDto.toDomain(): SavedPaymentMethod =
         cardHolderName = cardHolderName,
         expiryMonth = expiryMonth,
         expiryYear = expiryYear,
-        isDefault = defaultMethod,
     )

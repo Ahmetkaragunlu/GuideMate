@@ -637,14 +637,14 @@ Bir test icin gerekirse su kanit eklenir:
 
 - [ ] `PROFILE-036` Kayitli Kartlar ekrani yalniz provider/backend maskeli kart
   metadata'sini gosterir.
-- [ ] `PROFILE-037` Kartta banka/marka, son dort hane ve varsayilan durumu dogru
-  gorunur; tam kart/SKT/CVV yoktur.
+- [ ] `PROFILE-037` Kartta banka/marka ve son dort hane dogru gorunur; tam
+  kart/SKT/CVV veya varsayilan kart etiketi yoktur.
 - [ ] `PROFILE-038` Standalone kart ekleme FAB'i veya native ham kart formu
   bulunmaz.
-- [ ] `PROFILE-039` Kart varsayilan yapma onayindan sonra liste sirasi/default
-  state canonical olarak yenilenir.
-- [ ] `PROFILE-040` Varsayilan kart silme urun/backend kuralina gore uygun onay
-  veya red verir.
+- [ ] `PROFILE-039` Turist kart yonetiminde varsayilan yapma aksiyonu bulunmaz;
+  gercek kart secimi hosted iyzico ekraninda yapilir.
+- [ ] `PROFILE-040` Son kayitli kart dahil her sahip olunan kart, kullanici
+  onayi ve provider/backend sonucu ile silinebilir.
 - [ ] `PROFILE-041` Kart silme onayi/iptali ve provider hata durumu dogru
   gorunur.
 - [ ] `PROFILE-042` Empty saved-card state kullaniciyi sahte kart ekleme akisina
@@ -1308,12 +1308,15 @@ Bir test icin gerekirse su kanit eklenir:
   `addJavascriptInterface` bridge yoktur.
 - [ ] `PAYMENT-022` SSL hatasi bypass edilmez; payment iptal/hata durumuna gider.
 - [ ] `PAYMENT-023` Mixed content ve local file access kapali kalir.
-- [ ] `PAYMENT-024` WebView geri/topbar davranisi kullaniciyi belirsiz payment
-  state'inde birakmaz; urun cancel akisi kullanilir.
-- [ ] `PAYMENT-025` Callback HTML/JSON veya sayfanin kapanmasi tek basina basari
+- [ ] `PAYMENT-024` Kosullar veya provider alt sayfasinda topbar/sistem geri
+  once WebView gecmisiyle odeme formuna doner; ana odeme sayfasinda geri mevcut
+  iptal dialogunu acar.
+- [ ] `PAYMENT-025` Callback'in ham HTML/XML/JSON cevabi gosterilmez; ortak
+  `Odemeniz dogrulaniyor...` gorunumu acilir ve callback tek basina basari
   sayilmaz.
 - [ ] `PAYMENT-026` POST callback `shouldOverrideUrlLoading` tek kanit kabul
-  edilmeden page lifecycle sonrasi backend status polling baslar.
+  edilmeden page lifecycle sonrasi backend status polling baslar; dogrulama UI'i
+  en az 3 saniye ve canonical sonuc gelene kadar gorunur.
 - [ ] `PAYMENT-027` WebView page load hatasi retry/cancel aksiyonlarini dogru
   gosterir.
 - [ ] `PAYMENT-028` Hosted ekranda `karti kaydet` secilirse provider-backed saved
@@ -2472,7 +2475,7 @@ bagli sonraki blokta uydurma veri veya gecici Android mock'u kullanilarak
 - [ ] `RUN-E02` Hosted card tour purchase tum currency, card save, success,
   failed, cancel ve timeout durumlariyla kosulur.
 - [ ] `RUN-E03` Wallet top-up, balance/ledger yenileme ve provider saved card
-  list/default/delete akislari kosulur.
+  list/delete akislari kosulur; turist varsayilan kart etiketi/aksiyonu bulunmaz.
 - [ ] `RUN-E04` App/process death payment recovery, late callback, refund ve
   MANUAL_REVIEW akislari kosulur.
 - [ ] `RUN-E05` Guide earning/wallet/withdrawal sonucu turist purchase/refund

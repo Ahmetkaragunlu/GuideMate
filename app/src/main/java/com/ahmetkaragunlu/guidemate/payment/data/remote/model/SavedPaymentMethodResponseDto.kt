@@ -14,5 +14,4 @@ data class SavedPaymentMethodResponseDto(
     @SerializedName("cardHolderName") val cardHolderName: String?,
     @SerializedName("expiryMonth") val expiryMonth: Int?,
     @SerializedName("expiryYear") val expiryYear: Int?,
-    @SerializedName("defaultMethod") val defaultMethod: Boolean,
 )

@@ -9,7 +9,5 @@ interface SavedPaymentMethodRepository {
 
     suspend fun getSavedPaymentMethods(): DataResult<List<SavedPaymentMethod>>
 
-    suspend fun makeDefault(savedPaymentMethodId: String): DataResult<SavedPaymentMethod>
-
     suspend fun delete(savedPaymentMethodId: String): DataResult<Unit>
 }

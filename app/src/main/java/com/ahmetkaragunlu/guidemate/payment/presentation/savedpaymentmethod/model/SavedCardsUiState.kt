@@ -7,7 +7,6 @@ data class SavedCardsUiState(
     val loadState: ContentLoadState = ContentLoadState.LOADING,
     val savedCards: List<SavedPaymentCardUiModel> = emptyList(),
     val showDeleteDialogFor: String? = null,
-    val showMakeDefaultDialogFor: String? = null,
     val isMutationInProgress: Boolean = false,
     val errorMessage: String? = null,
 )
