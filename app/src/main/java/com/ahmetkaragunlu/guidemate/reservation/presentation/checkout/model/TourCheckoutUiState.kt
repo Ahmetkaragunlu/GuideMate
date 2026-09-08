@@ -23,6 +23,8 @@ data class TourCheckoutUiState(
     val quote: PaymentQuote? = null,
     val selectedMethod: PaymentMethod = PaymentMethod.HOSTED_CARD,
     val termsAccepted: Boolean = false,
+    val showTermsSheet: Boolean = false,
+    val hasUserReadTerms: Boolean = false,
     val isPaymentActionInProgress: Boolean = false,
     val paymentActionError: String? = null,
     val paymentLaunch: PaymentLaunch? = null,
@@ -36,4 +38,7 @@ data class TourCheckoutUiState(
 
     val canIncreaseParticipants: Boolean
         get() = participantCount < availableCapacity
+
+    val isWalletPaymentVerifying: Boolean
+        get() = selectedMethod == PaymentMethod.WALLET && isPaymentActionInProgress
 }

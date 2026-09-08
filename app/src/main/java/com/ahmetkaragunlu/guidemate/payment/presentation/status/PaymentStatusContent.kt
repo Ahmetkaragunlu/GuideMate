@@ -44,8 +44,9 @@ internal fun PaymentStatusContent(
     onPrimaryAction: () -> Unit,
     onSecondaryAction: () -> Unit,
     modifier: Modifier = Modifier,
+    statusOverride: PaymentUiStatus? = null,
 ) {
-    val presentation = paymentStatusPresentation(payment?.status)
+    val presentation = paymentStatusPresentation(statusOverride ?: payment?.status)
     val isPaymentSuccessful = payment?.status == PaymentUiStatus.SUCCEEDED
     val shouldShowVersion =
         payment?.status == PaymentUiStatus.VERIFYING
@@ -199,4 +200,16 @@ internal fun PaymentStatusContent(
             )
         }
     }
+}
+
+@Composable
+fun PaymentVerificationContent(modifier: Modifier = Modifier) {
+    PaymentStatusContent(
+        payment = null,
+        statusMessage = null,
+        onPrimaryAction = {},
+        onSecondaryAction = {},
+        modifier = modifier,
+        statusOverride = PaymentUiStatus.VERIFYING,
+    )
 }

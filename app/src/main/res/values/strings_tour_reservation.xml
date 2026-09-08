@@ -390,6 +390,22 @@
 
     <string name="reservation_detail_no_refund_notice">Bu rezervasyon için geçerli iptal koşulları nedeniyle ücret iadesi uygulanmaz.</string>
 
+    <string name="reservation_agreement_title">Rezervasyon, İptal ve İade Koşulları</string>
+
+    <string name="reservation_agreement_full_text">
+        GUIDEMATE REZERVASYON, İPTAL VE İADE KOŞULLARI\n\n
+        1. REZERVASYON KAPSAMI\n
+        Bu onay, seçtiğiniz tur oturumu, katılımcı sayısı ve ekranda gösterilen toplam ücret için geçerlidir. Rezervasyon yalnız ödemenin backend tarafından başarılı olarak doğrulanması ve kontenjanın kesinleştirilmesiyle tamamlanır.\n\n
+        2. TURİST İPTALİ\n
+        Tur başlangıç saatinden en az 48 saat önce yapılan turist iptalinde ödenen tutarın tamamı iade edilir. Tur başlangıç saatine 48 saatten az kala yapılan turist iptalinde ücret iadesi uygulanmaz.\n\n
+        3. REHBER İPTALİ\n
+        Tur oturumu rehber tarafından iptal edilirse turistin ödediği tutarın tamamı iade edilir.\n\n
+        4. İADE SÜRECİ\n
+        Cüzdanla yapılan ödemelerin iadesi GuideMate cüzdanına yansıtılır. Kartla yapılan ödemelerin iadesi ödeme sağlayıcısı üzerinden ödemenin yapıldığı karta gönderilir. İadenin karta yansıma süresi bankaya ve ödeme sağlayıcısına göre değişebilir.\n\n
+        5. SONUÇ\n
+        "Okudum, Onaylıyorum" seçeneğine basarak bu rezervasyon için geçerli koşulları kabul etmiş olursunuz.
+    </string>
+
     <string name="upcoming_trips_empty">Henüz yaklaşan bir geziniz bulunmuyor.</string>
 
     <string name="past_trips_empty">Henüz geçmiş bir geziniz bulunmuyor.</string>

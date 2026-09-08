@@ -70,6 +70,7 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun acceptTerms() {
+        if (!_screenState.value.hasUserReadTerms) return
         _screenState.update { it.copy(isTermsAccepted = true, showTermsSheet = false) }
     }
 

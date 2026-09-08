@@ -18,6 +18,7 @@ import com.ahmetkaragunlu.guidemate.reservation.presentation.mapper.toTripUiMode
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.ReservationCancellationFeedback
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TouristTripsUiState
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripTab
+import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import javax.inject.Inject
@@ -33,6 +34,7 @@ class TouristTripsViewModel
     @Inject
     constructor(
         private val reservationRepository: ReservationRepository,
+        private val walletRepository: WalletRepository,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(TouristTripsUiState())
@@ -94,6 +96,9 @@ class TouristTripsViewModel
                             )
                         }
                         refresh()
+                        if (result.data.refundStatus == ReservationRefundStatus.SUCCEEDED) {
+                            viewModelScope.launch { walletRepository.getWallet() }
+                        }
                     }
                     is DataResult.Error -> {
                         _uiState.update {

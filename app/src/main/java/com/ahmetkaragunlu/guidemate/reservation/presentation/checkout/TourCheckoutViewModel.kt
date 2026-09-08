@@ -29,6 +29,9 @@ import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -174,9 +177,32 @@ class TourCheckoutViewModel
             checkoutIdempotencyKey = null
         }
 
-        fun onTermsAcceptedChange(isAccepted: Boolean) {
+        fun onTermsCheckboxClicked() {
+            actionState.update { current ->
+                if (current.termsAccepted) {
+                    current.copy(termsAccepted = false, validationErrorResId = null)
+                } else {
+                    current.copy(showTermsSheet = true, validationErrorResId = null)
+                }
+            }
+        }
+
+        fun dismissTermsSheet() {
+            actionState.update { it.copy(showTermsSheet = false) }
+        }
+
+        fun markTermsAsRead() {
+            actionState.update { it.copy(hasUserReadTerms = true) }
+        }
+
+        fun acceptTerms() {
+            if (!actionState.value.hasUserReadTerms) return
             actionState.update {
-                it.copy(termsAccepted = isAccepted, validationErrorResId = null)
+                it.copy(
+                    termsAccepted = true,
+                    showTermsSheet = false,
+                    validationErrorResId = null,
+                )
             }
         }
 
@@ -235,21 +261,32 @@ class TourCheckoutViewModel
                 checkoutIdempotencyKey ?: UUID.randomUUID().toString().also {
                     checkoutIdempotencyKey = it
                 }
-            when (
-                val result =
-                    paymentRepository.checkoutTour(
-                        sessionId = sessionId,
-                        participantCount = state.participantCount,
-                        method = state.selectedMethod,
-                        quoteId = state.quote?.id,
-                        locale = currentCheckoutLocale(),
-                        idempotencyKey = idempotencyKey,
-                    )
-            ) {
+            val result =
+                coroutineScope {
+                    val minimumVerificationDuration =
+                        if (state.selectedMethod == PaymentMethod.WALLET) {
+                            async { delay(MINIMUM_WALLET_VERIFICATION_MILLIS) }
+                        } else {
+                            null
+                        }
+                    val checkoutResult =
+                        paymentRepository.checkoutTour(
+                            sessionId = sessionId,
+                            participantCount = state.participantCount,
+                            method = state.selectedMethod,
+                            quoteId = state.quote?.id,
+                            locale = currentCheckoutLocale(),
+                            idempotencyKey = idempotencyKey,
+                        )
+                    minimumVerificationDuration?.await()
+                    checkoutResult
+                }
+            when (result) {
                 is DataResult.Success -> {
                     checkoutIdempotencyKey = null
                     actionState.update {
                         it.copy(
+                            quote = null,
                             isPaymentActionInProgress = false,
                             paymentLaunch =
                                 PaymentLaunch(
@@ -303,5 +340,6 @@ class TourCheckoutViewModel
 
         private companion object {
             const val CHECKOUT_IDEMPOTENCY_KEY = "checkout_idempotency_key"
+            const val MINIMUM_WALLET_VERIFICATION_MILLIS = 600L
         }
     }

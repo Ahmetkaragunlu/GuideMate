@@ -48,7 +48,7 @@ internal fun TourCheckoutContent(
     onIncreaseParticipant: () -> Unit,
     onPaymentMethodSelected: (PaymentMethod) -> Unit,
     onChargeCurrencySelected: (String) -> Unit,
-    onTermsAcceptedChange: (Boolean) -> Unit,
+    onTermsClick: () -> Unit,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -89,7 +89,7 @@ internal fun TourCheckoutContent(
             }
             TermsRow(
                 checked = uiState.termsAccepted,
-                onCheckedChange = onTermsAcceptedChange,
+                onClick = onTermsClick,
             )
             uiState.validationErrorResId?.let { errorResId ->
                 Text(
@@ -230,18 +230,18 @@ private fun TourSummaryCard(
 @Composable
 private fun TermsRow(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    onClick: () -> Unit,
 ) {
     Row(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .clickable { onCheckedChange(!checked) },
+                .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
             checked = checked,
-            onCheckedChange = onCheckedChange,
+            onCheckedChange = { onClick() },
             colors =
                 CheckboxDefaults.colors(
                     checkedColor = colorResource(R.color.brand_color),

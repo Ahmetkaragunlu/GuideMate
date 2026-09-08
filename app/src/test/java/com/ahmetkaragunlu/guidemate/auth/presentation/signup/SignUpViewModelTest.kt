@@ -28,6 +28,7 @@ class SignUpViewModelTest {
             viewModel.onSignUpClick()
             assertNull(repository.registerRequest)
 
+            viewModel.markTermsAsRead()
             viewModel.acceptTerms()
             viewModel.onSignUpClick()
             runCurrent()
@@ -38,6 +39,25 @@ class SignUpViewModelTest {
             )
             assertTrue(viewModel.screenState.value.isRegistrationSuccess)
         }
+
+    @Test
+    fun `terms can only be accepted after reading and can be declined later`() {
+        val viewModel = createViewModel(FakeAuthRepository())
+
+        viewModel.onTermsCheckboxClicked()
+        assertTrue(viewModel.screenState.value.showTermsSheet)
+
+        viewModel.acceptTerms()
+        assertTrue(!viewModel.screenState.value.isTermsAccepted)
+
+        viewModel.markTermsAsRead()
+        viewModel.acceptTerms()
+        assertTrue(viewModel.screenState.value.isTermsAccepted)
+        assertTrue(!viewModel.screenState.value.showTermsSheet)
+
+        viewModel.onTermsCheckboxClicked()
+        assertTrue(!viewModel.screenState.value.isTermsAccepted)
+    }
 
     private fun createViewModel(repository: FakeAuthRepository): SignUpViewModel =
         SignUpViewModel(

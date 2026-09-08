@@ -40,7 +40,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -80,7 +82,7 @@ class TourCheckoutViewModelTest {
                 viewModel.uiState.collect()
             }
             advanceUntilIdle()
-            viewModel.onTermsAcceptedChange(true)
+            acceptTerms(viewModel)
             advanceUntilIdle()
 
             viewModel.continueCheckout()
@@ -95,7 +97,86 @@ class TourCheckoutViewModelTest {
 
             assertEquals(1, paymentRepository.checkoutCalls)
             assertEquals("payment-1", viewModel.uiState.value.paymentLaunch?.paymentId)
+            assertNull(viewModel.uiState.value.quote)
             assertNull(viewModel.uiState.value.validationErrorResId)
+        }
+
+    @Test
+    fun `completed hosted attempt requires a new quote and idempotency key for retry`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val paymentRepository = FakePaymentRepository()
+            val viewModel = createViewModel(paymentRepository)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiState.collect()
+            }
+            advanceUntilIdle()
+            acceptTerms(viewModel)
+
+            viewModel.continueCheckout()
+            advanceUntilIdle()
+            viewModel.continueCheckout()
+            advanceUntilIdle()
+            viewModel.onPaymentNavigationHandled()
+
+            viewModel.continueCheckout()
+            advanceUntilIdle()
+            assertEquals(2, paymentRepository.quoteCalls)
+            assertEquals(1, paymentRepository.checkoutCalls)
+            assertEquals("quote-2", viewModel.uiState.value.quote?.id)
+
+            viewModel.continueCheckout()
+            advanceUntilIdle()
+
+            assertEquals(listOf("quote-1", "quote-2"), paymentRepository.checkedOutQuoteIds)
+            assertEquals(2, paymentRepository.checkoutIdempotencyKeys.distinct().size)
+        }
+
+    @Test
+    fun `wallet checkout keeps verification visible for the minimum transition`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val paymentRepository = FakePaymentRepository()
+            val viewModel = createViewModel(paymentRepository)
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiState.collect()
+            }
+            advanceUntilIdle()
+            acceptTerms(viewModel)
+            viewModel.onPaymentMethodSelected(PaymentMethod.WALLET)
+
+            viewModel.continueCheckout()
+            runCurrent()
+
+            assertEquals(true, viewModel.uiState.value.isWalletPaymentVerifying)
+            assertNull(viewModel.uiState.value.paymentLaunch)
+
+            advanceTimeBy(599)
+            runCurrent()
+            assertNull(viewModel.uiState.value.paymentLaunch)
+
+            advanceTimeBy(1)
+            runCurrent()
+            assertEquals(false, viewModel.uiState.value.isWalletPaymentVerifying)
+            assertEquals(false, viewModel.uiState.value.paymentLaunch?.requiresHostedCheckout)
+        }
+
+    @Test
+    fun `checkout terms require reading before acceptance and can be declined`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val viewModel = createViewModel(FakePaymentRepository())
+
+            viewModel.onTermsCheckboxClicked()
+            assertEquals(true, viewModel.uiState.value.showTermsSheet)
+
+            viewModel.acceptTerms()
+            assertEquals(false, viewModel.uiState.value.termsAccepted)
+
+            viewModel.markTermsAsRead()
+            viewModel.acceptTerms()
+            assertEquals(true, viewModel.uiState.value.termsAccepted)
+            assertEquals(false, viewModel.uiState.value.showTermsSheet)
+
+            viewModel.onTermsCheckboxClicked()
+            assertEquals(false, viewModel.uiState.value.termsAccepted)
         }
 
     private fun createViewModel(paymentRepository: PaymentRepository): TourCheckoutViewModel =
@@ -111,6 +192,8 @@ class TourCheckoutViewModelTest {
         override val pendingPaymentId: Flow<String?> = MutableStateFlow(null)
         var quoteCalls = 0
         var checkoutCalls = 0
+        val checkedOutQuoteIds = mutableListOf<String?>()
+        val checkoutIdempotencyKeys = mutableListOf<String>()
 
         override suspend fun getCheckoutCurrencies(): DataResult<CheckoutCurrencies> =
             DataResult.Success(
@@ -126,7 +209,7 @@ class TourCheckoutViewModelTest {
             chargeCurrencyCode: String,
         ): DataResult<PaymentQuote> {
             quoteCalls++
-            return DataResult.Success(quote())
+            return DataResult.Success(quote("quote-$quoteCalls"))
         }
 
         override suspend fun checkoutTour(
@@ -138,7 +221,9 @@ class TourCheckoutViewModelTest {
             idempotencyKey: String,
         ): DataResult<Payment> {
             checkoutCalls++
-            return DataResult.Success(payment())
+            checkedOutQuoteIds += quoteId
+            checkoutIdempotencyKeys += idempotencyKey
+            return DataResult.Success(payment(method = method, quoteId = quoteId))
         }
 
         override suspend fun quoteWalletTopUp(
@@ -160,9 +245,9 @@ class TourCheckoutViewModelTest {
 
         override suspend fun clearPendingPayment() = Unit
 
-        private fun quote(): PaymentQuote =
+        private fun quote(id: String): PaymentQuote =
             PaymentQuote(
-                id = "quote-1",
+                id = id,
                 purpose = PaymentPurpose.TOUR_BOOKING,
                 baseAmountMinor = 10_000,
                 baseCurrencyCode = "USD",
@@ -175,15 +260,23 @@ class TourCheckoutViewModelTest {
                 expiresAt = Instant.parse("2099-01-01T11:00:00Z"),
             )
 
-        private fun payment(): Payment =
+        private fun payment(
+            method: PaymentMethod,
+            quoteId: String?,
+        ): Payment =
             Payment(
                 id = "payment-1",
                 purpose = PaymentPurpose.TOUR_BOOKING,
-                method = PaymentMethod.HOSTED_CARD,
-                status = PaymentStatus.REQUIRES_ACTION,
+                method = method,
+                status =
+                    if (method == PaymentMethod.WALLET) {
+                        PaymentStatus.SUCCEEDED
+                    } else {
+                        PaymentStatus.REQUIRES_ACTION
+                    },
                 amountMinor = 10_000,
                 currencyCode = "USD",
-                quoteId = "quote-1",
+                quoteId = quoteId,
                 chargeAmountMinor = 325_000,
                 chargeCurrencyCode = "TRY",
                 fxRate = BigDecimal("32.5"),
@@ -192,7 +285,12 @@ class TourCheckoutViewModelTest {
                 paymentPageUrl = "https://sandbox.iyzipay.com/checkout",
                 expiresAt = null,
                 reservationId = null,
-                reservationStatus = null,
+                reservationStatus =
+                    if (method == PaymentMethod.WALLET) {
+                        com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservationStatus.CONFIRMED
+                    } else {
+                        null
+                    },
                 refundId = null,
                 refundStatus = null,
                 refundAmountMinor = null,
@@ -285,5 +383,11 @@ class TourCheckoutViewModelTest {
                         status = TourSessionStatus.OPEN_FOR_BOOKING,
                     ),
             )
+    }
+
+    private fun acceptTerms(viewModel: TourCheckoutViewModel) {
+        viewModel.onTermsCheckboxClicked()
+        viewModel.markTermsAsRead()
+        viewModel.acceptTerms()
     }
 }

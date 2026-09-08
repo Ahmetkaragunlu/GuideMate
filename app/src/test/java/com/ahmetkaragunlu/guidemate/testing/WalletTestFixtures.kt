@@ -38,11 +38,14 @@ class FakeWalletRepository : WalletRepository {
         DataResult.Success(WalletAccount(20_000, 20_000, "USD"))
     var transactionsResult: DataResult<PagedResult<WalletTransaction>> =
         DataResult.Success(emptyPage())
+    var getWalletCalls: Int = 0
 
-    override suspend fun getWallet(): DataResult<WalletAccount> =
-        walletResult.also { result ->
+    override suspend fun getWallet(): DataResult<WalletAccount> {
+        getWalletCalls++
+        return walletResult.also { result ->
             if (result is DataResult.Success) mutableWalletUpdates.tryEmit(result.data)
         }
+    }
 
     fun publishWallet(wallet: WalletAccount) {
         mutableWalletUpdates.tryEmit(wallet)

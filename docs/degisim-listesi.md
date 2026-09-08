@@ -110,36 +110,53 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ## Degisiklikler
 
-### DEG-056 - Iyzico Ret Cevaplarini Terminal Sonuca Donusturmek
+### DEG-062 - Tur Satin Alimi Sonrasi Yaklasan Gezileri Acmak
 
-- Durum: `UYGULANDI`
-- Kullanici testinde yetersiz bakiye karti sonrasinda odemenin `VERIFYING`
-  durumunda kaldigi dogrulandi.
-- Canli Sandbox incelemesinde iyzico `status=failure`,
-  `paymentStatus=FAILURE` ve `errorCode=10051` dondururken ret cevabinda
-  `signature` alaninin bulunmadigi goruldu. Token ve conversation kimligi
-  dogru eslesmesine ragmen backend tum cevaplarda imza zorunlu tuttugu icin ret
-  sonucu `FAILED` durumuna ulasamiyordu.
-- Basarili odemede gecerli response signature zorunlulugu korunmustur. Belirsiz
-  cevaplar ile mevcut fakat gecersiz imzali cevaplar kabul edilmez. Yalniz
-  provider'in acikca `failure/FAILURE` olarak bildirdigi imzasiz ret, sonraki
-  katmanda token ve conversation kimligi sabit zamanli karsilastirmayla
-  dogrulandiktan sonra mevcut failure mapper uzerinden terminal `FAILED`
-  sonucuna donusturulur.
-- Android provider cevabini yorumlamaz; backend canonical `FAILED` ve guvenli
-  hata kodunu dondurdugunde mevcut ortak odeme sonuc ekranini kullanir.
-- Odakli gateway, failure mapping ve payment result testleri basarili
-  tamamlandi. Yetersiz bakiye ve kayip kart akislarinin sonsuz loading yerine
-  uygun hata ekranina ulastigi gercek iyzico Sandbox kullanici testinde
-  dogrulanacaktir.
+- Durum: `ONAYLANDI`
+- Basarili tur satin alimi tamamlanip kullanici sonuc ekranindaki `Tamam`
+  eylemine bastiginda `Gezilerim` icindeki `Yaklasan` sekmesi acilmalidir.
+- Mevcut davranista payment akisi yalniz `TouristDestination.Trips` rotasina
+  gider. Bottom-bar navigation onceki destination state'ini geri yukledigi icin
+  kullanici en son `Gecmis` sekmesinde kaldiysa yeni satin aldigi gelecek tur
+  yerine yeniden `Gecmis` sekmesini gorebilir.
+- Duzeltme yalniz basarili `TOUR_BOOKING` sonucuna ozel, tek kullanimlik bir
+  `Yaklasan` sekme talebi olmalidir. Kullanici bottom bar uzerinden normal
+  bicimde `Gezilerim` ekranina dondugunde son sectigi sekmenin korunmasi devam
+  etmelidir; global `restoreState` davranisi kapatilmamalidir.
+- Yeni ekran, graph, repository, backend endpoint'i veya kalici state katmani
+  eklenmeyecektir. Navigation yalniz presentation niyetini tasiyacak; rezervasyon
+  verisi mevcut `ReservationRepository` kaynagindan yuklenmeye devam edecektir.
+- Test karari: Basarili tur odemesi sonrasinda tek kullanimlik talebin
+  `Yaklasan` sekmesini sectigi ve normal bottom-bar donusunun son sekmeyi korudugu
+  odakli navigation/state testiyle korunmalidir. Salt gorunum icin ayri kirilgan
+  UI testi yazilmayacaktir.
 
-### DEG-057 - Kesin Odeme Reddinde Tek ve Dogru Cikis Eylemi
+### DEG-063 - Bekleyen Rehber Kazancini Acik Gostermek
 
-- Durum: `UYGULANDI`
-- `FAILED` odeme ekranindaki `Tekrar Dene` ve `Odemeden Cik` eylemleri ayni
-  cikis callback'ini kullandigi icin yaniltici tekrar eylemi kaldirildi.
-- Kesin reddedilen odemede yalniz `Odemeden Cik` ana eylemi ortak `EditButton`
-  tasarimiyla gosterilir. Kullanici yeni odeme denemesini onceki satin alma veya
-  para yukleme ekranindan baslatir.
-- `TIMEOUT` ve diger odeme durumlarinin mevcut sunum ve davranislari
-  degistirilmedi. Backend ve navigasyon sozlesmesinde degisiklik yapilmadi.
+- Durum: `ONAYLANDI`
+- Turist odemesi basarili oldugunda olusan rehber kazanci, tur tamamlanana kadar
+  backend otoritesinde `PENDING` kalmaya devam edecektir. Bu tutar aylik kazanca
+  dahil olacak fakat cekilebilir bakiyeye veya wallet ledger hareketlerine erken
+  eklenmeyecektir.
+- Backend aylik kazanc projection/DTO sozlesmesinde ilgili ayda bekleyen kazanc
+  bulunup bulunmadigini kesin olarak bildirecektir. Android tarih veya ekran
+  verisinden durum tahmini yapmayacak; backend sonucunu domain ve UI modeline map
+  edecektir. Yeni tablo acilmayacak ve mevcut tekil kazanc `status` sozlesmesi
+  korunacaktir.
+- Aylik kazanc satirinda mevcut tutar yalniz bir kez gosterilecek. Backend ilgili
+  ay icin bekleyen kazanc bildirdiginde tutarin yaninda veya altinda yalniz
+  `Beklemede` etiketi gosterilecek; metin XML kaynagindan, renk hardcoded
+  `Color.Red` yerine mevcut tema/resource hata renginden alinacaktir.
+- Ilgili aydaki bekleyen kazanc kalmadiginda `Beklemede` etiketi kalkacaktir.
+  Yerine `Cekilebilir` etiketi veya ayni tutarin ikinci bir kopyasi
+  gosterilmeyecektir.
+- Bekleyen kazanc `Son Hareketler` ve `Tum Islemler` listelerine eklenmeyecektir;
+  henuz gerceklesmis bir wallet ledger hareketi degildir. Kazanc backend tarafinda
+  `AVAILABLE` oldugunda mevcut atomik akis cüzdani kredileyecek, cekilebilir
+  bakiyeyi artiracak ve `GUIDE_EARNING` hareketini hem on izlemede hem tum
+  islemlerde gosterecektir.
+- Test karari: Backend aylik projection'inin bekleyen kazanc bilgisini dogru
+  urettigi ve `PENDING -> AVAILABLE` gecisinin tek bir wallet kredisi olusturdugu
+  test edilmelidir. Android DTO/domain/UI mapper'i ile etiket gorunurluk karari
+  odakli unit testle korunmalidir; salt renk ve yerlesim icin kirilgan UI testi
+  yazilmayacaktir.

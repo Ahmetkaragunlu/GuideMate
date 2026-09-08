@@ -1361,6 +1361,18 @@ Bir test icin gerekirse su kanit eklenir:
   sonraki acilista eski sonuc yeniden acilmaz.
 - [ ] `PAYMENT-048` Farkli kullanici login olunca onceki hesabin pending payment'i
   acilmaz.
+- [ ] `PAYMENT-049` Checkout kosul satirina basinca ortak rezervasyon kosullari
+  bottom sheet'i acilir; `Okudum, Onayliyorum` metnin sonuna ulasilmadan aktif
+  olmaz, onay checkbox'i secer ve checkbox'a yeniden basmak kabulden vazgecer.
+- [ ] `PAYMENT-050` Wallet ile tur satin alma baslatilinca mevcut ortak
+  `Odemeniz dogrulaniyor...` gorunumu kisa ve titresimsiz bicimde gosterilir;
+  ardindan backend'in canonical sonucu basari veya hata ekranina gider.
+- [ ] `PAYMENT-051` Hosted kart odemesi basarisiz veya iptal olduktan sonra ayni
+  checkout ekraninda eski teklif kullanilmaz; yeni teklif alinir ve farkli
+  idempotency anahtariyla iyzico yeniden acilir.
+- [ ] `PAYMENT-052` Wallet ile odenen rezervasyonun iadeli iptalinden sonra profil
+  ve cuzdan bakiyesi sekme degistirmeden guncellenir; bakiye yenileme gecici
+  olarak basarisiz olsa bile tamamlanmis iptal basarisiz gosterilmez.
 
 ### 17. Chat REST, STOMP ve Kullanici Deneyimi
 

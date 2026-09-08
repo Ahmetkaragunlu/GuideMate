@@ -10,9 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.auth.presentation.signup.components.RegistrationSuccessDialog
 import com.ahmetkaragunlu.guidemate.auth.presentation.signup.components.SignUpScreenContent
-import com.ahmetkaragunlu.guidemate.auth.presentation.signup.components.TermsBottomSheet
+import com.ahmetkaragunlu.guidemate.common.ui.components.AgreementBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,12 +44,14 @@ fun SignUpScreen(
     }
 
     if (screenState.showTermsSheet) {
-        TermsBottomSheet(
+        AgreementBottomSheet(
             sheetState = sheetState,
-            hasUserReadTerms = screenState.hasUserReadTerms,
+            titleResId = R.string.terms_dialog_title,
+            bodyResId = R.string.terms_and_conditions_full_text,
+            hasUserReadAgreement = screenState.hasUserReadTerms,
             onDismiss = { viewModel.toggleTermsSheet(false) },
-            onMarkTermsAsRead = viewModel::markTermsAsRead,
-            onAcceptTerms = viewModel::acceptTerms,
+            onMarkAgreementAsRead = viewModel::markTermsAsRead,
+            onAcceptAgreement = viewModel::acceptTerms,
         )
     }
 

@@ -1,4 +1,8 @@
 <resources>
+    <string name="agreement_read_and_approve">Okudum, Onaylıyorum</string>
+
+    <string name="agreement_continue_reading">Okumaya Devam Edin…</string>
+
     <string name="app_name">Guide Mate</string>
 
     <string name="error_no_internet">İnternet bağlantınızı kontrol edin.</string>
