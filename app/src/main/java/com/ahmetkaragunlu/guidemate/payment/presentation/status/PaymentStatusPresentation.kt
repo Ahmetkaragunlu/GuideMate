@@ -84,7 +84,7 @@ internal fun paymentStatusPresentation(status: PaymentUiStatus?): PaymentStatusP
                 primaryActionResId = R.string.payment_return,
                 secondaryActionResId = null,
                 icon = Icons.Default.HourglassTop,
-                color = Color(0xFFB7791F),
+                color = colorResource(R.color.pending_status_color),
                 isLoading = false,
             )
         PaymentUiStatus.REFUNDED ->
@@ -104,7 +104,7 @@ internal fun paymentStatusPresentation(status: PaymentUiStatus?): PaymentStatusP
                 primaryActionResId = R.string.payment_return,
                 secondaryActionResId = null,
                 icon = Icons.Default.HourglassTop,
-                color = Color(0xFFB7791F),
+                color = colorResource(R.color.pending_status_color),
                 isLoading = false,
             )
         null ->

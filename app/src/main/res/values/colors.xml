@@ -5,4 +5,5 @@
     <color name="text_color">#FF60646d</color>
     <color name="border_color">#FFEEEDF1</color>
     <color name="notification_icon_color">#FF808080</color>
+    <color name="pending_status_color">#FFFF9800</color>
 </resources>

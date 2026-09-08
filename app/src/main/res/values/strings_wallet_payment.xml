@@ -9,6 +9,8 @@
 
     <string name="earnings_empty_year">Bu yıl için geçmiş kazanç bulunmuyor.</string>
 
+    <string name="earning_pending_amount">Beklemede: %1$s</string>
+
     <string name="view_all">Tümünü Gör</string>
 
     <string name="saved_cards_description">Kartlarını görüntüleyebilir veya silebilirsin. Yeni kartını güvenli ödeme sırasında kaydedebilirsin.</string>

@@ -145,6 +145,9 @@ class FakeGuideFinanceRepository : GuideFinanceRepository {
     var withdrawalRequest: Triple<String, Long, String>? = null
     var addBankAccountResult: DataResult<BankAccount> = DataResult.Success(testBankAccount())
     var addBankAccountRequest: Pair<String, String>? = null
+    var monthlyEarningsResult: DataResult<List<MonthlyGuideEarning>> = DataResult.Success(emptyList())
+    var getMonthlyEarningsCalls: Int = 0
+    val requestedMonthlyEarningsYears = mutableListOf<Int>()
 
     override suspend fun getEarnings(
         year: Int,
@@ -154,7 +157,11 @@ class FakeGuideFinanceRepository : GuideFinanceRepository {
 
     override suspend fun getMonthlyEarnings(
         year: Int
-    ): DataResult<List<MonthlyGuideEarning>> = error("Not required by this test fixture")
+    ): DataResult<List<MonthlyGuideEarning>> {
+        getMonthlyEarningsCalls++
+        requestedMonthlyEarningsYears += year
+        return monthlyEarningsResult
+    }
 
     override suspend fun getBankAccounts(
         page: Int,

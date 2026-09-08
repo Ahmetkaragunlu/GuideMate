@@ -32,6 +32,7 @@ class GuideFinanceRepositoryImplTest {
         assertEquals(8, earning.month)
         assertEquals(45_000L, earning.netEarningsMinor)
         assertEquals("USD", earning.currencyCode)
+        assertEquals(12_000L, earning.pendingEarningsMinor)
     }
 
     @Test
@@ -102,6 +103,7 @@ class GuideFinanceRepositoryImplTest {
                         month = 8,
                         netEarningsMinor = 45_000,
                         currencyCode = "USD",
+                        pendingEarningsMinor = 12_000,
                     ),
                 ),
             )

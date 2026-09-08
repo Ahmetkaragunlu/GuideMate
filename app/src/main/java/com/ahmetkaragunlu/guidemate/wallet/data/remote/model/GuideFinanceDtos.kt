@@ -20,6 +20,7 @@ data class MonthlyGuideEarningResponseDto(
     @SerializedName("month") val month: Int,
     @SerializedName("netEarningsMinor") val netEarningsMinor: Long,
     @SerializedName("currencyCode") val currencyCode: String,
+    @SerializedName("pendingEarningsMinor") val pendingEarningsMinor: Long,
 )
 
 data class BankAccountResponseDto(

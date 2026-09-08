@@ -3,10 +3,13 @@ package com.ahmetkaragunlu.guidemate.testing
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPayload
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferences
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
+import java.time.Instant
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -95,4 +98,18 @@ fun defaultNotificationPreferences(
         paymentsAndEarningsEnabled = true,
         newReviewsEnabled = true,
         securityAlertsEnabled = true,
+    )
+
+fun testNotification(
+    id: String = "notification-1",
+    type: NotificationType = NotificationType.EARNING_AVAILABLE,
+    createdAt: Instant = Instant.parse("2026-01-01T00:00:00Z"),
+): AppNotification =
+    AppNotification(
+        notificationId = id,
+        type = type,
+        actorDisplayName = null,
+        payload = NotificationPayload(),
+        isRead = false,
+        createdAt = createdAt,
     )

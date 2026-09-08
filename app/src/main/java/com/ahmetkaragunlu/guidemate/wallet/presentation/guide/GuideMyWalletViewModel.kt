@@ -7,6 +7,7 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.BankAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.GuideFinanceRepository
@@ -40,6 +41,7 @@ class GuideMyWalletViewModel
     constructor(
         private val walletRepository: WalletRepository,
         private val financeRepository: GuideFinanceRepository,
+        notificationRepository: NotificationRepository,
         private val resourceProvider: ResourceProvider,
         private val savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
@@ -78,6 +80,9 @@ class GuideMyWalletViewModel
             refresh()
             viewModelScope.launch {
                 financeRepository.financeChanges.collect { refresh() }
+            }
+            viewModelScope.launch {
+                notificationRepository.earningAvailabilityChanges().collect { refresh() }
             }
         }
 

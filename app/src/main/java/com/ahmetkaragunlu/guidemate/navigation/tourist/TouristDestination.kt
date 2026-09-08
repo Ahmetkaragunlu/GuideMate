@@ -35,3 +35,6 @@ object TouristDestination {
         val guideId: Long,
     )
 }
+
+internal const val OPEN_UPCOMING_TRIPS_AFTER_PURCHASE_KEY =
+    "open_upcoming_trips_after_purchase"

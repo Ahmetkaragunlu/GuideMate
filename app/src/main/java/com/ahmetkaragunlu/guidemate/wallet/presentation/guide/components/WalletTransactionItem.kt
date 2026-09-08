@@ -99,7 +99,7 @@ fun WalletTransactionItem(transaction: WalletTransactionUiModel) {
                     Text(
                         text = stringResource(R.string.payment_status_pending),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFFD32F2F),
+                        color = colorResource(R.color.pending_status_color),
                         fontWeight = FontWeight.SemiBold,
                     )
                 }

@@ -5,4 +5,5 @@ data class MonthlyGuideEarning(
     val month: Int,
     val netEarningsMinor: Long,
     val currencyCode: String,
+    val pendingEarningsMinor: Long,
 )

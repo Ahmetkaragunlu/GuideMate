@@ -70,7 +70,14 @@ fun TouristWalletTransactionItem(
                 Text(
                     text = stringResource(transaction.status.titleResId),
                     style = MaterialTheme.typography.labelSmall,
-                    color = colorResource(R.color.text_color),
+                    color =
+                        colorResource(
+                            if (transaction.status == TouristWalletTransactionStatus.PENDING) {
+                                R.color.pending_status_color
+                            } else {
+                                R.color.text_color
+                            },
+                        ),
                 )
             }
             Text(

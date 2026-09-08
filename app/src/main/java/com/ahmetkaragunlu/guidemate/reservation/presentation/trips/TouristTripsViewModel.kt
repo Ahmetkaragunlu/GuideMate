@@ -55,6 +55,11 @@ class TouristTripsViewModel
             refresh()
         }
 
+        fun showUpcomingAfterPurchase() {
+            _uiState.update { it.copy(selectedTab = TripTab.UPCOMING) }
+            refresh()
+        }
+
         fun refresh() {
             loadPage(reset = true)
         }

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.components.MonthlyEarningItem
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.components.PendingEarningLabel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.GuideEarningsUiState
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.toPeriodLabel
@@ -211,6 +212,12 @@ private fun CurrentMonthEarningsCard(
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF888DED),
             )
+            if (earning.pendingEarningsMinor > 0) {
+                PendingEarningLabel(
+                    amountMinor = earning.pendingEarningsMinor,
+                    currencyCode = earning.currencyCode,
+                )
+            }
             Text(
                 text = earning.toPeriodLabel(),
                 style = MaterialTheme.typography.bodyMedium,

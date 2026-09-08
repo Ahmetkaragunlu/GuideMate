@@ -81,6 +81,35 @@ class TouristTripsViewModelTest {
             assertTrue(viewModel.uiState.value.cancellationFeedback?.isSuccess == true)
         }
 
+    @Test
+    fun purchaseCompletionSelectsUpcomingAndReloadsItsReservations() =
+        runTest {
+            val repository =
+                FakeReservationRepository().apply {
+                    repeat(3) {
+                        reservationPages += DataResult.Success(reservationPage())
+                    }
+                }
+            val viewModel =
+                TouristTripsViewModel(repository, FakeWalletRepository(), FakeResourceProvider())
+            runCurrent()
+            viewModel.changeTab(TripTab.PAST)
+            runCurrent()
+
+            viewModel.showUpcomingAfterPurchase()
+            runCurrent()
+
+            assertEquals(TripTab.UPCOMING, viewModel.uiState.value.selectedTab)
+            assertEquals(
+                listOf(
+                    ReservationListType.UPCOMING,
+                    ReservationListType.PAST,
+                    ReservationListType.UPCOMING,
+                ),
+                repository.listRequests,
+            )
+        }
+
     private fun successfulWalletRefund(): DataResult<ReservationCancellationResult> =
         DataResult.Success(
             ReservationCancellationResult(

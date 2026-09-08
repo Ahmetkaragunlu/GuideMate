@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.navigation.tourist
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -24,6 +25,7 @@ import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.TouristProfileS
 import com.ahmetkaragunlu.guidemate.profile.presentation.publicprofile.GuidePublicProfileScreen
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.TouristProfileMenuTarget
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.TouristTripsScreen
+import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.TouristTripsViewModel
 import com.ahmetkaragunlu.guidemate.reservation.presentation.detail.TouristReservationDetailScreen
 import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.detail.TouristTourDetailScreen
 import com.ahmetkaragunlu.guidemate.tour.presentation.tourist.guide.TouristGuideToursScreen
@@ -62,8 +64,20 @@ internal fun NavGraphBuilder.touristNavGraph(
             },
         )
     }
-    composable<TouristDestination.Trips> {
+    composable<TouristDestination.Trips> { backStackEntry ->
+        val tripsViewModel = hiltViewModel<TouristTripsViewModel>(backStackEntry)
+        val openUpcomingAfterPurchase =
+            backStackEntry.savedStateHandle
+                .getStateFlow(OPEN_UPCOMING_TRIPS_AFTER_PURCHASE_KEY, false)
+                .collectAsStateWithLifecycle()
+        LaunchedEffect(openUpcomingAfterPurchase.value) {
+            if (openUpcomingAfterPurchase.value) {
+                tripsViewModel.showUpcomingAfterPurchase()
+                backStackEntry.savedStateHandle[OPEN_UPCOMING_TRIPS_AFTER_PURCHASE_KEY] = false
+            }
+        }
         TouristTripsScreen(
+            viewModel = tripsViewModel,
             onNavigateToReservationDetail = { reservationId ->
                 touristNavController.navigateTo(
                     TouristDestination.ReservationDetail(reservationId),

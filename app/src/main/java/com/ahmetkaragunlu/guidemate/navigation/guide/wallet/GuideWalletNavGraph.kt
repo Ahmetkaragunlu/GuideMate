@@ -1,5 +1,6 @@
 package com.ahmetkaragunlu.guidemate.navigation.guide.wallet
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -15,6 +16,7 @@ internal fun NavGraphBuilder.guideWalletNavGraph(
     earningsViewModel: GuideEarningsViewModel,
 ) {
     composable<GuideWalletDestination.Earnings> {
+        LaunchedEffect(Unit) { earningsViewModel.refresh() }
         val earningsUiState = earningsViewModel.uiState.collectAsStateWithLifecycle()
         GuideEarningsScreen(
             uiState = earningsUiState.value,
@@ -23,6 +25,7 @@ internal fun NavGraphBuilder.guideWalletNavGraph(
         )
     }
     composable<GuideWalletDestination.Wallet> {
+        LaunchedEffect(Unit) { earningsViewModel.refreshCurrentYear() }
         val earningsUiState = earningsViewModel.uiState.collectAsStateWithLifecycle()
         GuideMyWalletScreen(
             earnings = earningsUiState.value.walletPreviewEarnings,

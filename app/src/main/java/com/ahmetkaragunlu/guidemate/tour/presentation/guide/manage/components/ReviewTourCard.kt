@@ -76,7 +76,7 @@ fun ReviewTourCard(
                 fontWeight = FontWeight.Bold,
                 color =
                     if (tour.approvalStatus == TourApprovalStatus.PENDING_REVIEW) {
-                        Color(0xFFFF9800)
+                        colorResource(R.color.pending_status_color)
                     } else {
                         MaterialTheme.colorScheme.error
                     },

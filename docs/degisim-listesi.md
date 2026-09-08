@@ -80,83 +80,47 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   birakilmaz, fakat varsayimsal gelecek veya yuzeysel coverage artisi icin proje
   sisirilmez.
 
-## Calisma Kurali
-
-- Kullanici degisiklikleri arka arkaya soylerken kod yazilmaz.
-- Her istek bu dosyaya sirasi korunarak ayri bir madde olarak kaydedilir.
-- Yeni madde onceki maddeyle celisiyorsa son kullanici karari esas alinir ve
-  celiski acikca not edilir.
-- Kullanici acikca `uygula` demeden Android veya backend kodu degistirilmez.
-- Uygulama komutu geldiginde bekleyen maddeler birlikte analiz edilir ve
-  birbirini etkileyen degisiklikler tek tutarli kapsam halinde uygulanir.
-- Yalniz kullanicinin istedigi alanlar degistirilir. Zorunlu baglantili
-  duzeltmeler varsa uygulamadan once listede belirtilir.
-- Tasarim, kullanici akisi ve mevcut davranis istenmedikce degistirilmez.
-- Kod; mevcut mimari, feature sahipligi, SOLID, bagimlilik yonu, ortak yapi,
-  isimlendirme, okunabilirlik ve test edilebilirlik kurallarini korur.
-- Kullanilmayan kod, import, dosya veya paket yalniz yapilan degisiklik nedeniyle
-  kesin olarak bosa dustuyse temizlenir.
-- Toplu uygulama sonrasinda ilgili otomatik kontroller calistirilir ve etkilenen
-  kullanici testleri `docs/kullanici-testleri.md` dosyasindan belirlenir.
-
-## Durumlar
-
-- `BEKLIYOR`: Kullanici istedi, henuz uygulanmadi.
-- `NETLESTIRILECEK`: Karar veya kapsam tamamlanmadi.
-- `ONAYLANDI`: Kapsam kesinlesti, toplu uygulama komutu bekleniyor.
-- `UYGULANDI`: Kod degisikligi tamamlandi.
-- `DOGRULANDI`: Ilgili otomatik ve kullanici testleri gecti.
-- `IPTAL`: Kullanici maddeden vazgecti veya daha yeni kararla degistirdi.
-
 ## Degisiklikler
 
-### DEG-062 - Tur Satin Alimi Sonrasi Yaklasan Gezileri Acmak
+### DEG-066 - Rehber Tur Detayinda Gercek Yorum Listesi
 
 - Durum: `ONAYLANDI`
-- Basarili tur satin alimi tamamlanip kullanici sonuc ekranindaki `Tamam`
-  eylemine bastiginda `Gezilerim` icindeki `Yaklasan` sekmesi acilmalidir.
-- Mevcut davranista payment akisi yalniz `TouristDestination.Trips` rotasina
-  gider. Bottom-bar navigation onceki destination state'ini geri yukledigi icin
-  kullanici en son `Gecmis` sekmesinde kaldiysa yeni satin aldigi gelecek tur
-  yerine yeniden `Gecmis` sekmesini gorebilir.
-- Duzeltme yalniz basarili `TOUR_BOOKING` sonucuna ozel, tek kullanimlik bir
-  `Yaklasan` sekme talebi olmalidir. Kullanici bottom bar uzerinden normal
-  bicimde `Gezilerim` ekranina dondugunde son sectigi sekmenin korunmasi devam
-  etmelidir; global `restoreState` davranisi kapatilmamalidir.
-- Yeni ekran, graph, repository, backend endpoint'i veya kalici state katmani
-  eklenmeyecektir. Navigation yalniz presentation niyetini tasiyacak; rezervasyon
-  verisi mevcut `ReservationRepository` kaynagindan yuklenmeye devam edecektir.
-- Test karari: Basarili tur odemesi sonrasinda tek kullanimlik talebin
-  `Yaklasan` sekmesini sectigi ve normal bottom-bar donusunun son sekmeyi korudugu
-  odakli navigation/state testiyle korunmalidir. Salt gorunum icin ayri kirilgan
-  UI testi yazilmayacaktir.
+- Rehberin `Turlarim > Aktif` ve `Turlarim > Gecmis` akislari ayni rehber tur
+  detay ekranini kullanmaya devam edecektir.
+- Detayin ustundeki `averageRating` ve `reviewCount` degerleri korunurken yorum
+  sekmesi bos birakilmayacak; mevcut `ReviewRepository` arayuzu uzerinden turun
+  gercek yorumlari cekilip ortak `TourDetailContent` modeline aktarilacaktir.
+- `GuideTourDetailViewModel` somut data implementasyonuna degil domain repository
+  arayuzune baglanacaktir. Yeni backend endpoint'i, ekran, navigation destination,
+  use-case veya ortak olmayan ek katman olusturulmayacaktir.
+- Yorum istegi basarisiz oldugunda tur detayinin tamamini kullanilamaz yapmak
+  yerine mevcut detay verisi korunacak; yorum bolumunun hata davranisi uygulama
+  sirasinda mevcut ortak hata UX'iyle orantili bicimde ele alinacaktir.
+- Test karari: Rehber detayinda basarili yorum listesinin UI modeline aktarildigi
+  ve yorum istegi hatasinin ana tur detayini kaybettirmedigi ViewModel testiyle
+  dogrulanmalidir. Aktif ve gecmis mod icin ayni davranis tekrar test edilmez.
 
-### DEG-063 - Bekleyen Rehber Kazancini Acik Gostermek
+### DEG-065 - Bildirim Okundu Durumunda Es Zamanli Yenileme Guvenligi
 
 - Durum: `ONAYLANDI`
-- Turist odemesi basarili oldugunda olusan rehber kazanci, tur tamamlanana kadar
-  backend otoritesinde `PENDING` kalmaya devam edecektir. Bu tutar aylik kazanca
-  dahil olacak fakat cekilebilir bakiyeye veya wallet ledger hareketlerine erken
-  eklenmeyecektir.
-- Backend aylik kazanc projection/DTO sozlesmesinde ilgili ayda bekleyen kazanc
-  bulunup bulunmadigini kesin olarak bildirecektir. Android tarih veya ekran
-  verisinden durum tahmini yapmayacak; backend sonucunu domain ve UI modeline map
-  edecektir. Yeni tablo acilmayacak ve mevcut tekil kazanc `status` sozlesmesi
-  korunacaktir.
-- Aylik kazanc satirinda mevcut tutar yalniz bir kez gosterilecek. Backend ilgili
-  ay icin bekleyen kazanc bildirdiginde tutarin yaninda veya altinda yalniz
-  `Beklemede` etiketi gosterilecek; metin XML kaynagindan, renk hardcoded
-  `Color.Red` yerine mevcut tema/resource hata renginden alinacaktir.
-- Ilgili aydaki bekleyen kazanc kalmadiginda `Beklemede` etiketi kalkacaktir.
-  Yerine `Cekilebilir` etiketi veya ayni tutarin ikinci bir kopyasi
-  gosterilmeyecektir.
-- Bekleyen kazanc `Son Hareketler` ve `Tum Islemler` listelerine eklenmeyecektir;
-  henuz gerceklesmis bir wallet ledger hareketi degildir. Kazanc backend tarafinda
-  `AVAILABLE` oldugunda mevcut atomik akis cüzdani kredileyecek, cekilebilir
-  bakiyeyi artiracak ve `GUIDE_EARNING` hareketini hem on izlemede hem tum
-  islemlerde gosterecektir.
-- Test karari: Backend aylik projection'inin bekleyen kazanc bilgisini dogru
-  urettigi ve `PENDING -> AVAILABLE` gecisinin tek bir wallet kredisi olusturdugu
-  test edilmelidir. Android DTO/domain/UI mapper'i ile etiket gorunurluk karari
-  odakli unit testle korunmalidir; salt renk ve yerlesim icin kirilgan UI testi
-  yazilmayacaktir.
+- Kullanici sistem bildirimine veya uygulama icindeki ilgili icerige dokundugunda,
+  hedef ekran basariyla yuklendikten sonra ilgili bildirimler backend otoritesinde
+  okundu olarak isaretlenmeye devam edecektir. Hedef yuklenemezse bildirim okundu
+  sayilmayacaktir.
+- FCM, STOMP ve ekran yenilemesinden ayni anda baslayan eski bildirim liste veya
+  okunmamis sayi istekleri, daha sonra tamamlanarak yeni `okundu` sonucunun
+  uzerine yazamayacaktir.
+- Bildirim repository'sindeki canonical liste, okunmamis sayi ve okundu
+  mutasyonlari tek ve sirali bir state guncelleme sinirinda yonetilecektir.
+  Cozum yalniz UI'da rozeti gizlemeyecek; backend sonucu ile yerel state'in
+  tutarliligini koruyacaktir.
+- Davranis sohbet, tur, rezervasyon ve odeme hedefleriyle birlikte tekil okunan
+  guvenlik, kazanc ve diger bildirim turlerini kapsayacaktir. Ilgisiz okunmamis
+  bildirimler varsa ust bardaki kirmizi rozet gorunmeye devam edecektir.
+- Mevcut typed navigation, hedef bazli `markRelatedRead`, tekil `markRead`, FCM ve
+  STOMP sorumluluklari korunacak; yeni ekran, gereksiz use-case veya genel amacli
+  concurrency framework'u eklenmeyecektir.
+- Test karari: Gec baslayan eski yenileme cevabinin basarili `markRead`,
+  `markRelatedRead` veya `markAllRead` sonucunu geri alamadigi repository
+  seviyesinde deterministik coroutine testleriyle dogrulanmalidir. Salt kirmizi
+  rozet gorunumu icin kirilgan UI testi yazilmayacaktir.

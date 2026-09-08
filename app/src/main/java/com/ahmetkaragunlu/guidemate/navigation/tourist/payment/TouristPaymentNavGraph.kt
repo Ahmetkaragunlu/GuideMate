@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.ahmetkaragunlu.guidemate.navigation.RootDestination
 import com.ahmetkaragunlu.guidemate.navigation.navigateBottomBar
 import com.ahmetkaragunlu.guidemate.navigation.navigateTo
+import com.ahmetkaragunlu.guidemate.navigation.tourist.OPEN_UPCOMING_TRIPS_AFTER_PURCHASE_KEY
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristDestination
 import com.ahmetkaragunlu.guidemate.navigation.tourist.account.TouristAccountStart
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentPurpose
@@ -44,6 +45,9 @@ internal fun NavGraphBuilder.touristPaymentNavGraph(
                     destination = TouristDestination.Trips,
                     startDestination = TouristDestination.Home,
                 )
+                touristNavController.currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(OPEN_UPCOMING_TRIPS_AFTER_PURCHASE_KEY, true)
             }
         }
     }

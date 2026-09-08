@@ -5,10 +5,13 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.testing.FakeGuideFinanceRepository
+import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
 import com.ahmetkaragunlu.guidemate.testing.testBankAccount
+import com.ahmetkaragunlu.guidemate.testing.testNotification
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -46,6 +49,7 @@ class GuideMyWalletViewModelTest {
                 GuideMyWalletViewModel(
                     walletRepository = FakeWalletRepository(),
                     financeRepository = financeRepository,
+                    notificationRepository = FakeNotificationRepository(),
                     resourceProvider = FakeResourceProvider(),
                     savedStateHandle = SavedStateHandle(),
                 )
@@ -63,6 +67,41 @@ class GuideMyWalletViewModelTest {
             assertNotNull(financeRepository.withdrawalRequest?.third)
             assertTrue(viewModel.uiState.value.isWithdrawalRequestSubmitted)
             assertFalse(viewModel.uiState.value.isWithdrawalInProgress)
+            collection.cancel()
+        }
+
+    @Test
+    fun earningAvailableNotificationRefreshesCanonicalWalletData() =
+        runTest {
+            val walletRepository = FakeWalletRepository()
+            val notificationRepository = FakeNotificationRepository()
+            val viewModel =
+                GuideMyWalletViewModel(
+                    walletRepository = walletRepository,
+                    financeRepository = FakeGuideFinanceRepository(),
+                    notificationRepository = notificationRepository,
+                    resourceProvider = FakeResourceProvider(),
+                    savedStateHandle = SavedStateHandle(),
+                )
+            val collection = backgroundScope.launch { viewModel.uiState.collect {} }
+            runCurrent()
+
+            assertEquals(1, walletRepository.getWalletCalls)
+
+            notificationRepository.notificationState.value =
+                listOf(testNotification(type = NotificationType.CHAT_MESSAGE))
+            runCurrent()
+
+            assertEquals(1, walletRepository.getWalletCalls)
+
+            notificationRepository.notificationState.value =
+                listOf(
+                    testNotification(id = "earning", type = NotificationType.EARNING_AVAILABLE),
+                    testNotification(id = "chat", type = NotificationType.CHAT_MESSAGE),
+                )
+            runCurrent()
+
+            assertEquals(2, walletRepository.getWalletCalls)
             collection.cancel()
         }
 }

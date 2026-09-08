@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
@@ -40,12 +42,20 @@ fun MonthlyEarningItem(
             color = colorResource(R.color.text_color),
             fontWeight = FontWeight.Bold,
         )
-        Text(
-            text = "+${earning.amountMinor.toCurrencyFromMinorUnit(earning.currencyCode)}",
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF388E3C),
-        )
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = "+${earning.amountMinor.toCurrencyFromMinorUnit(earning.currencyCode)}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF388E3C),
+            )
+            if (earning.pendingEarningsMinor > 0) {
+                PendingEarningLabel(
+                    amountMinor = earning.pendingEarningsMinor,
+                    currencyCode = earning.currencyCode,
+                )
+            }
+        }
     }
 
     if (showDivider) {
@@ -54,4 +64,23 @@ fun MonthlyEarningItem(
             color = Color.LightGray.copy(alpha = 0.5f),
         )
     }
+}
+
+@Composable
+fun PendingEarningLabel(
+    amountMinor: Long,
+    currencyCode: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text =
+            stringResource(
+                R.string.earning_pending_amount,
+                amountMinor.toCurrencyFromMinorUnit(currencyCode),
+            ),
+        modifier = modifier,
+        style = MaterialTheme.typography.bodySmall,
+        fontWeight = FontWeight.SemiBold,
+        color = colorResource(R.color.pending_status_color),
+    )
 }

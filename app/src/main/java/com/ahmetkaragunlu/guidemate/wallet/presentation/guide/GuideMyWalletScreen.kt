@@ -49,6 +49,8 @@ fun GuideMyWalletScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val actionErrorMessage = uiState.actionErrorMessage
 
+    LaunchedEffect(Unit) { viewModel.refresh() }
+
     GuideMateContentState(
         state = uiState.loadState,
         onRetry = viewModel::refresh,

@@ -152,7 +152,7 @@ internal fun TourStatusCard(
         StatusItemCard(
             count = pendingCount,
             label = stringResource(R.string.pending_tours),
-            indicatorColor = Color(0xFFFF9800),
+            indicatorColor = colorResource(R.color.pending_status_color),
             modifier = Modifier.weight(1f).fillMaxHeight(),
         )
     }

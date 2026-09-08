@@ -42,6 +42,7 @@ fun MonthlyGuideEarningResponseDto.toDomain(): MonthlyGuideEarning =
         month = month,
         netEarningsMinor = netEarningsMinor,
         currencyCode = currencyCode,
+        pendingEarningsMinor = pendingEarningsMinor,
     )
 
 fun BankAccountResponseDto.toDomain(): BankAccount =
