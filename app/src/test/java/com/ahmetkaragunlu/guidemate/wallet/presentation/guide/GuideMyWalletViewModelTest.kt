@@ -71,7 +71,7 @@ class GuideMyWalletViewModelTest {
         }
 
     @Test
-    fun earningAvailableNotificationRefreshesCanonicalWalletData() =
+    fun guideEarningNotificationsRefreshCanonicalWalletData() =
         runTest {
             val walletRepository = FakeWalletRepository()
             val notificationRepository = FakeNotificationRepository()
@@ -96,12 +96,21 @@ class GuideMyWalletViewModelTest {
 
             notificationRepository.notificationState.value =
                 listOf(
-                    testNotification(id = "earning", type = NotificationType.EARNING_AVAILABLE),
+                    testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED),
                     testNotification(id = "chat", type = NotificationType.CHAT_MESSAGE),
                 )
             runCurrent()
 
             assertEquals(2, walletRepository.getWalletCalls)
+
+            notificationRepository.notificationState.value =
+                listOf(
+                    testNotification(id = "earning", type = NotificationType.EARNING_AVAILABLE),
+                    testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED),
+                )
+            runCurrent()
+
+            assertEquals(3, walletRepository.getWalletCalls)
             collection.cancel()
         }
 }

@@ -70,7 +70,7 @@ constructor(
     override val pushEvents: SharedFlow<NotificationNavigationTarget> =
         mutablePushEvents.asSharedFlow()
 
-    private val pageMutex = Mutex()
+    private val notificationStateMutex = Mutex()
     private var currentPage = -1
 
     init {
@@ -79,7 +79,7 @@ constructor(
     }
 
     override suspend fun refreshNotifications(): DataResult<List<AppNotification>> =
-        pageMutex.withLock {
+        notificationStateMutex.withLock {
             apiCallExecutor.execute(
                 request = { api.getNotifications(page = 0, size = NOTIFICATION_PAGE_SIZE) },
                 transform = { page -> page.content.map { it.toDomain() } to !page.isLast },
@@ -92,7 +92,7 @@ constructor(
         }
 
     override suspend fun loadMoreNotifications(): DataResult<List<AppNotification>> =
-        pageMutex.withLock {
+        notificationStateMutex.withLock {
             if (!mutableHasMoreNotifications.value) {
                 return@withLock DataResult.Success(mutableNotifications.value)
             }
@@ -111,73 +111,81 @@ constructor(
         }
 
     override suspend fun refreshUnreadCount(): DataResult<Int> =
-        apiCallExecutor.execute(
-            request = api::getUnreadCount,
-            transform = { it.unreadCount.toSafeInt() },
-        ).mapSuccess { count ->
-            mutableUnreadCount.value = count
-            count
+        notificationStateMutex.withLock {
+            apiCallExecutor.execute(
+                request = api::getUnreadCount,
+                transform = { it.unreadCount.toSafeInt() },
+            ).mapSuccess { count ->
+                mutableUnreadCount.value = count
+                count
+            }
         }
 
     override suspend fun markRead(notificationId: String): DataResult<AppNotification> =
-        apiCallExecutor.execute(
-            request = { api.markRead(notificationId) },
-            transform = { it.toDomain() },
-        ).mapSuccess { updated ->
-            val wasUnread = mutableNotifications.value.any {
-                it.notificationId == notificationId && !it.isRead
-            }
-            mutableNotifications.update { notifications ->
-                notifications.map { notification ->
-                    if (notification.notificationId == notificationId) updated else notification
+        notificationStateMutex.withLock {
+            apiCallExecutor.execute(
+                request = { api.markRead(notificationId) },
+                transform = { it.toDomain() },
+            ).mapSuccess { updated ->
+                val wasUnread = mutableNotifications.value.any {
+                    it.notificationId == notificationId && !it.isRead
                 }
+                mutableNotifications.update { notifications ->
+                    notifications.map { notification ->
+                        if (notification.notificationId == notificationId) updated else notification
+                    }
+                }
+                if (wasUnread) {
+                    mutableUnreadCount.update { count -> (count - 1).coerceAtLeast(0) }
+                }
+                systemNotificationController.dismiss(updated.navigationTarget)
+                updated
             }
-            if (wasUnread) {
-                mutableUnreadCount.update { count -> (count - 1).coerceAtLeast(0) }
-            }
-            systemNotificationController.dismiss(updated.navigationTarget)
-            updated
         }
 
     override suspend fun markAllRead(): DataResult<Int> =
-        apiCallExecutor.execute(
-            request = api::markAllRead,
-            transform = { it.unreadCount.toSafeInt() },
-        ).mapSuccess { unreadCount ->
-            mutableNotifications.update { notifications ->
-                notifications.map { it.copy(isRead = true) }
+        notificationStateMutex.withLock {
+            apiCallExecutor.execute(
+                request = api::markAllRead,
+                transform = { it.unreadCount.toSafeInt() },
+            ).mapSuccess { unreadCount ->
+                mutableNotifications.update { notifications ->
+                    notifications.map { it.copy(isRead = true) }
+                }
+                mutableUnreadCount.value = unreadCount
+                systemNotificationController.dismissAll()
+                unreadCount
             }
-            mutableUnreadCount.value = unreadCount
-            systemNotificationController.dismissAll()
-            unreadCount
         }
 
     override suspend fun markRelatedRead(
         target: NotificationTargetReference,
     ): DataResult<Int> =
-        apiCallExecutor.execute(
-            request = {
-                api.markRelatedRead(
-                    MarkRelatedNotificationsReadRequestDto(
-                        targetType = target.type.name,
-                        targetId = target.targetId,
-                    ),
-                )
-            },
-            transform = { it.unreadCount.toSafeInt() },
-        ).mapSuccess { unreadCount ->
-            mutableNotifications.update { notifications ->
-                notifications.map { notification ->
-                    if (!notification.isRead && target.matches(notification.payload)) {
-                        notification.copy(isRead = true)
-                    } else {
-                        notification
+        notificationStateMutex.withLock {
+            apiCallExecutor.execute(
+                request = {
+                    api.markRelatedRead(
+                        MarkRelatedNotificationsReadRequestDto(
+                            targetType = target.type.name,
+                            targetId = target.targetId,
+                        ),
+                    )
+                },
+                transform = { it.unreadCount.toSafeInt() },
+            ).mapSuccess { unreadCount ->
+                mutableNotifications.update { notifications ->
+                    notifications.map { notification ->
+                        if (!notification.isRead && target.matches(notification.payload)) {
+                            notification.copy(isRead = true)
+                        } else {
+                            notification
+                        }
                     }
                 }
+                mutableUnreadCount.value = unreadCount
+                systemNotificationController.dismissRelated(target)
+                unreadCount
             }
-            mutableUnreadCount.value = unreadCount
-            systemNotificationController.dismissRelated(target)
-            unreadCount
         }
 
     override suspend fun refreshPreferences(): DataResult<NotificationPreferences> =

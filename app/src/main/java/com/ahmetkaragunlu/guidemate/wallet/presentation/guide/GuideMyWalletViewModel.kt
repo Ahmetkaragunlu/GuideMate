@@ -82,7 +82,7 @@ class GuideMyWalletViewModel
                 financeRepository.financeChanges.collect { refresh() }
             }
             viewModelScope.launch {
-                notificationRepository.earningAvailabilityChanges().collect { refresh() }
+                notificationRepository.guideEarningChanges().collect { refresh() }
             }
         }
 

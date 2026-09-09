@@ -176,5 +176,11 @@ class TouristExploreViewModelTest {
             page: Int,
             size: Int,
         ): DataResult<PagedResult<TourReview>> = error("Not used")
+
+        override suspend fun getOwnedTourReviews(
+            tourId: String,
+            page: Int,
+            size: Int,
+        ): DataResult<PagedResult<TourReview>> = error("Not used")
     }
 }

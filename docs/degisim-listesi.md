@@ -82,6 +82,46 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ## Degisiklikler
 
+### DEG-068 - Turistte Public Rehber Tur Listesi Basligi
+
+- Durum: `ONAYLANDI`
+- Turist bir rehberin profilindeki `Tumunu Gor` aksiyonuyla public tur listesine
+  girdiginde topbar basligi `Turlarim` olmayacak; `Rehberin Turlari` olarak
+  gosterilecektir. `Turlarim` ifadesi yalniz rehberin kendi tur yonetimi
+  ekraninda korunacaktir.
+- Turist navigation UI config'i icin ayri ve acik amacli bir XML string resource
+  kullanilacaktir. Public profil icindeki daha once kararlastirilan `Turlarim`
+  bolum basligi bu kapsamda degistirilmeyecektir.
+- Backend, ekran, graph, destination, back-stack ve navigasyon davranisi
+  degismeyecektir. Rehber adini navigation parametresine ekleyen gereksiz
+  dinamik baslik altyapisi kurulmayacaktir.
+- Test karari: Salt gorunen metin degisikligi oldugu icin yeni otomatik test
+  yazilmayacak; resource/derleme kontrolu ve kullanici testi yeterli olacaktir.
+
+### DEG-067 - Rehber Kazancini Domain Olaylariyla Anlik Yenilemek
+
+- Durum: `ONAYLANDI`
+- Turist bir tur satin aldiginda rehberin yeni `PENDING` kazanci, rehber kazanc
+  veya cuzdan ekrani aciksa sekme degistirmeden gorunmelidir. Ekran backend
+  sonucunu yeniden cekerek bu ayki toplam ve bekleyen toplamlarini
+  guncelleyecektir; Android tutari yerelde tahmin etmeyecektir.
+- Mevcut STOMP/notification hatti yenileme sinyali olarak kullanilacaktir.
+  `TOUR_PURCHASED`, ilgili kazancin tersine cevrilmesine yol acan olaylar ve
+  `EARNING_AVAILABLE` gibi kazanc durumunu gercekten degistiren bildirimler dar
+  bir domain olayi eslemesinde ele alinacaktir. Surekli polling yapilmayacaktir.
+- Mevcut `earningAvailabilityChanges` yardimcisi, yalniz kullanilabilirlik
+  degil butun gercek kazanc degisimlerini anlattigi icin sorumluluguna uygun
+  bicimde yeniden adlandirilacak ve genisletilecektir. ViewModel bildirim DTO'su,
+  STOMP veya FCM ayrintisini bilmeyecek; `NotificationRepository` arayuzundeki
+  tip guvenli domain akisina bagli kalacaktir.
+- Backend para, komisyon ve kazanc durumu icin tek otorite olarak kalacaktir.
+  Yeni endpoint, tablo, ekran, navigation destination, use-case veya genel
+  amacli event framework'u eklenmeyecektir.
+- Test karari: `TOUR_PURCHASED` ve `EARNING_AVAILABLE` olaylarinin acik kazanc
+  ekranini yeniledigi, ilgisiz bildirimlerin ise gereksiz istek olusturmadigi
+  odakli ViewModel/flow testleriyle dogrulanmalidir. STOMP ve FCM ayrintisi ayni
+  davranis icin tekrar test edilmeyecektir.
+
 ### DEG-066 - Rehber Tur Detayinda Gercek Yorum Listesi
 
 - Durum: `ONAYLANDI`

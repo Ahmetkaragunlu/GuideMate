@@ -6,6 +6,7 @@ import com.ahmetkaragunlu.guidemate.testing.FakeGuideFinanceRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.testNotification
+import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.MonthlyGuideEarning
 import java.time.YearMonth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,7 +54,7 @@ class GuideEarningsViewModelTest {
         }
 
     @Test
-    fun earningAvailableNotificationRefreshesCurrentYearWithoutChangingSelection() =
+    fun guideEarningNotificationsRefreshCurrentYearWithoutChangingSelection() =
         runTest {
             val currentYear = YearMonth.now().year
             val previousYear = currentYear - 1
@@ -71,11 +72,25 @@ class GuideEarningsViewModelTest {
             runCurrent()
             assertEquals(previousYear, viewModel.uiState.value.selectedYear)
 
-            notificationRepository.notificationState.value = listOf(testNotification())
+            notificationRepository.notificationState.value =
+                listOf(testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED))
             runCurrent()
 
             assertEquals(
                 listOf(currentYear, previousYear, currentYear),
+                repository.requestedMonthlyEarningsYears,
+            )
+            assertEquals(previousYear, viewModel.uiState.value.selectedYear)
+
+            notificationRepository.notificationState.value =
+                listOf(
+                    testNotification(id = "earning", type = NotificationType.EARNING_AVAILABLE),
+                    testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED),
+                )
+            runCurrent()
+
+            assertEquals(
+                listOf(currentYear, previousYear, currentYear, currentYear),
                 repository.requestedMonthlyEarningsYears,
             )
             assertEquals(previousYear, viewModel.uiState.value.selectedYear)

@@ -42,4 +42,14 @@ class ReviewRepositoryImpl @Inject constructor(
             request = { api.getTourReviews(tourId = tourId, page = page, size = size) },
             transform = { it.toDomain() },
         )
+
+    override suspend fun getOwnedTourReviews(
+        tourId: String,
+        page: Int,
+        size: Int,
+    ): DataResult<PagedResult<TourReview>> =
+        apiCallExecutor.execute(
+            request = { api.getOwnedTourReviews(tourId = tourId, page = page, size = size) },
+            transform = { it.toDomain() },
+        )
 }

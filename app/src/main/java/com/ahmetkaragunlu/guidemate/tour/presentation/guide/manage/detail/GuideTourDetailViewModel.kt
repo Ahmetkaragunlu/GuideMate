@@ -16,6 +16,7 @@ import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
+import com.ahmetkaragunlu.guidemate.review.domain.repository.ReviewRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
@@ -39,12 +40,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+private const val REVIEW_PREVIEW_SIZE = 20
+
 @HiltViewModel
 class GuideTourDetailViewModel
     @Inject
     constructor(
         savedStateHandle: SavedStateHandle,
         private val repository: GuideTourRepository,
+        private val reviewRepository: ReviewRepository,
         private val notificationRepository: NotificationRepository,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
@@ -76,12 +80,12 @@ class GuideTourDetailViewModel
                                 )
                             }
                         } else {
+                            val tourWithReviews =
+                                TourWithSession(result.data.tour, session).withOwnedTourReviews()
                             details = result.data
                             _uiState.update {
                                 it.copy(
-                                    detail =
-                                        TourWithSession(result.data.tour, session)
-                                            .toTourDetailUiState(),
+                                    detail = tourWithReviews.toTourDetailUiState(),
                                     mode =
                                         when {
                                             result.data.tour.approvalStatus !=
@@ -113,6 +117,19 @@ class GuideTourDetailViewModel
                 }
             }
         }
+
+        private suspend fun TourWithSession.withOwnedTourReviews(): TourWithSession =
+            when (
+                val result =
+                    reviewRepository.getOwnedTourReviews(
+                        tourId = tour.id,
+                        page = 0,
+                        size = REVIEW_PREVIEW_SIZE,
+                    )
+            ) {
+                is DataResult.Success -> copy(tour = tour.copy(recentReviews = result.data.items))
+                is DataResult.Error -> this
+            }
 
         fun showCancelDialog() {
             _uiState.update {

@@ -20,4 +20,10 @@ interface ReviewRepository {
         page: Int,
         size: Int,
     ): DataResult<PagedResult<TourReview>>
+
+    suspend fun getOwnedTourReviews(
+        tourId: String,
+        page: Int,
+        size: Int,
+    ): DataResult<PagedResult<TourReview>>
 }

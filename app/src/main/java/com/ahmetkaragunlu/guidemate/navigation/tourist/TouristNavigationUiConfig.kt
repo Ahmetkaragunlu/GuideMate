@@ -53,7 +53,7 @@ internal fun NavDestination?.touristNavigationUiConfig(): NavigationUiConfig =
             )
         hasRoute<TouristDestination.GuideTours>() ->
             touristNavigationUiConfig(
-                titleResId = R.string.guide_tours,
+                titleResId = R.string.public_guide_tours_title,
                 showBackButton = true,
                 showBottomBar = false,
             )

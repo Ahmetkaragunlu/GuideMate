@@ -21,9 +21,11 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNaviga
 import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -81,6 +83,32 @@ class NotificationRepositoryImplTest {
         assertEquals(1, repository.unreadCount.value)
         assertEquals("notification-1", systemNotifications.dismissedTargets.last().notificationId)
     }
+
+    @Test
+    fun `in flight refresh completes before a later read mutation updates canonical state`() =
+        runTest {
+            val api = FakeNotificationApi(unreadCount = 2)
+            val repository = createRepository(api, FakeUserRepository(), backgroundScope)
+            runCurrent()
+            repository.refreshNotifications()
+            repository.refreshUnreadCount()
+
+            api.notificationRequestStarted = CompletableDeferred()
+            api.notificationResponseGate = CompletableDeferred()
+            val refresh = async { repository.refreshNotifications() }
+            api.notificationRequestStarted?.await()
+            val markRead = async { repository.markRead("notification-1") }
+            runCurrent()
+
+            assertEquals(0, api.markReadCalls)
+
+            api.notificationResponseGate?.complete(Unit)
+            refresh.await()
+            markRead.await()
+
+            assertTrue(repository.notifications.value.single().isRead)
+            assertEquals(1, repository.unreadCount.value)
+        }
 
     @Test
     fun `mark related read applies canonical count and updates only matching cached items`() =
@@ -276,12 +304,17 @@ class NotificationRepositoryImplTest {
         val requestedPages = mutableListOf<Int>()
         var deviceRequest: RegisterDeviceRequestDto? = null
         var relatedReadRequest: MarkRelatedNotificationsReadRequestDto? = null
+        var notificationRequestStarted: CompletableDeferred<Unit>? = null
+        var notificationResponseGate: CompletableDeferred<Unit>? = null
+        var markReadCalls = 0
 
         override suspend fun getNotifications(
             page: Int,
             size: Int,
         ): Response<ApiPageResponse<NotificationResponseDto>> {
             requestedPages += page
+            notificationRequestStarted?.complete(Unit)
+            notificationResponseGate?.await()
             val content =
                 when (page) {
                     0 -> listOf(notification("notification-1", minute = 1, isRead = false))
@@ -309,8 +342,10 @@ class NotificationRepositoryImplTest {
 
         override suspend fun markRead(
             notificationId: String,
-        ): Response<NotificationResponseDto> =
-            Response.success(notification(notificationId, minute = 1, isRead = true))
+        ): Response<NotificationResponseDto> {
+            markReadCalls++
+            return Response.success(notification(notificationId, minute = 1, isRead = true))
+        }
 
         override suspend fun markAllRead(): Response<UnreadCountResponseDto> =
             Response.success(UnreadCountResponseDto(0))

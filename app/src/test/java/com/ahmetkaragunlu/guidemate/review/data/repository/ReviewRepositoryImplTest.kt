@@ -52,12 +52,27 @@ class ReviewRepositoryImplTest {
         assertEquals("reviewer", (result as DataResult.Success).data.items.single().reviewerName)
     }
 
+    @Test
+    fun `owned tour review page uses guide endpoint and keeps pagination`() = runTest {
+        val api = FakeReviewApi()
+        val repository = ReviewRepositoryImpl(api, testApiCallExecutor())
+
+        val result = repository.getOwnedTourReviews(tourId = "tour-2", page = 1, size = 5)
+
+        assertTrue(result is DataResult.Success)
+        assertTrue(api.ownedTourReviewsRequested)
+        assertEquals("tour-2", api.tourId)
+        assertEquals(1, api.page)
+        assertEquals(5, api.size)
+    }
+
     private class FakeReviewApi : ReviewApi {
         var reservationId: String? = null
         var submission: ReviewSubmissionRequestDto? = null
         var tourId: String? = null
         var page: Int? = null
         var size: Int? = null
+        var ownedTourReviewsRequested = false
 
         override suspend fun submitReview(
             reservationId: String,
@@ -104,6 +119,15 @@ class ReviewRepositoryImplTest {
                     isLast = true,
                 ),
             )
+        }
+
+        override suspend fun getOwnedTourReviews(
+            tourId: String,
+            page: Int,
+            size: Int,
+        ): Response<ApiPageResponse<TourReviewResponseDto>> {
+            ownedTourReviewsRequested = true
+            return getTourReviews(tourId = tourId, page = page, size = size)
         }
 
         private companion object {

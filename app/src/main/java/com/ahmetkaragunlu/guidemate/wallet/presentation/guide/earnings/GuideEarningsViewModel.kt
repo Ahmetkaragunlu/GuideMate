@@ -10,7 +10,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.MonthlyGuideEarning
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.GuideFinanceRepository
-import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earningAvailabilityChanges
+import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.guideEarningChanges
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.GuideEarningsUiState
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,7 +51,7 @@ class GuideEarningsViewModel
         init {
             refresh()
             viewModelScope.launch {
-                notificationRepository.earningAvailabilityChanges().collect {
+                notificationRepository.guideEarningChanges().collect {
                     refreshCurrentYear()
                 }
             }

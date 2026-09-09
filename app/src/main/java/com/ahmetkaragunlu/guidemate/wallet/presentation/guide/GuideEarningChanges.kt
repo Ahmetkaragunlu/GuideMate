@@ -8,12 +8,19 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
-internal fun NotificationRepository.earningAvailabilityChanges(): Flow<Unit> =
+private val GUIDE_EARNING_CHANGE_TYPES =
+    setOf(
+        NotificationType.TOUR_PURCHASED,
+        NotificationType.RESERVATION_CANCELLED,
+        NotificationType.EARNING_AVAILABLE,
+    )
+
+internal fun NotificationRepository.guideEarningChanges(): Flow<Unit> =
     notifications
         .map { notifications ->
             notifications
                 .asSequence()
-                .filter { it.type == NotificationType.EARNING_AVAILABLE }
+                .filter { it.type in GUIDE_EARNING_CHANGE_TYPES }
                 .map { it.notificationId }
                 .toSet()
         }.distinctUntilChanged()

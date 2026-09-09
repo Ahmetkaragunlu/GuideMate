@@ -15,6 +15,7 @@ class FakeReviewRepository : ReviewRepository {
     var submitResult: DataResult<SubmittedReview> = DataResult.Success(testSubmittedReview())
     var reviewsResult: DataResult<PagedResult<TourReview>> = DataResult.Success(emptyPage())
     var submittedReview: Pair<String, ReviewSubmissionInput>? = null
+    var ownedTourReviewsRequested = false
 
     override suspend fun submitReview(
         reservationId: String,
@@ -29,6 +30,15 @@ class FakeReviewRepository : ReviewRepository {
         page: Int,
         size: Int,
     ): DataResult<PagedResult<TourReview>> = reviewsResult
+
+    override suspend fun getOwnedTourReviews(
+        tourId: String,
+        page: Int,
+        size: Int,
+    ): DataResult<PagedResult<TourReview>> {
+        ownedTourReviewsRequested = true
+        return reviewsResult
+    }
 }
 
 fun testSubmittedReview(): SubmittedReview =
