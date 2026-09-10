@@ -82,85 +82,140 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ## Degisiklikler
 
-### DEG-068 - Turistte Public Rehber Tur Listesi Basligi
+### DEG-069 - Odeme Zaman Asiminda Guvenli Durum Yenileme
 
-- Durum: `ONAYLANDI`
-- Turist bir rehberin profilindeki `Tumunu Gor` aksiyonuyla public tur listesine
-  girdiginde topbar basligi `Turlarim` olmayacak; `Rehberin Turlari` olarak
-  gosterilecektir. `Turlarim` ifadesi yalniz rehberin kendi tur yonetimi
-  ekraninda korunacaktir.
-- Turist navigation UI config'i icin ayri ve acik amacli bir XML string resource
-  kullanilacaktir. Public profil icindeki daha once kararlastirilan `Turlarim`
-  bolum basligi bu kapsamda degistirilmeyecektir.
-- Backend, ekran, graph, destination, back-stack ve navigasyon davranisi
-  degismeyecektir. Rehber adini navigation parametresine ekleyen gereksiz
-  dinamik baslik altyapisi kurulmayacaktir.
-- Test karari: Salt gorunen metin degisikligi oldugu icin yeni otomatik test
-  yazilmayacak; resource/derleme kontrolu ve kullanici testi yeterli olacaktir.
+- Durum: `TAMAMLANDI`
+- Odeme sonucu `TIMEOUT` oldugunda `Tekrar Dene` aksiyonu odeme ekranindan
+  cikmayacak; mevcut `paymentId` icin backend durum sorgusunu yeniden
+  baslatacaktir.
+- Bu aksiyon yeni odeme, rezervasyon, koltuk hold'u veya idempotency anahtari
+  olusturmayacak ve karttan yeniden tahsilat denemeyecektir. Yalniz mevcut
+  odemenin son durumu sorgulanacaktir.
+- Sonuc kesinlesmisse kullanici basarili, basarisiz, iptal, iade veya manuel
+  inceleme durumuna yonlendirilecektir. Sonuc halen dogrulaniyorsa mevcut polling
+  davranisi devam edecektir.
+- `FAILED` durumundaki yetersiz bakiye, kayip kart, gecersiz CVV ve banka reddi
+  gibi kesin hatalarda yalniz `Odemeden Cik` aksiyonu korunacaktir.
+- Mevcut `PaymentStatusViewModel.refresh()` ve repository sozlesmesi
+  kullanilacaktir. Yeni endpoint, repository, use-case, ekran, navigation rotasi
+  veya genel amacli tekrar deneme katmani eklenmeyecektir.
+- Test karari: `TIMEOUT` durumundaki birincil aksiyonun ayni `paymentId` icin
+  durum sorgusunu yeniden baslattigi ve cikis callback'ini tetiklemedigi odakli
+  bir davranis testiyle dogrulanmalidir. Kesin `FAILED` durumunda yalniz cikis
+  aksiyonunun kaldigi mevcut testte korunmali veya ayni odakli kapsamda
+  dogrulanmalidir.
 
-### DEG-067 - Rehber Kazancini Domain Olaylariyla Anlik Yenilemek
+### DEG-070 - Uluslararasi Ad ve Soyad Dogrulamasi
 
-- Durum: `ONAYLANDI`
-- Turist bir tur satin aldiginda rehberin yeni `PENDING` kazanci, rehber kazanc
-  veya cuzdan ekrani aciksa sekme degistirmeden gorunmelidir. Ekran backend
-  sonucunu yeniden cekerek bu ayki toplam ve bekleyen toplamlarini
-  guncelleyecektir; Android tutari yerelde tahmin etmeyecektir.
-- Mevcut STOMP/notification hatti yenileme sinyali olarak kullanilacaktir.
-  `TOUR_PURCHASED`, ilgili kazancin tersine cevrilmesine yol acan olaylar ve
-  `EARNING_AVAILABLE` gibi kazanc durumunu gercekten degistiren bildirimler dar
-  bir domain olayi eslemesinde ele alinacaktir. Surekli polling yapilmayacaktir.
-- Mevcut `earningAvailabilityChanges` yardimcisi, yalniz kullanilabilirlik
-  degil butun gercek kazanc degisimlerini anlattigi icin sorumluluguna uygun
-  bicimde yeniden adlandirilacak ve genisletilecektir. ViewModel bildirim DTO'su,
-  STOMP veya FCM ayrintisini bilmeyecek; `NotificationRepository` arayuzundeki
-  tip guvenli domain akisina bagli kalacaktir.
-- Backend para, komisyon ve kazanc durumu icin tek otorite olarak kalacaktir.
-  Yeni endpoint, tablo, ekran, navigation destination, use-case veya genel
-  amacli event framework'u eklenmeyecektir.
-- Test karari: `TOUR_PURCHASED` ve `EARNING_AVAILABLE` olaylarinin acik kazanc
-  ekranini yeniledigi, ilgisiz bildirimlerin ise gereksiz istek olusturmadigi
-  odakli ViewModel/flow testleriyle dogrulanmalidir. STOMP ve FCM ayrintisi ayni
-  davranis icin tekrar test edilmeyecektir.
+- Durum: `TAMAMLANDI`
+- Ad ve soyad dogrulamasi Turkce ve ASCII harflerle sinirli olmayacak; butun
+  Unicode harfleri ile gercek isimlerde kullanilan tek bosluk, tire ve kesme
+  isaretini destekleyecektir. `Jose`, `José`, `Anne-Marie` ve `O'Connor` gibi
+  gecerli isimler kabul edilecektir.
+- Basta ve sondaki bosluklar normalize edilecek, art arda bosluk veya ayiraclar
+  kabul edilmeyecektir. Minimum uzunluk ayiraclarla degil harf sayisiyla
+  hesaplanacaktir: ad en az 3, soyad en az 2 harf icerecektir. Bu nedenle
+  `aa `, `a a` veya yalniz bosluklarla minimum uzunluk asilamayacaktir.
+- Android ayni kurali erken UX dogrulamasi icin uygulayacak ve gecersiz
+  karakter ile yetersiz harf sayisini XML kaynakli, acik hata metinleriyle
+  gosterecektir.
+- Backend ayni kurali kayit API sinirinda otoriter olarak uygulayacaktir.
+  Android kontrolu atlanarak API dogrudan cagrilsa bile gecersiz ad veya soyad
+  kaydedilmeyecektir. Normalize edilmis deger dogrulanip saklanacak; DTO
+  dogrulamasi ile kaydedilen deger arasinda bosluk kaynakli tutarsizlik
+  kalmayacaktir.
+- Yeni ekran, navigation rotasi, use-case veya genel amacli validation
+  framework'u eklenmeyecektir. Mevcut Android form dogrulamasi ve backend kayit
+  siniri, ayni acik business kuraliyla en kucuk kapsamda guncellenecektir.
+- Test karari: Android ve backend tarafinda kabul edilen uluslararasi isimler ile
+  bosluk/ayirac kullanarak minimum uzunlugu asmayan gecersiz girdiler odakli
+  parametrik testlerle dogrulanmalidir. Ayni regex implementation ayrintisi
+  tekrar tekrar test edilmeyecektir.
 
-### DEG-066 - Rehber Tur Detayinda Gercek Yorum Listesi
+### DEG-071 - Sozlesme, KVKK ve SSS Metinlerini Gercek Akisla Eslemek
 
-- Durum: `ONAYLANDI`
-- Rehberin `Turlarim > Aktif` ve `Turlarim > Gecmis` akislari ayni rehber tur
-  detay ekranini kullanmaya devam edecektir.
-- Detayin ustundeki `averageRating` ve `reviewCount` degerleri korunurken yorum
-  sekmesi bos birakilmayacak; mevcut `ReviewRepository` arayuzu uzerinden turun
-  gercek yorumlari cekilip ortak `TourDetailContent` modeline aktarilacaktir.
-- `GuideTourDetailViewModel` somut data implementasyonuna degil domain repository
-  arayuzune baglanacaktir. Yeni backend endpoint'i, ekran, navigation destination,
-  use-case veya ortak olmayan ek katman olusturulmayacaktir.
-- Yorum istegi basarisiz oldugunda tur detayinin tamamini kullanilamaz yapmak
-  yerine mevcut detay verisi korunacak; yorum bolumunun hata davranisi uygulama
-  sirasinda mevcut ortak hata UX'iyle orantili bicimde ele alinacaktir.
-- Test karari: Rehber detayinda basarili yorum listesinin UI modeline aktarildigi
-  ve yorum istegi hatasinin ana tur detayini kaybettirmedigi ViewModel testiyle
-  dogrulanmalidir. Aktif ve gecmis mod icin ayni davranis tekrar test edilmez.
+- Durum: `TAMAMLANDI`
+- Kayit sozlesmesi, profil altindaki yasal metinler ve SSS cevaplari uygulamanin
+  gercek odeme, iptal, iade ve veri isleme davranislarini birbiriyle tutarli
+  anlatacaktir.
+- Odeme metni yalniz kart odemesi varmis gibi yazilmayacak; kart ve GuideMate
+  cuzdan odemelerini kapsayacaktir. Ham kart bilgilerinin GuideMate sunucularinda
+  saklanmadigi ve kart islemlerinin odeme saglayicisi tarafindan yurutuldugu
+  gercek siniriyla ifade edilecektir.
+- Iptal metinlerinin tamami canonical politikayla eslenecektir: tur baslangicina
+  en az 48 saat varken turist iptalinde tam iade, 48 saatten az varken iade yok,
+  rehber kaynakli iptalde tam iade. Gercekte bulunmayan `standart kesinti` veya
+  telafi odemesi vaatleri kaldirilacaktir.
+- Veri isleme aciklamasi yalniz rezervasyonla sinirli tutulmayacak; hesap ve
+  e-posta dogrulama, guvenlik, rezervasyon, mesajlasma, bildirim ve odeme
+  islemlerini kapsayan sade ve gercek bir aciklama kullanacaktir.
+- Uygulamada kokart yukleme veya dogrulama akisi bulunmadigi surece GuideMate'in
+  rehber kokartini zorunlu olarak dogruladigi izlenimi veren ifade
+  kullanilmayacaktir. Gercekte uygulanmayan bir kontrol metinle vaat
+  edilmeyecektir.
+- Local MVP'de dogrulanamayan `256-bit SSL` gibi kesin teknik guvenlik vaatleri
+  kaldirilacak; metin odeme saglayicisi ve guvenli hosted odeme sinirini
+  anlatacaktir. Production yayinindan once nihai metin hukuk uzmani tarafindan
+  ayrica incelenmelidir.
+- Yalniz XML metin kaynaklari guncellenecektir. Backend is kurallari, ekranlar,
+  navigation, odeme ve iptal akislarinda davranis degisikligi yapilmayacaktir.
+- Test karari: Salt metin uyumu icin kirilgan otomatik UI testi yazilmayacak;
+  resource/derleme kontrolu ve odeme-iptal akislarini kapsayan kullanici testi
+  yeterli olacaktir.
 
-### DEG-065 - Bildirim Okundu Durumunda Es Zamanli Yenileme Guvenligi
+### DEG-072 - Kismi Veri Hatasini Gercek Bos Durumdan Ayirmak
 
-- Durum: `ONAYLANDI`
-- Kullanici sistem bildirimine veya uygulama icindeki ilgili icerige dokundugunda,
-  hedef ekran basariyla yuklendikten sonra ilgili bildirimler backend otoritesinde
-  okundu olarak isaretlenmeye devam edecektir. Hedef yuklenemezse bildirim okundu
-  sayilmayacaktir.
-- FCM, STOMP ve ekran yenilemesinden ayni anda baslayan eski bildirim liste veya
-  okunmamis sayi istekleri, daha sonra tamamlanarak yeni `okundu` sonucunun
-  uzerine yazamayacaktir.
-- Bildirim repository'sindeki canonical liste, okunmamis sayi ve okundu
-  mutasyonlari tek ve sirali bir state guncelleme sinirinda yonetilecektir.
-  Cozum yalniz UI'da rozeti gizlemeyecek; backend sonucu ile yerel state'in
-  tutarliligini koruyacaktir.
-- Davranis sohbet, tur, rezervasyon ve odeme hedefleriyle birlikte tekil okunan
-  guvenlik, kazanc ve diger bildirim turlerini kapsayacaktir. Ilgisiz okunmamis
-  bildirimler varsa ust bardaki kirmizi rozet gorunmeye devam edecektir.
-- Mevcut typed navigation, hedef bazli `markRelatedRead`, tekil `markRead`, FCM ve
-  STOMP sorumluluklari korunacak; yeni ekran, gereksiz use-case veya genel amacli
-  concurrency framework'u eklenmeyecektir.
-- Test karari: Gec baslayan eski yenileme cevabinin basarili `markRead`,
-  `markRelatedRead` veya `markAllRead` sonucunu geri alamadigi repository
-  seviyesinde deterministik coroutine testleriyle dogrulanmalidir. Salt kirmizi
-  rozet gorunumu icin kirilgan UI testi yazilmayacaktir.
+- Durum: `TAMAMLANDI`
+- Rehber public profili basariyla yuklenirken tur onizleme istegi basarisiz
+  olursa tur bolumu bos liste gibi kaybolmayacaktir. Profil gorunmeye devam
+  edecek; yalniz tur bolumunde XML kaynakli `Turlar yuklenemedi` mesaji ve
+  `Tekrar Dene` aksiyonu gosterilecektir.
+- Turist rezervasyon detayi basariyla yuklenirken yorum istegi basarisiz olursa
+  bu sonuc `Henuz yorum yok` olarak gosterilmeyecektir. Rezervasyon detayi
+  korunacak; yalniz yorum bolumunde XML kaynakli hata ve `Tekrar Dene` aksiyonu
+  gosterilecektir.
+- Gercek bos durum yalniz backend basarili cevapla bos liste dondurdugunde
+  gosterilecektir. Ag, sunucu veya parsing hatasi bos veriye donusturulmeyecek;
+  mevcut merkezi `AppError` eslemesi kullaniciya uygun mesaja donusecektir.
+- `Tekrar Dene` yalniz basarisiz olan alt bolumun repository istegini yeniden
+  calistiracaktir. Internet geri geldiyse tur veya yorumlar ayni ekranda
+  gorunecek; profil ya da rezervasyonun basariyla yuklenmis ana verisi yeniden
+  kaybedilmeyecektir.
+- Yeni backend endpoint'i, ekran, navigation rotasi, use-case veya genel amacli
+  yukleme framework'u eklenmeyecektir. Mevcut repository arayuzleri ve ortak
+  yukleme/hata bilesenleri, ilgili feature'in dar alt-bolum state'iyle
+  kullanilacaktir.
+- Test karari: Basarisiz alt istegin bos durum yerine hata durumuna donustugu,
+  tekrar denemenin yalniz ilgili istegi yeniden calistirdigi ve sonraki basarili
+  cevabin veriyi gosterdigi odakli ViewModel testleriyle dogrulanmalidir. Salt
+  hata metni veya Compose gorunumu icin gereksiz UI testi yazilmayacaktir.
+
+### DEG-073 - Rehber Cuzdaninda Acik Bos Durumlar
+
+- Durum: `TAMAMLANDI`
+- Rehber cuzdaninda aylik kazanc listesi basarili cevapla bos geldiyse sabit ve
+  aciklamasiz alan yerine XML kaynakli `Henuz kazanciniz bulunmuyor` mesaji
+  gosterilecektir.
+- Son cuzdan hareketleri basarili cevapla bos geldiyse XML kaynakli `Henuz
+  cuzdan hareketiniz bulunmuyor` mesaji gosterilecektir.
+- Bos durum metinleri uygulamadaki diger bos liste mesajlariyla ayni
+  `R.color.text_color` ve body typography kullanimi ile gosterilecektir. Gereksiz
+  sabit bosluk kucultulecektir.
+- `Tumunu Gor` aksiyonlari liste bosken de korunacaktir. Bu aksiyonlar kullaniciya
+  aylik kazanc gecmisi ile `Tumu`, tur kazanclari, para cekme ve diger cuzdan
+  hareketi filtrelerinin bulundugu tam ekranlari kesfetme imkani verir. Hedef
+  ekranlar bos sonucu kendi XML kaynakli aciklamalariyla gostermeye devam
+  edecektir.
+- Turist ana sayfasindaki `Henuz uygun bir rehber bulunamadi` bos durum metni de
+  tema varsayilanina birakilmayacak; diger bos durumlarla tutarli olarak acikca
+  `R.color.text_color` kullanacaktir.
+- Ilgili veri olustugunda bos durum metninin yerini mevcut onizleme listesi
+  alacaktir. Basarili bos cevap ile ag/sunucu hatasi birbirine
+  karistirilmayacak; hata durumu `DEG-072` kapsamindaki hata ve yeniden deneme
+  davranisini kullanacaktir.
+- Backend, repository, navigation ve ekran yapisi degismeyecek; yeni genel
+  amacli empty-state framework'u kurulmayacaktir. Degisiklik mevcut rehber
+  cuzdan iceriginde orantili bir presentation duzenlemesi olarak kalacaktir.
+- Test karari: Salt metin, renk ve bosluk icin kirilgan UI testi yazilmayacak;
+  derleme ve kullanici testi yeterli olacaktir. Bos liste ile hata ayriminin
+  state davranisi `DEG-072` test kapsaminda dogrulanacaktir.

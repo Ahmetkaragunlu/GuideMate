@@ -28,6 +28,7 @@ class FakeReservationRepository : ReservationRepository {
             )
         )
     val listRequests = mutableListOf<ReservationListType>()
+    val reservationRequests = mutableListOf<String>()
     var cancellationRequest: Triple<String, CancelReservationInput, String>? = null
 
     override suspend fun getMyReservations(
@@ -39,8 +40,10 @@ class FakeReservationRepository : ReservationRepository {
         return reservationPages.removeFirst()
     }
 
-    override suspend fun getReservation(reservationId: String): DataResult<TouristReservation> =
-        reservationResult
+    override suspend fun getReservation(reservationId: String): DataResult<TouristReservation> {
+        reservationRequests += reservationId
+        return reservationResult
+    }
 
     override suspend fun cancelReservation(
         reservationId: String,

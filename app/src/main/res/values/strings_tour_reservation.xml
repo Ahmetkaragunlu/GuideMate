@@ -205,6 +205,8 @@
     <string name="select_city">Şehir Seç</string>
 
     <string name="guide_search_empty">Henüz uygun bir rehber bulunamadı.</string>
+    <string name="tour_reviews_load_error">Yorumlar yüklenemedi.</string>
+    <string name="tour_reviews_load_error_with_reason">Yorumlar yüklenemedi. %1$s</string>
 
     <string name="price_range">Fiyat Aralığı</string>
 

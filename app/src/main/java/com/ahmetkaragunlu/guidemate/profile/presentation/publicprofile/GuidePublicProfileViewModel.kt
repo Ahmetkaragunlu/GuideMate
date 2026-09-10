@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.profile.presentation.publicprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -39,6 +41,7 @@ class GuidePublicProfileViewModel
 
         private var requestedGuideId: Long? = null
         private var loadJob: Job? = null
+        private var popularToursJob: Job? = null
         private var startChatJob: Job? = null
         private val mutableChatDestinations = MutableSharedFlow<String>()
         val chatDestinations: SharedFlow<String> = mutableChatDestinations.asSharedFlow()
@@ -63,38 +66,75 @@ class GuidePublicProfileViewModel
             }
             requestedGuideId = guideId
             loadJob?.cancel()
+            popularToursJob?.cancel()
             loadJob =
                 viewModelScope.launch {
                     _uiState.value = GuideProfileContentUiState(loadState = ContentLoadState.LOADING)
                     _uiState.value =
                         when (val result = profileRepository.getPublicProfile(guideId)) {
                             is DataResult.Success -> {
-                                val popularTours = loadPopularTours(guideId)
-                                result.data.toProfileContentUiState(
+                                val profileState = result.data.toProfileContentUiState(
                                     loadState = ContentLoadState.CONTENT,
-                                    popularTours = popularTours,
                                 )
+                                profileState.copy(popularToursLoadState = ContentLoadState.LOADING)
                             }
                             is DataResult.Error ->
                                 GuideProfileContentUiState(loadState = ContentLoadState.ERROR)
                         }
+                    if (_uiState.value.loadState == ContentLoadState.CONTENT) {
+                        refreshPopularTours(guideId)
+                    }
                 }
         }
 
-        private suspend fun loadPopularTours(guideId: Long) =
-            when (
-                val result =
-                    tourRepository.getPopularToursForGuide(
-                        guideId = guideId,
-                        page = 0,
-                        size = PROFILE_TOUR_PREVIEW_SIZE,
-                    )
-            ) {
-                is DataResult.Success ->
-                    result.data.items
-                        .map { it.toPopularTourCardUiModel() }
-                is DataResult.Error -> emptyList()
-            }
+        fun retryPopularTours() {
+            requestedGuideId?.let(::refreshPopularTours)
+        }
+
+        private fun refreshPopularTours(guideId: Long) {
+            if (popularToursJob?.isActive == true) return
+            popularToursJob =
+                viewModelScope.launch {
+                    _uiState.update {
+                        it.copy(
+                            popularToursLoadState = ContentLoadState.LOADING,
+                            popularToursErrorMessage = null,
+                        )
+                    }
+                    when (
+                        val result =
+                            tourRepository.getPopularToursForGuide(
+                                guideId = guideId,
+                                page = 0,
+                                size = PROFILE_TOUR_PREVIEW_SIZE,
+                            )
+                    ) {
+                        is DataResult.Success ->
+                            _uiState.update {
+                                it.copy(
+                                    popularTours =
+                                        result.data.items.map { tour ->
+                                            tour.toPopularTourCardUiModel()
+                                        },
+                                    popularToursLoadState = ContentLoadState.CONTENT,
+                                    popularToursErrorMessage = null,
+                                )
+                            }
+                        is DataResult.Error ->
+                            _uiState.update {
+                                it.copy(
+                                    popularTours = emptyList(),
+                                    popularToursLoadState = ContentLoadState.ERROR,
+                                    popularToursErrorMessage =
+                                        resourceProvider.getString(
+                                            R.string.profile_tours_load_error_with_reason,
+                                            result.error.toMessage(resourceProvider),
+                                        ),
+                                )
+                            }
+                    }
+                }
+        }
 
         fun retry() {
             requestedGuideId?.let { guideId ->

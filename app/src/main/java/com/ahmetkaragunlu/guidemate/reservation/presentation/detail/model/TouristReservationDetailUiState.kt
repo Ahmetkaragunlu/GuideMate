@@ -9,6 +9,8 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiS
 data class TouristReservationDetailUiState(
     val loadState: ContentLoadState = ContentLoadState.LOADING,
     val detail: TourDetailUiState? = null,
+    val reviewsLoadState: ContentLoadState = ContentLoadState.CONTENT,
+    val reviewsErrorMessage: String? = null,
     val reservationStatus: TouristReservationStatus? = null,
     val canSubmitReview: Boolean = false,
     val reviewForm: TourReviewFormUiState = TourReviewFormUiState(),

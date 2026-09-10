@@ -165,6 +165,8 @@ class FakeGuideProfileRepository(
     override val cachedOwnProfile: GuideProfile?
         get() = profileState.value
     var updateResult: DataResult<GuideProfile> = DataResult.Success(profile)
+    var publicProfileResult: DataResult<GuideProfile> = DataResult.Success(profile)
+    val publicProfileRequests = mutableListOf<Long>()
     var lastUpdate: GuideProfileUpdate? = null
 
     override suspend fun refreshOwnProfile(): DataResult<GuideProfile> =
@@ -177,8 +179,10 @@ class FakeGuideProfileRepository(
         return result
     }
 
-    override suspend fun getPublicProfile(guideId: Long): DataResult<GuideProfile> =
-        error("Not required by this test fixture")
+    override suspend fun getPublicProfile(guideId: Long): DataResult<GuideProfile> {
+        publicProfileRequests += guideId
+        return publicProfileResult
+    }
 
     override suspend fun searchGuides(
         query: String?,

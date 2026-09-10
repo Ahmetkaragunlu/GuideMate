@@ -103,6 +103,24 @@ class PaymentStatusViewModelTest {
             assertEquals("error", viewModel.uiState.value.errorMessage)
         }
 
+    @Test
+    fun `refresh after timeout queries the same payment id again`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val repository =
+                FakePaymentRepository(
+                    payment(status = PaymentStatus.TIMEOUT),
+                    payment(status = PaymentStatus.TIMEOUT),
+                )
+            val viewModel = createViewModel(repository)
+            advanceUntilIdle()
+
+            viewModel.refresh()
+            advanceUntilIdle()
+
+            assertEquals(listOf("payment-1", "payment-1"), repository.requestedPaymentIds)
+            assertEquals(PaymentUiStatus.TIMEOUT, viewModel.uiState.value.payment?.status)
+        }
+
     private fun createViewModel(
         repository: PaymentRepository,
         openHostedIfRequired: Boolean = false,
@@ -156,9 +174,11 @@ class PaymentStatusViewModelTest {
     private class FakePaymentRepository(vararg results: Any) : PaymentRepository {
         private val responses = ArrayDeque(results.toList())
         val clearedPaymentIds = mutableListOf<String>()
+        val requestedPaymentIds = mutableListOf<String>()
         override val pendingPaymentId: Flow<String?> = MutableStateFlow("payment-1")
 
         override suspend fun getPayment(paymentId: String): DataResult<Payment> {
+            requestedPaymentIds += paymentId
             val next = if (responses.size > 1) responses.removeFirst() else responses.first()
             @Suppress("UNCHECKED_CAST") return next as? DataResult<Payment>
                 ?: DataResult.Success(next as Payment)

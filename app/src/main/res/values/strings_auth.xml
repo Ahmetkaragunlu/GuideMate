@@ -41,11 +41,11 @@
 
     <string name="email">E-posta</string>
 
-    <string name="name_error_message">İsim en az 3 karakter olmalıdır</string>
+    <string name="name_error_message">İsim en az 3 harf içermeli; yalnızca harf, tek boşluk, tire veya kesme işareti kullanılmalıdır</string>
 
     <string name="email_error_message">Geçersiz e-posta adresi</string>
 
-    <string name="last_name_error_message">Soy isim en az 2 karakter olmalıdır</string>
+    <string name="last_name_error_message">Soy isim en az 2 harf içermeli; yalnızca harf, tek boşluk, tire veya kesme işareti kullanılmalıdır</string>
 
     <string name="password_error_message">Şifre en az 8 rakamdan oluşmalıdır</string>
 
@@ -175,18 +175,18 @@
         2. HİZMETİN KAPSAMI\n
         GuideMate, seyahat etmek isteyen kullanıcılar (Turist) ile profesyonel rehberlik hizmeti verenleri (Rehber) bir araya getiren bir "Aracı Hizmet Sağlayıcı"dır. GuideMate, turların doğrudan düzenleyicisi değil, güvenli buluşma ve ödeme platformudur.\n\n
         3. ÖDEME VE GÜVENLİK \n
-        3.1. Tüm ödemeler, Platform üzerinden Kredi/Banka Kartı ile 256-bit SSL sertifikalı güvenli ödeme altyapısı kullanılarak yapılır.\n
-        3.2. Kullanıcı kart bilgileri GuideMate sunucularında ASLA SAKLANMAZ. İşlemler, uluslararası güvenlik standartlarına (PCI-DSS) sahip ödeme kuruluşları aracılığıyla gerçekleştirilir.\n
+        3.1. Ödemeler, uygun akışta GuideMate cüzdanı veya ödeme sağlayıcısının güvenli kart ödeme ekranı üzerinden gerçekleştirilir.\n
+        3.2. Ham kart numarası, son kullanma tarihi ve güvenlik kodu GuideMate sunucularında saklanmaz. Kart işlemleri ödeme sağlayıcısı tarafından yürütülür; kayıtlı kartlar yalnız sağlayıcının güvenli referansı ve maskeli bilgilerle gösterilir.\n
         3.3. Platform Dışı Ödeme Yasağı: Güvenlik gereği, Turist ve Rehber arasındaki tüm para transferi uygulama üzerinden yapılmalıdır. Elden nakit ödeme veya harici IBAN transferlerinde yaşanan mağduriyetlerde GuideMate hiçbir hukuki sorumluluk kabul etmez.\n\n
         4. KİŞİSEL VERİLERİN KORUNMASI (KVKK AYDINLATMA METNİ)\n
-        4.1. Paylaştığınız Ad, Soyad, E-posta, Konum ve İletişim bilgileri; hizmetin ifası, fatura düzenlenmesi ve güvenliğin sağlanması amacıyla 6698 sayılı KVKK kapsamında işlenmektedir.\n
-        4.2. Kişisel verileriniz, yasal zorunluluklar haricinde üçüncü şahıslarla paylaşılmaz. Rehberler, sadece turun gerçekleşmesi için gerekli olan sınırlı bilgileri görebilir.\n\n
+        4.1. Paylaştığınız ad, soyad, e-posta, konum ve iletişim bilgileri; hesap ve e-posta doğrulama, güvenlik, rezervasyon, mesajlaşma, bildirim ve ödeme süreçlerinin yürütülmesi amacıyla 6698 sayılı KVKK kapsamında işlenir.\n
+        4.2. Kişisel verileriniz, yasal zorunluluklar ve hizmetin yürütülmesi için yetkili hizmet sağlayıcılarla paylaşılması gereken durumlar dışında paylaşılmaz. Rehberler yalnız turun gerçekleşmesi için gerekli sınırlı bilgileri görebilir.\n\n
         5. İPTAL VE İADE KOŞULLARI\n
         5.1. Turist, satın aldığı turu, tur başlangıç saatinden en az 48 saat önce iptal etmesi durumunda %100 ücret iadesi alır.\n
         5.2. Tur başlangıç saatine 48 saatten az kala yapılan turist iptallerinde ücret iadesi uygulanmaz.\n
         5.3. Rehber tarafından kaynaklanan iptallerde, ödemenin tamamı Turist’e kesintisiz iade edilir.\n\n
         6. KULLANIM KURALLARI VE YASAKLAR\n
-        Platform üzerinde genel ahlaka aykırı, tehditkar, yanıltıcı veya taciz edici mesajlaşmalar yasaktır. Rehberlerin "Profesyonel Turist Rehberi" kokartına sahip olması zorunludur.\n\n
+        Platform üzerinde genel ahlaka aykırı, tehditkar, yanıltıcı veya taciz edici mesajlaşmalar yasaktır. Kullanıcılar yürürlükteki mevzuata, platform kurallarına ve doğru bilgi verme yükümlülüğüne uymalıdır.\n\n
         7. YÜRÜRLÜK\n
         Kullanıcı, "Okudum ve Kabul Ediyorum" kutucuğunu işaretleyerek işbu sözleşmenin tüm maddelerini kabul etmiş sayılır.
     </string>

@@ -14,6 +14,8 @@ class FakeReviewRepository : ReviewRepository {
     override val reviewChanges: Flow<Unit> = MutableSharedFlow()
     var submitResult: DataResult<SubmittedReview> = DataResult.Success(testSubmittedReview())
     var reviewsResult: DataResult<PagedResult<TourReview>> = DataResult.Success(emptyPage())
+    val reviewsResults = ArrayDeque<DataResult<PagedResult<TourReview>>>()
+    val tourReviewRequests = mutableListOf<String>()
     var submittedReview: Pair<String, ReviewSubmissionInput>? = null
     var ownedTourReviewsRequested = false
 
@@ -29,7 +31,10 @@ class FakeReviewRepository : ReviewRepository {
         tourId: String,
         page: Int,
         size: Int,
-    ): DataResult<PagedResult<TourReview>> = reviewsResult
+    ): DataResult<PagedResult<TourReview>> {
+        tourReviewRequests += tourId
+        return reviewsResults.removeFirstOrNull() ?: reviewsResult
+    }
 
     override suspend fun getOwnedTourReviews(
         tourId: String,

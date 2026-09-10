@@ -10,6 +10,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.AuthRepository
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.EmailPolicy
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.NumericPasswordPolicy
+import com.ahmetkaragunlu.guidemate.auth.domain.validation.PersonalNamePolicy
 import com.ahmetkaragunlu.guidemate.auth.presentation.signup.model.SignUpFormState
 import com.ahmetkaragunlu.guidemate.auth.presentation.signup.model.SignUpScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 class SignUpViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val emailPolicy: EmailPolicy,
+    private val namePolicy: PersonalNamePolicy,
     private val passwordPolicy: NumericPasswordPolicy,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
@@ -87,15 +89,9 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun isValidFirstName(): Boolean {
-        val value = _formState.value.firstName.trim()
-        return value.length >= 3 && NAME_PATTERN.matches(value)
-    }
+    fun isValidFirstName(): Boolean = namePolicy.isValidFirstName(_formState.value.firstName)
 
-    fun isValidLastName(): Boolean {
-        val value = _formState.value.lastName.trim()
-        return value.length >= 2 && NAME_PATTERN.matches(value)
-    }
+    fun isValidLastName(): Boolean = namePolicy.isValidLastName(_formState.value.lastName)
 
     fun isValidPassword(): Boolean = passwordPolicy.isValid(_formState.value.password)
 
@@ -130,8 +126,8 @@ class SignUpViewModel @Inject constructor(
             when (
                 val result =
                     authRepository.register(
-                        form.firstName,
-                        form.lastName,
+                        namePolicy.normalize(form.firstName),
+                        namePolicy.normalize(form.lastName),
                         form.email,
                         form.password,
                     )
@@ -196,8 +192,6 @@ class SignUpViewModel @Inject constructor(
     }
 
     private companion object {
-        val NAME_PATTERN =
-            Regex("^[a-zA-ZğüşıöçĞÜŞİÖÇ]+(?: [a-zA-ZğüşıöçĞÜŞİÖÇ]+)*$")
         const val FIELD_FIRST_NAME = "firstName"
         const val FIELD_LAST_NAME = "lastName"
         const val FIELD_EMAIL = "email"

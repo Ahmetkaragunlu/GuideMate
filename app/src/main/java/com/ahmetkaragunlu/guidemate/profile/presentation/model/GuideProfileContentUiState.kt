@@ -16,5 +16,7 @@ data class GuideProfileContentUiState(
     val biography: String = "",
     val spokenLanguages: List<GuideSpokenLanguageUi> = emptyList(),
     val popularTours: List<PopularTourCardUiModel> = emptyList(),
+    val popularToursLoadState: ContentLoadState = ContentLoadState.CONTENT,
+    val popularToursErrorMessage: String? = null,
     val loadState: ContentLoadState = ContentLoadState.LOADING,
 )

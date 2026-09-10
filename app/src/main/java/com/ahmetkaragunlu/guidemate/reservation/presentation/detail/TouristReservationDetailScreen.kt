@@ -51,6 +51,9 @@ fun TouristReservationDetailScreen(
                     },
                 onPrimaryAction = viewModel::showReviewForm,
                 onGuideProfileClick = { onNavigateToGuideProfile(detail.guideId) },
+                reviewsLoadState = uiState.reviewsLoadState,
+                reviewsErrorMessage = uiState.reviewsErrorMessage,
+                onReviewsRetry = viewModel::retryReviews,
                 modifier = modifier,
                 topContent =
                     uiState.noticeResId?.let { messageResId ->

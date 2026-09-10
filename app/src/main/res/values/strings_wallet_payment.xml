@@ -86,6 +86,8 @@
     <string name="wallet_filter_reversals">Kazanç İadeleri</string>
 
     <string name="wallet_transactions_empty">Bu filtreye uygun cüzdan hareketi bulunamadı.</string>
+    <string name="guide_wallet_earnings_empty">Henüz kazancınız bulunmuyor.</string>
+    <string name="guide_wallet_transactions_empty">Henüz cüzdan hareketiniz bulunmuyor.</string>
 
     <string name="add_payment_card_hint">Kartınızı güvenli ödeme sırasında kaydedebilirsiniz.</string>
 

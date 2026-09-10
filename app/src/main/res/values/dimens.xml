@@ -9,6 +9,7 @@
     <dimen name="spacing_large">32dp</dimen>
 
     <dimen name="spacing_extra_large">48dp</dimen>
+    <dimen name="wallet_empty_preview_height">56dp</dimen>
 
     <dimen name="spacing_double_extra_large">72dp</dimen>
 

@@ -110,11 +110,11 @@
 
     <string name="legal_clause_2_title">2. Gizlilik ve Veri Güvenliği</string>
 
-    <string name="legal_clause_2_desc">Kişisel verileriniz ve ödeme bilgileriniz uluslararası güvenlik standartlarında ve KVKK kapsamında korunmaktadır. Verileriniz, yalnızca rezervasyon süreçlerinin yürütülmesi amacıyla işlenir.</string>
+    <string name="legal_clause_2_desc">Kişisel verileriniz; hesap ve e-posta doğrulama, güvenlik, rezervasyon, mesajlaşma, bildirim ve ödeme süreçlerinin yürütülmesi amacıyla KVKK kapsamında işlenir. Ham kart bilgileriniz GuideMate sunucularında saklanmaz; kart işlemleri ödeme sağlayıcısının güvenli ekranında yürütülür.</string>
 
     <string name="legal_clause_3_title">3. İptal ve İade Koşulları</string>
 
-    <string name="legal_clause_3_desc">Tura 48 saat kalana kadar yapılan iptallerde platform üzerinden tam iade sağlanır. Daha geç yapılan iptallerde sistemin standart kesinti politikaları devreye girer.</string>
+    <string name="legal_clause_3_desc">Turist, tur başlangıcına en az 48 saat varken iptal ederse tam iade alır. Başlangıca 48 saatten az kala yapılan turist iptalinde iade uygulanmaz. Rehber kaynaklı iptalde ödemenin tamamı turiste iade edilir.</string>
 
     <string name="legal_clause_4_title">4. Fikri Mülkiyet Hakları</string>
 
@@ -130,11 +130,11 @@
 
     <string name="guide_legal_clause_2_title">2. Gizlilik ve Veri Güvenliği</string>
 
-    <string name="guide_legal_clause_2_desc">Kişisel verileriniz, banka hesap bilgileriniz ve turistlerle olan iletişiminiz uluslararası güvenlik standartlarında ve KVKK kapsamında korunmaktadır. Verileriniz, yalnızca operasyonel süreçlerin yürütülmesi amacıyla işlenir.</string>
+    <string name="guide_legal_clause_2_desc">Kişisel verileriniz, banka hesap bilgileriniz ve turistlerle iletişiminiz; hesap doğrulama, güvenlik, tur ve rezervasyon yönetimi, mesajlaşma, bildirim, ödeme ve para çekme süreçlerinin yürütülmesi amacıyla KVKK kapsamında işlenir.</string>
 
     <string name="guide_legal_clause_3_title">3. İptal Politikası ve Sorumluluklar</string>
 
-    <string name="guide_legal_clause_3_desc">Turistlerin, tura 48 saat kalana kadar ücretsiz iptal ve tam iade hakkı bulunmaktadır. Rehber tarafından yapılan mazeretsiz ve son dakika iptalleri, turist mağduriyetine yol açacağından; profil puanının düşürülmesine, hesabın askıya alınmasına veya platformdan tamamen ihraca neden olabilir.</string>
+    <string name="guide_legal_clause_3_desc">Turist, tur başlangıcına en az 48 saat varken iptal ederse tam iade alır; 48 saatten az kala yapılan turist iptalinde iade uygulanmaz. Rehber kaynaklı iptalde ödemenin tamamı turiste iade edilir.</string>
 
     <string name="guide_legal_clause_4_title">4. Ödemeler ve Komisyon</string>
 
@@ -154,7 +154,7 @@
 
     <string name="faq_2_title">Rezervasyonumu iptal edebilir miyim?</string>
 
-    <string name="faq_2_desc">Evet, tur başlangıç saatine 48 saat kalana kadar yaptığınız iptallerde tam iade alırsınız. Daha yakın saatlerdeki iptallerde sistemin standart kesinti politikaları devreye girer.</string>
+    <string name="faq_2_desc">Evet. Tur başlangıcına en az 48 saat varken iptal ederseniz tam iade alırsınız. Başlangıca 48 saatten az kala yaptığınız iptalde iade uygulanmaz. Rehber turu iptal ederse ödemenizin tamamı iade edilir.</string>
 
     <string name="faq_3_title">Rehberimle nasıl iletişime geçeceğim?</string>
 
@@ -170,7 +170,7 @@
 
     <string name="guide_faq_2_title">Bir turist rezervasyonunu iptal ederse ne olur?</string>
 
-    <string name="guide_faq_2_desc">Turistlerin tura 48 saat kalana kadar ücretsiz iptal hakkı vardır. Ancak 48 saatten daha az bir süre kala yapılan iptallerde, rehber olarak sizin mağduriyetinizi önlemek adına standart kesinti politikalarımız çerçevesinde hesabınıza belirli bir telafi ödemesi yansıtılır.</string>
+    <string name="guide_faq_2_desc">Turist, tur başlangıcına en az 48 saat varken iptal ederse tam iade alır. Başlangıca 48 saatten az kala yapılan turist iptalinde iade uygulanmaz. İptal ve hak ediş sonucu cüzdan hareketlerinize yansıtılır.</string>
 
     <string name="guide_faq_3_title">Turistlerimle nasıl iletişime geçeceğim?</string>
 
@@ -179,6 +179,8 @@
     <string name="guide_faq_4_title">Ödememi ne zaman ve nasıl alacağım?</string>
 
     <string name="guide_faq_4_desc">Tamamlanan turlardan doğan net hak edişleriniz, iptal ve iade kontrollerinin ardından kullanılabilir cüzdan bakiyenize yansıtılır. Cüzdan ekranından kayıtlı banka hesabınızı seçerek para çekme talebi oluşturabilir ve durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
+    <string name="profile_tours_load_error">Turlar yüklenemedi.</string>
+    <string name="profile_tours_load_error_with_reason">Turlar yüklenemedi. %1$s</string>
 
     <string name="contact_support_question">Sorunuzun yanıtını bulamadınız mı?</string>
 

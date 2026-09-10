@@ -37,7 +37,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.tour.presentation.components.PopularTourCard
 import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiModel
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.components.ProfileStatsRow
@@ -54,6 +56,7 @@ fun GuideProfileContent(
     onMessageClick: () -> Unit = {},
     onTourClick: (String) -> Unit = {},
     onSeeAllToursClick: (() -> Unit)? = null,
+    onRetryPopularTours: () -> Unit = {},
 ) {
     var isAboutExpanded by rememberSaveable { mutableStateOf(false) }
     var showGuideLevelInfoBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -83,12 +86,28 @@ fun GuideProfileContent(
         Spacer(modifier = Modifier.height(24.dp))
         LanguagesSection(languages = uiState.spokenLanguages)
         Spacer(modifier = Modifier.height(24.dp))
-        if (uiState.popularTours.isNotEmpty()) {
-            PopularToursSection(
-                popularTours = uiState.popularTours,
-                onTourClick = onTourClick,
-                onSeeAllToursClick = onSeeAllToursClick,
+        when (uiState.popularToursLoadState) {
+            ContentLoadState.CONTENT -> {
+                if (uiState.popularTours.isNotEmpty()) {
+                    PopularToursSection(
+                        popularTours = uiState.popularTours,
+                        onTourClick = onTourClick,
+                        onSeeAllToursClick = onSeeAllToursClick,
+                    )
+                }
+            }
+            ContentLoadState.LOADING,
+            ContentLoadState.ERROR,
+            -> PopularToursRequestState(
+                loadState = uiState.popularToursLoadState,
+                errorMessage = uiState.popularToursErrorMessage,
+                onRetry = onRetryPopularTours,
             )
+        }
+        if (
+            uiState.popularTours.isNotEmpty() ||
+                uiState.popularToursLoadState != ContentLoadState.CONTENT
+        ) {
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
         }
         MessageButtonSection(onClick = onMessageClick)
@@ -100,6 +119,26 @@ fun GuideProfileContent(
         currentLevel = uiState.guideLevel,
         viewerType = GuideLevelViewerType.VISITOR,
     )
+}
+
+@Composable
+private fun PopularToursRequestState(
+    loadState: ContentLoadState,
+    errorMessage: String?,
+    onRetry: () -> Unit,
+) {
+    Text(
+        text = stringResource(R.string.guide_tours),
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.fillMaxWidth().padding(start = dimensionResource(R.dimen.spacing_small)),
+    )
+    GuideMateContentState(
+        state = loadState,
+        onRetry = onRetry,
+        errorMessage = errorMessage ?: stringResource(R.string.profile_tours_load_error),
+        modifier = Modifier.fillMaxWidth().height(170.dp),
+    ) {}
 }
 
 @Composable

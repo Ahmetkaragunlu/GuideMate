@@ -32,7 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
+import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailReviewUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailTab
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiState
@@ -41,6 +43,9 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiS
 internal fun TourDetailTabContent(
     selectedTab: TourDetailTab,
     uiState: TourDetailUiState,
+    reviewsLoadState: ContentLoadState,
+    reviewsErrorMessage: String?,
+    onReviewsRetry: () -> Unit,
 ) {
     var isDetailsExpanded by rememberSaveable { mutableStateOf(false) }
     var isMeetingExpanded by rememberSaveable { mutableStateOf(false) }
@@ -60,6 +65,9 @@ internal fun TourDetailTabContent(
                 },
                 reviewsScrollState = reviewsScrollState,
                 reviews = uiState.reviews,
+                loadState = reviewsLoadState,
+                errorMessage = reviewsErrorMessage,
+                onRetry = onReviewsRetry,
             )
         }
 
@@ -89,33 +97,43 @@ private fun ReviewsSection(
     onExpandReview: (String) -> Unit,
     reviewsScrollState: ScrollState,
     reviews: List<TourDetailReviewUiModel>,
+    loadState: ContentLoadState,
+    errorMessage: String?,
+    onRetry: () -> Unit,
 ) {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(170.dp)
-                .verticalScroll(reviewsScrollState)
-                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+    GuideMateContentState(
+        state = loadState,
+        onRetry = onRetry,
+        errorMessage = errorMessage ?: stringResource(R.string.tour_reviews_load_error),
+        modifier = Modifier.fillMaxWidth().height(170.dp),
     ) {
-        if (reviews.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_reviews_yet),
-                style = MaterialTheme.typography.bodyMedium,
-                color = colorResource(R.color.text_color),
-                modifier = Modifier.align(Alignment.Center),
-            )
-        } else {
-            Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))) {
-                reviews.forEachIndexed { index, review ->
-                    key(review.id) {
-                        TourReviewItem(
-                            review = review,
-                            isExpanded = expandedReviewIds.contains(review.id),
-                            onExpand = { onExpandReview(review.id) },
-                        )
-                        if (index != reviews.lastIndex) {
-                            TourDetailSectionDivider()
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(170.dp)
+                    .verticalScroll(reviewsScrollState)
+                    .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        ) {
+            if (reviews.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.no_reviews_yet),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorResource(R.color.text_color),
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))) {
+                    reviews.forEachIndexed { index, review ->
+                        key(review.id) {
+                            TourReviewItem(
+                                review = review,
+                                isExpanded = expandedReviewIds.contains(review.id),
+                                onExpand = { onExpandReview(review.id) },
+                            )
+                            if (index != reviews.lastIndex) {
+                                TourDetailSectionDivider()
+                            }
                         }
                     }
                 }

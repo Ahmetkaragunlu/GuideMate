@@ -49,6 +49,7 @@ fun GuidePublicProfileScreen(
                 onMessageClick = { viewModel.startChat(guideId) },
                 onTourClick = onTourClick,
                 onSeeAllToursClick = onSeeAllToursClick,
+                onRetryPopularTours = viewModel::retryPopularTours,
             )
         }
         SnackbarHost(

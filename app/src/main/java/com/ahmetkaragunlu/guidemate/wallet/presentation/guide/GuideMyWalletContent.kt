@@ -29,6 +29,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
@@ -119,17 +120,26 @@ private fun EarningsSection(
 ) {
     WalletSection(
         titleResId = R.string.earnings_by_month,
-        height = 160.dp,
+        height =
+            if (items.isEmpty()) {
+                dimensionResource(R.dimen.wallet_empty_preview_height)
+            } else {
+                160.dp
+            },
         scrollState = scrollState,
         headerAction = {
             ViewAllAction(onClick = onViewAllClick)
         },
     ) {
-        items.forEachIndexed { index, earning ->
-            MonthlyEarningItem(
-                earning = earning,
-                showDivider = index < items.lastIndex,
-            )
+        if (items.isEmpty()) {
+            EmptyWalletSectionMessage(messageResId = R.string.guide_wallet_earnings_empty)
+        } else {
+            items.forEachIndexed { index, earning ->
+                MonthlyEarningItem(
+                    earning = earning,
+                    showDivider = index < items.lastIndex,
+                )
+            }
         }
     }
 }
@@ -142,16 +152,36 @@ private fun RecentFinancialTransactionsSection(
 ) {
     WalletSection(
         titleResId = R.string.recent_transactions,
-        height = 200.dp,
+        height =
+            if (items.isEmpty()) {
+                dimensionResource(R.dimen.wallet_empty_preview_height)
+            } else {
+                200.dp
+            },
         scrollState = scrollState,
         headerAction = {
             ViewAllAction(onClick = onViewAllClick)
         },
     ) {
-        items.forEach { transaction ->
-            WalletTransactionItem(transaction = transaction)
+        if (items.isEmpty()) {
+            EmptyWalletSectionMessage(messageResId = R.string.guide_wallet_transactions_empty)
+        } else {
+            items.forEach { transaction ->
+                WalletTransactionItem(transaction = transaction)
+            }
         }
     }
+}
+
+@Composable
+private fun EmptyWalletSectionMessage(messageResId: Int) {
+    Text(
+        text = stringResource(messageResId),
+        color = colorResource(R.color.text_color),
+        style = MaterialTheme.typography.bodyMedium,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth().padding(vertical = dimensionResource(R.dimen.spacing_small)),
+    )
 }
 
 @Composable

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditButton
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateTabRow
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailMode
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailTab
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiState
@@ -34,6 +35,9 @@ fun TourDetailContent(
     modifier: Modifier = Modifier,
     topContent: (@Composable () -> Unit)? = null,
     onGuideProfileClick: (() -> Unit)? = null,
+    reviewsLoadState: ContentLoadState = ContentLoadState.CONTENT,
+    reviewsErrorMessage: String? = null,
+    onReviewsRetry: () -> Unit = {},
     isPrimaryActionLoading: Boolean = false,
     isPrimaryActionEnabled: Boolean = true,
 ) {
@@ -68,6 +72,9 @@ fun TourDetailContent(
             TourDetailTabContent(
                 selectedTab = selectedTab,
                 uiState = uiState,
+                reviewsLoadState = reviewsLoadState,
+                reviewsErrorMessage = reviewsErrorMessage,
+                onReviewsRetry = onReviewsRetry,
             )
         }
 

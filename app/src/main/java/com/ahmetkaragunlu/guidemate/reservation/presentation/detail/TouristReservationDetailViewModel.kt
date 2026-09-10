@@ -46,6 +46,7 @@ class TouristReservationDetailViewModel
         private val _uiState = MutableStateFlow(TouristReservationDetailUiState())
         val uiState: StateFlow<TouristReservationDetailUiState> = _uiState.asStateFlow()
         private var loadJob: Job? = null
+        private var reviewsLoadJob: Job? = null
         private var submitJob: Job? = null
         private var currentReservation: TouristReservation? = null
 
@@ -55,6 +56,7 @@ class TouristReservationDetailViewModel
 
         fun refresh() {
             if (loadJob?.isActive == true) return
+            reviewsLoadJob?.cancel()
             loadJob =
                 viewModelScope.launch {
                     _uiState.value =
@@ -62,6 +64,7 @@ class TouristReservationDetailViewModel
                     when (val result = reservationRepository.getReservation(reservationId)) {
                         is DataResult.Success -> {
                             showReservation(result.data)
+                            refreshReviews(result.data)
                             notificationRepository.markRelatedRead(
                                 NotificationTargetReference(
                                     type = NotificationTargetType.RESERVATION,
@@ -186,30 +189,28 @@ class TouristReservationDetailViewModel
             }
         }
 
-        private suspend fun showReservation(
+        fun retryReviews() {
+            val reservation = currentReservation ?: return
+            if (reviewsLoadJob?.isActive == true) return
+            refreshReviews(reservation)
+        }
+
+        private fun refreshReviews(reservation: TouristReservation) {
+            reviewsLoadJob?.cancel()
+            reviewsLoadJob = viewModelScope.launch { loadReviews(reservation) }
+        }
+
+        private fun showReservation(
             reservation: TouristReservation,
             reviewForm: TourReviewFormUiState = _uiState.value.reviewForm,
         ) {
+            reviewsLoadJob?.cancel()
             currentReservation = reservation
-            val reviews =
-                when (
-                    val result =
-                        reviewRepository.getTourReviews(
-                            tourId = reservation.snapshot.tourId,
-                            page = 0,
-                            size = REVIEW_PREVIEW_SIZE,
-                        )
-                ) {
-                    is DataResult.Success -> result.data
-                    is DataResult.Error -> null
-                }
             _uiState.value =
                 TouristReservationDetailUiState(
                     loadState = ContentLoadState.CONTENT,
-                    detail =
-                        reservation.toTourDetailUiState(
-                            publicReviews = reviews?.items.orEmpty(),
-                        ),
+                    detail = reservation.toTourDetailUiState(),
+                    reviewsLoadState = ContentLoadState.LOADING,
                     reservationStatus = reservation.status,
                     canSubmitReview = reservation.canSubmitReview(),
                     reviewForm = reviewForm,
@@ -217,13 +218,49 @@ class TouristReservationDetailViewModel
                 )
         }
 
+        private suspend fun loadReviews(reservation: TouristReservation) {
+            _uiState.update {
+                it.copy(
+                    reviewsLoadState = ContentLoadState.LOADING,
+                    reviewsErrorMessage = null,
+                )
+            }
+            when (
+                val result =
+                    reviewRepository.getTourReviews(
+                        tourId = reservation.snapshot.tourId,
+                        page = 0,
+                        size = REVIEW_PREVIEW_SIZE,
+                    )
+            ) {
+                is DataResult.Success ->
+                    _uiState.update {
+                        it.copy(
+                            detail = reservation.toTourDetailUiState(result.data.items),
+                            reviewsLoadState = ContentLoadState.CONTENT,
+                            reviewsErrorMessage = null,
+                        )
+                    }
+                is DataResult.Error ->
+                    _uiState.update {
+                        it.copy(
+                            reviewsLoadState = ContentLoadState.ERROR,
+                            reviewsErrorMessage =
+                                resourceProvider.getString(
+                                    R.string.tour_reviews_load_error_with_reason,
+                                    result.error.toMessage(resourceProvider),
+                                ),
+                        )
+                    }
+            }
+        }
+
         private suspend fun refreshReservationAfterReview() {
             when (val result = reservationRepository.getReservation(reservationId)) {
-                is DataResult.Success ->
-                    showReservation(
-                        reservation = result.data,
-                        reviewForm = _uiState.value.reviewForm,
-                    )
+                is DataResult.Success -> {
+                    showReservation(result.data, _uiState.value.reviewForm)
+                    refreshReviews(result.data)
+                }
                 is DataResult.Error -> Unit
             }
         }

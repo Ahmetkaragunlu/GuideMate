@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.auth.presentation.signup
 
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.EmailPolicy
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.NumericPasswordPolicy
+import com.ahmetkaragunlu.guidemate.auth.domain.validation.PersonalNamePolicy
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
@@ -63,6 +64,7 @@ class SignUpViewModelTest {
         SignUpViewModel(
             authRepository = repository,
             emailPolicy = EmailPolicy(),
+            namePolicy = PersonalNamePolicy(),
             passwordPolicy = NumericPasswordPolicy(),
             resourceProvider = FakeResourceProvider(),
         )

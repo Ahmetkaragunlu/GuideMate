@@ -50,11 +50,25 @@ fun PaymentStatusScreen(
         PaymentStatusContent(
             payment = payment,
             statusMessage = uiState.statusMessage,
-            onPrimaryAction = onExitPayment,
+            onPrimaryAction = {
+                handlePaymentStatusPrimaryAction(
+                    status = payment?.status,
+                    onRetry = viewModel::refresh,
+                    onExit = onExitPayment,
+                )
+            },
             onSecondaryAction = onExitPayment,
             modifier = modifier,
         )
     }
+}
+
+internal fun handlePaymentStatusPrimaryAction(
+    status: PaymentUiStatus?,
+    onRetry: () -> Unit,
+    onExit: () -> Unit,
+) {
+    if (status == PaymentUiStatus.TIMEOUT) onRetry() else onExit()
 }
 
 @Composable
