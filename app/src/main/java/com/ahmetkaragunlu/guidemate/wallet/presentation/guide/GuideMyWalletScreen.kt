@@ -28,6 +28,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.components.EditAlertDialog
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyInput
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
+import com.ahmetkaragunlu.guidemate.common.ui.lifecycle.RefreshOnResumeAfterInitialLoad
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings.model.MonthlyEarningUiModel
 
@@ -49,7 +50,7 @@ fun GuideMyWalletScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val actionErrorMessage = uiState.actionErrorMessage
 
-    LaunchedEffect(Unit) { viewModel.refresh() }
+    RefreshOnResumeAfterInitialLoad(viewModel::refresh)
 
     GuideMateContentState(
         state = uiState.loadState,

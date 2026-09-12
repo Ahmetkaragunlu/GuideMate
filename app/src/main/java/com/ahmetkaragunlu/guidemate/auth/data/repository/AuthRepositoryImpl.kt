@@ -83,9 +83,13 @@ class AuthRepositoryImpl @Inject constructor(
         val accessToken = tokenManager.getAccessToken()
         val refreshToken = tokenManager.getRefreshToken()
         val installationId =
-            runCatching {
+            try {
                 installationIdDataSource.getOrCreate()
-            }.getOrNull()
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                null
+            }
         authSessionManager.clearSession()
         credentialSessionManager.clear()
 

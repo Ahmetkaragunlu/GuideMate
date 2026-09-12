@@ -121,6 +121,26 @@ class PaymentStatusViewModelTest {
             assertEquals(PaymentUiStatus.TIMEOUT, viewModel.uiState.value.payment?.status)
         }
 
+    @Test
+    fun `local polling timeout keeps pending payment and retry uses same id`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val repository = FakePaymentRepository(payment(status = PaymentStatus.VERIFYING))
+            val viewModel = createViewModel(repository)
+
+            advanceUntilIdle()
+
+            assertEquals(PaymentUiStatus.TIMEOUT, viewModel.uiState.value.payment?.status)
+            assertTrue(repository.clearedPaymentIds.isEmpty())
+            val firstAttemptCount = repository.requestedPaymentIds.size
+
+            viewModel.refresh()
+            advanceUntilIdle()
+
+            assertTrue(repository.requestedPaymentIds.size > firstAttemptCount)
+            assertTrue(repository.requestedPaymentIds.all { it == "payment-1" })
+            assertTrue(repository.clearedPaymentIds.isEmpty())
+        }
+
     private fun createViewModel(
         repository: PaymentRepository,
         openHostedIfRequired: Boolean = false,

@@ -15,6 +15,8 @@ import java.time.Instant
 class FakeTourDiscoveryRepository : TourDiscoveryRepository {
     val searchResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
     val searchRequests = mutableListOf<SearchRequest>()
+    var searchHandler: (suspend (TourSearchQuery, Int, Int) -> DataResult<PagedResult<TourSearchItem>>)? =
+        null
     var popularForGuideResult: DataResult<PagedResult<TourSearchItem>> =
         DataResult.Success(tourSearchPage(page = 0, isLast = true))
     val popularForGuideResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
@@ -30,7 +32,7 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
         size: Int,
     ): DataResult<PagedResult<TourSearchItem>> {
         searchRequests += SearchRequest(query, page, size)
-        return searchResults.removeFirst()
+        return searchHandler?.invoke(query, page, size) ?: searchResults.removeFirst()
     }
 
     override suspend fun getPopularTours(

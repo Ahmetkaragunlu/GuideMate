@@ -3,7 +3,9 @@ package com.ahmetkaragunlu.guidemate.discovery.presentation.tourist
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.location.model.CountryOption
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
+import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.review.domain.model.ReviewSubmissionInput
 import com.ahmetkaragunlu.guidemate.review.domain.model.SubmittedReview
 import com.ahmetkaragunlu.guidemate.review.domain.repository.ReviewRepository
@@ -13,12 +15,15 @@ import com.ahmetkaragunlu.guidemate.testing.testTourSearchItem
 import com.ahmetkaragunlu.guidemate.testing.tourSearchPage
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReview
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -148,6 +153,148 @@ class TouristExploreViewModelTest {
             assertEquals(null, clearedRequest.query.countryCode)
             assertEquals(null, clearedRequest.query.categoryCode)
             assertEquals(0, clearedRequest.page)
+        }
+
+    @Test
+    fun newSearchClearsOldResultsAndIgnoresDelayedPreviousResponse() =
+        runTest {
+            val oldRequestStarted = CompletableDeferred<Unit>()
+            val releaseOldRequest = CompletableDeferred<Unit>()
+            val repository =
+                FakeTourDiscoveryRepository().apply {
+                    searchHandler = { query, _, _ ->
+                        when (query.text) {
+                            "old" -> {
+                                oldRequestStarted.complete(Unit)
+                                withContext(NonCancellable) { releaseOldRequest.await() }
+                                DataResult.Success(
+                                    tourSearchPage(
+                                        page = 0,
+                                        isLast = true,
+                                        testTourSearchItem("old-tour", "old-session"),
+                                    )
+                                )
+                            }
+                            "new" ->
+                                DataResult.Success(
+                                    tourSearchPage(
+                                        page = 0,
+                                        isLast = true,
+                                        testTourSearchItem("new-tour", "new-session"),
+                                    )
+                                )
+                            else -> DataResult.Success(tourSearchPage(page = 0, isLast = true))
+                        }
+                    }
+                }
+            val viewModel =
+                TouristExploreViewModel(
+                    tourRepository = repository,
+                    profileRepository = FakeGuideProfileRepository(),
+                    reviewRepository = FakeReviewRepository(),
+                )
+
+            viewModel.updateToursSearchQuery("old")
+            advanceTimeBy(351)
+            runCurrent()
+            oldRequestStarted.await()
+
+            viewModel.updateToursSearchQuery("new")
+            advanceTimeBy(351)
+            runCurrent()
+
+            assertEquals(
+                listOf("new-session"),
+                viewModel.uiState.value.tours.results.map { it.sessionId },
+            )
+
+            releaseOldRequest.complete(Unit)
+            runCurrent()
+
+            assertEquals(
+                listOf("new-session"),
+                viewModel.uiState.value.tours.results.map { it.sessionId },
+            )
+        }
+
+    @Test
+    fun failedNewSearchShowsErrorInsteadOfPreviousResults() =
+        runTest {
+            val repository =
+                FakeTourDiscoveryRepository().apply {
+                    searchResults +=
+                        DataResult.Success(
+                            tourSearchPage(
+                                page = 0,
+                                isLast = true,
+                                testTourSearchItem("tour-1", "session-1"),
+                            )
+                        )
+                    searchResults += DataResult.Error(AppError.NoInternet)
+                    searchResults +=
+                        DataResult.Success(
+                            tourSearchPage(
+                                page = 0,
+                                isLast = true,
+                                testTourSearchItem("tour-2", "session-2"),
+                            )
+                        )
+                }
+            val viewModel =
+                TouristExploreViewModel(
+                    tourRepository = repository,
+                    profileRepository = FakeGuideProfileRepository(),
+                    reviewRepository = FakeReviewRepository(),
+                )
+            advanceTimeBy(351)
+            runCurrent()
+            assertEquals(1, viewModel.uiState.value.tours.results.size)
+
+            viewModel.updateToursSearchQuery("offline")
+            advanceTimeBy(351)
+            runCurrent()
+
+            assertTrue(viewModel.uiState.value.tours.results.isEmpty())
+            assertEquals(ContentLoadState.ERROR, viewModel.uiState.value.tours.loadState)
+
+            viewModel.refreshTours()
+            runCurrent()
+
+            assertEquals("offline", repository.searchRequests.last().query.text)
+            assertEquals("session-2", viewModel.uiState.value.tours.results.single().sessionId)
+        }
+
+    @Test
+    fun loadMoreFailureKeepsPreviouslyLoadedResults() =
+        runTest {
+            val repository =
+                FakeTourDiscoveryRepository().apply {
+                    searchResults +=
+                        DataResult.Success(
+                            tourSearchPage(
+                                page = 0,
+                                isLast = false,
+                                testTourSearchItem("tour-1", "session-1"),
+                            )
+                        )
+                    searchResults += DataResult.Error(AppError.NoInternet)
+                }
+            val viewModel =
+                TouristExploreViewModel(
+                    tourRepository = repository,
+                    profileRepository = FakeGuideProfileRepository(),
+                    reviewRepository = FakeReviewRepository(),
+                )
+            advanceTimeBy(351)
+            runCurrent()
+
+            viewModel.loadMoreTours()
+            runCurrent()
+
+            assertEquals(listOf("session-1"), viewModel.uiState.value.tours.results.map { it.sessionId })
+            assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.tours.loadState)
+            assertTrue(viewModel.uiState.value.tours.appendFailed)
+            assertTrue(viewModel.uiState.value.tours.canLoadMore)
         }
 
     private fun createViewModel(): TouristExploreViewModel =

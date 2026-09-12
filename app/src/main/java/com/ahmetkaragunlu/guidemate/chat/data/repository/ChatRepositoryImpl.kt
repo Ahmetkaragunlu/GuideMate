@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -60,48 +61,62 @@ constructor(
         ConcurrentHashMap<String, MutableStateFlow<ChatMessageHistory>>()
     private var reconnectAttempt = 0
     private var reconnectJob: Job? = null
+    private var realtimeEventsJob: Job? = null
+    @Volatile private var sessionGeneration = 0L
 
     init {
-        observeRealtimeEvents()
         observeAuthenticatedUser()
     }
 
     override fun observeMessages(chatId: String): Flow<ChatMessageHistory> =
         messageHistory(chatId).asStateFlow()
 
-    override suspend fun refreshConversations(): DataResult<List<ChatConversation>> =
-        apiCallExecutor.execute(
+    override suspend fun refreshConversations(): DataResult<List<ChatConversation>> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = api::getConversations,
             transform = { responses ->
                 responses.map { it.toDomain() }.sortedByDescending(ChatConversation::lastActivityAt)
             },
         ).also { result ->
-            if (result is DataResult.Success) mutableConversations.value = result.data
+            if (result is DataResult.Success && session.isCurrent()) {
+                mutableConversations.value = result.data
+            }
         }
+    }
 
-    override suspend fun refreshUnreadCount(): DataResult<Int> =
-        apiCallExecutor.execute(
+    override suspend fun refreshUnreadCount(): DataResult<Int> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = api::getUnreadCount,
             transform = { it.unreadCount.toSafeInt() },
         ).also { result ->
-            if (result is DataResult.Success) mutableTotalUnreadCount.value = result.data
+            if (result is DataResult.Success && session.isCurrent()) {
+                mutableTotalUnreadCount.value = result.data
+            }
         }
+    }
 
-    override suspend fun loadInitialMessages(chatId: String): DataResult<ChatMessageHistory> =
-        apiCallExecutor.execute(
+    override suspend fun loadInitialMessages(chatId: String): DataResult<ChatMessageHistory> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = { api.getMessages(chatId = chatId, size = MESSAGE_PAGE_SIZE) },
             transform = { it.toDomain() },
         ).also { result ->
-            if (result is DataResult.Success) {
+            if (result is DataResult.Success && session.isCurrent()) {
                 messageHistory(chatId).update { current ->
                     result.data.copy(
                         messages = mergeMessages(current.messages, result.data.messages),
                     )
                 }
             }
-        }.mapSuccess { messageHistory(chatId).value }
+        }.mapSuccess { loaded ->
+            if (session.isCurrent()) messageHistory(chatId).value else loaded
+        }
+    }
 
     override suspend fun loadOlderMessages(chatId: String): DataResult<ChatMessageHistory> {
+        val session = currentSession()
         val current = messageHistory(chatId).value
         if (!current.hasMore || current.nextCursor == null) return DataResult.Success(current)
 
@@ -115,14 +130,16 @@ constructor(
             },
             transform = { it.toDomain() },
         ).also { result ->
-            if (result is DataResult.Success) {
+            if (result is DataResult.Success && session.isCurrent()) {
                 messageHistory(chatId).update { latest ->
                     result.data.copy(
                         messages = mergeMessages(result.data.messages, latest.messages),
                     )
                 }
             }
-        }.mapSuccess { messageHistory(chatId).value }
+        }.mapSuccess { loaded ->
+            if (session.isCurrent()) messageHistory(chatId).value else loaded
+        }
     }
 
     override suspend fun sendMessage(
@@ -134,6 +151,7 @@ constructor(
         val body = text.trim()
         if (body.isEmpty()) return DataResult.Error(AppError.GenericFailure)
         val clientMessageId = UUID.randomUUID().toString()
+        val session = currentSession()
         val pendingMessage =
             ChatMessage(
                 messageId = clientMessageId,
@@ -144,8 +162,8 @@ constructor(
                 sentAt = Instant.now(),
                 deliveryStatus = ChatMessageDeliveryStatus.PENDING,
             )
-        upsertMessage(pendingMessage)
-        return sendPendingMessage(pendingMessage)
+        upsertMessage(pendingMessage, session)
+        return sendPendingMessage(pendingMessage, session)
     }
 
     override suspend fun retryMessage(
@@ -158,16 +176,18 @@ constructor(
                     it.deliveryStatus == ChatMessageDeliveryStatus.FAILED
             } ?: return DataResult.Error(AppError.GenericFailure)
         val pending = message.copy(deliveryStatus = ChatMessageDeliveryStatus.PENDING)
-        upsertMessage(pending)
-        return sendPendingMessage(pending)
+        val session = currentSession()
+        upsertMessage(pending, session)
+        return sendPendingMessage(pending, session)
     }
 
-    override suspend fun markRead(chatId: String): DataResult<Int> =
-        apiCallExecutor.execute(
+    override suspend fun markRead(chatId: String): DataResult<Int> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = { api.markRead(chatId) },
             transform = { it.unreadCount.toSafeInt() },
         ).also { result ->
-            if (result is DataResult.Success) {
+            if (result is DataResult.Success && session.isCurrent()) {
                 mutableTotalUnreadCount.value = result.data
                 mutableConversations.update { conversations ->
                     conversations.map { conversation ->
@@ -180,9 +200,11 @@ constructor(
                 }
             }
         }
+    }
 
-    override suspend fun clearConversation(chatId: String): DataResult<Int> =
-        apiCallExecutor.execute(
+    override suspend fun clearConversation(chatId: String): DataResult<Int> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = {
                 api.clearConversation(
                     chatId = chatId,
@@ -191,7 +213,7 @@ constructor(
             },
             transform = { it.unreadCount.toSafeInt() },
         ).also { result ->
-            if (result is DataResult.Success) {
+            if (result is DataResult.Success && session.isCurrent()) {
                 mutableTotalUnreadCount.value = result.data
                 mutableConversations.update { conversations ->
                     conversations.filterNot { conversation -> conversation.chatId == chatId }
@@ -199,21 +221,27 @@ constructor(
                 messageHistories.remove(chatId)
             }
         }
+    }
 
-    override suspend fun findOrCreate(remoteUserId: Long): DataResult<ChatConversation> =
-        apiCallExecutor.execute(
+    override suspend fun findOrCreate(remoteUserId: Long): DataResult<ChatConversation> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = { api.findOrCreate(remoteUserId) },
             transform = { it.toDomain() },
         ).also { result ->
-            if (result is DataResult.Success) {
+            if (result is DataResult.Success && session.isCurrent()) {
                 mutableConversations.update { conversations ->
                     (conversations.filterNot { it.chatId == result.data.chatId } + result.data)
                         .sortedByDescending(ChatConversation::lastActivityAt)
                 }
             }
         }
+    }
 
-    private suspend fun sendPendingMessage(message: ChatMessage): DataResult<ChatMessage> {
+    private suspend fun sendPendingMessage(
+        message: ChatMessage,
+        session: SessionSnapshot,
+    ): DataResult<ChatMessage> {
         val result =
             apiCallExecutor.execute(
                 request = {
@@ -230,34 +258,38 @@ constructor(
             )
         when (result) {
             is DataResult.Success -> {
-                upsertMessage(result.data)
-                refreshConversations()
-                refreshUnreadCount()
+                if (session.isCurrent()) {
+                    upsertMessage(result.data, session)
+                    refreshConversations()
+                    refreshUnreadCount()
+                }
             }
-            is DataResult.Error -> markMessageFailed(message)
+            is DataResult.Error -> if (session.isCurrent()) markMessageFailed(message)
         }
         return result
     }
 
-    private fun observeRealtimeEvents() {
-        applicationScope.launch {
-            realtimeClient.events.collect { event ->
+    private fun observeRealtimeEvents(session: SessionSnapshot) {
+        realtimeEventsJob =
+            applicationScope.launch {
+                realtimeClient.events.collectLatest { event ->
+                    if (!session.isCurrent()) return@collectLatest
                 when (event) {
                     ChatRealtimeEvent.Connected -> {
                         reconnectAttempt = 0
                         reconnectJob?.cancel()
-                        resyncCanonicalState()
+                        resyncCanonicalState(session)
                     }
-                    ChatRealtimeEvent.Disconnected -> scheduleReconnect()
+                    ChatRealtimeEvent.Disconnected -> scheduleReconnect(session)
                     is ChatRealtimeEvent.MessageReceived -> {
                         val message = event.message.toDomain()
-                        messageHistories[message.chatId]?.let { upsertMessage(message) }
+                        messageHistories[message.chatId]?.let { upsertMessage(message, session) }
                         refreshConversations()
                         refreshUnreadCount()
                     }
                     is ChatRealtimeEvent.ParticipantProfileUpdated -> {
                         val participant = event.participant
-                        mutableConversations.update { conversations ->
+                        if (session.isCurrent()) mutableConversations.update { conversations ->
                             conversations.map { conversation ->
                                 conversation.copy(
                                     guide =
@@ -282,39 +314,52 @@ constructor(
 
     private fun observeAuthenticatedUser() {
         applicationScope.launch {
+            var isInitialState = true
             userRepository.userState
                 .map { it.userId }
                 .distinctUntilChanged()
-                .collect { userId ->
-                    reconnectJob?.cancel()
-                    clearCachedState()
-                    if (userId == null) {
-                        realtimeClient.disconnect()
+                .collectLatest { userId ->
+                    if (isInitialState) {
+                        isInitialState = false
                     } else {
+                        sessionGeneration++
+                    }
+                    reconnectJob?.cancel()
+                    realtimeEventsJob?.cancel()
+                    realtimeClient.disconnect()
+                    reconnectAttempt = 0
+                    clearCachedState()
+                    if (userId != null) {
+                        val session = currentSession()
+                        observeRealtimeEvents(session)
                         refreshConversations()
                         refreshUnreadCount()
-                        realtimeClient.connect()
+                        if (session.isCurrent()) realtimeClient.connect()
                     }
                 }
         }
     }
 
-    private suspend fun resyncCanonicalState() {
+    private suspend fun resyncCanonicalState(session: SessionSnapshot) {
+        if (!session.isCurrent()) return
         refreshConversations()
         refreshUnreadCount()
-        messageHistories.keys.toList().forEach { chatId -> loadInitialMessages(chatId) }
+        if (session.isCurrent()) {
+            messageHistories.keys.toList().forEach { chatId -> loadInitialMessages(chatId) }
+        }
     }
 
-    private fun scheduleReconnect() {
-        if (userRepository.userState.value.userId == null || reconnectJob?.isActive == true) return
+    private fun scheduleReconnect(session: SessionSnapshot) {
+        if (!session.isCurrent() || reconnectJob?.isActive == true) return
         reconnectJob =
             applicationScope.launch {
                 val delaySeconds = min(1L shl reconnectAttempt.coerceAtMost(5), MAX_RECONNECT_DELAY_SECONDS)
                 reconnectAttempt++
                 delay(delaySeconds * 1_000)
+                if (!session.isCurrent()) return@launch
                 refreshConversations()
                 refreshUnreadCount()
-                realtimeClient.connect()
+                if (session.isCurrent()) realtimeClient.connect()
             }
     }
 
@@ -328,7 +373,11 @@ constructor(
     private fun messageHistory(chatId: String): MutableStateFlow<ChatMessageHistory> =
         messageHistories.getOrPut(chatId) { MutableStateFlow(ChatMessageHistory()) }
 
-    private fun upsertMessage(message: ChatMessage) {
+    private fun upsertMessage(
+        message: ChatMessage,
+        session: SessionSnapshot,
+    ) {
+        if (!session.isCurrent()) return
         messageHistory(message.chatId).update { history ->
             history.copy(messages = mergeMessages(history.messages, listOf(message)))
         }
@@ -361,7 +410,22 @@ constructor(
             compareBy(ChatMessage::sentAt, ChatMessage::messageId),
         )
     }
+
+    private fun currentSession(): SessionSnapshot =
+        SessionSnapshot(
+            userId = userRepository.userState.value.userId,
+            generation = sessionGeneration,
+        )
+
+    private fun SessionSnapshot.isCurrent(): Boolean =
+        generation == sessionGeneration && userId == userRepository.userState.value.userId
+
     private fun Long.toSafeInt(): Int = coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
+
+    private data class SessionSnapshot(
+        val userId: Long?,
+        val generation: Long,
+    )
 }
 
 private fun ChatParticipant.withUpdatedAvatar(

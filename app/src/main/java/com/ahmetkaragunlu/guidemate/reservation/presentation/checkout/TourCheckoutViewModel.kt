@@ -10,9 +10,9 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.TouristPaymentDestination
-import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrencies
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
+import com.ahmetkaragunlu.guidemate.payment.presentation.currency.preferredChargeCurrencyCode
 import com.ahmetkaragunlu.guidemate.payment.presentation.locale.currentCheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentLaunch
 import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.checkoutErrorResId
@@ -24,8 +24,6 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.detail.mapper.toTourDetail
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
-import java.util.Currency
-import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -120,7 +118,7 @@ class TourCheckoutViewModel
                                         currencies.data.chargeCurrencies.any {
                                             it.currencyCode == code
                                         }
-                                    } ?: currencies.data.preferredCurrencyCode(),
+                                    } ?: currencies.data.preferredChargeCurrencyCode(),
                         )
                     }
                 }
@@ -328,14 +326,6 @@ class TourCheckoutViewModel
                     paymentActionError = error.error.toMessage(resourceProvider),
                 )
             }
-        }
-
-        private fun CheckoutCurrencies.preferredCurrencyCode(): String? {
-            val deviceCurrencyCode =
-                runCatching { Currency.getInstance(Locale.getDefault()).currencyCode }.getOrNull()
-            return chargeCurrencies.firstOrNull { it.currencyCode == deviceCurrencyCode }?.currencyCode
-                ?: chargeCurrencies.firstOrNull { it.currencyCode == baseCurrencyCode }?.currencyCode
-                ?: chargeCurrencies.firstOrNull()?.currencyCode
         }
 
         private companion object {

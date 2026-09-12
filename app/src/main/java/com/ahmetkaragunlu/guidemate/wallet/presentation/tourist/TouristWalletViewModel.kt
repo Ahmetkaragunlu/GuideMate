@@ -8,10 +8,10 @@ import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.isValidCurrencyInput
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrencies
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.SavedPaymentMethodRepository
+import com.ahmetkaragunlu.guidemate.payment.presentation.currency.preferredChargeCurrencyCode
 import com.ahmetkaragunlu.guidemate.payment.presentation.locale.currentCheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.presentation.mapper.toUiModel
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentLaunch
@@ -20,8 +20,6 @@ import com.ahmetkaragunlu.guidemate.wallet.presentation.mapper.toTouristUiModel
 import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.model.TouristWalletUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
-import java.util.Currency
-import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -99,7 +97,7 @@ class TouristWalletViewModel
                                     currencies.data.chargeCurrencies.any {
                                         it.currencyCode == code
                                     }
-                                } ?: currencies.data.preferredCurrencyCode(),
+                                } ?: currencies.data.preferredChargeCurrencyCode(),
                     )
                 }
                 refreshCards()
@@ -251,14 +249,6 @@ class TouristWalletViewModel
 
         private fun showLoadError() {
             mutableUiState.update { it.copy(loadState = ContentLoadState.ERROR) }
-        }
-
-        private fun CheckoutCurrencies.preferredCurrencyCode(): String? {
-            val deviceCurrencyCode =
-                runCatching { Currency.getInstance(Locale.getDefault()).currencyCode }.getOrNull()
-            return chargeCurrencies.firstOrNull { it.currencyCode == deviceCurrencyCode }?.currencyCode
-                ?: chargeCurrencies.firstOrNull { it.currencyCode == baseCurrencyCode }?.currencyCode
-                ?: chargeCurrencies.firstOrNull()?.currencyCode
         }
 
         private companion object {

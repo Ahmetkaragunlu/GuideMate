@@ -4,7 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
+import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.TouristDestination
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
@@ -23,6 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -33,11 +37,14 @@ class TouristTourDetailViewModel
         private val tourRepository: TourDiscoveryRepository,
         private val reviewRepository: ReviewRepository,
         private val notificationRepository: NotificationRepository,
+        private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val sessionId = savedStateHandle.toRoute<TouristDestination.TourDetail>().sessionId
         private val _uiState = MutableStateFlow(TouristTourDetailScreenState())
         val uiState: StateFlow<TouristTourDetailScreenState> = _uiState.asStateFlow()
         private var loadJob: Job? = null
+        private var reviewsJob: Job? = null
+        private var loadedTour: TourWithSession? = null
 
         init {
             refresh()
@@ -56,31 +63,35 @@ class TouristTourDetailViewModel
 
         fun refresh() {
             if (loadJob?.isActive == true) return
+            reviewsJob?.cancel()
             loadJob =
                 viewModelScope.launch {
                     _uiState.value = TouristTourDetailScreenState(loadState = ContentLoadState.LOADING)
                     when (val result = tourRepository.getSession(sessionId)) {
                         is DataResult.Success -> {
-                            val tourWithReviews = result.data.withPublicReviews()
+                            loadedTour = result.data
                             val now = Instant.now()
                             _uiState.value =
                                 TouristTourDetailScreenState(
                                     loadState = ContentLoadState.CONTENT,
-                                    detail = tourWithReviews.toTourDetailUiState(),
+                                    detail = result.data.toTourDetailUiState(),
                                     bookingAvailability =
-                                        tourWithReviews.resolveBookingAvailability(
+                                        result.data.resolveBookingAvailability(
                                             hasReservation = false,
                                             now = now,
                                         ),
+                                    reviewsLoadState = ContentLoadState.LOADING,
                                 )
                             notificationRepository.markRelatedRead(
                                 NotificationTargetReference(
                                     type = NotificationTargetType.TOUR,
-                                    targetId = tourWithReviews.tour.id,
+                                    targetId = result.data.tour.id,
                                 ),
                             )
+                            loadReviews(result.data)
                         }
                         is DataResult.Error -> {
+                            loadedTour = null
                             _uiState.value =
                                 TouristTourDetailScreenState(loadState = ContentLoadState.ERROR)
                         }
@@ -88,18 +99,53 @@ class TouristTourDetailViewModel
                 }
         }
 
-        private suspend fun TourWithSession.withPublicReviews(): TourWithSession =
-            when (
-                val result =
-                    reviewRepository.getTourReviews(
-                        tourId = tour.id,
-                        page = 0,
-                        size = REVIEW_PREVIEW_SIZE,
-                    )
-            ) {
-                is DataResult.Success -> copy(tour = tour.copy(recentReviews = result.data.items))
-                is DataResult.Error -> this
-            }
+        fun retryReviews() {
+            loadedTour?.let(::loadReviews)
+        }
+
+        private fun loadReviews(tour: TourWithSession) {
+            reviewsJob?.cancel()
+            reviewsJob =
+                viewModelScope.launch {
+                    _uiState.update {
+                        it.copy(
+                            reviewsLoadState = ContentLoadState.LOADING,
+                            reviewsErrorMessage = null,
+                        )
+                    }
+                    when (
+                        val result =
+                            reviewRepository.getTourReviews(
+                                tourId = tour.tour.id,
+                                page = 0,
+                                size = REVIEW_PREVIEW_SIZE,
+                            )
+                    ) {
+                        is DataResult.Success -> {
+                            val tourWithReviews =
+                                tour.copy(tour = tour.tour.copy(recentReviews = result.data.items))
+                            _uiState.update {
+                                it.copy(
+                                    detail = tourWithReviews.toTourDetailUiState(),
+                                    reviewsLoadState = ContentLoadState.CONTENT,
+                                    reviewsErrorMessage = null,
+                                )
+                            }
+                        }
+                        is DataResult.Error ->
+                            _uiState.update {
+                                it.copy(
+                                    reviewsLoadState = ContentLoadState.ERROR,
+                                    reviewsErrorMessage =
+                                        resourceProvider.getString(
+                                            R.string.tour_reviews_load_error_with_reason,
+                                            result.error.toMessage(resourceProvider),
+                                        ),
+                                )
+                            }
+                    }
+                }
+        }
 
         private companion object {
             const val REVIEW_PREVIEW_SIZE = 20

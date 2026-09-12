@@ -14,6 +14,7 @@ import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.toStatusUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.math.min
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,7 @@ class HostedPaymentViewModel
         private var pollingJob: Job? = null
         private var minimumVerificationJob: Job? = null
         private var minimumVerificationDurationElapsed = false
-        private var canonicalStatusResolved = false
+        private var backendPollingFinished = false
 
         init {
             loadPaymentPage()
@@ -93,7 +94,6 @@ class HostedPaymentViewModel
             if (!uiState.value.isVerifyingCallback) {
                 mutableUiState.update { it.copy(isPageLoading = false, pageErrorMessage = null) }
             }
-            startPolling()
         }
 
         fun onPageError(message: String) {
@@ -137,28 +137,40 @@ class HostedPaymentViewModel
             if (pollingJob?.isActive == true) return
             pollingJob =
                 viewModelScope.launch {
-                    while (true) {
-                        delay(POLL_INTERVAL_MILLIS)
+                    var elapsedMillis = 0L
+                    var nextDelayMillis = INITIAL_POLL_INTERVAL_MILLIS
+                    while (elapsedMillis < MAX_POLLING_DURATION_MILLIS) {
+                        val delayMillis =
+                            min(
+                                nextDelayMillis,
+                                MAX_POLLING_DURATION_MILLIS - elapsedMillis,
+                            )
+                        delay(delayMillis)
+                        elapsedMillis += delayMillis
                         when (val result = paymentRepository.getPayment(paymentId)) {
                             is DataResult.Success ->
                                 if (result.data.status != PaymentStatus.REQUIRES_ACTION) {
                                     if (!uiState.value.isVerifyingCallback) {
                                         beginCallbackVerification()
                                     }
-                                    canonicalStatusResolved = true
+                                    backendPollingFinished = true
                                     completeCallbackVerificationIfReady()
                                     return@launch
                                 }
                             is DataResult.Error -> Unit
                         }
+                        nextDelayMillis =
+                            (nextDelayMillis * 2).coerceAtMost(MAX_POLL_INTERVAL_MILLIS)
                     }
+                    backendPollingFinished = true
+                    completeCallbackVerificationIfReady()
                 }
         }
 
         private fun beginCallbackVerification() {
             if (uiState.value.isVerifyingCallback) return
             minimumVerificationDurationElapsed = false
-            canonicalStatusResolved = false
+            backendPollingFinished = false
             mutableUiState.update {
                 it.copy(
                     isPageLoading = false,
@@ -177,13 +189,15 @@ class HostedPaymentViewModel
         }
 
         private fun completeCallbackVerificationIfReady() {
-            if (minimumVerificationDurationElapsed && canonicalStatusResolved) {
+            if (minimumVerificationDurationElapsed && backendPollingFinished) {
                 mutableUiState.update { it.copy(shouldVerifyPayment = true) }
             }
         }
 
         private companion object {
-            const val POLL_INTERVAL_MILLIS = 2_000L
+            const val INITIAL_POLL_INTERVAL_MILLIS = 2_000L
+            const val MAX_POLL_INTERVAL_MILLIS = 8_000L
+            const val MAX_POLLING_DURATION_MILLIS = 30_000L
             const val MINIMUM_VERIFICATION_DURATION_MILLIS = 3_000L
         }
     }

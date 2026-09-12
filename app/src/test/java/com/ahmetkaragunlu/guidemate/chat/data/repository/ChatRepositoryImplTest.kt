@@ -18,10 +18,12 @@ import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -232,6 +234,41 @@ class ChatRepositoryImplTest {
         )
     }
 
+    @Test
+    fun `delayed old account response cannot overwrite the new account cache`() = runTest {
+        val api = FakeChatApi().apply {
+            conversationResponses = listOf(conversation("https://example.com/old-user.jpg"))
+        }
+        val userRepository = FakeUserRepository().apply {
+            state.value = UserState(userId = 1, email = "old@example.com")
+        }
+        val repository = createRepository(api, userRepository, backgroundScope)
+        runCurrent()
+
+        api.blockNextConversationRequest = true
+        api.conversationRequestStarted = CompletableDeferred()
+        api.conversationResponseGate = CompletableDeferred()
+        val oldRefresh = async { repository.refreshConversations() }
+        api.conversationRequestStarted?.await()
+
+        api.conversationResponses = listOf(api.conversation("https://example.com/new-user.jpg"))
+        userRepository.state.value = UserState(userId = 2, email = "new@example.com")
+        runCurrent()
+
+        assertEquals(
+            "https://example.com/new-user.jpg",
+            repository.conversations.value.single().guide.avatarUrl,
+        )
+
+        api.conversationResponseGate?.complete(Unit)
+        oldRefresh.await()
+
+        assertEquals(
+            "https://example.com/new-user.jpg",
+            repository.conversations.value.single().guide.avatarUrl,
+        )
+    }
+
     private fun createRepository(
         api: ChatApi,
         userRepository: UserRepository,
@@ -285,10 +322,19 @@ class ChatRepositoryImplTest {
         var conversationCalls = 0
         var unreadCountCalls = 0
         var conversationResponses: List<ChatConversationResponseDto> = emptyList()
+        var blockNextConversationRequest = false
+        var conversationRequestStarted: CompletableDeferred<Unit>? = null
+        var conversationResponseGate: CompletableDeferred<Unit>? = null
 
         override suspend fun getConversations(): Response<List<ChatConversationResponseDto>> {
             conversationCalls++
-            return Response.success(conversationResponses)
+            val response = conversationResponses
+            if (blockNextConversationRequest) {
+                blockNextConversationRequest = false
+                conversationRequestStarted?.complete(Unit)
+                conversationResponseGate?.await()
+            }
+            return Response.success(response)
         }
 
         override suspend fun findOrCreate(

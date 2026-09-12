@@ -33,23 +33,7 @@ class TouristSavedCardsViewModel
 
         fun refresh() {
             viewModelScope.launch {
-                mutableUiState.update { it.copy(loadState = ContentLoadState.LOADING) }
-                when (val result = repository.getSavedPaymentMethods()) {
-                    is DataResult.Success ->
-                        mutableUiState.update { current ->
-                            current.copy(
-                                loadState = ContentLoadState.CONTENT,
-                                savedCards = result.data.map { it.toUiModel() },
-                            )
-                        }
-                    is DataResult.Error ->
-                        mutableUiState.update {
-                            it.copy(
-                                loadState = ContentLoadState.ERROR,
-                                errorMessage = result.error.toMessage(resourceProvider),
-                            )
-                        }
-                }
+                refreshSavedCards(showLoading = true)
             }
         }
 
@@ -79,16 +63,45 @@ class TouristSavedCardsViewModel
                         showDeleteDialogFor = null,
                     )
                 }
-                when (val result = block()) {
-                    is DataResult.Success -> refresh()
-                    is DataResult.Error ->
-                        mutableUiState.update {
-                            it.copy(
-                                isMutationInProgress = false,
-                                errorMessage = result.error.toMessage(resourceProvider),
-                            )
-                        }
+                try {
+                    when (val result = block()) {
+                        is DataResult.Success -> refreshSavedCards(showLoading = false)
+                        is DataResult.Error -> showError(result)
+                    }
+                } finally {
+                    mutableUiState.update { it.copy(isMutationInProgress = false) }
                 }
+            }
+        }
+
+        private suspend fun refreshSavedCards(showLoading: Boolean) {
+            if (showLoading) {
+                mutableUiState.update {
+                    it.copy(loadState = ContentLoadState.LOADING, errorMessage = null)
+                }
+            }
+            when (val result = repository.getSavedPaymentMethods()) {
+                is DataResult.Success ->
+                    mutableUiState.update { current ->
+                        current.copy(
+                            loadState = ContentLoadState.CONTENT,
+                            savedCards = result.data.map { it.toUiModel() },
+                            errorMessage = null,
+                        )
+                    }
+                is DataResult.Error -> showError(result, isLoadError = true)
+            }
+        }
+
+        private fun showError(
+            result: DataResult.Error,
+            isLoadError: Boolean = false,
+        ) {
+            mutableUiState.update {
+                it.copy(
+                    loadState = if (isLoadError) ContentLoadState.ERROR else it.loadState,
+                    errorMessage = result.error.toMessage(resourceProvider),
+                )
             }
         }
     }

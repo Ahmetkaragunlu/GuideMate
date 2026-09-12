@@ -83,6 +83,7 @@ class FakePaymentRepository : PaymentRepository {
     var checkedOutQuoteId: String? = null
     var checkoutIdempotencyKey: String? = null
     val paymentResults = ArrayDeque<DataResult<Payment>>()
+    val requestedPaymentIds = mutableListOf<String>()
     var cancelResult: DataResult<Payment> = DataResult.Success(testTopUpPayment())
     var cancelledPaymentId: String? = null
     var clearAllPendingPaymentCalls = 0
@@ -122,8 +123,10 @@ class FakePaymentRepository : PaymentRepository {
         return topUpCheckoutResult
     }
 
-    override suspend fun getPayment(paymentId: String): DataResult<Payment> =
-        paymentResults.removeFirst()
+    override suspend fun getPayment(paymentId: String): DataResult<Payment> {
+        requestedPaymentIds += paymentId
+        return paymentResults.removeFirst()
+    }
 
     override suspend fun cancelPayment(paymentId: String): DataResult<Payment> {
         cancelledPaymentId = paymentId

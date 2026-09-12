@@ -24,6 +24,7 @@ import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.toStatusUi
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.math.min
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,7 +67,9 @@ class PaymentStatusViewModel
         }
 
         private suspend fun pollUntilResolved() {
-            while (true) {
+            var elapsedMillis = 0L
+            var nextDelayMillis = INITIAL_POLL_INTERVAL_MILLIS
+            while (elapsedMillis <= MAX_POLLING_DURATION_MILLIS) {
                 when (val result = paymentRepository.getPayment(paymentId)) {
                     is DataResult.Error -> {
                         if (
@@ -134,7 +137,24 @@ class PaymentStatusViewModel
                             paymentRepository.clearPendingPayment(paymentId)
                             return
                         }
-                        delay(POLL_INTERVAL_MILLIS)
+                        if (elapsedMillis == MAX_POLLING_DURATION_MILLIS) {
+                            mutableUiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    payment = uiModel.copy(status = PaymentUiStatus.TIMEOUT),
+                                )
+                            }
+                            return
+                        }
+                        val delayMillis =
+                            min(
+                                nextDelayMillis,
+                                MAX_POLLING_DURATION_MILLIS - elapsedMillis,
+                            )
+                        delay(delayMillis)
+                        elapsedMillis += delayMillis
+                        nextDelayMillis =
+                            (nextDelayMillis * 2).coerceAtMost(MAX_POLL_INTERVAL_MILLIS)
                     }
                 }
             }
@@ -165,6 +185,8 @@ class PaymentStatusViewModel
         }
 
         private companion object {
-            const val POLL_INTERVAL_MILLIS = 2_000L
+            const val INITIAL_POLL_INTERVAL_MILLIS = 2_000L
+            const val MAX_POLL_INTERVAL_MILLIS = 8_000L
+            const val MAX_POLLING_DURATION_MILLIS = 30_000L
         }
     }

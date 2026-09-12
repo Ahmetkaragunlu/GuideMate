@@ -81,10 +81,46 @@ class HostedPaymentViewModelTest {
 
             assertFalse(viewModel.uiState.value.shouldVerifyPayment)
 
-            advanceTimeBy(1_000)
+            advanceTimeBy(3_000)
             runCurrent()
 
             assertTrue(viewModel.uiState.value.shouldVerifyPayment)
+        }
+
+    @Test
+    fun ordinaryHostedPageDoesNotStartPaymentPolling() =
+        runTest {
+            val repository =
+                FakePaymentRepository().apply {
+                    paymentResults += DataResult.Success(testTopUpPayment())
+                }
+            val viewModel = createViewModel(repository)
+            runCurrent()
+
+            viewModel.onPageFinished("https://sandbox.example.com/payment")
+            advanceTimeBy(60_000)
+            runCurrent()
+
+            assertEquals(listOf("payment-1"), repository.requestedPaymentIds)
+            assertFalse(viewModel.uiState.value.shouldVerifyPayment)
+        }
+
+    @Test
+    fun callbackPollingHandsOffToBoundedStatusVerificationWhenProviderStaysPending() =
+        runTest {
+            val repository =
+                FakePaymentRepository().apply {
+                    repeat(8) { paymentResults += DataResult.Success(testTopUpPayment()) }
+                }
+            val viewModel = createViewModel(repository)
+            runCurrent()
+
+            viewModel.onPageStarted("https://local.example/api/v1/payments/iyzico/callback")
+            advanceTimeBy(30_001)
+            runCurrent()
+
+            assertTrue(viewModel.uiState.value.shouldVerifyPayment)
+            assertTrue(repository.requestedPaymentIds.size > 1)
         }
 
     @Test

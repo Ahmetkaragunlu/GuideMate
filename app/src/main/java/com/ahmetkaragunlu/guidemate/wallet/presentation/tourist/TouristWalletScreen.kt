@@ -6,14 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
+import com.ahmetkaragunlu.guidemate.common.ui.lifecycle.RefreshOnResumeAfterInitialLoad
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,7 +25,6 @@ fun TouristWalletScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showTopUpSheet by rememberSaveable { mutableStateOf(false) }
-    var hasCompletedInitialResume by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(uiState.paymentLaunch) {
@@ -37,14 +35,7 @@ fun TouristWalletScreen(
         }
     }
 
-    LifecycleResumeEffect(Unit) {
-        if (hasCompletedInitialResume) {
-            viewModel.refresh()
-        } else {
-            hasCompletedInitialResume = true
-        }
-        onPauseOrDispose { }
-    }
+    RefreshOnResumeAfterInitialLoad(viewModel::refresh)
 
     GuideMateContentState(
         state = uiState.loadState,

@@ -20,7 +20,6 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.category.TourCategoryCatal
 import com.ahmetkaragunlu.guidemate.tour.presentation.mapper.toSearchResultUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.math.roundToLong
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,6 +46,10 @@ class TouristExploreViewModel
         private var guideRequestJob: Job? = null
         private var currentTourPage = 0
         private var currentGuidePage = 0
+        private var tourRequestGeneration = 0L
+        private var guideRequestGeneration = 0L
+        private var loadedTourQuery: TourSearchQuery? = null
+        private var loadedGuideQuery: String? = null
 
         val categories = TourCategoryCatalog.filterOptions
 
@@ -79,34 +82,55 @@ class TouristExploreViewModel
 
         fun refreshTours() {
             tourRequestJob?.cancel()
-            tourRequestJob = loadTours(page = 0, append = false)
+            val query = _uiState.value.toTourSearchQuery()
+            val generation = ++tourRequestGeneration
+            tourRequestJob = loadTours(query = query, page = 0, append = false, generation = generation)
         }
 
         fun loadMoreTours() {
             val state = _uiState.value
             if (!state.tours.canLoadMore ||
                 state.tours.isLoadingMore ||
-                tourRequestJob?.isActive == true
+                tourRequestJob?.isActive == true ||
+                loadedTourQuery != state.toTourSearchQuery()
             ) {
                 return
             }
-            tourRequestJob = loadTours(page = currentTourPage + 1, append = true)
+            val query = state.toTourSearchQuery()
+            tourRequestJob =
+                loadTours(
+                    query = query,
+                    page = currentTourPage + 1,
+                    append = true,
+                    generation = tourRequestGeneration,
+                )
         }
 
         fun refreshGuides() {
             guideRequestJob?.cancel()
-            guideRequestJob = loadGuides(page = 0, append = false)
+            val query = _uiState.value.guides.searchQuery.trim()
+            val generation = ++guideRequestGeneration
+            guideRequestJob =
+                loadGuides(query = query, page = 0, append = false, generation = generation)
         }
 
         fun loadMoreGuides() {
             val state = _uiState.value
             if (!state.guides.canLoadMore ||
                 state.guides.isLoadingMore ||
-                guideRequestJob?.isActive == true
+                guideRequestJob?.isActive == true ||
+                loadedGuideQuery != state.guides.searchQuery.trim()
             ) {
                 return
             }
-            guideRequestJob = loadGuides(page = currentGuidePage + 1, append = true)
+            val query = state.guides.searchQuery.trim()
+            guideRequestJob =
+                loadGuides(
+                    query = query,
+                    page = currentGuidePage + 1,
+                    append = true,
+                    generation = guideRequestGeneration,
+                )
         }
 
         fun updateSelectedCategory(category: TourCategory?) {
@@ -194,8 +218,10 @@ class TouristExploreViewModel
         }
 
         private fun loadTours(
+            query: TourSearchQuery,
             page: Int,
             append: Boolean,
+            generation: Long,
         ): Job =
             viewModelScope.launch {
                 if (append) {
@@ -210,25 +236,31 @@ class TouristExploreViewModel
                             tours =
                                 it.tours.copy(
                                     loadState = ContentLoadState.LOADING,
+                                    results = emptyList(),
+                                    resultCount = 0,
                                     isLoadingMore = false,
                                     appendFailed = false,
+                                    canLoadMore = false,
                                 ),
                         )
                     }
+                    currentTourPage = 0
+                    loadedTourQuery = null
                 }
 
-                val state = _uiState.value
                 when (
                     val result =
                         tourRepository.searchTours(
-                            query = state.toTourSearchQuery(),
+                            query = query,
                             page = page,
                             size = TOUR_PAGE_SIZE,
                         )
                 ) {
                     is DataResult.Success -> {
+                        if (!isCurrentTourRequest(generation, query)) return@launch
                         val mapped = result.data.items.map { it.toSearchResultUiModel() }
                         currentTourPage = result.data.page
+                        loadedTourQuery = query
                         _uiState.update { current ->
                             current.copy(
                                 tours =
@@ -245,6 +277,7 @@ class TouristExploreViewModel
                         }
                     }
                     is DataResult.Error -> {
+                        if (!isCurrentTourRequest(generation, query)) return@launch
                         _uiState.update { current ->
                             current.copy(
                                 tours =
@@ -265,8 +298,10 @@ class TouristExploreViewModel
             }
 
         private fun loadGuides(
+            query: String,
             page: Int,
             append: Boolean,
+            generation: Long,
         ): Job =
             viewModelScope.launch {
                 if (append) {
@@ -281,24 +316,30 @@ class TouristExploreViewModel
                             guides =
                                 it.guides.copy(
                                     loadState = ContentLoadState.LOADING,
+                                    results = emptyList(),
                                     isLoadingMore = false,
                                     appendFailed = false,
+                                    canLoadMore = false,
                                 ),
                         )
                     }
+                    currentGuidePage = 0
+                    loadedGuideQuery = null
                 }
 
                 when (
                     val result =
                         profileRepository.searchGuides(
-                            query = _uiState.value.guides.searchQuery,
+                            query = query,
                             page = page,
                             size = GUIDE_PAGE_SIZE,
                         )
                 ) {
                     is DataResult.Success -> {
+                        if (!isCurrentGuideRequest(generation, query)) return@launch
                         val mapped = result.data.items.map { it.toGuideResultUiModel() }
                         currentGuidePage = result.data.page
+                        loadedGuideQuery = query
                         _uiState.update { current ->
                             current.copy(
                                 guides =
@@ -314,6 +355,7 @@ class TouristExploreViewModel
                         }
                     }
                     is DataResult.Error -> {
+                        if (!isCurrentGuideRequest(generation, query)) return@launch
                         _uiState.update { current ->
                             current.copy(
                                 guides =
@@ -333,28 +375,20 @@ class TouristExploreViewModel
                 }
             }
 
+        private fun isCurrentTourRequest(
+            generation: Long,
+            query: TourSearchQuery,
+        ): Boolean =
+            generation == tourRequestGeneration && query == _uiState.value.toTourSearchQuery()
+
+        private fun isCurrentGuideRequest(
+            generation: Long,
+            query: String,
+        ): Boolean =
+            generation == guideRequestGeneration && query == _uiState.value.guides.searchQuery.trim()
+
         private fun updateDraftFilters(transform: TourFilterUiState.() -> TourFilterUiState) {
             _uiState.update { it.copy(draftFilters = it.draftFilters.transform()) }
-        }
-
-        private fun ExploreUiState.toTourSearchQuery(): TourSearchQuery {
-            val filters = appliedFilters
-            return TourSearchQuery(
-                text = tours.searchQuery,
-                countryCode = filters.selectedCountry?.code,
-                cityPlaceId = filters.selectedCity?.placeId,
-                categoryCode = filters.selectedCategory?.code,
-                languageCodes = filters.selectedLanguages.map { it.code },
-                minimumRating = filters.selectedRating.takeIf { it > 0 }?.toDouble(),
-                minimumPriceMinor =
-                    filters.priceRange.start
-                        .takeIf { it > 0f }
-                        ?.toMinorUnits(),
-                maximumPriceMinor =
-                    filters.priceRange.endInclusive
-                        .takeIf { it < TourFilterUiState.MAX_PRICE }
-                        ?.toMinorUnits(),
-            )
         }
 
         private companion object {
@@ -363,5 +397,3 @@ class TouristExploreViewModel
             const val SEARCH_DEBOUNCE_MILLIS = 350L
         }
     }
-
-private fun Float.toMinorUnits(): Long = (toDouble() * 100).roundToLong()

@@ -23,12 +23,14 @@ import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationR
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -72,27 +74,34 @@ constructor(
 
     private val notificationStateMutex = Mutex()
     private var currentPage = -1
+    private var realtimeEventsJob: Job? = null
+    @Volatile private var sessionGeneration = 0L
 
     init {
-        observeRealtimeEvents()
         observeAuthenticatedUser()
     }
 
-    override suspend fun refreshNotifications(): DataResult<List<AppNotification>> =
-        notificationStateMutex.withLock {
+    override suspend fun refreshNotifications(): DataResult<List<AppNotification>> {
+        val session = currentSession()
+        return notificationStateMutex.withLock {
             apiCallExecutor.execute(
                 request = { api.getNotifications(page = 0, size = NOTIFICATION_PAGE_SIZE) },
                 transform = { page -> page.content.map { it.toDomain() } to !page.isLast },
             ).mapSuccess { (notifications, hasMore) ->
-                currentPage = 0
-                mutableNotifications.value = notifications
-                mutableHasMoreNotifications.value = hasMore
+                if (session.isCurrent()) {
+                    currentPage = 0
+                    mutableNotifications.value = notifications
+                    mutableHasMoreNotifications.value = hasMore
+                }
                 notifications
             }
         }
+    }
 
-    override suspend fun loadMoreNotifications(): DataResult<List<AppNotification>> =
-        notificationStateMutex.withLock {
+    override suspend fun loadMoreNotifications(): DataResult<List<AppNotification>> {
+        val session = currentSession()
+        return notificationStateMutex.withLock {
+            if (!session.isCurrent()) return@withLock DataResult.Success(emptyList())
             if (!mutableHasMoreNotifications.value) {
                 return@withLock DataResult.Success(mutableNotifications.value)
             }
@@ -103,30 +112,39 @@ constructor(
                 },
                 transform = { page -> page.content.map { it.toDomain() } to !page.isLast },
             ).mapSuccess { (incoming, hasMore) ->
-                currentPage = nextPage
-                mutableNotifications.update { current -> mergeNotifications(current, incoming) }
-                mutableHasMoreNotifications.value = hasMore
-                mutableNotifications.value
+                if (session.isCurrent()) {
+                    currentPage = nextPage
+                    mutableNotifications.update { current -> mergeNotifications(current, incoming) }
+                    mutableHasMoreNotifications.value = hasMore
+                    mutableNotifications.value
+                } else {
+                    incoming
+                }
             }
         }
+    }
 
-    override suspend fun refreshUnreadCount(): DataResult<Int> =
-        notificationStateMutex.withLock {
+    override suspend fun refreshUnreadCount(): DataResult<Int> {
+        val session = currentSession()
+        return notificationStateMutex.withLock {
             apiCallExecutor.execute(
                 request = api::getUnreadCount,
                 transform = { it.unreadCount.toSafeInt() },
             ).mapSuccess { count ->
-                mutableUnreadCount.value = count
+                if (session.isCurrent()) mutableUnreadCount.value = count
                 count
             }
         }
+    }
 
-    override suspend fun markRead(notificationId: String): DataResult<AppNotification> =
-        notificationStateMutex.withLock {
+    override suspend fun markRead(notificationId: String): DataResult<AppNotification> {
+        val session = currentSession()
+        return notificationStateMutex.withLock {
             apiCallExecutor.execute(
                 request = { api.markRead(notificationId) },
                 transform = { it.toDomain() },
             ).mapSuccess { updated ->
+                if (!session.isCurrent()) return@mapSuccess updated
                 val wasUnread = mutableNotifications.value.any {
                     it.notificationId == notificationId && !it.isRead
                 }
@@ -142,26 +160,32 @@ constructor(
                 updated
             }
         }
+    }
 
-    override suspend fun markAllRead(): DataResult<Int> =
-        notificationStateMutex.withLock {
+    override suspend fun markAllRead(): DataResult<Int> {
+        val session = currentSession()
+        return notificationStateMutex.withLock {
             apiCallExecutor.execute(
                 request = api::markAllRead,
                 transform = { it.unreadCount.toSafeInt() },
             ).mapSuccess { unreadCount ->
-                mutableNotifications.update { notifications ->
-                    notifications.map { it.copy(isRead = true) }
+                if (session.isCurrent()) {
+                    mutableNotifications.update { notifications ->
+                        notifications.map { it.copy(isRead = true) }
+                    }
+                    mutableUnreadCount.value = unreadCount
+                    systemNotificationController.dismissAll()
                 }
-                mutableUnreadCount.value = unreadCount
-                systemNotificationController.dismissAll()
                 unreadCount
             }
         }
+    }
 
     override suspend fun markRelatedRead(
         target: NotificationTargetReference,
-    ): DataResult<Int> =
-        notificationStateMutex.withLock {
+    ): DataResult<Int> {
+        val session = currentSession()
+        return notificationStateMutex.withLock {
             apiCallExecutor.execute(
                 request = {
                     api.markRelatedRead(
@@ -173,49 +197,60 @@ constructor(
                 },
                 transform = { it.unreadCount.toSafeInt() },
             ).mapSuccess { unreadCount ->
-                mutableNotifications.update { notifications ->
-                    notifications.map { notification ->
-                        if (!notification.isRead && target.matches(notification.payload)) {
-                            notification.copy(isRead = true)
-                        } else {
-                            notification
+                if (session.isCurrent()) {
+                    mutableNotifications.update { notifications ->
+                        notifications.map { notification ->
+                            if (!notification.isRead && target.matches(notification.payload)) {
+                                notification.copy(isRead = true)
+                            } else {
+                                notification
+                            }
                         }
                     }
+                    mutableUnreadCount.value = unreadCount
+                    systemNotificationController.dismissRelated(target)
                 }
-                mutableUnreadCount.value = unreadCount
-                systemNotificationController.dismissRelated(target)
                 unreadCount
             }
         }
+    }
 
-    override suspend fun refreshPreferences(): DataResult<NotificationPreferences> =
-        apiCallExecutor.execute(
+    override suspend fun refreshPreferences(): DataResult<NotificationPreferences> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = api::getPreferences,
             transform = { it.toDomain() },
         ).mapSuccess { preferences ->
-            mutablePreferences.value = preferences
+            if (session.isCurrent()) mutablePreferences.value = preferences
             preferences
         }
+    }
 
     override suspend fun updatePreferences(
         update: NotificationPreferenceUpdate,
-    ): DataResult<NotificationPreferences> =
-        apiCallExecutor.execute(
+    ): DataResult<NotificationPreferences> {
+        val session = currentSession()
+        return apiCallExecutor.execute(
             request = { api.updatePreferences(update.toDto()) },
             transform = { it.toDomain() },
         ).mapSuccess { preferences ->
-            mutablePreferences.value = preferences
+            if (session.isCurrent()) mutablePreferences.value = preferences
             preferences
         }
+    }
 
     override suspend fun registerDevice(pushInstallationId: String?): DataResult<Unit> {
+        val session = currentSession()
         if (!userRepository.userState.value.isAuthenticated) return DataResult.Success(Unit)
+        val installationId = installationIdDataSource.getOrCreate()
+        val firebaseInstallationId =
+            pushInstallationId ?: pushInstallationIdProvider.registerAndGetId()
+        if (!session.isCurrent()) return DataResult.Success(Unit)
         return apiCallExecutor.executeUnit {
             api.registerDevice(
                 RegisterDeviceRequestDto(
-                    installationId = installationIdDataSource.getOrCreate(),
-                    firebaseInstallationId =
-                        pushInstallationId ?: pushInstallationIdProvider.registerAndGetId(),
+                    installationId = installationId,
+                    firebaseInstallationId = firebaseInstallationId,
                 ),
             )
         }
@@ -236,6 +271,7 @@ constructor(
     }
 
     override fun clearLocalState() {
+        sessionGeneration++
         currentPage = -1
         mutableNotifications.value = emptyList()
         mutableUnreadCount.value = 0
@@ -248,11 +284,13 @@ constructor(
             userRepository.userState
                 .map { it.userId }
                 .distinctUntilChanged()
-                .collect { userId ->
+                .collectLatest { userId ->
+                    realtimeEventsJob?.cancel()
+                    realtimeClient.disconnect()
                     clearLocalState()
-                    if (userId == null) {
-                        realtimeClient.disconnect()
-                    } else {
+                    if (userId != null) {
+                        val session = currentSession()
+                        observeRealtimeEvents(session)
                         realtimeClient.connect()
                         registerDevice()
                     }
@@ -260,16 +298,31 @@ constructor(
         }
     }
 
-    private fun observeRealtimeEvents() {
-        applicationScope.launch {
-            realtimeClient.events.collect {
-                if (userRepository.userState.value.isAuthenticated) {
-                    refreshNotifications()
-                    refreshUnreadCount()
+    private fun observeRealtimeEvents(session: SessionSnapshot) {
+        realtimeEventsJob =
+            applicationScope.launch {
+                realtimeClient.events.collectLatest {
+                    if (session.isCurrent()) {
+                        refreshNotifications()
+                        refreshUnreadCount()
+                    }
                 }
             }
-        }
     }
+
+    private fun currentSession(): SessionSnapshot =
+        SessionSnapshot(
+            userId = userRepository.userState.value.userId,
+            generation = sessionGeneration,
+        )
+
+    private fun SessionSnapshot.isCurrent(): Boolean =
+        generation == sessionGeneration && userId == userRepository.userState.value.userId
+
+    private data class SessionSnapshot(
+        val userId: Long?,
+        val generation: Long,
+    )
 }
 
 private fun mergeNotifications(

@@ -8,4 +8,6 @@ data class TouristTourDetailScreenState(
     val loadState: ContentLoadState = ContentLoadState.LOADING,
     val detail: TourDetailUiState? = null,
     val bookingAvailability: TourBookingAvailability = TourBookingAvailability.UNAVAILABLE,
+    val reviewsLoadState: ContentLoadState = ContentLoadState.LOADING,
+    val reviewsErrorMessage: String? = null,
 )

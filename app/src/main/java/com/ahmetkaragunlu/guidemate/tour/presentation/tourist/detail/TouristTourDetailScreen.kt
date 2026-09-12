@@ -42,6 +42,9 @@ fun TouristTourDetailScreen(
                     if (bookingAvailability.isBookable) onBookTour(detail.sessionId)
                 },
                 onGuideProfileClick = { onNavigateToGuideProfile(detail.guideId) },
+                reviewsLoadState = uiState.reviewsLoadState,
+                reviewsErrorMessage = uiState.reviewsErrorMessage,
+                onReviewsRetry = viewModel::retryReviews,
                 modifier = modifier,
                 topContent =
                     resolveDetailNoticeResId(

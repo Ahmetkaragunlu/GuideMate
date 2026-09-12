@@ -183,6 +183,8 @@ class NotificationRepositoryImplTest {
             )
         val repository = createRepository(api, userRepository, backgroundScope)
 
+        runCurrent()
+        advanceUntilIdle()
         repository.registerDevice("firebase-callback-installation")
 
         assertEquals("firebase-callback-installation", api.deviceRequest?.firebaseInstallationId)
@@ -220,6 +222,37 @@ class NotificationRepositoryImplTest {
             scope.cancel()
         }
     }
+
+    @Test
+    fun `delayed old account response cannot overwrite notifications loaded for new account`() =
+        runTest {
+            val api = FakeNotificationApi()
+            val userRepository =
+                FakeUserRepository(UserState(userId = 1, email = "old@example.com"))
+            val repository = createRepository(api, userRepository, backgroundScope)
+            runCurrent()
+
+            api.firstPageNotificationId = "old-notification"
+            api.notificationRequestStarted = CompletableDeferred()
+            api.notificationResponseGate = CompletableDeferred()
+            val oldRefresh = async { repository.refreshNotifications() }
+            api.notificationRequestStarted?.await()
+
+            userRepository.updateUser(UserState(userId = 2, email = "new@example.com"))
+            api.firstPageNotificationId = "new-notification"
+            runCurrent()
+            val newRefresh = async { repository.refreshNotifications() }
+            runCurrent()
+
+            api.notificationResponseGate?.complete(Unit)
+            oldRefresh.await()
+            newRefresh.await()
+
+            assertEquals(
+                listOf("new-notification"),
+                repository.notifications.value.map { it.notificationId },
+            )
+        }
 
     private fun createRepository(
         api: NotificationApi,
@@ -296,6 +329,10 @@ class NotificationRepositoryImplTest {
             mutableUserState.value =
                 mutableUserState.value.copy(avatarMediaId = mediaAssetId, avatarUrl = imageUrl)
         }
+
+        fun updateUser(userState: UserState) {
+            mutableUserState.value = userState
+        }
     }
 
     private class FakeNotificationApi(
@@ -307,17 +344,19 @@ class NotificationRepositoryImplTest {
         var notificationRequestStarted: CompletableDeferred<Unit>? = null
         var notificationResponseGate: CompletableDeferred<Unit>? = null
         var markReadCalls = 0
+        var firstPageNotificationId = "notification-1"
 
         override suspend fun getNotifications(
             page: Int,
             size: Int,
         ): Response<ApiPageResponse<NotificationResponseDto>> {
             requestedPages += page
+            val notificationId = firstPageNotificationId
             notificationRequestStarted?.complete(Unit)
             notificationResponseGate?.await()
             val content =
                 when (page) {
-                    0 -> listOf(notification("notification-1", minute = 1, isRead = false))
+                    0 -> listOf(notification(notificationId, minute = 1, isRead = false))
                     else ->
                         listOf(
                             notification("notification-1", minute = 1, isRead = false),
