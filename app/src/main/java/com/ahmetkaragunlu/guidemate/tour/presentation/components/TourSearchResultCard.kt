@@ -84,7 +84,7 @@ fun TourSearchResultCard(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            tint = Color(0xFFFFC107),
+                            tint = colorResource(R.color.star_color),
                             modifier = Modifier.size(18.dp),
                         )
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))

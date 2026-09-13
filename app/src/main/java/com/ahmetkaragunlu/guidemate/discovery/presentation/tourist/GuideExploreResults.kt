@@ -47,7 +47,7 @@ internal fun GuideExploreResults(
     onLoadMore: () -> Unit,
     onGuideClick: (Long) -> Unit,
 ) {
-    Column(modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium))) {
+    Column(modifier = modifier) {
         EditTextField(
             value = searchQuery,
             onValueChange = onSearchQueryChange,

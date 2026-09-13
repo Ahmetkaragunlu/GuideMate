@@ -2,10 +2,13 @@ package com.ahmetkaragunlu.guidemate.profile.presentation.guide
 
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
+import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.FakeTourDiscoveryRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeUserAvatarRepository
+import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.profile.domain.usecase.UpdateUserAvatarUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -28,10 +31,16 @@ class GuideProfileViewModelTest {
         runTest {
             val profileRepository = FakeGuideProfileRepository()
             val userAvatarRepository = FakeUserAvatarRepository()
+            val mediaRepository = FakeMediaRepository()
             val viewModel =
                 GuideProfileViewModel(
                     profileRepository = profileRepository,
-                    userAvatarRepository = userAvatarRepository,
+                    updateUserAvatar =
+                        UpdateUserAvatarUseCase(
+                            mediaRepository = mediaRepository,
+                            userAvatarRepository = userAvatarRepository,
+                            userRepository = FakeUserRepository(),
+                        ),
                     resourceProvider = FakeResourceProvider(),
                     tourRepository = FakeTourDiscoveryRepository(),
                     notificationRepository = FakeNotificationRepository(),
@@ -42,7 +51,8 @@ class GuideProfileViewModelTest {
             viewModel.onProfileImageSelected("content://avatar")
             runCurrent()
 
-            assertEquals("content://avatar", userAvatarRepository.selectedUri)
+            assertEquals("content://avatar", mediaRepository.uploadedUri)
+            assertEquals("media-1", userAvatarRepository.selectedMediaAssetId)
             assertFalse(viewModel.profileState.value.isAvatarUpdating)
             assertNull(viewModel.profileState.value.selectedProfileImageUri)
             collection.cancel()

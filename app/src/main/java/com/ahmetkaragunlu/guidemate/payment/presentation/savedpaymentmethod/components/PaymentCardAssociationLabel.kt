@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentCardAssociation
 
 @Composable
@@ -100,7 +102,7 @@ private fun AssociationTextMark(
                 )
                 .border(
                     width = 1.dp,
-                    color = Color(0xFFE5E7EB),
+                    color = colorResource(R.color.divider_color),
                     shape = RoundedCornerShape(4.dp),
                 ),
         contentAlignment = Alignment.Center,

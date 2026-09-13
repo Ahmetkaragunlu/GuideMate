@@ -1,11 +1,64 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit
 
+import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyInput
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyMinorUnitsOrNull
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourContentInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditContentFormState
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditIdentityState
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditOperationState
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditSessionFormState
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditUiState
 import java.time.LocalDateTime
 import java.time.ZoneId
+
+internal fun TourDetails.toGuideTourEditUiState(sessionId: String): GuideTourEditUiState? {
+    val selectedSession = session(sessionId) ?: return null
+    val zone = tour.timeZoneId.toZoneId()
+    return GuideTourEditUiState(
+        identity =
+            GuideTourEditIdentityState(
+                tourId = tour.id,
+                sessionId = selectedSession.id,
+                tourVersion = tour.version,
+                sessionVersion = selectedSession.version,
+                country = tour.country,
+                countryCode = tour.countryCode,
+                location = tour.city,
+                cityPlaceId = tour.cityPlaceId,
+                timeZoneId = tour.timeZoneId,
+                isTourIdentityLocked = true,
+            ),
+        content =
+            GuideTourEditContentFormState(
+                title = tour.title,
+                description = tour.description,
+                category = tour.category,
+                languages = tour.languages,
+                coverImageUrl = tour.coverImageUrl,
+                coverMediaId = tour.coverMediaId,
+            ),
+        session =
+            GuideTourEditSessionFormState(
+                meetingPoint = selectedSession.meetingPoint,
+                tourDate = selectedSession.startsAt.atZone(zone).toLocalDate(),
+                startTime = selectedSession.startsAt.atZone(zone).toLocalTime(),
+                durationMinutes = selectedSession.durationMinutes.toString(),
+                price = selectedSession.priceMinor.toCurrencyInput(),
+                capacity = selectedSession.capacity.toString(),
+                hasBookings = selectedSession.bookedCount > 0,
+            ),
+        operation =
+            GuideTourEditOperationState(
+                approvalStatus = tour.approvalStatus,
+                requiresReviewConfirmation = tour.approvalStatus == TourApprovalStatus.REJECTED,
+                loadState = ContentLoadState.CONTENT,
+            ),
+    )
+}
 
 internal fun GuideTourEditUiState.toContentInputOrNull(coverMediaId: String?): TourContentInput? {
     val selectedCategory = category ?: return null

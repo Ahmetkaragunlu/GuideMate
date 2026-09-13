@@ -54,7 +54,7 @@ fun GuideTourPublishStepProgress(
                                 if (index <= filledStepIndexInclusive) {
                                     colorResource(R.color.brand_color)
                                 } else {
-                                    Color(0xFFE5E7EB)
+                                    colorResource(R.color.divider_color)
                                 },
                             shape = RoundedCornerShape(
                                 dimensionResource(R.dimen.radius_small),

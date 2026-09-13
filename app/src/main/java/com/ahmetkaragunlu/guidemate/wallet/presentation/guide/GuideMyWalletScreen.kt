@@ -153,7 +153,7 @@ fun GuideMyWalletScreen(
                 title = R.string.withdrawal_confirmation_title,
                 text = R.string.withdrawal_confirmation_description,
                 textFormatArguments = listOf(amountMinor.toPlatformCurrencyFromMinorUnit()),
-                textModifier = Modifier.offset(y = (-4).dp),
+                textVerticalOffset = (-4).dp,
                 compactText = true,
                 confirmButton = {
                     TextButton(
@@ -185,7 +185,7 @@ fun GuideMyWalletScreen(
             EditAlertDialog(
                 title = R.string.withdrawal_request_received_title,
                 text = R.string.withdrawal_request_received_description,
-                textModifier = Modifier.offset(y = (-4).dp),
+                textVerticalOffset = (-4).dp,
                 compactText = true,
                 confirmButton = {
                     TextButton(onClick = viewModel::dismissWithdrawalConfirmation) {

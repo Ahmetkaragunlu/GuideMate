@@ -6,4 +6,6 @@
     <color name="border_color">#FFEEEDF1</color>
     <color name="notification_icon_color">#FF808080</color>
     <color name="pending_status_color">#FFFF9800</color>
+    <color name="star_color">#FFFFC107</color>
+    <color name="divider_color">#FFE5E7EB</color>
 </resources>

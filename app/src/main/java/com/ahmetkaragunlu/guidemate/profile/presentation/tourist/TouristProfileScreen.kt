@@ -41,8 +41,8 @@ import com.ahmetkaragunlu.guidemate.wallet.presentation.tourist.components.Touri
 
 @Composable
 fun TouristProfileScreen(
-    viewModel: TouristProfileViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    viewModel: TouristProfileViewModel = hiltViewModel(),
     onNavigateToAccount: (TouristProfileMenuTarget) -> Unit = {},
     onNavigateToWallet: () -> Unit = {},
 ) {

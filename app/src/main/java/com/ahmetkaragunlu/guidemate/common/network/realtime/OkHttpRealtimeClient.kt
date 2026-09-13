@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.common.network.realtime
 
-import com.ahmetkaragunlu.guidemate.auth.domain.session.AccessTokenProvider
 import com.ahmetkaragunlu.guidemate.common.network.ApiBaseUrl
+import com.ahmetkaragunlu.guidemate.common.network.session.AccessTokenProvider
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton

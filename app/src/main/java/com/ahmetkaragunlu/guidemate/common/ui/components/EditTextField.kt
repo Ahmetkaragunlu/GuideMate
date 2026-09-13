@@ -20,14 +20,14 @@ import com.ahmetkaragunlu.guidemate.R
 @Composable
 fun EditTextField(
     value: String,
-    isError: Boolean = false,
     onValueChange: (String) -> Unit,
+    keyboardOptions: KeyboardOptions,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
     @StringRes placeholder: Int? = null,
     placeholderText: String? = null,
     @StringRes supportingText: Int? = null,
     supportingTextValue: String? = null,
-    keyboardOptions: KeyboardOptions,
-    modifier: Modifier = Modifier,
     readOnly: Boolean = false,
     enabled: Boolean = true,
     visualTransformation: VisualTransformation = VisualTransformation.None,

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -85,7 +86,7 @@ fun PopularTourCard(
                     Icon(
                         Icons.Default.Star,
                         null,
-                        tint = Color(0xFFFFC107),
+                        tint = colorResource(R.color.star_color),
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
@@ -122,7 +123,7 @@ fun PopularTourCard(
                     GuideMateImage(
                         fallbackImageResId = tour.guideImageResId,
                         imageUrl = tour.guideImageUrl,
-                        contentDescription = "Rehber",
+                        contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier =
                             Modifier
@@ -135,9 +136,7 @@ fun PopularTourCard(
                         text =
                             buildAnnotatedString {
                                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append(
-                                        "Rehber: "
-                                    )
+                                    append(stringResource(R.string.popular_tour_guide_label))
                                 }
                                 withStyle(
                                     style =

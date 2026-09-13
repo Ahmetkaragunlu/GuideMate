@@ -150,7 +150,7 @@ private fun EarningsYearSelector(
             colors =
                 OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colorResource(R.color.brand_color),
-                    unfocusedBorderColor = Color(0xFFE5E7EB),
+                    unfocusedBorderColor = colorResource(R.color.divider_color),
                 ),
             modifier =
                 Modifier
@@ -193,7 +193,7 @@ private fun CurrentMonthEarningsCard(
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF2F2FD)),
         border = BorderStroke(
             width = 1.dp,
-            color = Color(0xFFE5E7EB),
+            color = colorResource(R.color.divider_color),
         ),
     ) {
         Column(

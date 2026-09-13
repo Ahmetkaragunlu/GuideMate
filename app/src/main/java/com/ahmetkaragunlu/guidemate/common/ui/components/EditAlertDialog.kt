@@ -7,18 +7,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun EditAlertDialog(
     @StringRes title: Int,
     @StringRes text: Int,
+    confirmButton: @Composable () -> Unit,
+    textVerticalOffset: Dp = 0.dp,
     textValue: String? = null,
     textFormatArguments: List<Any> = emptyList(),
-    textModifier: Modifier = Modifier,
     compactText: Boolean = false,
-    confirmButton: @Composable () -> Unit,
     dismissButton: @Composable (() -> Unit)? = null,
     onDismissRequest: () -> Unit = {},
 ) {
@@ -38,7 +41,7 @@ fun EditAlertDialog(
         },
         text = {
             Text(
-                modifier = textModifier,
+                modifier = Modifier.offset(y = textVerticalOffset),
                 text =
                     textValue
                         ?: stringResource(

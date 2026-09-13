@@ -1,5 +1,7 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit
 
+import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
+import com.ahmetkaragunlu.guidemate.testing.testTourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditUiState
@@ -17,6 +19,42 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class GuideTourEditStateMapperTest {
+    @Test
+    fun `tour details map session fields in tour time zone`() {
+        val details = testTourDetails()
+        val session =
+            details.sessions.single().copy(
+                startsAt = Instant.parse("2099-05-24T09:30:00Z"),
+                priceMinor = 12_500,
+                capacity = 12,
+                bookedCount = 3,
+            )
+        val localizedDetails =
+            details.copy(
+                tour = details.tour.copy(timeZoneId = "Europe/Istanbul"),
+                sessions = listOf(session),
+            )
+
+        val state = localizedDetails.toGuideTourEditUiState(session.id)
+
+        assertNotNull(state)
+        assertEquals(details.tour.id, state?.tourId)
+        assertEquals(details.tour.title, state?.title)
+        assertEquals(LocalDate.of(2099, 5, 24), state?.tourDate)
+        assertEquals(LocalTime.of(12, 30), state?.startTime)
+        assertEquals("125", state?.price)
+        assertEquals("12", state?.capacity)
+        assertTrue(state?.hasBookings == true)
+        assertEquals(details.tour.languages, state?.languages)
+        assertEquals(details.tour.coverMediaId, state?.coverMediaId)
+        assertEquals(ContentLoadState.CONTENT, state?.loadState)
+    }
+
+    @Test
+    fun `missing session does not create edit state`() {
+        assertNull(testTourDetails().toGuideTourEditUiState("missing-session"))
+    }
+
     @Test
     fun `content and session changes are detected independently`() {
         val original = validState()

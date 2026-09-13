@@ -28,6 +28,7 @@ class FakeAuthRepository : AuthRepository {
     var changePasswordRequest: Pair<String, String>? = null
     var clearLocalSessionCalls = 0
     var logoutCalls = 0
+    var logoutException: Throwable? = null
 
     override suspend fun login(email: String, password: String): DataResult<UserState> {
         loginRequest = email to password
@@ -48,6 +49,7 @@ class FakeAuthRepository : AuthRepository {
 
     override suspend fun logout(): DataResult<Unit> {
         logoutCalls++
+        logoutException?.let { throw it }
         return logoutResult
     }
 

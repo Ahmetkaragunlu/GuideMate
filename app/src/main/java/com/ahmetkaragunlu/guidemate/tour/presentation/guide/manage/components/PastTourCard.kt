@@ -152,7 +152,7 @@ fun PastTourCard(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = null,
-                                tint = Color(0xFFFFC107),
+                                tint = colorResource(R.color.star_color),
                                 modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))

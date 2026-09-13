@@ -45,7 +45,7 @@ fun GuideWalletTransactionsContent(
         LazyRow(
             modifier =
                 Modifier
-                    .widthIn(max = 380.dp)
+                    .widthIn(max = dimensionResource(R.dimen.content_max_width))
                     .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
             contentPadding =
@@ -81,7 +81,7 @@ fun GuideWalletTransactionsContent(
             Box(
                 modifier =
                     Modifier
-                        .widthIn(max = 380.dp)
+                        .widthIn(max = dimensionResource(R.dimen.content_max_width))
                         .fillMaxWidth()
                         .weight(1f),
                 contentAlignment = Alignment.Center,
@@ -96,7 +96,7 @@ fun GuideWalletTransactionsContent(
             LazyColumn(
                 modifier =
                     Modifier
-                        .widthIn(max = 380.dp)
+                        .widthIn(max = dimensionResource(R.dimen.content_max_width))
                         .fillMaxWidth()
                         .weight(1f),
                 contentPadding =

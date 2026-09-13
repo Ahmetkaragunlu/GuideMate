@@ -7,6 +7,7 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNaviga
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
 import com.ahmetkaragunlu.guidemate.notification.domain.push.NotificationForegroundState
+import com.ahmetkaragunlu.guidemate.session.domain.usecase.TerminateUserSessionUseCase
 import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeOnboardingRepository
@@ -99,8 +100,13 @@ class RootNavigationViewModelTest {
             authRepository = authRepository,
             userRepository = userRepository,
             onboardingRepository = onboardingRepository,
-            paymentRepository = paymentRepository,
-            notificationRepository = notificationRepository,
+            terminateUserSession =
+                TerminateUserSessionUseCase(
+                    authRepository = authRepository,
+                    paymentRepository = paymentRepository,
+                    notificationRepository = notificationRepository,
+                    notificationNavigationCoordinator = notificationNavigationCoordinator,
+                ),
             notificationNavigationCoordinator = notificationNavigationCoordinator,
             notificationForegroundState = NotificationForegroundState(),
         )

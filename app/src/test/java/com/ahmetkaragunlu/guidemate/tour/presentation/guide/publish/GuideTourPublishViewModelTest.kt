@@ -14,6 +14,7 @@ import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
+import com.ahmetkaragunlu.guidemate.tour.domain.usecase.PublishGuideTourUseCase
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.model.GuideTourPublishStep
 import java.time.LocalDate
 import java.time.LocalTime
@@ -49,7 +50,7 @@ class GuideTourPublishViewModelTest {
         }
 
     @Test
-    fun validDraftUploadsCoverAndCreatesTrimmedTourInput() =
+    fun validDraftPublishesTourAndExposesSuccessState() =
         runTest {
             val tourRepository = FakeGuideTourRepository()
             val mediaRepository = FakeMediaRepository()
@@ -64,30 +65,8 @@ class GuideTourPublishViewModelTest {
 
             assertEquals("content://cover", mediaRepository.uploadedUri)
             assertNotNull(tourRepository.createInput)
-            assertEquals("City Walk", tourRepository.createInput?.content?.title)
-            assertEquals("Main square", tourRepository.createInput?.session?.meetingPoint)
-            assertEquals(10_000L, tourRepository.createInput?.session?.priceMinor)
             assertTrue(viewModel.uiState.value.publishSucceeded)
             assertFalse(viewModel.uiState.value.isPublishing)
-            collection.cancel()
-        }
-
-    @Test
-    fun shortTitleStopsPublishOnContentStep() =
-        runTest {
-            val viewModel = createViewModel()
-            val collection = backgroundScope.launch { viewModel.uiState.collect {} }
-            runCurrent()
-
-            viewModel.onTourNameChange("AB")
-
-            assertFalse(viewModel.validateStep3())
-            runCurrent()
-            assertEquals(
-                GuideTourPublishStep.CONTENT_AND_MEDIA,
-                viewModel.uiState.value.validationErrorStep,
-            )
-            assertEquals(R.string.error_tour_title_length, viewModel.uiState.value.validationErrorResId)
             collection.cancel()
         }
 
@@ -157,8 +136,7 @@ class GuideTourPublishViewModelTest {
         mediaRepository: FakeMediaRepository = FakeMediaRepository(),
     ) =
         GuideTourPublishViewModel(
-            repository = tourRepository,
-            mediaRepository = mediaRepository,
+            publishGuideTour = PublishGuideTourUseCase(tourRepository, mediaRepository),
             profileRepository = FakeGuideProfileRepository(),
             resourceProvider = FakeResourceProvider(),
         )

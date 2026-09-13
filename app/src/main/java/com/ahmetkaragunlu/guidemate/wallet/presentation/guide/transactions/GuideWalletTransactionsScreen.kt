@@ -35,14 +35,14 @@ fun GuideWalletTransactionsScreen(
         GuideMateContentState(
             state = uiState.loadState,
             onRetry = viewModel::refresh,
-            modifier = modifier,
+            modifier = Modifier,
             errorMessage = uiState.errorMessage,
         ) {
             GuideWalletTransactionsContent(
                 uiState = uiState,
                 onFilterSelected = viewModel::selectFilter,
                 onLoadNextPage = viewModel::loadNextPage,
-                modifier = modifier,
+                modifier = Modifier,
             )
         }
         SnackbarHost(

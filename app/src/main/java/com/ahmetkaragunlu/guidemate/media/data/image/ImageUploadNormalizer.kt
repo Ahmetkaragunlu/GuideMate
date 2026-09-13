@@ -7,9 +7,9 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
 import androidx.core.net.toUri
+import androidx.exifinterface.media.ExifInterface
 import com.ahmetkaragunlu.guidemate.common.image.IMAGE_UPLOAD_JPEG_QUALITY
 import com.ahmetkaragunlu.guidemate.common.image.MAX_IMAGE_UPLOAD_BYTES
 import com.ahmetkaragunlu.guidemate.common.image.MAX_IMAGE_UPLOAD_DIMENSION_PX

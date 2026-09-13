@@ -13,7 +13,7 @@ import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationR
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfile
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.profile.domain.repository.GuideProfileRepository
-import com.ahmetkaragunlu.guidemate.profile.domain.repository.UserAvatarRepository
+import com.ahmetkaragunlu.guidemate.profile.domain.usecase.UpdateUserAvatarUseCase
 import com.ahmetkaragunlu.guidemate.profile.presentation.guide.model.GuideProfileUiState
 import com.ahmetkaragunlu.guidemate.profile.presentation.model.GuideSpokenLanguageUi
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
@@ -37,7 +37,7 @@ class GuideProfileViewModel
     @Inject
     constructor(
         private val profileRepository: GuideProfileRepository,
-        private val userAvatarRepository: UserAvatarRepository,
+        private val updateUserAvatar: UpdateUserAvatarUseCase,
         private val resourceProvider: ResourceProvider,
         private val tourRepository: TourDiscoveryRepository,
         notificationRepository: NotificationRepository,
@@ -144,7 +144,7 @@ class GuideProfileViewModel
                 it.copy(selectedProfileImageUri = uri, isAvatarUpdating = true)
             }
             viewModelScope.launch {
-                when (val result = userAvatarRepository.updateAvatar(uri)) {
+                when (val result = updateUserAvatar(uri)) {
                     is DataResult.Error -> {
                         operationState.update {
                             it.copy(userMessage = result.error.toMessage(resourceProvider))

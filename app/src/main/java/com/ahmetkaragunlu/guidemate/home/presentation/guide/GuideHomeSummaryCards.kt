@@ -61,7 +61,7 @@ internal fun GuideStatCard(
                 contentDescription = null,
                 tint =
                     if (stat.usesRatingTint) {
-                        Color(0xFFFFC107)
+                        colorResource(R.color.star_color)
                     } else {
                         colorResource(R.color.brand_color)
                     },

@@ -184,7 +184,11 @@ private fun SignInFormSection(
     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
 
     Row(
-        modifier = Modifier.widthIn(max = 380.dp).fillMaxWidth().padding(horizontal = 56.dp),
+        modifier =
+            Modifier
+                .widthIn(max = dimensionResource(R.dimen.content_max_width))
+                .fillMaxWidth()
+                .padding(horizontal = 56.dp),
         horizontalArrangement = Arrangement.End,
     ) {
         Text(

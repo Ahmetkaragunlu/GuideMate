@@ -111,7 +111,7 @@ private fun TourStatusSection(
 
 @Composable
 internal fun TourDetailSectionDivider() {
-    HorizontalDivider(color = Color(0xFFE5E7EB), thickness = 1.dp)
+    HorizontalDivider(color = colorResource(R.color.divider_color), thickness = 1.dp)
 }
 
 @Composable

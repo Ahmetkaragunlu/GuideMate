@@ -41,11 +41,11 @@ fun GuidePublicProfileScreen(
         GuideMateContentState(
             state = uiState.loadState,
             onRetry = viewModel::retry,
-            modifier = modifier,
+            modifier = Modifier,
         ) {
             GuideProfileContent(
                 uiState = uiState,
-                modifier = modifier,
+                modifier = Modifier,
                 onMessageClick = { viewModel.startChat(guideId) },
                 onTourClick = onTourClick,
                 onSeeAllToursClick = onSeeAllToursClick,

@@ -49,9 +49,9 @@ fun GuideMyToursScreen(
     onNavigateToTourPublish: () -> Unit,
     onNavigateToTourDetail: (tourId: String, sessionId: String) -> Unit,
     onNavigateToTourEdit: (tourId: String, sessionId: String) -> Unit,
+    modifier: Modifier = Modifier,
     requestedTab: GuideTourTab? = null,
     onRequestedTabConsumed: () -> Unit = {},
-    modifier: Modifier = Modifier,
     viewModel: GuideMyToursViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

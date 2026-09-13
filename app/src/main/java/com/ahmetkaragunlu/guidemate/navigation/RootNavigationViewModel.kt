@@ -13,8 +13,7 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNaviga
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationVisibleTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
 import com.ahmetkaragunlu.guidemate.notification.domain.push.NotificationForegroundState
-import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
-import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
+import com.ahmetkaragunlu.guidemate.session.domain.usecase.TerminateUserSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,8 +40,7 @@ class RootNavigationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
     private val onboardingRepository: OnboardingRepository,
-    private val paymentRepository: PaymentRepository,
-    private val notificationRepository: NotificationRepository,
+    private val terminateUserSession: TerminateUserSessionUseCase,
     private val notificationNavigationCoordinator: NotificationNavigationCoordinator,
     private val notificationForegroundState: NotificationForegroundState,
 ) : ViewModel() {
@@ -61,11 +59,7 @@ class RootNavigationViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            notificationNavigationCoordinator.clear()
-            notificationRepository.dismissSystemNotifications()
-            authRepository.logout()
-            notificationRepository.clearLocalState()
-            paymentRepository.clearPendingPayment()
+            terminateUserSession()
         }
     }
 

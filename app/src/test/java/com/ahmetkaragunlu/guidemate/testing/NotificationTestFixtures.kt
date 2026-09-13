@@ -31,6 +31,8 @@ class FakeNotificationRepository : NotificationRepository {
     var markRelatedResult: DataResult<Int> = DataResult.Success(0)
     var clearLocalStateCalls = 0
     var dismissSystemNotificationsCalls = 0
+    var dismissSystemNotificationsException: Throwable? = null
+    var clearLocalStateException: Throwable? = null
 
     override val notifications: StateFlow<List<AppNotification>> = notificationState
     override val unreadCount: StateFlow<Int> = unreadState
@@ -80,10 +82,12 @@ class FakeNotificationRepository : NotificationRepository {
 
     override fun dismissSystemNotifications() {
         dismissSystemNotificationsCalls++
+        dismissSystemNotificationsException?.let { throw it }
     }
 
     override fun clearLocalState() {
         clearLocalStateCalls++
+        clearLocalStateException?.let { throw it }
     }
 }
 

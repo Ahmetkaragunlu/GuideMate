@@ -10,24 +10,17 @@ import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.isValidCurrencyInput
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyInput
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
-import com.ahmetkaragunlu.guidemate.media.domain.repository.MediaRepository
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
-import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.SubmitTourChangeInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.UpdateTourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
+import com.ahmetkaragunlu.guidemate.tour.domain.usecase.SubmitGuideTourContentChangeUseCase
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditUiState
-import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditContentFormState
-import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditIdentityState
-import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditOperationState
-import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditSessionFormState
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import com.ahmetkaragunlu.guidemate.tour.presentation.mapper.toTourLanguage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,7 +38,7 @@ class GuideTourEditViewModel
     constructor(
         savedStateHandle: SavedStateHandle,
         private val repository: GuideTourRepository,
-        private val mediaRepository: MediaRepository,
+        private val submitTourContentChange: SubmitGuideTourContentChangeUseCase,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val route = savedStateHandle.toRoute<GuideTourDestination.Edit>()
@@ -202,20 +195,9 @@ class GuideTourEditViewModel
         private suspend fun submitContentChanges(
             state: GuideTourEditUiState,
         ): GuideTourEditUiState? {
-            var uploadedMediaId: String? = null
-            state.selectedCoverImageUri?.let { uri ->
-                when (val upload = mediaRepository.uploadImage(uri, MediaPurpose.TOUR_COVER)) {
-                    is DataResult.Success -> uploadedMediaId = upload.data.mediaAssetId
-                    is DataResult.Error -> {
-                        finishWithError(upload.error.toMessage(resourceProvider))
-                        return null
-                    }
-                }
-            }
-            val coverMediaId = uploadedMediaId ?: state.coverMediaId
+            val coverMediaId = state.coverMediaId ?: state.selectedCoverImageUri
             val content = state.toContentInputOrNull(coverMediaId)
             if (content == null) {
-                uploadedMediaId?.let { mediaRepository.deleteUnreferenced(it) }
                 showError()
                 _uiState.update {
                     it.copy(operation = it.operation.copy(isSaving = false))
@@ -224,17 +206,14 @@ class GuideTourEditViewModel
             }
             return when (
                 val change =
-                    repository.submitChange(
+                    submitTourContentChange(
                         tourId = route.tourId,
-                        input =
-                            SubmitTourChangeInput(
-                                baseVersion = state.tourVersion,
-                                content = content,
-                            ),
+                        baseVersion = state.tourVersion,
+                        content = content,
+                        newCoverImageUri = state.selectedCoverImageUri,
                     )
             ) {
                 is DataResult.Error -> {
-                    uploadedMediaId?.let { mediaRepository.deleteUnreferenced(it) }
                     finishWithError(change.error.toMessage(resourceProvider))
                     null
                 }
@@ -245,7 +224,7 @@ class GuideTourEditViewModel
                                 state.identity.copy(tourVersion = change.data.details.tour.version),
                             content =
                                 state.content.copy(
-                                    coverMediaId = coverMediaId,
+                                    coverMediaId = change.data.details.tour.coverMediaId,
                                     coverImageUrl = change.data.details.tour.coverImageUrl,
                                     selectedCoverImageUri = null,
                                 ),
@@ -312,8 +291,8 @@ class GuideTourEditViewModel
         }
 
         private fun setInitialState(details: TourDetails) {
-            val session = details.session(route.sessionId)
-            if (session == null) {
+            val state = details.toGuideTourEditUiState(route.sessionId)
+            if (state == null) {
                 _uiState.update {
                     it.copy(
                         operation =
@@ -328,49 +307,6 @@ class GuideTourEditViewModel
                 }
                 return
             }
-            val zone = details.tour.timeZoneId.toZoneId()
-            val state =
-                GuideTourEditUiState(
-                    identity =
-                        GuideTourEditIdentityState(
-                            tourId = details.tour.id,
-                            sessionId = session.id,
-                            tourVersion = details.tour.version,
-                            sessionVersion = session.version,
-                            country = details.tour.country,
-                            countryCode = details.tour.countryCode,
-                            location = details.tour.city,
-                            cityPlaceId = details.tour.cityPlaceId,
-                            timeZoneId = details.tour.timeZoneId,
-                            isTourIdentityLocked = true,
-                        ),
-                    content =
-                        GuideTourEditContentFormState(
-                            title = details.tour.title,
-                            description = details.tour.description,
-                            category = details.tour.category,
-                            languages = details.tour.languages,
-                            coverImageUrl = details.tour.coverImageUrl,
-                            coverMediaId = details.tour.coverMediaId,
-                        ),
-                    session =
-                        GuideTourEditSessionFormState(
-                            meetingPoint = session.meetingPoint,
-                            tourDate = session.startsAt.atZone(zone).toLocalDate(),
-                            startTime = session.startsAt.atZone(zone).toLocalTime(),
-                            durationMinutes = session.durationMinutes.toString(),
-                            price = session.priceMinor.toCurrencyInput(),
-                            capacity = session.capacity.toString(),
-                            hasBookings = session.bookedCount > 0,
-                        ),
-                    operation =
-                        GuideTourEditOperationState(
-                            approvalStatus = details.tour.approvalStatus,
-                            requiresReviewConfirmation =
-                                details.tour.approvalStatus == TourApprovalStatus.REJECTED,
-                            loadState = ContentLoadState.CONTENT,
-                        ),
-                )
             originalApprovalStatus = details.tour.approvalStatus
             originalState = state
             _uiState.value = state

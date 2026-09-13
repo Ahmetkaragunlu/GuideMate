@@ -130,6 +130,7 @@ class FakeGuideTourRepository : GuideTourRepository {
 class FakeMediaRepository : MediaRepository {
     var uploadResult: DataResult<MediaAsset> = DataResult.Success(testMediaAsset())
     var uploadedUri: String? = null
+    var uploadedPurpose: MediaPurpose? = null
     var deletedMediaIds = mutableListOf<String>()
 
     override suspend fun uploadImage(
@@ -137,6 +138,7 @@ class FakeMediaRepository : MediaRepository {
         purpose: MediaPurpose,
     ): DataResult<MediaAsset> {
         uploadedUri = localUri
+        uploadedPurpose = purpose
         return uploadResult
     }
 
@@ -149,10 +151,10 @@ class FakeMediaRepository : MediaRepository {
 class FakeUserAvatarRepository : UserAvatarRepository {
     var updateResult: DataResult<MediaReference> =
         DataResult.Success(MediaReference("media-1", "https://example.com/avatar.jpg"))
-    var selectedUri: String? = null
+    var selectedMediaAssetId: String? = null
 
-    override suspend fun updateAvatar(localUri: String): DataResult<MediaReference> {
-        selectedUri = localUri
+    override suspend fun updateAvatar(mediaAssetId: String): DataResult<MediaReference> {
+        selectedMediaAssetId = mediaAssetId
         return updateResult
     }
 }

@@ -87,6 +87,7 @@ class FakePaymentRepository : PaymentRepository {
     var cancelResult: DataResult<Payment> = DataResult.Success(testTopUpPayment())
     var cancelledPaymentId: String? = null
     var clearAllPendingPaymentCalls = 0
+    var clearAllPendingPaymentException: Throwable? = null
 
     override suspend fun getCheckoutCurrencies(): DataResult<CheckoutCurrencies> = currenciesResult
 
@@ -137,6 +138,7 @@ class FakePaymentRepository : PaymentRepository {
 
     override suspend fun clearPendingPayment() {
         clearAllPendingPaymentCalls++
+        clearAllPendingPaymentException?.let { throw it }
     }
 }
 

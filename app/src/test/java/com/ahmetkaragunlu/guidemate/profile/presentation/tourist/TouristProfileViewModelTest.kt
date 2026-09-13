@@ -4,10 +4,12 @@ import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeUserAvatarRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
+import com.ahmetkaragunlu.guidemate.profile.domain.usecase.UpdateUserAvatarUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -38,11 +40,17 @@ class TouristProfileViewModelTest {
                     ),
                 )
             val avatarRepository = FakeUserAvatarRepository()
+            val mediaRepository = FakeMediaRepository()
             val viewModel =
                 TouristProfileViewModel(
                     userRepository = userRepository,
                     walletRepository = FakeWalletRepository(),
-                    userAvatarRepository = avatarRepository,
+                    updateUserAvatar =
+                        UpdateUserAvatarUseCase(
+                            mediaRepository = mediaRepository,
+                            userAvatarRepository = avatarRepository,
+                            userRepository = userRepository,
+                        ),
                     resourceProvider = FakeResourceProvider(),
                 )
             runCurrent()
@@ -52,7 +60,8 @@ class TouristProfileViewModelTest {
             viewModel.onProfileImageSelected("content://new-avatar")
             runCurrent()
 
-            assertEquals("content://new-avatar", avatarRepository.selectedUri)
+            assertEquals("content://new-avatar", mediaRepository.uploadedUri)
+            assertEquals("media-1", avatarRepository.selectedMediaAssetId)
             assertEquals("https://example.com/avatar.jpg", viewModel.uiState.value.avatarUrl)
             assertFalse(viewModel.uiState.value.isAvatarUpdating)
             assertNull(viewModel.uiState.value.selectedAvatarUri)
@@ -66,7 +75,12 @@ class TouristProfileViewModelTest {
                 TouristProfileViewModel(
                     userRepository = FakeUserRepository(),
                     walletRepository = walletRepository,
-                    userAvatarRepository = FakeUserAvatarRepository(),
+                    updateUserAvatar =
+                        UpdateUserAvatarUseCase(
+                            mediaRepository = FakeMediaRepository(),
+                            userAvatarRepository = FakeUserAvatarRepository(),
+                            userRepository = FakeUserRepository(),
+                        ),
                     resourceProvider = FakeResourceProvider(),
                 )
             runCurrent()

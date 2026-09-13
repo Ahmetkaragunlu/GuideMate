@@ -57,7 +57,7 @@
 
     <string name="withdraw_info_text">Talebinizin durumunu cüzdan hareketlerinden takip edebilirsiniz.</string>
 
-    <string name="add_money_info_text">Yuklenecek tutar guvenli odeme altyapisi uzerinden bakiyenize aktarilacaktir.</string>
+    <string name="add_money_info_text">Yüklenecek tutar güvenli ödeme altyapısı üzerinden bakiyenize aktarılacaktır.</string>
 
     <string name="wallet_transaction_history">Cüzdan Hareketleri</string>
 

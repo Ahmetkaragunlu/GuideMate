@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.auth.data.local.session
 
-import com.ahmetkaragunlu.guidemate.auth.domain.session.AccessTokenProvider
+import com.ahmetkaragunlu.guidemate.common.network.session.AccessTokenProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 

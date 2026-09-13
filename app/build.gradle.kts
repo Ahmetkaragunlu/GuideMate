@@ -96,6 +96,7 @@ dependencies {
   // Image loading
   implementation(libs.coil.compose)
   implementation(libs.coil.network.okhttp)
+  implementation(libs.androidx.exifinterface)
 
   // Google Authentication
   implementation(libs.androidx.credentials)

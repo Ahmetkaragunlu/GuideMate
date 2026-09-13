@@ -3,7 +3,7 @@ package com.ahmetkaragunlu.guidemate.auth.di
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.AndroidKeystoreSessionStorage
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.SecureSessionStorage
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.TokenManager
-import com.ahmetkaragunlu.guidemate.auth.domain.session.AccessTokenProvider
+import com.ahmetkaragunlu.guidemate.common.network.session.AccessTokenProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

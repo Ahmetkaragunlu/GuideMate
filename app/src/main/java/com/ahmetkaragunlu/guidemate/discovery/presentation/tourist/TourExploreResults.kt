@@ -56,7 +56,7 @@ internal fun TourExploreResults(
     onClearFilters: () -> Unit,
     onTourClick: (String) -> Unit,
 ) {
-    Column(modifier = modifier.padding(dimensionResource(R.dimen.spacing_medium))) {
+    Column(modifier = modifier) {
         EditTextField(
             value = searchQuery,
             onValueChange = onSearchQueryChange,

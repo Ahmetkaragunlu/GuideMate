@@ -7,6 +7,7 @@ import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.tour.domain.usecase.SubmitGuideTourContentChangeUseCase
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
@@ -70,7 +71,11 @@ class GuideTourEditViewModelTest {
                     )
                 ),
             repository = repository,
-            mediaRepository = FakeMediaRepository(),
+            submitTourContentChange =
+                SubmitGuideTourContentChangeUseCase(
+                    tourRepository = repository,
+                    mediaRepository = FakeMediaRepository(),
+                ),
             resourceProvider = FakeResourceProvider(),
         )
 }

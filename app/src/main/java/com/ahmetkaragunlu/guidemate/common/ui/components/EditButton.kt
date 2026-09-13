@@ -37,7 +37,7 @@ fun EditButton(
         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.brand_color)),
         modifier =
             modifier
-                .widthIn(max = 380.dp)
+                .widthIn(max = dimensionResource(R.dimen.content_max_width))
                 .fillMaxWidth()
                 .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
     ) {

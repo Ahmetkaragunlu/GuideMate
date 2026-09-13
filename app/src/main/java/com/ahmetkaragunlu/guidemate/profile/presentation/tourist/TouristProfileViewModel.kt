@@ -8,7 +8,7 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.profile.domain.repository.UserAvatarRepository
+import com.ahmetkaragunlu.guidemate.profile.domain.usecase.UpdateUserAvatarUseCase
 import com.ahmetkaragunlu.guidemate.profile.presentation.tourist.model.ProfileUiState
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +25,7 @@ class TouristProfileViewModel
     constructor(
         private val userRepository: UserRepository,
         private val walletRepository: WalletRepository,
-        private val userAvatarRepository: UserAvatarRepository,
+        private val updateUserAvatar: UpdateUserAvatarUseCase,
         private val resourceProvider: ResourceProvider,
     ) : ViewModel() {
         private val mutableUiState = MutableStateFlow(ProfileUiState())
@@ -81,7 +81,7 @@ class TouristProfileViewModel
                 it.copy(selectedAvatarUri = uri, isAvatarUpdating = true)
             }
             viewModelScope.launch {
-                when (val result = userAvatarRepository.updateAvatar(uri)) {
+                when (val result = updateUserAvatar(uri)) {
                     is DataResult.Success ->
                         mutableUiState.update {
                             it.copy(

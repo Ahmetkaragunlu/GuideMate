@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.auth.domain.session
+package com.ahmetkaragunlu.guidemate.common.network.session
 
 interface AccessTokenProvider {
     fun getAccessToken(): String?

@@ -36,7 +36,7 @@ fun TouristExploreScreen(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .padding(dimensionResource(R.dimen.spacing_medium)),
+                            .padding(dimensionResource(R.dimen.spacing_large)),
                     searchQuery = uiState.tours.searchQuery,
                     onSearchQueryChange = viewModel::updateToursSearchQuery,
                     onNavigateToFilter = onNavigateToFilter,
@@ -57,7 +57,7 @@ fun TouristExploreScreen(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .padding(dimensionResource(R.dimen.spacing_medium)),
+                            .padding(dimensionResource(R.dimen.spacing_large)),
                     searchQuery = uiState.guides.searchQuery,
                     onSearchQueryChange = viewModel::updateGuidesSearchQuery,
                     guides = uiState.guides.results,

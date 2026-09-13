@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
-import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.detailMessageResId
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.TourDetailContent
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.TourDetailNotice
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailMode

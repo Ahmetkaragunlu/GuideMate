@@ -73,7 +73,7 @@ fun GuideTourPublishStep3DetailsMediaContent(
         Column(
             modifier =
                 Modifier
-                    .widthIn(max = 380.dp)
+                    .widthIn(max = dimensionResource(R.dimen.content_max_width))
                     .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
         ) {

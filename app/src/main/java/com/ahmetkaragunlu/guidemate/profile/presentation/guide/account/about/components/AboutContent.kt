@@ -64,7 +64,7 @@ fun AboutContent(
             modifier =
                 Modifier
                     .weight(1f)
-                    .widthIn(max = 380.dp)
+                    .widthIn(max = dimensionResource(R.dimen.content_max_width))
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(24.dp),
