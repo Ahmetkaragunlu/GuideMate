@@ -32,22 +32,22 @@ fun TouristTourDetailScreen(
                 uiState = detail,
                 mode =
                     when {
-                        detail.sessionStatus != null ->
+                        detail.session.status != null ->
                             TourDetailMode.TOURIST_PAST
                         bookingAvailability.isBookable -> TourDetailMode.TOURIST_BOOKABLE
                         else -> TourDetailMode.TOURIST_UNAVAILABLE
                     },
                 onPrimaryAction = {
-                    if (bookingAvailability.isBookable) onBookTour(detail.sessionId)
+                    if (bookingAvailability.isBookable) onBookTour(detail.session.sessionId)
                 },
-                onGuideProfileClick = { onNavigateToGuideProfile(detail.guideId) },
+                onGuideProfileClick = { onNavigateToGuideProfile(detail.guide.id) },
                 reviewsLoadState = uiState.reviewsLoadState,
                 reviewsErrorMessage = uiState.reviewsErrorMessage,
                 onReviewsRetry = viewModel::retryReviews,
                 modifier = modifier,
                 topContent =
                     resolveDetailNoticeResId(
-                        detailStatus = detail.sessionStatus,
+                        detailStatus = detail.session.status,
                         bookingMessageResId = bookingAvailability.detailMessageResId,
                     )?.let { messageResId ->
                         { TourDetailNotice(messageResId = messageResId) }

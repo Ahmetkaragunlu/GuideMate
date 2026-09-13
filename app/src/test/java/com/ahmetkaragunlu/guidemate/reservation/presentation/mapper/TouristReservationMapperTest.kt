@@ -22,20 +22,20 @@ class TouristReservationMapperTest {
         val trip = reservation.toTripUiModel()
         val detail = reservation.toTourDetailUiState()
 
-        assertEquals(trip.title, detail.title)
-        assertEquals(trip.date, detail.date)
-        assertEquals(trip.location, detail.location)
-        assertEquals(trip.imageUrl, detail.imageUrl)
-        assertEquals(trip.category, detail.category)
-        assertEquals(trip.languagesText, detail.languagesText)
-        assertEquals(reservation.unitPriceMinor, detail.priceMinor)
+        assertEquals(trip.title, detail.tour.title)
+        assertEquals(trip.date, detail.session.date)
+        assertEquals(trip.location, detail.tour.location)
+        assertEquals(trip.imageUrl, detail.tour.imageUrl)
+        assertEquals(trip.category, detail.tour.category)
+        assertEquals(trip.languagesText, detail.tour.languagesText)
+        assertEquals(reservation.unitPriceMinor, detail.session.priceMinor)
         assertEquals(reservation.totalPriceMinor, trip.totalPriceMinor)
-        assertEquals(null, detail.reservedParticipantCount)
-        assertEquals(reservation.averageRating, detail.rating ?: 0.0, 0.0)
-        assertEquals(reservation.reviewCount, detail.reviewCount)
-        assertEquals(reservation.bookedCount, detail.bookedCount)
-        assertEquals(reservation.capacity, detail.capacity)
-        assertEquals(reservation.snapshot.guide.id, detail.guideId)
+        assertEquals(null, detail.session.reservedParticipantCount)
+        assertEquals(reservation.averageRating, detail.tour.rating ?: 0.0, 0.0)
+        assertEquals(reservation.reviewCount, detail.tour.reviewCount)
+        assertEquals(reservation.bookedCount, detail.session.bookedCount)
+        assertEquals(reservation.capacity, detail.session.capacity)
+        assertEquals(reservation.snapshot.guide.id, detail.guide.id)
     }
 
     @Test
@@ -73,9 +73,9 @@ class TouristReservationMapperTest {
 
         val detail = reservation.toTourDetailUiState()
 
-        assertEquals(TourDetailStatus.COMPLETED, detail.sessionStatus)
-        assertEquals(reservation.snapshot.title, detail.title)
-        assertEquals(reservation.snapshot.meetingPoint, detail.meetingPoint)
+        assertEquals(TourDetailStatus.COMPLETED, detail.session.status)
+        assertEquals(reservation.snapshot.title, detail.tour.title)
+        assertEquals(reservation.snapshot.meetingPoint, detail.session.meetingPoint)
     }
 
     private fun reservation(): TouristReservation =

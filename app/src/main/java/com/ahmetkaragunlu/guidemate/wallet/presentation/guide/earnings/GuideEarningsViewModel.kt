@@ -49,7 +49,6 @@ class GuideEarningsViewModel
         private var currentYearRefreshJob: Job? = null
 
         init {
-            refresh()
             viewModelScope.launch {
                 notificationRepository.guideEarningChanges().collect {
                     refreshCurrentYear()

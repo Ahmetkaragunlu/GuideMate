@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.profile.presentation.guide.preview
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -12,15 +13,12 @@ fun GuideProfilePreviewScreen(
     modifier: Modifier = Modifier,
     viewModel: GuideProfilePreviewViewModel = hiltViewModel(),
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     GuideMateContentState(
-        state = uiState.value.loadState,
+        state = uiState.loadState,
         onRetry = viewModel::refreshProfile,
         modifier = modifier,
     ) {
-        GuideProfileContent(
-            uiState = uiState.value,
-            modifier = modifier,
-        )
+        GuideProfileContent(uiState = uiState)
     }
 }

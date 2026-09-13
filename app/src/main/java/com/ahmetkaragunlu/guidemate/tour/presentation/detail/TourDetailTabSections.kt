@@ -73,7 +73,7 @@ internal fun TourDetailTabContent(
 
         TourDetailTab.DETAILS -> {
             ExpandableTextSection(
-                text = uiState.description,
+                text = uiState.tour.description,
                 isExpanded = isDetailsExpanded,
                 onExpand = { isDetailsExpanded = true },
                 textScrollState = detailsScrollState,
@@ -82,7 +82,7 @@ internal fun TourDetailTabContent(
 
         TourDetailTab.MEETING -> {
             ExpandableTextSection(
-                text = uiState.meetingPoint,
+                text = uiState.session.meetingPoint,
                 isExpanded = isMeetingExpanded,
                 onExpand = { isMeetingExpanded = true },
                 textScrollState = meetingScrollState,

@@ -194,11 +194,16 @@ class TouristExploreViewModel
                     _uiState.map { it.selectedTab },
                     _uiState.map { it.tours.searchQuery.trim() },
                     _uiState.map { it.appliedFilters },
-                    ::Triple,
-                ).distinctUntilChanged()
-                    .collectLatest { (tab, _, _) ->
+                ) { tab, query, filters ->
+                    TourSearchTrigger(
+                        selectedTab = tab,
+                        query = query,
+                        filters = filters,
+                    )
+                }.distinctUntilChanged()
+                    .collectLatest { trigger ->
                         delay(SEARCH_DEBOUNCE_MILLIS)
-                        if (tab == ExploreTab.TOURS) refreshTours()
+                        if (trigger.selectedTab == ExploreTab.TOURS) refreshTours()
                     }
             }
         }
@@ -397,3 +402,9 @@ class TouristExploreViewModel
             const val SEARCH_DEBOUNCE_MILLIS = 350L
         }
     }
+
+private data class TourSearchTrigger(
+    val selectedTab: ExploreTab,
+    val query: String,
+    val filters: TourFilterUiState,
+)

@@ -66,10 +66,10 @@ class TourCheckoutViewModel
                 val availableCapacity = tourWithSession?.session?.availableCapacity ?: 0
 
                 action.copy(
-                    tourTitle = detail?.title.orEmpty(),
-                    date = detail?.date.orEmpty(),
-                    location = detail?.location.orEmpty(),
-                    unitPriceMinor = detail?.priceMinor ?: 0,
+                    tourTitle = detail?.tour?.title.orEmpty(),
+                    date = detail?.session?.date.orEmpty(),
+                    location = detail?.tour?.location.orEmpty(),
+                    unitPriceMinor = detail?.session?.priceMinor ?: 0,
                     participantCount =
                         action.participantCount.coerceIn(
                             minimumValue = 1,

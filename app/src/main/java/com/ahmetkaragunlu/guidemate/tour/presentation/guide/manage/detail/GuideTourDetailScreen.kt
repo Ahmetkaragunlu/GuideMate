@@ -65,7 +65,7 @@ fun GuideTourDetailScreen(
                 if (uiState.action.isCancelDialogVisible) {
                     CancelTourSessionDialog(
                         reason = uiState.action.cancellationReason,
-                        hasBookings = detail.bookedCount > 0,
+                        hasBookings = detail.session.bookedCount > 0,
                         onReasonChange = viewModel::onCancellationReasonChange,
                         onDismiss = viewModel::dismissCancelDialog,
                         onConfirm = viewModel::cancelSession,

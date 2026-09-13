@@ -39,7 +39,11 @@ constructor(
             repository.hasMoreNotifications,
             loadState,
             combine(isLoadingMore, isMarkingAllRead, errorMessage) { more, marking, error ->
-                Triple(more, marking, error)
+                NotificationOperationState(
+                    isLoadingMore = more,
+                    isMarkingAllRead = marking,
+                    errorMessage = error,
+                )
             },
         ) { notifications, unreadCount, hasMore, currentLoadState, operationState ->
             NotificationUiState(
@@ -47,9 +51,9 @@ constructor(
                 unreadCount = unreadCount,
                 hasMore = hasMore,
                 loadState = currentLoadState,
-                isLoadingMore = operationState.first,
-                isMarkingAllRead = operationState.second,
-                errorMessage = operationState.third,
+                isLoadingMore = operationState.isLoadingMore,
+                isMarkingAllRead = operationState.isMarkingAllRead,
+                errorMessage = operationState.errorMessage,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -135,3 +139,9 @@ constructor(
         errorMessage.value = null
     }
 }
+
+private data class NotificationOperationState(
+    val isLoadingMore: Boolean,
+    val isMarkingAllRead: Boolean,
+    val errorMessage: String?,
+)

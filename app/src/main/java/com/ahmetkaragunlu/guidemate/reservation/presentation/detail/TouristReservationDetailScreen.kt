@@ -50,7 +50,7 @@ fun TouristReservationDetailScreen(
                         -> TourDetailMode.TOURIST_UNAVAILABLE
                     },
                 onPrimaryAction = viewModel::showReviewForm,
-                onGuideProfileClick = { onNavigateToGuideProfile(detail.guideId) },
+                onGuideProfileClick = { onNavigateToGuideProfile(detail.guide.id) },
                 reviewsLoadState = uiState.reviewsLoadState,
                 reviewsErrorMessage = uiState.reviewsErrorMessage,
                 onReviewsRetry = viewModel::retryReviews,

@@ -78,8 +78,8 @@ class TouristReservationDetailViewModelTest {
             assertEquals("Excellent tour", reviewRepository.submittedReview?.second?.comment)
             assertTrue(viewModel.uiState.value.reviewForm.showSuccessDialog)
             val detail = requireNotNull(viewModel.uiState.value.detail)
-            assertEquals(4.9, detail.rating ?: 0.0, 0.0)
-            assertEquals(18L, detail.reviewCount)
+            assertEquals(4.9, detail.tour.rating ?: 0.0, 0.0)
+            assertEquals(18L, detail.tour.reviewCount)
             assertFalse(viewModel.uiState.value.canSubmitReview)
         }
 

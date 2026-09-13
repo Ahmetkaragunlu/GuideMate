@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -99,10 +99,7 @@ fun GuideMyToursScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        itemsIndexed(uiState.tours, key = { _, tour -> tour.id }) { index, tour ->
-                            if (index == uiState.tours.lastIndex && uiState.canLoadMore) {
-                                LaunchedEffect(tour.id) { viewModel.loadMore() }
-                            }
+                        items(uiState.tours, key = { tour -> tour.id }) { tour ->
                             when (uiState.selectedTab) {
                                 GuideTourTab.ACTIVE ->
                                     ActiveTourCard(
@@ -149,6 +146,12 @@ fun GuideMyToursScreen(
                             item {
                                 TextButton(onClick = viewModel::loadMore) {
                                     Text(text = stringResource(R.string.common_retry))
+                                }
+                            }
+                        } else if (uiState.canLoadMore) {
+                            item {
+                                LaunchedEffect(uiState.tours.size) {
+                                    viewModel.loadMore()
                                 }
                             }
                         }

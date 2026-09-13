@@ -46,6 +46,7 @@ class GuideEarningsViewModelTest {
                     FakeNotificationRepository(),
                     FakeResourceProvider(),
                 )
+            viewModel.refresh()
             runCurrent()
 
             val currentMonth = viewModel.uiState.value.currentMonth
@@ -77,7 +78,7 @@ class GuideEarningsViewModelTest {
             runCurrent()
 
             assertEquals(
-                listOf(currentYear, previousYear, currentYear),
+                listOf(previousYear, currentYear),
                 repository.requestedMonthlyEarningsYears,
             )
             assertEquals(previousYear, viewModel.uiState.value.selectedYear)
@@ -90,7 +91,7 @@ class GuideEarningsViewModelTest {
             runCurrent()
 
             assertEquals(
-                listOf(currentYear, previousYear, currentYear, currentYear),
+                listOf(previousYear, currentYear, currentYear),
                 repository.requestedMonthlyEarningsYears,
             )
             assertEquals(previousYear, viewModel.uiState.value.selectedYear)

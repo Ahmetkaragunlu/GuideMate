@@ -143,7 +143,10 @@ private fun LazyListScope.popularToursSection(
                     LazyRow(
                         horizontalArrangement =
                             Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-                        contentPadding = PaddingValues(horizontal = 4.dp),
+                        contentPadding =
+                            PaddingValues(
+                                horizontal = dimensionResource(R.dimen.spacing_tiny),
+                            ),
                     ) {
                         items(tours, key = { it.id }) { tour ->
                             PopularTourCard(

@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.navigation.tourist
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -86,9 +87,9 @@ internal fun NavGraphBuilder.touristNavGraph(
         )
     }
     composable<TouristDestination.Chat> {
-        val chatListUiState = chatListViewModel.uiState.collectAsStateWithLifecycle()
+        val chatListUiState by chatListViewModel.uiState.collectAsStateWithLifecycle()
         ChatListScreen(
-            uiState = chatListUiState.value,
+            uiState = chatListUiState,
             onNavigateToDetail = { chatId ->
                 touristNavController.navigateTo(ChatDestination.Detail(chatId))
             },

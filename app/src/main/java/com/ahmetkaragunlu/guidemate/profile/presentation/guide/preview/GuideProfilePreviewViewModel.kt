@@ -36,6 +36,7 @@ class GuideProfilePreviewViewModel
                 },
             )
         private var refreshJob: Job? = null
+        private var popularToursJob: Job? = null
         private val popularTours = MutableStateFlow<List<TourSearchItem>>(emptyList())
 
         val uiState: StateFlow<GuideProfileContentUiState> =
@@ -58,7 +59,6 @@ class GuideProfilePreviewViewModel
             )
 
         init {
-            profileRepository.cachedOwnProfile?.guideId?.let(::refreshPopularTours)
             refreshProfile()
         }
 
@@ -76,6 +76,9 @@ class GuideProfilePreviewViewModel
                             }
                             is DataResult.Error ->
                                 if (hasCachedProfile) {
+                                    profileRepository.cachedOwnProfile
+                                        ?.guideId
+                                        ?.let(::refreshPopularTours)
                                     ContentLoadState.CONTENT
                                 } else {
                                     ContentLoadState.ERROR
@@ -85,7 +88,9 @@ class GuideProfilePreviewViewModel
         }
 
         private fun refreshPopularTours(guideId: Long) {
-            viewModelScope.launch {
+            popularToursJob?.cancel()
+            popularToursJob =
+                viewModelScope.launch {
                 when (
                     val result =
                         tourRepository.getPopularToursForGuide(

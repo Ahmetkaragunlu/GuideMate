@@ -6,8 +6,11 @@ import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripUiModel
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReview
+import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailGuideUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailReviewUiModel
+import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailSessionUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
+import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailTourUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
 
@@ -16,20 +19,20 @@ fun TouristReservation.toTripUiModel(): TripUiModel {
     return TripUiModel(
         reservationId = id,
         tourSessionId = tourSessionId,
-        title = detail.title,
-        date = detail.date,
-        location = detail.location,
-        imageResId = detail.imageResId,
-        imageUrl = detail.imageUrl,
+        title = detail.tour.title,
+        date = detail.session.date,
+        location = detail.tour.location,
+        imageResId = detail.tour.imageResId,
+        imageUrl = detail.tour.imageUrl,
         participantCount = participantCount,
-        category = checkNotNull(detail.category),
-        languagesFlag = detail.languagesFlag,
-        languagesText = detail.languagesText,
+        category = checkNotNull(detail.tour.category),
+        languagesFlag = detail.tour.languagesFlag,
+        languagesText = detail.tour.languagesText,
         totalPriceMinor = totalPriceMinor,
         startsAt = snapshot.startsAt,
-        sessionStatus = detail.sessionStatus,
+        sessionStatus = detail.session.status,
         cancellationTitleResId = cancellationTitleResId(),
-        cancellationReason = detail.cancellationReason,
+        cancellationReason = detail.session.cancellationReason,
     )
 }
 
@@ -37,33 +40,44 @@ fun TouristReservation.toTourDetailUiState(
     publicReviews: List<TourReview> = emptyList(),
 ): TourDetailUiState =
     TourDetailUiState(
-        sessionId = tourSessionId,
-        tourId = snapshot.tourId,
-        title = snapshot.title,
-        imageResId = R.drawable.ic_image_unavailable,
-        imageUrl = snapshot.coverImageUrl,
-        rating = averageRating.takeIf { reviewCount > 0 },
-        reviewCount = reviewCount,
-        date = snapshot.startsAt.formatTourDateTime(snapshot.timeZoneId),
-        durationMinutes = snapshot.durationMinutes,
-        location =
-            listOf(snapshot.city, snapshot.country)
-                .filter(String::isNotBlank)
-                .joinToString(", "),
-        languagesFlag = snapshot.languages.joinToString(separator = " ") { it.flagEmoji },
-        languagesText = snapshot.languages.joinToString(separator = ", ") { it.shortCode },
-        category = snapshot.category,
-        priceMinor = unitPriceMinor,
-        bookedCount = bookedCount,
-        capacity = capacity,
-        description = snapshot.description,
-        meetingPoint = snapshot.meetingPoint,
-        sessionStatus = status.toDetailStatus(),
-        cancellationReason = cancellationReason,
-        guideId = snapshot.guide.id,
-        guideName = snapshot.guide.displayName,
-        guideImageResId = R.drawable.ic_default_avatar,
-        guideImageUrl = snapshot.guide.profileImageUrl,
+        tour =
+            TourDetailTourUiState(
+                id = snapshot.tourId,
+                title = snapshot.title,
+                imageResId = R.drawable.ic_image_unavailable,
+                imageUrl = snapshot.coverImageUrl,
+                rating = averageRating.takeIf { reviewCount > 0 },
+                reviewCount = reviewCount,
+                location =
+                    listOf(snapshot.city, snapshot.country)
+                        .filter(String::isNotBlank)
+                        .joinToString(", "),
+                languagesFlag =
+                    snapshot.languages.joinToString(separator = " ") { it.flagEmoji },
+                languagesText =
+                    snapshot.languages.joinToString(separator = ", ") { it.shortCode },
+                category = snapshot.category,
+                description = snapshot.description,
+            ),
+        session =
+            TourDetailSessionUiState(
+                sessionId = tourSessionId,
+                date = snapshot.startsAt.formatTourDateTime(snapshot.timeZoneId),
+                durationMinutes = snapshot.durationMinutes,
+                priceMinor = unitPriceMinor,
+                bookedCount = bookedCount,
+                capacity = capacity,
+                meetingPoint = snapshot.meetingPoint,
+                status = status.toDetailStatus(),
+                cancellationReason = cancellationReason,
+            ),
+        guide =
+            TourDetailGuideUiState(
+                id = snapshot.guide.id,
+                name = snapshot.guide.displayName,
+                imageResId = R.drawable.ic_default_avatar,
+                imageUrl = snapshot.guide.profileImageUrl,
+            ),
         reviews = publicReviews.map(TourReview::toDetailReviewUiModel),
     )
 

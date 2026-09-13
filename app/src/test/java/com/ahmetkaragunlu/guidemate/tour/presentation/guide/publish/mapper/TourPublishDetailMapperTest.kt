@@ -60,25 +60,25 @@ class TourPublishDetailMapperTest {
 
         val preview = state.toPreviewDetailUiState()
 
-        assertEquals("Historic Istanbul", preview.title)
-        assertEquals("A guided city walk", preview.description)
-        assertEquals("Sultanahmet Square", preview.meetingPoint)
-        assertEquals("Türkiye, İstanbul", preview.location)
-        assertEquals(150_025L, preview.priceMinor)
-        assertEquals(12, preview.capacity)
-        assertEquals("Ada Guide", preview.guideName)
-        assertEquals("content://cover", preview.imageUrl)
-        assertTrue(preview.date.isNotBlank())
+        assertEquals("Historic Istanbul", preview.tour.title)
+        assertEquals("A guided city walk", preview.tour.description)
+        assertEquals("Sultanahmet Square", preview.session.meetingPoint)
+        assertEquals("Türkiye, İstanbul", preview.tour.location)
+        assertEquals(150_025L, preview.session.priceMinor)
+        assertEquals(12, preview.session.capacity)
+        assertEquals("Ada Guide", preview.guide.name)
+        assertEquals("content://cover", preview.tour.imageUrl)
+        assertTrue(preview.session.date.isNotBlank())
     }
 
     @Test
     fun `empty draft does not invent mock tour content`() {
         val preview = GuideTourPublishUiState().toPreviewDetailUiState()
 
-        assertEquals("", preview.title)
-        assertEquals("", preview.description)
-        assertEquals("", preview.meetingPoint)
-        assertEquals(0L, preview.priceMinor)
-        assertEquals(0, preview.capacity)
+        assertEquals("", preview.tour.title)
+        assertEquals("", preview.tour.description)
+        assertEquals("", preview.session.meetingPoint)
+        assertEquals(0L, preview.session.priceMinor)
+        assertEquals(0, preview.session.capacity)
     }
 }

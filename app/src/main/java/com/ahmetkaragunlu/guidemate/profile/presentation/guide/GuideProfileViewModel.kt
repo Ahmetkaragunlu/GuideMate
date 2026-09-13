@@ -55,6 +55,7 @@ class GuideProfileViewModel
             )
         private val popularTours = MutableStateFlow<List<TourSearchItem>>(emptyList())
         private var refreshJob: Job? = null
+        private var popularToursJob: Job? = null
 
         val profileState: StateFlow<GuideProfileUiState> =
             combine(
@@ -79,7 +80,6 @@ class GuideProfileViewModel
             )
 
         init {
-            profileRepository.cachedOwnProfile?.guideId?.let(::refreshPopularTours)
             refreshProfile()
             viewModelScope.launch {
                 notificationRepository.pushEvents.collect { target ->
@@ -112,6 +112,9 @@ class GuideProfileViewModel
                                 operationState.update {
                                     it.copy(userMessage = result.error.toMessage(resourceProvider))
                                 }
+                                profileRepository.cachedOwnProfile
+                                    ?.guideId
+                                    ?.let(::refreshPopularTours)
                             } else {
                                 operationState.update { it.copy(loadState = ContentLoadState.ERROR) }
                             }
@@ -121,7 +124,9 @@ class GuideProfileViewModel
         }
 
         private fun refreshPopularTours(guideId: Long) {
-            viewModelScope.launch {
+            popularToursJob?.cancel()
+            popularToursJob =
+                viewModelScope.launch {
                 when (
                     val result =
                         tourRepository.getPopularToursForGuide(

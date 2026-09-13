@@ -1,6 +1,5 @@
 package com.ahmetkaragunlu.guidemate.notification.presentation.guide.settings
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,21 +9,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.common.ui.components.GuideMateContentState
 import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationPreferencesUiState
 import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationPreferencesViewModel
 import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationSettingsSectionTitle
+import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationSettingsScreenHost
 import com.ahmetkaragunlu.guidemate.notification.presentation.settings.NotificationSettingsSwitchRow
 
 @Composable
@@ -32,21 +27,10 @@ fun GuideNotificationSettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: NotificationPreferencesViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    LaunchedEffect(uiState.userMessage) {
-        uiState.userMessage?.let { message ->
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            viewModel.onMessageShown()
-        }
-    }
-
-    GuideMateContentState(
-        state = uiState.loadState,
-        onRetry = viewModel::refresh,
-        errorMessage = uiState.userMessage,
+    NotificationSettingsScreenHost(
+        viewModel = viewModel,
         modifier = modifier,
-    ) {
+    ) { uiState ->
         GuideNotificationSettingsContent(
             uiState = uiState,
             onUpcomingTourRemindersChanged = viewModel::updateUpcomingTourReminders,

@@ -167,12 +167,16 @@ class FakeGuideProfileRepository(
     override val cachedOwnProfile: GuideProfile?
         get() = profileState.value
     var updateResult: DataResult<GuideProfile> = DataResult.Success(profile)
+    var refreshOwnProfileResult: DataResult<GuideProfile>? = null
+    var refreshOwnProfileRequestCount: Int = 0
     var publicProfileResult: DataResult<GuideProfile> = DataResult.Success(profile)
     val publicProfileRequests = mutableListOf<Long>()
     var lastUpdate: GuideProfileUpdate? = null
 
-    override suspend fun refreshOwnProfile(): DataResult<GuideProfile> =
-        DataResult.Success(checkNotNull(profileState.value))
+    override suspend fun refreshOwnProfile(): DataResult<GuideProfile> {
+        refreshOwnProfileRequestCount += 1
+        return refreshOwnProfileResult ?: DataResult.Success(checkNotNull(profileState.value))
+    }
 
     override suspend fun updateOwnProfile(update: GuideProfileUpdate): DataResult<GuideProfile> {
         lastUpdate = update

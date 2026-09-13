@@ -18,7 +18,7 @@ class TourDetailMapperTest {
                 session = details.sessions.single(),
             ).toTourDetailUiState()
 
-        assertEquals(details.tour.guide.id, uiState.guideId)
+        assertEquals(details.tour.guide.id, uiState.guide.id)
     }
 
     @Test
@@ -31,6 +31,6 @@ class TourDetailMapperTest {
                 session = details.sessions.single(),
             ).toTourDetailUiState()
 
-        assertEquals(TourDetailStatus.EXPIRED, uiState.sessionStatus)
+        assertEquals(TourDetailStatus.EXPIRED, uiState.session.status)
     }
 }

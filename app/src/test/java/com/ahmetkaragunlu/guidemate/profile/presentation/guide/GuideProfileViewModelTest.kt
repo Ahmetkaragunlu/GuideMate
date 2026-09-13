@@ -57,4 +57,28 @@ class GuideProfileViewModelTest {
             assertNull(viewModel.profileState.value.selectedProfileImageUri)
             collection.cancel()
         }
+
+    @Test
+    fun cachedProfileLoadsPopularToursOnceAfterSuccessfulRefresh() =
+        runTest {
+            val profileRepository = FakeGuideProfileRepository()
+            val tourRepository = FakeTourDiscoveryRepository()
+
+            GuideProfileViewModel(
+                profileRepository = profileRepository,
+                updateUserAvatar =
+                    UpdateUserAvatarUseCase(
+                        mediaRepository = FakeMediaRepository(),
+                        userAvatarRepository = FakeUserAvatarRepository(),
+                        userRepository = FakeUserRepository(),
+                    ),
+                resourceProvider = FakeResourceProvider(),
+                tourRepository = tourRepository,
+                notificationRepository = FakeNotificationRepository(),
+            )
+            runCurrent()
+
+            assertEquals(1, profileRepository.refreshOwnProfileRequestCount)
+            assertEquals(1, tourRepository.popularForGuideRequests.size)
+        }
 }

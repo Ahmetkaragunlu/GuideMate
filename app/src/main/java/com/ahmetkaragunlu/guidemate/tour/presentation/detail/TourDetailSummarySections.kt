@@ -49,10 +49,10 @@ internal fun TourDetailSummary(
     topContent?.invoke()
     if (mode.showPreviewBanner) PreviewBanner()
     HeroSection(uiState = uiState)
-    uiState.sessionStatus?.let { status ->
+    uiState.session.status?.let { status ->
         TourStatusSection(
             status = status,
-            cancellationReason = uiState.cancellationReason,
+            cancellationReason = uiState.session.cancellationReason,
         )
     }
     TourDetailSectionDivider()
@@ -149,8 +149,8 @@ private fun HeroSection(uiState: TourDetailUiState) {
                 .padding(top = dimensionResource(R.dimen.spacing_medium)),
     ) {
         GuideMateImage(
-            fallbackImageResId = uiState.imageResId,
-            imageUrl = uiState.imageUrl,
+            fallbackImageResId = uiState.tour.imageResId,
+            imageUrl = uiState.tour.imageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
@@ -180,14 +180,21 @@ private fun HeroSection(uiState: TourDetailUiState) {
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
         ) {
             Text(
-                text = uiState.title,
+                text = uiState.tour.title,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onPrimary,
                 fontWeight = FontWeight.Bold,
             )
-            if (uiState.rating != null && uiState.reviewCount > 0) {
+            if (uiState.tour.rating != null && uiState.tour.reviewCount > 0) {
                 Text(
-                    text = "⭐ ${stringResource(R.string.rating_review_format, uiState.rating, uiState.reviewCount)}",
+                    text =
+                        "⭐ ${
+                            stringResource(
+                                R.string.rating_review_format,
+                                uiState.tour.rating,
+                                uiState.tour.reviewCount,
+                            )
+                        }",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary,
                 )
@@ -207,22 +214,26 @@ private fun DateLocationRow(uiState: TourDetailUiState) {
     ) {
         EmojiLabelItem(
             emoji = "📅",
-            label = uiState.date,
+            label = uiState.session.date,
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (uiState.durationMinutes > 0) {
+            if (uiState.session.durationMinutes > 0) {
                 EmojiLabelItem(
                     emoji = "⏱️",
-                    label = stringResource(R.string.tour_duration_format, uiState.durationMinutes),
+                    label =
+                        stringResource(
+                            R.string.tour_duration_format,
+                            uiState.session.durationMinutes,
+                        ),
                 )
             }
             EmojiLabelItem(
                 emoji = "🌍",
-                label = uiState.location,
+                label = uiState.tour.location,
             )
         }
     }
@@ -239,10 +250,10 @@ private fun LanguageCategoryRow(uiState: TourDetailUiState) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         EmojiLabelItem(
-            emoji = uiState.languagesFlag,
-            label = uiState.languagesText,
+            emoji = uiState.tour.languagesFlag,
+            label = uiState.tour.languagesText,
         )
-        uiState.category?.let { category ->
+        uiState.tour.category?.let { category ->
             EmojiLabelItem(
                 emoji = "🏷️",
                 label = stringResource(TourCategoryCatalog.uiModelFor(category).titleResId),
@@ -279,14 +290,14 @@ private fun PriceRow(uiState: TourDetailUiState) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = uiState.priceMinor.toPlatformCurrencyFromMinorUnit(),
+            text = uiState.session.priceMinor.toPlatformCurrencyFromMinorUnit(),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.brand_color),
         )
         if (
-            uiState.sessionStatus != TourDetailStatus.CANCELLED &&
-                (uiState.reservedParticipantCount != null || uiState.capacity > 0)
+            uiState.session.status != TourDetailStatus.CANCELLED &&
+                (uiState.session.reservedParticipantCount != null || uiState.session.capacity > 0)
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
@@ -300,13 +311,13 @@ private fun PriceRow(uiState: TourDetailUiState) {
                 )
                 Text(
                     text =
-                        uiState.reservedParticipantCount?.let { participantCount ->
+                        uiState.session.reservedParticipantCount?.let { participantCount ->
                             stringResource(R.string.participant_count, participantCount)
                         }
                             ?: stringResource(
                                 R.string.tour_participant_capacity_format,
-                                uiState.bookedCount,
-                                uiState.capacity,
+                                uiState.session.bookedCount,
+                                uiState.session.capacity,
                             ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorResource(R.color.text_color),
@@ -334,8 +345,8 @@ private fun GuideInfoRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             GuideMateImage(
-                fallbackImageResId = uiState.guideImageResId,
-                imageUrl = uiState.guideImageUrl,
+                fallbackImageResId = uiState.guide.imageResId,
+                imageUrl = uiState.guide.imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier =
@@ -345,7 +356,7 @@ private fun GuideInfoRow(
             )
             Column {
                 Text(
-                    text = uiState.guideName,
+                    text = uiState.guide.name,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                 )
