@@ -68,9 +68,9 @@
 
     <string name="notification_tour_cancelled">Turunuz iptal edildi.</string>
 
-    <string name="notification_tour_completed">%1$s turunuz tamamlandı ve Geçmiş bölümüne taşındı.</string>
+    <string name="notification_tour_completed">%1$s turunuz tamamlandı.</string>
 
-    <string name="notification_tour_completed_generic">Turunuz tamamlandı ve Geçmiş bölümüne taşındı.</string>
+    <string name="notification_tour_completed_generic">Turunuz tamamlandı.</string>
 
     <string name="notification_review_request">Tamamlanan turunuzu değerlendirebilirsiniz.</string>
 

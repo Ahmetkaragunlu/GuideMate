@@ -11,10 +11,10 @@ import kotlinx.coroutines.CancellationException
 @Singleton
 class CredentialSessionManager @Inject constructor(
     @ApplicationContext context: Context,
-) {
+) : CredentialSessionCleaner {
     private val credentialManager = CredentialManager.create(context)
 
-    suspend fun clear() {
+    override suspend fun clear() {
         try {
             credentialManager.clearCredentialState(ClearCredentialStateRequest())
         } catch (cancellation: CancellationException) {

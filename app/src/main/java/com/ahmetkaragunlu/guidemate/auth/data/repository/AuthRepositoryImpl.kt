@@ -4,7 +4,7 @@ import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.auth.domain.session.isTerminalSessionError
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.AuthSessionManager
-import com.ahmetkaragunlu.guidemate.auth.data.local.session.CredentialSessionManager
+import com.ahmetkaragunlu.guidemate.auth.data.local.session.CredentialSessionCleaner
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.TokenManager
 import com.ahmetkaragunlu.guidemate.auth.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.auth.data.mapper.toNetwork
@@ -35,7 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenManager: TokenManager,
     private val installationIdDataSource: InstallationIdDataSource,
     private val authSessionManager: AuthSessionManager,
-    private val credentialSessionManager: CredentialSessionManager,
+    private val credentialSessionCleaner: CredentialSessionCleaner,
     private val apiErrorParser: ApiErrorParser,
     private val networkExceptionMapper: NetworkExceptionMapper,
     private val emailPolicy: EmailPolicy,
@@ -91,7 +91,7 @@ class AuthRepositoryImpl @Inject constructor(
                 null
             }
         authSessionManager.clearSession()
-        credentialSessionManager.clear()
+        credentialSessionCleaner.clear()
 
         if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank() || installationId == null) {
             return DataResult.Success(Unit)
@@ -164,7 +164,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun clearLocalSession() {
         authSessionManager.clearSession()
-        credentialSessionManager.clear()
+        credentialSessionCleaner.clear()
     }
 
     private suspend fun Response<AuthResponse>.toSessionResult(

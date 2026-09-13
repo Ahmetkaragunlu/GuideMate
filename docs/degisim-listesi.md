@@ -73,6 +73,10 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
   sinirlari ve constructor dependency injection ile saglanir.
 - Testler ilgili feature ve katmanin test paketinde bulunur; Android davranisi
   icin backend, backend davranisi icin Android testi yazilmaz.
+- Her partta test dosyalarinin feature ve katman sahipligi, JVM, Robolectric
+  veya instrumentation source-set secimi, production ve test bagimlilik yonu
+  ile SOLID uyumu kontrol edilir. Gercek bir ihlal varsa ayni partta en kucuk
+  cozumle giderilir; test ugruna production mimarisi veya katman yonu bozulmaz.
 - Kod yazilirken ilgili otomatik testler yazilip calistirilir. Kapsamli manuel
   cihaz/Sandbox/coklu kullanici testleri ayrica `docs/kullanici-testleri.md`
   uzerinden izlenir.
@@ -82,245 +86,197 @@ mimariyi gereksiz yere buyutmek icin kullanilmaz.
 
 ## Degisiklikler
 
-### DEG-001 - Kazanc Ekranindaki Ilk Yenileme Tekrarini Kaldirmak
+### Part 1 - Auth, Oturum ve Yerel Guvenlik Sinirlari
+
+Bu part once uygulanir. Oturumun kaydedilmesi, temizlenmesi, access token
+siniri ve cihaza ait kalici kimlikler birlikte dogrulanir.
+
+#### TEST-001 - Auth Repository Oturum Davranisi
 
 - Durum: `TAMAMLANDI`
-- `GuideEarningsViewModel` olusturulurken `init` icinde `refresh()` cagriliyor;
-  kazanc veya rehber cuzdan rotasi composition'a girdiginde navigation katmani
-  ayni veriyi yeniden istiyor. Bu durum ilk acilista gereksiz ve iptal edilip
-  yeniden baslatilan bir backend istegi olusturabilir.
-- `LaunchedEffect(Unit)` ekrandan ayrilip tekrar girildiginde yeniden calisir.
-  Bu nedenle eski rapordaki "yalniz ilk composition'da calisir" gerekcesi esas
-  alinmayacaktir.
-- En sade cozum, ViewModel `init` icindeki eager `refresh()` cagrisini kaldirip
-  rota acilisindaki yenilemeyi korumaktir. Boylece veri yalniz gercekten gereken
-  ekran acildiginda ve ekrana yeniden girildiginde guncellenir.
-- Bildirim kaynakli `EARNING_AVAILABLE` yenilemesi, secili yil davranisi, ekran
-  tasarimi, navigation ve backend sozlesmesi degismeyecektir. Yeni lifecycle
-  helper'i, use-case, repository veya ekran eklenmeyecektir.
-- Test karari: Mevcut ViewModel testleri eager yukleme varsayiyorsa ekran
-  sahipligindeki yeni davranisa gore guncellenecektir. Salt `LaunchedEffect`
-  calistigini kanitlamak icin gereksiz Compose testi yazilmayacaktir; derleme ve
-  mevcut kazanc state testleri yeterlidir.
+- `AuthRepositoryImpl` icin basarili giriste token ve kullanici kaydi, eksik
+  token iceren basarili cevabin reddedilmesi, terminal oturum hatasinda yerel
+  oturumun temizlenmesi ve backend logout basarisiz olsa bile yerel temizligin
+  tamamlanmasi test edilmektedir.
+- AndroidX credential temizligi gercek bir dis sistem adapter siniri oldugu icin
+  repository somut framework sinifi yerine `CredentialSessionCleaner`
+  sozlesmesine baglanmistir. Hilt uretimde mevcut manager'i kullanmaya devam
+  eder; kullanici davranisi degismemistir.
 
-### DEG-002 - Bildirim Islem State'ini Isimli Hale Getirmek
+#### TEST-002 - Auth Preferences Kaliciligi
 
 - Durum: `TAMAMLANDI`
-- `NotificationViewModel` icindeki nested `combine`, ek islem durumlarini
-  `Triple<Boolean, Boolean, String?>` ile tasiyor. Kod calisiyor ancak
-  `first`, `second` ve `third` alanlari kendi anlamlarini aciklamiyor.
-- Yalniz ViewModel sahipliginde dar bir `NotificationOperationState` modeli
-  kullanilarak `isLoadingMore`, `isMarkingAllRead` ve `errorMessage` alanlari
-  isimli hale getirilecektir.
-- Repository'nin canonical bildirim, okunmamis sayi ve sayfalama akislarinin
-  sahipligi korunacaktir. Butun state tek bir mutable UI state'e tasinmayacak;
-  manuel senkronizasyon veya ikinci bir state kaynagi olusturulmayacaktir.
-- Bildirim yenileme, FCM/STOMP, rozet, okundu senkronizasyonu, hata mesaji,
-  tasarim ve kullanici davranisi degismeyecektir. Bu yalniz okunabilirlik ve
-  isimlendirme refactor'udur.
-- Test karari: Davranis degismedigi icin yeni test yazilmayacaktir. Mevcut
-  `NotificationViewModel` testleri ve derleme, refactor'un ayni state'i
-  urettigini dogrulamak icin yeterlidir.
+- `AuthPreferencesDataSource` icin tum kullanici alanlarini kaydetme ve geri
+  yukleme, StateFlow guncellemesi ve cikista onboarding tercihini koruyarak
+  kullanici verisini temizleme test edilmektedir. Nullable alanlarin eski
+  degerleri birakmadigi da dogrulanmaktadir.
 
-### DEG-003 - Kesfet Arama Tetikleyicisinin Niyetini Aciklamak
+#### TEST-012 - Auth Interceptor Token Siniri
 
 - Durum: `TAMAMLANDI`
-- `TouristExploreViewModel` arama akisi tab, arama metni ve filtre degisikliklerini
-  dinliyor; ancak `collectLatest { (tab, _, _) -> ... }` ifadesi arama metni ve
-  filtrenin neden combine'a dahil edildigini okuyucuya aciklamiyor.
-- Arama metni ve filtre degerleri sonuc lambdasinda kullanilmasa bile degisiklik
-  tetikleyicileridir; gercek sorgu yenileme aninda guncel UI state'ten uretilmeye
-  devam edecektir.
-- Akis, bu niyeti isimlerle gosteren dar bir trigger degerine veya acik bir
-  combine donusumune cevrilecektir. Yeni genel event framework'u, use-case,
-  repository veya ek state kaynagi kurulmayacaktir.
-- Debounce, `collectLatest`, request-generation korumasi, filtreleme, sayfalama,
-  hata/retry davranisi ve ekran tasarimi aynen korunacaktir.
-- Test karari: Part 1'de eklenen kesfet ViewModel testleri arama metni, filtre,
-  gec sonuc ve sayfalama davranisini zaten kapsadigi icin yeni bir test
-  yazilmayacaktir. Mevcut testler refactor sonrasinda yeniden calistirilacaktir.
+- Access tokenin yalniz korumali GuideMate backend isteklerine eklendigi;
+  public endpointlere ve harici adreslere sizmadigi odakli ag testiyle
+  dogrulanmaktadir.
 
-### DEG-004 - Rehber Profilinde Yinelenen Popular Tur Istegini Onlemek
+#### TEST-013 - Installation ID Kararliligi
 
 - Durum: `TAMAMLANDI`
-- `GuideProfileViewModel` ve `GuideProfilePreviewViewModel`, onbellekte rehber
-  profili varsa popular turlari `init` sirasinda isteyebiliyor. Ardindan profil
-  yenilemesi basarili olunca ayni rehber icin ayni istek yeniden baslatiliyor.
-  Tek ekran acilisinda ayni verinin iki kez istenmesi gereksiz backend ve ag
-  yuku olusturabilir; gec tamamlanan iki sonuc da birbiriyle yarismamalidir.
-- Ortak helper, base ViewModel veya yalniz repository metodunu cagiran bos bir
-  use-case eklenmeyecektir. Public rehber profilinin uc turluk on izleme,
-  bagimsiz hata ve retry davranisi farkli oldugu icin bu akis zorla
-  ortaklastirilmayacaktir.
-- Kendi profil ve on izleme ViewModel'lerinde acilis karari dar tutulacaktir.
-  Profil yenilemesi basariliysa guncel `guideId`, yenileme basarisiz fakat
-  onbellekte profil varsa cached `guideId` kullanilarak popular turlar yalniz
-  bir kez istenecektir. Gerekli is iptali veya aktif is korumasi ilgili
-  ViewModel sahipliginde kalacaktir.
-- Profil, popular tur kartlari, hata davranisi, navigation, ekran tasarimi ve
-  backend sozlesmesi degismeyecektir. Degisiklik yalniz yinelenen istegi ve
-  olasi sonuc yarisini kaldiracaktir.
-- Test karari: Onbellekte profil varken basarili ve cached-fallback acilislarinda
-  popular tur repository cagrisinin yalniz bir kez yapildigi odakli ViewModel
-  testleriyle dogrulanacaktir. Public profil akisi veya Compose gorunumu ayni
-  davranis icin yeniden test edilmeyecektir.
+- `InstallationIdDataSource` icin tekrarli ve es zamanli cagrilarin ayni gecerli
+  UUID'yi dondurmesi, bozuk kaydin ise guvenli sekilde yenilenmesi test
+  edilmektedir.
 
-### DEG-005 - Bildirim Ayarlari Ortak Ekran State Host'unu Ayirmak
+#### TEST-014 - Android Keystore Smoke Testi
 
 - Durum: `TAMAMLANDI`
-- Rehber ve turist bildirim ayari ekranlari ayni
-  `NotificationPreferencesViewModel` state'ini lifecycle-aware toplama,
-  kullanici mesajini Toast olarak gosterip temizleme ve ortak loading/error/retry
-  davranisini birebir tekrarliyor. Rol bazli switch secenekleri ve metinler ise
-  farkli business sunumlari olarak kalmalidir.
-- Yalniz ortak ekran state sahipligi
-  `notification/presentation/settings/NotificationSettingsScreenHost.kt`
-  icinde toplanacaktir. Host state toplama, mesaj lifecycle'i ve
-  `GuideMateContentState` sinirini yonetecek; rehber ve turist content
-  composable'lari kendi mevcut paketlerinde kalacaktir.
-- Ortak host Retrofit, DTO, repository implementation, FCM, STOMP veya
-  navigation bilmeyecektir. ViewModel ve domain repository sozlesmesi mevcut
-  yonleriyle korunacak; yapi `common` paketine tasinmayacaktir cunku yalniz
-  notification feature'ina aittir.
-- Role ozel ekranlar ortak host'u kullanacak ancak kendi switch callback'lerini,
-  string resource'larini ve tasarimlarini koruyacaktir. Yeni ekran, destination,
-  backend degisikligi veya genel amacli Compose framework'u eklenmeyecektir.
-- Test karari: Bu davranis degistirmeyen presentation refactor'u icin yeni ve
-  kirilgan Compose testi yazilmayacaktir. Mevcut notification preference
-  ViewModel testleri korunacak; derleme, lint ve degisen kapsamin kullanim
-  taramasi yeterli olacaktir.
+- `AndroidKeystoreSessionStorage` icin gercek Android Keystore gerektiren tek
+  bir instrumentation smoke testi yazilmistir. Kaydetme, okuma, ustune yazma
+  ve temizleme kapsanmis; ayrintili veya kirilgan framework testi
+  uretilmemistir. Test `androidTest` source-set'inde derlenmis ve Android
+  emulatorundeki gercek Keystore uzerinde basariyla calistirilmistir.
 
-### DEG-006 - Rehber Profil On Izlemesinde State ve Modifier Sahipligini Netlestirmek
+### Part 2 - Odeme, Para Cekme ve Finans Kaliciligi
 
-- Durum: `TAMAMLANDI`
-- `GuideProfilePreviewScreen`, lifecycle-aware toplanan state'i diger ekranlardan
-  farkli olarak `State<T>` seklinde tutup her kullanimda `.value` ile aciyor.
-  Mevcut kullanim teknik olarak dogru olsa da proje genelindeki `by` delegate
-  sozlesmesiyle uyumlu ve daha okunabilir hale getirilecektir.
-- Ayni ekranda cagirandan gelen `modifier`, hem dis `GuideMateContentState` hem
-  de ic `GuideProfileContent` dugumune uygulanmaktadir. Bos modifier ile mevcut
-  gorunum etkilenmese de ileride padding, boyut, tiklama, test etiketi veya
-  semantics eklendiginde ayni etkinin iki kez uygulanmasi riski vardir.
-- Cagirandan gelen modifier yalniz ekranin en dis dugumune uygulanacak; ic icerik
-  kendi bagimsiz `Modifier` degerini kullanacaktir. Mevcut etkili padding,
-  boyutlar, renkler, fontlar, state akisi ve kullanici davranisi degismeyecektir.
-- Cozum yalniz `GuideProfilePreviewScreen` presentation sinirinda tutulacaktir.
-  ViewModel, repository, domain, navigation, backend, yeni helper, use-case veya
-  ortak Compose framework'u eklenmeyecektir.
-- Test karari: `by` ve modifier sahipligi davranis-koruyucu Compose temizligidir.
-  Sirf bu satirlar icin kirilgan UI testi yazilmayacak; derleme, lint ve kullanim
-  taramasi yeterli olacaktir.
+Bu part Part 1 sonrasinda uygulanir. Uygulama yeniden acilmasi ve tekrar edilen
+para islemlerindeki kayip veya cift islem riskleri birlikte ele alinir.
 
-### DEG-007 - Turist Sohbet Rotasinda State Okuma Bicimini Tutarlilastirmak
+#### TEST-003 - Pending Payment DataStore Davranisi
 
-- Durum: `TAMAMLANDI`
-- `TouristNavGraph` icindeki sohbet destination'i lifecycle-aware Compose
-  state'ini `State<T>` olarak tutup `.value` ile okumaktadir. Bu kullanim teknik
-  olarak dogru ve guvenlidir; mesaj state'i, recomposition veya lifecycle
-  davranisinda hata olusturmamaktadir.
-- Projenin diger ekran ve destination'larinda kullanilan Kotlin delegation
-  sozlesmesiyle tutarlilik icin state `by collectAsStateWithLifecycle()` ile
-  acilacak ve `ChatListScreen`e dogrudan asil UI state verilecektir.
-- Degisiklik yalniz `TouristNavGraph` presentation/navigation baglanti noktasinda
-  tutulacaktir. Chat ViewModel, repository, state modeli, rota, back stack,
-  ekran tasarimi ve backend sozlesmesi degismeyecektir.
-- Test karari: Bu davranis degistirmeyen iki satirlik okunabilirlik refactor'u
-  icin yeni test yazilmayacaktir. Derleme, lint ve kullanilmayan import taramasi
-  yeterli olacaktir.
+- Durum: `BEKLIYOR`
+- Gercek `DataStorePendingPaymentStorage` ile payment ID kaydetme, dogru ID ile
+  temizleme, yanlis ID ile temizleme isteginde mevcut kaydi koruma ve tum kaydi
+  temizleme davranislari test edilecektir.
 
-### DEG-008 - Rehber Ana Sayfa Para Birimi Varsayilanini Tekillestirmek
+#### TEST-004 - Para Islemlerinde Idempotency
 
-- Durum: `TAMAMLANDI`
-- `GuideHomeUiState` backend cevabi gelmeden once kullanilacak para birimini
-  dogrudan `"USD"` olarak tanimliyor. Projede ayni platform varsayilani icin
-  zaten `PLATFORM_CURRENCY_CODE` bulundugundan iki ayri kaynak tutulmayacaktir.
-- Varsayilan state degeri `PLATFORM_CURRENCY_CODE` kullanacaktir. Bu sabit
-  yalniz ekranin ilk, bos veya backend cevabi henuz gelmemis state'i icin UI
-  fallback'idir; finansal is kurali ya da kalici para birimi otoritesi degildir.
-- Dashboard basariyla yuklendiginde backend'in dondurdugu `currencyCode` mevcut
-  davranistaki gibi varsayilan degerin uzerine yazilacak ve kesin deger olmaya
-  devam edecektir. Android sabiti backend sonucunu ezmeyecek; bakiye, kazanc,
-  odeme ve hareket para birimleri backend sozlesmesinden alinacaktir.
-- Cozum `GuideHomeUiState` presentation modelinde dar tutulacaktir. Nullable
-  para birimi ve her formatlama noktasina gereksiz null kontrolu, yeni config
-  katmani, repository, use-case veya backend degisikligi eklenmeyecektir.
-- Tasarim, gosterilen mevcut `USD` degeri, hesaplamalar ve kullanici akisi
-  degismeyecektir. Test karari: Bu tek kaynak refactor'u icin yeni test
-  yazilmayacak; derleme, lint ve kullanilmayan import taramasi yeterli olacaktir.
+- Durum: `BEKLIYOR`
+- Para yukleme ve para cekme basarisiz olduktan sonra ayni islem tekrarlandiginda
+  ayni idempotency anahtarinin kullanilmasi; tutar, hedef veya islem degistiginde
+  yeni anahtar uretilmesi test edilecektir. Zaten kapsanan tur checkout
+  davranisi ayni seviyede yeniden test edilmeyecektir.
 
-### DEG-009 - Tur Detay UI State'ini Anlamli Sorumluluklara Ayirmak
+#### TEST-011 - Rehber Banka Hesabi Mutasyonlari
 
-- Durum: `TAMAMLANDI`
-- `TourDetailUiState` su anda tur, oturum, rehber ve yorum bilgilerini ayni
-  seviyede tasiyan 26 alanli bir presentation modelidir. Alanlarin tamami ayni
-  anda degisen tek bir kavrama ait olmadigi icin yalniz rehber alanlarini
-  birlestirerek modeli 23 alana dusurmek yeterli bir cozum olmayacaktir.
-- Ana state, gercek UI sorumluluklariyla uyumlu dort anlamli sinira
-  ayrilacaktir: `tour`, `session`, `guide` ve `reviews`. Tur kimligi, baslik,
-  medya, puan, aciklama, kategori ve dil bilgileri tur grubunda; tarih, sure,
-  konum, bulusma noktasi, fiyat, kapasite, katilimci ve durum bilgileri session
-  grubunda; rehber kimligi, adi ve profil gorseli guide grubunda kalacaktir.
-- Kalan kapasite veya finansal deger gibi backend otoritesindeki bilgiler
-  Android tarafinda yeniden uretilmeyecek; yalniz mevcut backend/domain
-  sonucunun presentation icin anlamli yapida tasinmasi saglanacaktir.
-- Alt modeller `tour/presentation/detail/model` sahipliginde kalacaktir.
-  `DrawableRes` ve formatlanmis UI degerleri icerdikleri icin domain ya da data
-  katmanina tasinmayacak, genel `common` paketine alinmayacaktir. Farkli bir
-  lifecycle'a ait `TourPublishGuideState` veya baska ekran modelleri sirf alanlari
-  benziyor diye yeniden kullanilmayacaktir.
-- Mapper'lar ve UI kullanimlari yeni anlamli alan yollarina uyarlanacak; ana
-  `TourDetailUiState` yaklasik dort ust seviye parametre tasiyacaktir. Backend
-  DTO'su, repository sozlesmesi, navigation, ekran tasarimi, gosterilen veri ve
-  kullanici akisi degismeyecektir.
-- Refactor sonunda eski duz alanlara ait kullanilmayan import, property ve
-  yardimci kodlar temizlenecektir. Yalniz parametre sayisini dusurmek icin ek
-  interface, use-case, manager, generic model veya yeni katman eklenmeyecektir.
-- Test karari: Mevcut mapper ve ViewModel testleri yeni gruplu modele
-  uyarlanacaktir. Tur, session ve rehber alanlarinin dogru gruba aktarildigini
-  kapsayan mevcut dogrulamalar korunacak; salt nested property yolu degisti diye
-  ayni davranisi tekrarlayan yeni testler yazilmayacaktir.
+- Durum: `BEKLIYOR`
+- Banka hesabi silme, varsayilan yapma, basarisiz islemden sonra mutasyon
+  kilidinin acilmasi ve basarili islemden sonra canonical listenin yenilenmesi
+  `GuideBankAccountsViewModel` ve gerekli repository sinirinda test edilecektir.
 
-### DEG-010 - Rehber Turlarim Sayfalama Tetikleyicisini Footer'a Tasimak
+### Part 3 - ViewModel State ve Kritik Kullanici Akislari
 
-- Durum: `TAMAMLANDI`
-- `GuideMyToursScreen` yeni sayfa yukleme kararini son tur kartinin
-  `itemsIndexed` blogu icinde vermektedir. Mevcut ViewModel yinelenen istegi
-  engelledigi icin bu kritik bir hata degildir; ancak kart cizimi ile liste
-  sayfalama lifecycle'ini ayni ogeye baglayarak sorumluluklari karistirmaktadir.
-- Tur kartlari yalniz kendilerini gosterecek sekilde normal `items` blogunda
-  kalacaktir. Listenin sonunda `isLoadingMore`, `appendFailed` ve `canLoadMore`
-  durumlarini sirayla yoneten bagimsiz footer ogeleri kullanilacaktir.
-- Yeni sayfa tetikleyicisi, footer composition'a girdiginde mevcut
-  `viewModel.loadMore()` metodunu `uiState.tours.size` anahtariyla cagiracaktir.
-  Boylece her basarili eklemede yeni liste boyutu yeni sayfaya izin verirken,
-  ayni boyut icin gereksiz tekrar tetiklenmeyecektir. ViewModel'deki mevcut
-  `canLoadMore`, `isLoadingMore` ve aktif is korumalari aynen korunacaktir.
-- Yalniz `GuideMyToursScreen` presentation kodu duzenlenecektir. ViewModel,
-  repository, backend, API, tab davranisi, kart tasarimi, loading ve retry
-  gorunumu degismeyecektir. Generic paging delegate, helper, use-case veya yeni
-  katman eklenmeyecektir.
-- Test karari: Sayfalama business ve state gecisleri mevcut ViewModel testleriyle
-  korunacaktir. Salt `LaunchedEffect` konumunu kanitlamak icin kirilgan Compose
-  testi yazilmayacak; ilgili mevcut testler, derleme ve lint calistirilacaktir.
+Bu part Part 1 ve Part 2 sonrasinda uygulanir. StateFlow, coroutine, pagination,
+retry ve typed bildirim hedefleri mevcut davranisi degistirmeden guvenceye
+alinir.
 
-### DEG-011 - Mevcut Dimension Tokenlarini Tutarli Kullanmak
+#### TEST-005 - Tur Duzenleme Kismi Basari Akisi
 
-- Durum: `TAMAMLANDI`
-- `TouristHomeScreen` icindeki `4.dp` yatay liste boslugu, projede zaten ayni
-  degeri temsil eden `R.dimen.spacing_tiny` bulunmasina ragmen dogrudan
-  yazilmistir. Ayni tasarim tokeni iki ayri kaynaktan yonetilmeyecektir.
-- Mevcut `dimen` kaynaklariyla anlam ve deger olarak birebir eslesen dogrudan
-  `dp` kullanimlari `dimensionResource` uzerinden alinacaktir. Bu kapsamda
-  yatay liste boslugu `spacing_tiny` kullanacaktir.
-- `20.dp`, `24.dp`, `152.dp` ve `168.dp` gibi belirli bir composable veya
-  yerlesime ait, mevcut ortak tokenla eslesmeyen tekil olculer sirf XML'e
-  tasinmis olmak icin yeni resource'a donusturulmeyecektir. Ayni sekilde Material
-  elevation degerleri spacing tokeni olarak ele alinmayacaktir.
-- Yeni bir dimension kaynagi ancak ayni tasarim anlami gercekten birden fazla
-  yerde paylasildiginda veya cihaz/resource varyanti gerektiginde eklenecektir.
-  Sayi benzerligi tek basina ortaklastirma gerekcesi olmayacaktir.
-- Degisiklik yalniz presentation kaynak kullanimidir. Ekran olculeri, bosluklar,
-  kart boyutlari, tasarim, kullanici akisi ve backend davranisi degismeyecektir.
-- Test karari: Salt ayni `4dp` degerinin mevcut resource'tan okunmasi icin
-  kirilgan UI testi yazilmayacak; derleme, lint ve gorsel davranisin korunmasi
-  yeterli olacaktir.
+- Durum: `BEKLIYOR`
+- `GuideTourEditViewModel` icin yalniz session degisikligi ve content basarili
+  olduktan sonra session guncellemesinin basarisiz olmasi test edilecektir.
+  Retry sirasinda basarili content isleminin ikinci kez gonderilmedigi
+  dogrulanacaktir.
+
+#### TEST-006 - Turist Ana Sayfa State Akisi
+
+- Durum: `BEKLIYOR`
+- `TouristHomeViewModel` icin ilk yukleme, kategoriye gore dogru sorgu, hata
+  davranisi ve review degisikliginden sonra popular tur ile rehber verilerinin
+  yenilenmesi test edilecektir.
+
+#### TEST-007 - Bildirim Ekrani State Akisi
+
+- Durum: `BEKLIYOR`
+- `NotificationViewModel` icin ilk yukleme, cached icerik varken yenileme hatasi,
+  load-more korumalari, tek bildirimi okuma ve tumunu okundu yapma state
+  gecisleri test edilecektir.
+
+#### TEST-008 - Sehir Arama State Akisi
+
+- Durum: `BEKLIYOR`
+- `CityPickerViewModel` icin debounce, onceki aramanin iptali ve son sorgunun
+  kazanmasi, kisa sorguda sonuclarin temizlenmesi, hata/retry ve secimin
+  tuketilmesi test edilecektir.
+
+#### TEST-009 - Cuzdan Hareketleri Sayfalama Akisi
+
+- Durum: `BEKLIYOR`
+- Rehber ve turist cuzdan hareketleri ViewModel'lerinde ilk sayfa, sonraki
+  sayfa, son sayfa korumasi ve append hatasinda mevcut icerigin korunmasi test
+  edilecektir. Ayni paging davranisi gereksiz yere farkli seviyelerde tekrar
+  test edilmeyecektir.
+
+#### TEST-010 - Bildirim Intent ve Typed Hedef Koprusu
+
+- Durum: `BEKLIYOR`
+- `NotificationTargetParser` icin FCM data haritasindan typed hedef uretme,
+  hedefi Intent extras'a yazip geri okuma, extras'i tek kullanimdan sonra
+  temizleme ve eksik/bilinmeyen veride guvenli fallback test edilecektir.
+
+### Part 4 - Test Mimarisi Temizligi ve Korunacak Kapsam
+
+Bu part son uygulanir. Onceki partlarda eklenen testlerden sonra source-set,
+feature sahipligi, tekrar ve kullanilmayan test taramasi yapilir.
+
+#### TEST-015 - Tour Checkout Testini JVM Katmanina Tasimak
+
+- Durum: `BEKLIYOR`
+- UI veya gercek cihaz davranisi test etmeyen `TourCheckoutViewModelTest`,
+  `androidTest`ten `src/test` altina tasinacak ve gerekli Android API davranisi
+  mevcut Robolectric altyapisiyla saglanacaktir. Bes mevcut senaryo aynen
+  korunacaktir.
+
+#### TEST-016 - Notification Category Testini Tamamlamak
+
+- Durum: `BEKLIYOR`
+- `NotificationCategoryTest`, adinin belirttigi gibi mevcut butun
+  `NotificationType` degerlerini kapsayacak ve yeni bir bildirim turunun sessizce
+  yanlis kategoriye dusmesini yakalayacaktir.
+
+#### TEST-017 - Java Time Test Sahipligini Duzeltmek
+
+- Durum: `BEKLIYOR`
+- `common/network/serialization` altindaki saf zaman adapter testleri feature
+  DTO'larina ve uygulama DI'ina bagimli kalmayacaktir. Saf adapter davranisi
+  yerel test modeliyle common katmaninda; notification/payment DTO serialization
+  sozlesmeleri ise ilgili feature data test paketlerinde tutulacaktir.
+
+#### TEST-018 - Gecerli Testleri Gereksiz Yere Silmemek
+
+- Durum: `KORUNACAK`
+- Mevcut taramada dummy, her zaman basarili, `@Ignore` edilmis veya kesin olarak
+  obsolete test bulunmamistir. Kanit olmadan test silinmeyecektir.
+
+#### TEST-019 - Coverage Ugruna Test Uretmemek
+
+- Durum: `KORUNACAK`
+- Her mapper, DTO, string, renk, basit delegasyon veya yalniz satir kapsami icin
+  test yazilmayacaktir. `OnboardingRepositoryImpl` gibi davranis eklemeyen dar
+  delegasyon sinirlari icin coverage-theater testi uretilmeyecektir.
+
+#### TEST-020 - Harici SDK Test Sinirini Korumak
+
+- Durum: `KORUNACAK`
+- Firebase ve Places SDK siniflari agir ve kirilgan mock katmanlariyla taklit
+  edilmeyecektir. Uygulamanin kendi parser, repository ve state sinirlari
+  otomatik test edilecek; gercek servis davranisi cihaz ve E2E testleriyle
+  dogrulanacaktir.
+
+#### TEST-021 - Guclu Mevcut Test Kapsamini Korumak
+
+- Durum: `KORUNACAK`
+- Odeme, sohbet, bildirim repository'si, medya, validation, mapper ve mevcut dort
+  use-case testleri farkli gercek sorumluluklari korudugu icin tutulacaktir.
+  Benzer isimli testler yalniz bu nedenle tekrar kabul edilmeyecek veya
+  birlestirilmeyecektir.
+
+## Uygulama Sirasi ve Part Kapilari
+
+1. `Part 1` tamamlanir; auth, DataStore ve guvenlik siniri testleri calistirilir.
+2. `Part 2` tamamlanir; odeme, cuzdan ve finans testleri calistirilir.
+3. `Part 3` tamamlanir; ilgili ViewModel ve navigation testleri calistirilir.
+4. `Part 4` tamamlanir; source-set ve test sahipligi temizlenir.
+5. Her part sonunda ilgili odakli testler, ardindan `testDebugUnitTest` ve
+   `compileDebugAndroidTestKotlin` calistirilir.
+6. Gercek Android Keystore smoke testi emulator veya cihaz hazir oldugunda
+   `connectedDebugAndroidTest` ile calistirilir.
+7. Son durumda paket/katman yonu, kullanilmayan test yardimcilari ve test tekrari
+   yeniden taranir; bulgu yoksa ek test veya refactor yapilmaz.

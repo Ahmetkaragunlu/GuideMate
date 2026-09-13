@@ -3,7 +3,7 @@ package com.ahmetkaragunlu.guidemate.auth.data.remote.session
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.ahmetkaragunlu.guidemate.auth.data.local.preferences.AuthPreferencesDataSource
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.AuthSessionManager
-import com.ahmetkaragunlu.guidemate.auth.data.local.session.SecureSessionStorage
+import com.ahmetkaragunlu.guidemate.auth.data.local.session.InMemorySecureSessionStorage
 import com.ahmetkaragunlu.guidemate.auth.data.local.session.TokenManager
 import com.ahmetkaragunlu.guidemate.auth.data.remote.api.AuthApi
 import com.ahmetkaragunlu.guidemate.common.network.error.ApiErrorParser
@@ -153,17 +153,4 @@ class TokenAuthenticatorTest {
         }
         """.trimIndent()
 
-    private class InMemorySecureSessionStorage : SecureSessionStorage {
-        private val values = mutableMapOf<String, String>()
-
-        override fun get(key: String): String? = values[key]
-
-        override fun putAll(values: Map<String, String>) {
-            this.values.putAll(values)
-        }
-
-        override fun remove(vararg keys: String) {
-            keys.forEach(values::remove)
-        }
-    }
 }
