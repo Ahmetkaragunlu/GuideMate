@@ -82,6 +82,7 @@ class FakePaymentRepository : PaymentRepository {
     var quotedTopUp: Pair<Long, String>? = null
     var checkedOutQuoteId: String? = null
     var checkoutIdempotencyKey: String? = null
+    val topUpCheckoutIdempotencyKeys = mutableListOf<String>()
     val paymentResults = ArrayDeque<DataResult<Payment>>()
     val requestedPaymentIds = mutableListOf<String>()
     var cancelResult: DataResult<Payment> = DataResult.Success(testTopUpPayment())
@@ -121,6 +122,7 @@ class FakePaymentRepository : PaymentRepository {
     ): DataResult<Payment> {
         checkedOutQuoteId = quoteId
         checkoutIdempotencyKey = idempotencyKey
+        topUpCheckoutIdempotencyKeys += idempotencyKey
         return topUpCheckoutResult
     }
 
@@ -146,10 +148,17 @@ class FakeGuideFinanceRepository : GuideFinanceRepository {
     override val financeChanges: Flow<Unit> = MutableSharedFlow()
     var bankAccountsResult: DataResult<PagedResult<BankAccount>> =
         DataResult.Success(emptyPage())
+    var getBankAccountsCalls: Int = 0
     var withdrawalResult: DataResult<Withdrawal> = DataResult.Success(testWithdrawal())
     var withdrawalRequest: Triple<String, Long, String>? = null
+    val withdrawalRequests = mutableListOf<Triple<String, Long, String>>()
     var addBankAccountResult: DataResult<BankAccount> = DataResult.Success(testBankAccount())
     var addBankAccountRequest: Pair<String, String>? = null
+    var makeDefaultBankAccountResult: DataResult<BankAccount> =
+        DataResult.Success(testBankAccount())
+    val makeDefaultBankAccountRequests = mutableListOf<String>()
+    var deleteBankAccountResult: DataResult<Unit> = DataResult.Success(Unit)
+    val deleteBankAccountRequests = mutableListOf<String>()
     var monthlyEarningsResult: DataResult<List<MonthlyGuideEarning>> = DataResult.Success(emptyList())
     var getMonthlyEarningsCalls: Int = 0
     val requestedMonthlyEarningsYears = mutableListOf<Int>()
@@ -171,7 +180,10 @@ class FakeGuideFinanceRepository : GuideFinanceRepository {
     override suspend fun getBankAccounts(
         page: Int,
         size: Int,
-    ): DataResult<PagedResult<BankAccount>> = bankAccountsResult
+    ): DataResult<PagedResult<BankAccount>> {
+        getBankAccountsCalls++
+        return bankAccountsResult
+    }
 
     override suspend fun addBankAccount(
         iban: String,
@@ -183,10 +195,15 @@ class FakeGuideFinanceRepository : GuideFinanceRepository {
 
     override suspend fun makeDefaultBankAccount(
         bankAccountId: String
-    ): DataResult<BankAccount> = error("Not required by this test fixture")
+    ): DataResult<BankAccount> {
+        makeDefaultBankAccountRequests += bankAccountId
+        return makeDefaultBankAccountResult
+    }
 
-    override suspend fun deleteBankAccount(bankAccountId: String): DataResult<Unit> =
-        error("Not required by this test fixture")
+    override suspend fun deleteBankAccount(bankAccountId: String): DataResult<Unit> {
+        deleteBankAccountRequests += bankAccountId
+        return deleteBankAccountResult
+    }
 
     override suspend fun getWithdrawals(
         page: Int,
@@ -199,6 +216,7 @@ class FakeGuideFinanceRepository : GuideFinanceRepository {
         idempotencyKey: String,
     ): DataResult<Withdrawal> {
         withdrawalRequest = Triple(bankAccountId, amountMinor, idempotencyKey)
+        withdrawalRequests += Triple(bankAccountId, amountMinor, idempotencyKey)
         return withdrawalResult
     }
 }
@@ -231,13 +249,16 @@ fun testWithdrawal(): Withdrawal =
         failureCode = null,
     )
 
-fun testTopUpQuote(): PaymentQuote =
+fun testTopUpQuote(
+    id: String = "quote-1",
+    baseAmountMinor: Long = 5_000,
+): PaymentQuote =
     PaymentQuote(
-        id = "quote-1",
+        id = id,
         purpose = PaymentPurpose.WALLET_TOP_UP,
-        baseAmountMinor = 5_000,
+        baseAmountMinor = baseAmountMinor,
         baseCurrencyCode = "USD",
-        chargeAmountMinor = 5_000,
+        chargeAmountMinor = baseAmountMinor,
         chargeCurrencyCode = "USD",
         fxRate = BigDecimal.ONE,
         rateSource = "TEST",

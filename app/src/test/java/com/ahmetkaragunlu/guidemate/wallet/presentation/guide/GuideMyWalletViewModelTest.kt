@@ -3,6 +3,7 @@ package com.ahmetkaragunlu.guidemate.wallet.presentation.guide
 import androidx.lifecycle.SavedStateHandle
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
+import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
@@ -12,12 +13,14 @@ import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
 import com.ahmetkaragunlu.guidemate.testing.testBankAccount
 import com.ahmetkaragunlu.guidemate.testing.testNotification
+import com.ahmetkaragunlu.guidemate.wallet.domain.model.BankAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -113,4 +116,66 @@ class GuideMyWalletViewModelTest {
             assertEquals(3, walletRepository.getWalletCalls)
             collection.cancel()
         }
+
+    @Test
+    fun failedWithdrawalRetryReusesKeyUntilAccountOrAmountChanges() =
+        runTest {
+            val financeRepository =
+                FakeGuideFinanceRepository().apply {
+                    bankAccountsResult =
+                        bankAccountPage(
+                            testBankAccount(id = "bank-1"),
+                            testBankAccount(id = "bank-2", isDefault = false),
+                        )
+                    withdrawalResult = DataResult.Error(AppError.NoInternet)
+                }
+            val viewModel =
+                GuideMyWalletViewModel(
+                    walletRepository = FakeWalletRepository(),
+                    financeRepository = financeRepository,
+                    notificationRepository = FakeNotificationRepository(),
+                    resourceProvider = FakeResourceProvider(),
+                    savedStateHandle = SavedStateHandle(),
+                )
+            val collection = backgroundScope.launch { viewModel.uiState.collect {} }
+            runCurrent()
+
+            viewModel.requestWithdrawal(5_000)
+            runCurrent()
+            viewModel.requestWithdrawal(5_000)
+            runCurrent()
+
+            val firstAttemptKey = financeRepository.withdrawalRequests.first().third
+            assertEquals(
+                listOf(firstAttemptKey, firstAttemptKey),
+                financeRepository.withdrawalRequests.map { it.third },
+            )
+
+            viewModel.selectNextBankAccount()
+            runCurrent()
+            viewModel.requestWithdrawal(5_000)
+            runCurrent()
+            val changedAccountKey = financeRepository.withdrawalRequests.last().third
+            assertNotEquals(firstAttemptKey, changedAccountKey)
+
+            viewModel.requestWithdrawal(6_000)
+            runCurrent()
+            val changedAmountKey = financeRepository.withdrawalRequests.last().third
+            assertNotEquals(changedAccountKey, changedAmountKey)
+            assertFalse(viewModel.uiState.value.isWithdrawalInProgress)
+            collection.cancel()
+        }
+
+    private fun bankAccountPage(vararg accounts: BankAccount): DataResult<PagedResult<BankAccount>> =
+        DataResult.Success(
+            PagedResult(
+                items = accounts.toList(),
+                page = 0,
+                size = 50,
+                totalElements = accounts.size.toLong(),
+                totalPages = 1,
+                isFirst = true,
+                isLast = true,
+            )
+        )
 }

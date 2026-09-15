@@ -141,25 +141,27 @@ para islemlerindeki kayip veya cift islem riskleri birlikte ele alinir.
 
 #### TEST-003 - Pending Payment DataStore Davranisi
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - Gercek `DataStorePendingPaymentStorage` ile payment ID kaydetme, dogru ID ile
   temizleme, yanlis ID ile temizleme isteginde mevcut kaydi koruma ve tum kaydi
-  temizleme davranislari test edilecektir.
+  temizleme davranislari test edilmektedir.
 
 #### TEST-004 - Para Islemlerinde Idempotency
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - Para yukleme ve para cekme basarisiz olduktan sonra ayni islem tekrarlandiginda
   ayni idempotency anahtarinin kullanilmasi; tutar, hedef veya islem degistiginde
-  yeni anahtar uretilmesi test edilecektir. Zaten kapsanan tur checkout
-  davranisi ayni seviyede yeniden test edilmeyecektir.
+  yeni anahtar uretilmesi test edilmektedir. Zaten kapsanan tur checkout
+  davranisi ayni seviyede yeniden test edilmemistir.
 
 #### TEST-011 - Rehber Banka Hesabi Mutasyonlari
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - Banka hesabi silme, varsayilan yapma, basarisiz islemden sonra mutasyon
   kilidinin acilmasi ve basarili islemden sonra canonical listenin yenilenmesi
-  `GuideBankAccountsViewModel` ve gerekli repository sinirinda test edilecektir.
+  `GuideBankAccountsViewModel` sinirinda test edilmektedir. Repository'nin
+  idempotency ve DTO aktarim sozlesmesi mevcut data testleriyle korunmaya devam
+  ettigi icin ayni davranis ikinci kez test edilmemistir.
 
 ### Part 3 - ViewModel State ve Kritik Kullanici Akislari
 
