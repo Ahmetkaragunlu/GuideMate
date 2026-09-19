@@ -37,10 +37,10 @@ class TokenAuthenticator @Inject constructor(
         val path = response.request.url.encodedPath
         if (
             response.code != 401 ||
-                !AuthEndpointPolicy.isBackendRequest(response.request.url, apiBaseUrl) ||
-                AuthEndpointPolicy.isRefreshRequest(path) ||
-                !AuthEndpointPolicy.requiresAccessToken(path) ||
-                responseCount(response) > MAX_RETRY_COUNT
+            !AuthEndpointPolicy.isBackendRequest(response.request.url, apiBaseUrl) ||
+            AuthEndpointPolicy.isRefreshRequest(path) ||
+            !AuthEndpointPolicy.requiresAccessToken(path) ||
+            responseCount(response) > MAX_RETRY_COUNT
         ) {
             return null
         }

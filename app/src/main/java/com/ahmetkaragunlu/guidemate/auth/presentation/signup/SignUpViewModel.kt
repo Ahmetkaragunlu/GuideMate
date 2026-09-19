@@ -165,10 +165,10 @@ class SignUpViewModel @Inject constructor(
         val form = _formState.value
         if (
             form.firstName.isBlank() ||
-                form.lastName.isBlank() ||
-                form.email.isBlank() ||
-                form.password.isBlank() ||
-                form.confirmPassword.isBlank()
+            form.lastName.isBlank() ||
+            form.email.isBlank() ||
+            form.password.isBlank() ||
+            form.confirmPassword.isBlank()
         ) {
             _screenState.update {
                 it.copy(errorMessage = resourceProvider.getString(R.string.error_fill_all_fields))
@@ -178,10 +178,10 @@ class SignUpViewModel @Inject constructor(
 
         val hasInputError =
             !isValidFirstName() ||
-                !isValidLastName() ||
-                !isValidEmail() ||
-                !isValidPassword() ||
-                !isValidConfirmPassword()
+                    !isValidLastName() ||
+                    !isValidEmail() ||
+                    !isValidPassword() ||
+                    !isValidConfirmPassword()
         if (hasInputError) {
             _screenState.update {
                 it.copy(errorMessage = resourceProvider.getString(R.string.error_fix_fields))

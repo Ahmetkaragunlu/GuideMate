@@ -4,6 +4,7 @@ import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeClient
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeEvent
+import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeSessionManager
 import com.ahmetkaragunlu.guidemate.chat.data.remote.api.ChatApi
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatConversationResponseDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ClearChatRequestDto
@@ -13,6 +14,7 @@ import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantProfil
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantResponseDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.SendChatMessageRequestDto
 import com.ahmetkaragunlu.guidemate.chat.data.remote.model.UnreadCountResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.state.ChatStateStore
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
@@ -277,9 +279,10 @@ class ChatRepositoryImplTest {
     ): ChatRepositoryImpl =
         ChatRepositoryImpl(
             api = api,
-            realtimeClient = realtimeClient,
+            realtimeSessionManager = ChatRealtimeSessionManager(realtimeClient, scope),
             userRepository = userRepository,
             apiCallExecutor = testApiCallExecutor(),
+            stateStore = ChatStateStore(),
             applicationScope = scope,
         )
 

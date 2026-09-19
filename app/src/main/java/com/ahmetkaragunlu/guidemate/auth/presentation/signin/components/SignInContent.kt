@@ -136,7 +136,10 @@ private fun SignInFormSection(
         value = formState.email,
         onValueChange = onEmailChange,
         placeholder = R.string.email,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
+        ),
         leadingIcon = {
             Icon(imageVector = Icons.Default.Email, contentDescription = null, tint = Color.Gray)
         },
@@ -156,7 +159,10 @@ private fun SignInFormSection(
         value = formState.password,
         onValueChange = onPasswordChange,
         placeholder = R.string.password,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.NumberPassword,
+            imeAction = ImeAction.Done
+        ),
         visualTransformation =
             if (formState.passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
         leadingIcon = {
@@ -221,17 +227,27 @@ private fun SignInFormSection(
 @Composable
 private fun OrContinueDivider() {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        HorizontalDivider(modifier = Modifier.weight(1f), color = Color.Gray.copy(alpha = 0.4f), thickness = 1.dp)
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = Color.Gray.copy(alpha = 0.4f),
+            thickness = 1.dp
+        )
         Text(
             text = stringResource(R.string.or_continue_with),
             modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small)),
             style = MaterialTheme.typography.bodySmall,
             color = colorResource(R.color.text_color),
         )
-        HorizontalDivider(modifier = Modifier.weight(1f), color = Color.Gray.copy(alpha = 0.4f), thickness = 1.dp)
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            color = Color.Gray.copy(alpha = 0.4f),
+            thickness = 1.dp
+        )
     }
 }
 
@@ -252,7 +268,11 @@ private fun GoogleSignInButton(
                 .padding(horizontal = dimensionResource(R.dimen.spacing_extra_large)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
     ) {
-        Icon(painter = painterResource(R.drawable.google_icon), contentDescription = null, tint = Color.Unspecified)
+        Icon(
+            painter = painterResource(R.drawable.google_icon),
+            contentDescription = null,
+            tint = Color.Unspecified
+        )
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
         Text(
             text = stringResource(R.string.google),

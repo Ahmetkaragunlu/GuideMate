@@ -27,7 +27,7 @@ internal class GoogleCredentialSignInClient(
             val credential = credentialManager.getCredential(context, request).credential
             if (
                 credential is CustomCredential &&
-                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
             ) {
                 val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 GoogleSignInResult.Success(googleCredential.idToken)

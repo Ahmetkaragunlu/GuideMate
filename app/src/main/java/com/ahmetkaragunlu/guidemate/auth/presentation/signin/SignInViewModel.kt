@@ -64,8 +64,8 @@ class SignInViewModel @Inject constructor(
     fun onSignInClick() {
         if (
             _screenState.value.isLoading ||
-                _screenState.value.loginRetryAfterSeconds > 0 ||
-                !validateForm()
+            _screenState.value.loginRetryAfterSeconds > 0 ||
+            !validateForm()
         ) {
             return
         }
@@ -166,7 +166,7 @@ class SignInViewModel @Inject constructor(
         val backendError = error as? AppError.Backend
         if (
             backendError?.code == BackendErrorCode.ACCOUNT_PENDING_VERIFICATION &&
-                !verificationEmail.isNullOrBlank()
+            !verificationEmail.isNullOrBlank()
         ) {
             _screenState.update {
                 it.copy(

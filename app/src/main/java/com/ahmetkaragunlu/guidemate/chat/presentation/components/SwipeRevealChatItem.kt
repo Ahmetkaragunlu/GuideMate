@@ -42,6 +42,8 @@ private enum class ChatSwipeRevealValue {
     REVEALED,
 }
 
+private const val REVEAL_POSITIONAL_THRESHOLD = 0.35f
+
 @Composable
 fun SwipeRevealChatItem(
     chatItem: ChatUiModel,
@@ -90,7 +92,9 @@ fun SwipeRevealChatItem(
     }
 
     Box(
-        modifier = modifier.fillMaxWidth().clipToBounds(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clipToBounds(),
     ) {
         IconButton(
             onClick = {
@@ -134,7 +138,8 @@ fun SwipeRevealChatItem(
                         reverseDirection = false,
                         orientation = Orientation.Horizontal,
                         flingBehavior = flingBehavior,
-                    ).background(MaterialTheme.colorScheme.background),
+                    )
+                    .background(MaterialTheme.colorScheme.background),
         ) {
             ChatListItem(
                 chatItem = chatItem,
@@ -150,5 +155,3 @@ fun SwipeRevealChatItem(
         }
     }
 }
-
-private const val REVEAL_POSITIONAL_THRESHOLD = 0.35f

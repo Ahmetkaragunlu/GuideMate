@@ -156,7 +156,9 @@ private fun SignUpFormSection(
     onToggleConfirmPasswordVisibility: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
@@ -192,7 +194,10 @@ private fun SignUpFormSection(
             value = formState.email,
             onValueChange = onEmailChange,
             placeholder = R.string.email,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
             isError = (!isEmailValid && formState.email.isNotEmpty()) || emailErrorMessage != null,
             supportingText =
                 if (!isEmailValid && formState.email.isNotEmpty()) R.string.email_error_message else null,
@@ -203,7 +208,10 @@ private fun SignUpFormSection(
             onValueChange = onPasswordChange,
             placeholder = R.string.password,
             keyboardOptions =
-                KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Next),
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.NumberPassword,
+                    imeAction = ImeAction.Next
+                ),
             visualTransformation =
                 if (formState.passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             isError = (!isPasswordValid && formState.password.isNotEmpty()) || passwordErrorMessage != null,
@@ -231,7 +239,10 @@ private fun SignUpFormSection(
             visualTransformation =
                 if (formState.confirmPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions =
-                KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
+                KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.NumberPassword,
+                    imeAction = ImeAction.Done
+                ),
             trailingIcon = {
                 Icon(
                     imageVector =
@@ -279,7 +290,9 @@ private fun TermsAgreementRow(
             text = stringResource(R.string.agree_terms_conditions),
             style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
             color = colorResource(R.color.text_color),
-            modifier = Modifier.padding(top = 2.dp).clickable { onTermsClick() },
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .clickable { onTermsClick() },
         )
     }
 }

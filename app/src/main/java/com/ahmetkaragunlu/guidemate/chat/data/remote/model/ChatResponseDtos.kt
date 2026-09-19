@@ -35,15 +35,6 @@ data class ChatMessagePageResponseDto(
     @SerializedName("hasNext") val hasNext: Boolean,
 )
 
-data class SendChatMessageRequestDto(
-    @SerializedName("clientMessageId") val clientMessageId: String,
-    @SerializedName("body") val body: String,
-)
-
-data class ClearChatRequestDto(
-    @SerializedName("clientRequestId") val clientRequestId: String,
-)
-
 data class UnreadCountResponseDto(
     @SerializedName("unreadCount") val unreadCount: Long,
 )
