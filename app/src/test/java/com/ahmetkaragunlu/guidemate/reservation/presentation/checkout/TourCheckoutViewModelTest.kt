@@ -49,8 +49,11 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
 class TourCheckoutViewModelTest {
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
@@ -111,12 +114,14 @@ class TourCheckoutViewModelTest {
             }
             advanceUntilIdle()
             acceptTerms(viewModel)
+            runCurrent()
 
             viewModel.continueCheckout()
             advanceUntilIdle()
             viewModel.continueCheckout()
             advanceUntilIdle()
             viewModel.onPaymentNavigationHandled()
+            runCurrent()
 
             viewModel.continueCheckout()
             advanceUntilIdle()
@@ -142,6 +147,7 @@ class TourCheckoutViewModelTest {
             advanceUntilIdle()
             acceptTerms(viewModel)
             viewModel.onPaymentMethodSelected(PaymentMethod.WALLET)
+            runCurrent()
 
             viewModel.continueCheckout()
             runCurrent()
@@ -163,19 +169,27 @@ class TourCheckoutViewModelTest {
     fun `checkout terms require reading before acceptance and can be declined`() =
         runTest(mainDispatcherRule.dispatcher) {
             val viewModel = createViewModel(FakePaymentRepository())
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                viewModel.uiState.collect()
+            }
+            advanceUntilIdle()
 
             viewModel.onTermsCheckboxClicked()
+            runCurrent()
             assertEquals(true, viewModel.uiState.value.showTermsSheet)
 
             viewModel.acceptTerms()
+            runCurrent()
             assertEquals(false, viewModel.uiState.value.termsAccepted)
 
             viewModel.markTermsAsRead()
             viewModel.acceptTerms()
+            runCurrent()
             assertEquals(true, viewModel.uiState.value.termsAccepted)
             assertEquals(false, viewModel.uiState.value.showTermsSheet)
 
             viewModel.onTermsCheckboxClicked()
+            runCurrent()
             assertEquals(false, viewModel.uiState.value.termsAccepted)
         }
 
