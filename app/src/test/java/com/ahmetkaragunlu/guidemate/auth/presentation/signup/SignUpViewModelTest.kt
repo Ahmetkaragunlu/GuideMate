@@ -60,6 +60,23 @@ class SignUpViewModelTest {
         assertTrue(!viewModel.screenState.value.isTermsAccepted)
     }
 
+    @Test
+    fun `mismatched passwords do not submit registration`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val repository = FakeAuthRepository()
+            val viewModel = createViewModel(repository)
+            fillValidForm(viewModel)
+            viewModel.onConfirmPasswordChange("87654321")
+            viewModel.markTermsAsRead()
+            viewModel.acceptTerms()
+
+            viewModel.onSignUpClick()
+            runCurrent()
+
+            assertNull(repository.registerRequest)
+            assertTrue(viewModel.screenState.value.errorMessage != null)
+        }
+
     private fun createViewModel(repository: FakeAuthRepository): SignUpViewModel =
         SignUpViewModel(
             authRepository = repository,

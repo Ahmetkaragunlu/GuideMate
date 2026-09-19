@@ -1,18 +1,22 @@
 package com.ahmetkaragunlu.guidemate.auth.presentation.signin
 
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.EmailPolicy
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.NumericPasswordPolicy
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.BackendErrorCode
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.common.result.AppFieldError
 import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -57,6 +61,73 @@ class SignInViewModelTest {
 
             assertTrue(viewModel.screenState.value.showVerificationDialog)
             assertEquals("user@example.com", viewModel.screenState.value.verificationEmail)
+        }
+
+    @Test
+    fun `rate limit blocks another login until cooldown finishes`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val repository =
+                FakeAuthRepository().apply {
+                    loginResult =
+                        DataResult.Error(
+                            AppError.Backend(
+                                code = BackendErrorCode.RATE_LIMITED,
+                                fallbackMessage = null,
+                                retryAfterSeconds = 2,
+                            )
+                        )
+                }
+            val viewModel = createViewModel(repository)
+            viewModel.onEmailChange("user@example.com")
+            viewModel.onPasswordChange("12345678")
+
+            viewModel.onSignInClick()
+            runCurrent()
+            assertEquals(2, viewModel.screenState.value.loginRetryAfterSeconds)
+
+            repository.loginRequest = null
+            viewModel.onSignInClick()
+            runCurrent()
+            assertNull(repository.loginRequest)
+
+            advanceTimeBy(2_000)
+            runCurrent()
+            assertEquals(0, viewModel.screenState.value.loginRetryAfterSeconds)
+        }
+
+    @Test
+    fun `backend field errors are assigned to matching form fields`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val repository =
+                FakeAuthRepository().apply {
+                    loginResult =
+                        DataResult.Error(
+                            AppError.Backend(
+                                code = BackendErrorCode.VALIDATION_FAILED,
+                                fallbackMessage = null,
+                                fieldErrors =
+                                    listOf(
+                                        AppFieldError("email", "INVALID_EMAIL", null),
+                                        AppFieldError("password", "INVALID_PASSWORD", null),
+                                    ),
+                            )
+                        )
+                }
+            val viewModel = createViewModel(repository)
+            viewModel.onEmailChange("user@example.com")
+            viewModel.onPasswordChange("12345678")
+
+            viewModel.onSignInClick()
+            runCurrent()
+
+            assertEquals(
+                "string-${R.string.email_error_message}",
+                viewModel.screenState.value.emailErrorMessage,
+            )
+            assertEquals(
+                "string-${R.string.error_invalid_field}",
+                viewModel.screenState.value.passwordErrorMessage,
+            )
         }
 
     private fun createViewModel(repository: FakeAuthRepository): SignInViewModel =

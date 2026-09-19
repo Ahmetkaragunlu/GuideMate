@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -19,6 +20,22 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class ForgotPasswordViewModelTest {
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
+
+    @Test
+    fun `successful request sends email and opens confirmation dialog`() =
+        runTest(mainDispatcherRule.dispatcher) {
+            val repository = FakeAuthRepository()
+            val viewModel =
+                ForgotPasswordViewModel(repository, EmailPolicy(), FakeResourceProvider())
+            viewModel.onEmailChange("user@example.com")
+
+            viewModel.onSubmitClick()
+            runCurrent()
+
+            assertEquals("user@example.com", repository.forgotPasswordEmail)
+            assertFalse(viewModel.screenState.value.isLoading)
+            assertTrue(viewModel.screenState.value.showSuccessDialog)
+        }
 
     @Test
     fun `rate limit blocks another request until countdown finishes`() =

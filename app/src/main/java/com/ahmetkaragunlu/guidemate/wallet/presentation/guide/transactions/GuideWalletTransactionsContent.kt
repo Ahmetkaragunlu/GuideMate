@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.components.WalletTransactionItem
 import com.ahmetkaragunlu.guidemate.wallet.presentation.guide.transactions.model.GuideWalletTransactionFilter

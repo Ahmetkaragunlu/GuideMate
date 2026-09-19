@@ -1,6 +1,9 @@
 package com.ahmetkaragunlu.guidemate.notification.presentation.settings
 
+import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
+import com.ahmetkaragunlu.guidemate.common.result.AppError
+import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
@@ -53,6 +56,31 @@ class NotificationPreferencesViewModelTest {
             assertFalse(repository.lastPreferenceUpdate?.chatMessagesEnabled ?: true)
             assertNull(repository.lastPreferenceUpdate?.upcomingTourRemindersEnabled)
             assertFalse(viewModel.uiState.value.preferences?.chatMessagesEnabled ?: true)
+            collection.cancel()
+        }
+
+    @Test
+    fun failedUpdatePreservesPreferencesAndReleasesOperationLock() =
+        runTest {
+            val originalPreferences = defaultNotificationPreferences(chatMessagesEnabled = true)
+            val repository =
+                FakeNotificationRepository().apply {
+                    refreshPreferencesResult = DataResult.Success(originalPreferences)
+                    updatePreferencesResult = DataResult.Error(AppError.NoInternet)
+                }
+            val viewModel = NotificationPreferencesViewModel(repository, FakeResourceProvider())
+            val collection = backgroundScope.launch { viewModel.uiState.collect {} }
+            runCurrent()
+
+            viewModel.updateChatMessages(false)
+            runCurrent()
+
+            assertEquals(originalPreferences, viewModel.uiState.value.preferences)
+            assertFalse(viewModel.uiState.value.isUpdating)
+            assertEquals(
+                "string-${R.string.error_no_internet}",
+                viewModel.uiState.value.userMessage,
+            )
             collection.cancel()
         }
 }

@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.notification.data.mapper
 
 import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationResponseDto
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationPreferencesResponseDto
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
@@ -89,6 +90,29 @@ class NotificationMapperTest {
         assertEquals(true, dto.newReviewsEnabled)
         assertNull(dto.upcomingTourRemindersEnabled)
         assertNull(dto.reservationUpdatesEnabled)
+    }
+
+    @Test
+    fun `preference response preserves every backend flag`() {
+        val preferences =
+            NotificationPreferencesResponseDto(
+                    upcomingTourRemindersEnabled = true,
+                    chatMessagesEnabled = false,
+                    reservationUpdatesEnabled = true,
+                    reviewRequestsEnabled = false,
+                    paymentsAndEarningsEnabled = true,
+                    newReviewsEnabled = false,
+                    securityAlertsEnabled = true,
+                )
+                .toDomain()
+
+        assertEquals(true, preferences.upcomingTourRemindersEnabled)
+        assertEquals(false, preferences.chatMessagesEnabled)
+        assertEquals(true, preferences.reservationUpdatesEnabled)
+        assertEquals(false, preferences.reviewRequestsEnabled)
+        assertEquals(true, preferences.paymentsAndEarningsEnabled)
+        assertEquals(false, preferences.newReviewsEnabled)
+        assertEquals(true, preferences.securityAlertsEnabled)
     }
 
     private fun securityNotification(securityEvent: String) =
