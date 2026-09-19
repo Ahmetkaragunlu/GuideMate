@@ -56,6 +56,8 @@ class FakeGuideTourRepository : GuideTourRepository {
     var createInput: CreateGuideTourInput? = null
     var submitChangeInput: SubmitTourChangeInput? = null
     var updateSessionInput: UpdateTourSessionInput? = null
+    val submitChangeInputs = mutableListOf<SubmitTourChangeInput>()
+    val updateSessionInputs = mutableListOf<UpdateTourSessionInput>()
     var requestedTourId: String? = null
     var cancelSessionRequest: Triple<String, String, String>? = null
 
@@ -87,6 +89,7 @@ class FakeGuideTourRepository : GuideTourRepository {
         input: SubmitTourChangeInput,
     ): DataResult<TourReviewSubmission> {
         submitChangeInput = input
+        submitChangeInputs += input
         return submitChangeResult
     }
 
@@ -100,6 +103,7 @@ class FakeGuideTourRepository : GuideTourRepository {
         input: UpdateTourSessionInput,
     ): DataResult<TourSession> {
         updateSessionInput = input
+        updateSessionInputs += input
         return updateSessionResult
     }
 
@@ -171,6 +175,8 @@ class FakeGuideProfileRepository(
     var refreshOwnProfileRequestCount: Int = 0
     var publicProfileResult: DataResult<GuideProfile> = DataResult.Success(profile)
     val publicProfileRequests = mutableListOf<Long>()
+    var topGuidesResult: DataResult<List<GuideSearchResult>> = DataResult.Success(emptyList())
+    val topGuideLimits = mutableListOf<Int>()
     var lastUpdate: GuideProfileUpdate? = null
 
     override suspend fun refreshOwnProfile(): DataResult<GuideProfile> {
@@ -196,8 +202,10 @@ class FakeGuideProfileRepository(
         size: Int,
     ): DataResult<PagedResult<GuideSearchResult>> = error("Not required by this test fixture")
 
-    override suspend fun getTopGuides(limit: Int): DataResult<List<GuideSearchResult>> =
-        error("Not required by this test fixture")
+    override suspend fun getTopGuides(limit: Int): DataResult<List<GuideSearchResult>> {
+        topGuideLimits += limit
+        return topGuidesResult
+    }
 }
 
 fun testTourDetails(
@@ -315,4 +323,18 @@ fun testGuideProfile(): GuideProfile =
                 reviewCount = 20,
                 level = GuideLevelTier.SUPER,
             ),
+    )
+
+fun testGuideSearchResult(guideId: Long = 7): GuideSearchResult =
+    GuideSearchResult(
+        guideId = guideId,
+        displayName = "Ada Guide",
+        specialtyTitle = "Historian",
+        avatar = null,
+        languageCodes = listOf("en"),
+        completedSessionCount = 10,
+        totalParticipantCount = 50,
+        averageRating = 4.8,
+        reviewCount = 20,
+        level = GuideLevelTier.SUPER,
     )

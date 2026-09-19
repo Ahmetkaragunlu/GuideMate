@@ -11,13 +11,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class FakeReviewRepository : ReviewRepository {
-    override val reviewChanges: Flow<Unit> = MutableSharedFlow()
+    val reviewChangeEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val reviewChanges: Flow<Unit> = reviewChangeEvents
     var submitResult: DataResult<SubmittedReview> = DataResult.Success(testSubmittedReview())
     var reviewsResult: DataResult<PagedResult<TourReview>> = DataResult.Success(emptyPage())
     val reviewsResults = ArrayDeque<DataResult<PagedResult<TourReview>>>()
     val tourReviewRequests = mutableListOf<String>()
     var submittedReview: Pair<String, ReviewSubmissionInput>? = null
     var ownedTourReviewsRequested = false
+
+    fun publishReviewChange() {
+        check(reviewChangeEvents.tryEmit(Unit))
+    }
 
     override suspend fun submitReview(
         reservationId: String,

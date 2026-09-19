@@ -19,6 +19,8 @@ import com.ahmetkaragunlu.guidemate.wallet.domain.model.MonthlyGuideEarning
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.PayoutMode
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransaction
+import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionDirection
+import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionType
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.Withdrawal
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WithdrawalStatus
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.GuideFinanceRepository
@@ -38,6 +40,8 @@ class FakeWalletRepository : WalletRepository {
         DataResult.Success(WalletAccount(20_000, 20_000, "USD"))
     var transactionsResult: DataResult<PagedResult<WalletTransaction>> =
         DataResult.Success(emptyPage())
+    val transactionResults = ArrayDeque<DataResult<PagedResult<WalletTransaction>>>()
+    val transactionRequests = mutableListOf<Pair<Int, Int>>()
     var getWalletCalls: Int = 0
 
     override suspend fun getWallet(): DataResult<WalletAccount> {
@@ -54,7 +58,10 @@ class FakeWalletRepository : WalletRepository {
     override suspend fun getTransactions(
         page: Int,
         size: Int,
-    ): DataResult<PagedResult<WalletTransaction>> = transactionsResult
+    ): DataResult<PagedResult<WalletTransaction>> {
+        transactionRequests += page to size
+        return transactionResults.removeFirstOrNull() ?: transactionsResult
+    }
 }
 
 class FakeSavedPaymentMethodRepository : SavedPaymentMethodRepository {
@@ -247,6 +254,47 @@ fun testWithdrawal(): Withdrawal =
         requestedAt = Instant.parse("2026-01-01T00:00:00Z"),
         completedAt = null,
         failureCode = null,
+    )
+
+fun testWalletTransaction(
+    id: String,
+    type: WalletTransactionType,
+    occurredAt: Instant = Instant.parse("2026-01-01T00:00:00Z"),
+): WalletTransaction =
+    WalletTransaction(
+        id = id,
+        direction =
+            if (type == WalletTransactionType.TOUR_PURCHASE ||
+                type == WalletTransactionType.WITHDRAWAL
+            ) {
+                WalletTransactionDirection.DEBIT
+            } else {
+                WalletTransactionDirection.CREDIT
+            },
+        type = type,
+        amountMinor = 1_000,
+        currencyCode = "USD",
+        referenceType = null,
+        referenceId = null,
+        referenceTitle = "Test transaction",
+        occurredAt = occurredAt,
+    )
+
+fun walletTransactionPage(
+    page: Int,
+    isLast: Boolean,
+    vararg transactions: WalletTransaction,
+): DataResult<PagedResult<WalletTransaction>> =
+    DataResult.Success(
+        PagedResult(
+            items = transactions.toList(),
+            page = page,
+            size = 20,
+            totalElements = transactions.size.toLong() + if (isLast) 0 else 1,
+            totalPages = if (isLast) page + 1 else page + 2,
+            isFirst = page == 0,
+            isLast = isLast,
+        )
     )
 
 fun testTopUpQuote(

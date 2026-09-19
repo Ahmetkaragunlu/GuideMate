@@ -15,6 +15,10 @@ import java.time.Instant
 class FakeTourDiscoveryRepository : TourDiscoveryRepository {
     val searchResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
     val searchRequests = mutableListOf<SearchRequest>()
+    var popularResult: DataResult<PagedResult<TourSearchItem>> =
+        DataResult.Success(tourSearchPage(page = 0, isLast = true))
+    val popularResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
+    val popularRequests = mutableListOf<Pair<Int, Int>>()
     var searchHandler: (suspend (TourSearchQuery, Int, Int) -> DataResult<PagedResult<TourSearchItem>>)? =
         null
     var popularForGuideResult: DataResult<PagedResult<TourSearchItem>> =
@@ -38,7 +42,10 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
     override suspend fun getPopularTours(
         page: Int,
         size: Int,
-    ): DataResult<PagedResult<TourSearchItem>> = error("Not required by this test fixture")
+    ): DataResult<PagedResult<TourSearchItem>> {
+        popularRequests += page to size
+        return popularResults.removeFirstOrNull() ?: popularResult
+    }
 
     override suspend fun getPopularToursForGuide(
         guideId: Long,

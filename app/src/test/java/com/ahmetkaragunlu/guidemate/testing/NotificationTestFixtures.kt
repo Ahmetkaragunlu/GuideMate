@@ -26,6 +26,18 @@ class FakeNotificationRepository : NotificationRepository {
         DataResult.Success(defaultNotificationPreferences())
     var updatePreferencesResult: DataResult<NotificationPreferences> =
         DataResult.Success(defaultNotificationPreferences())
+    var refreshNotificationsResult: DataResult<List<AppNotification>>? = null
+    var loadMoreNotificationsResult: DataResult<List<AppNotification>> =
+        DataResult.Success(emptyList())
+    var loadMoreNotificationsHandler: (suspend () -> DataResult<List<AppNotification>>)? = null
+    var refreshUnreadCountResult: DataResult<Int>? = null
+    var markReadResult: DataResult<AppNotification>? = null
+    var markAllReadResult: DataResult<Int> = DataResult.Success(0)
+    var refreshNotificationsCalls = 0
+    var loadMoreNotificationsCalls = 0
+    var refreshUnreadCountCalls = 0
+    val markedNotificationIds = mutableListOf<String>()
+    var markAllReadCalls = 0
     var lastPreferenceUpdate: NotificationPreferenceUpdate? = null
     val markedRelatedTargets = mutableListOf<NotificationTargetReference>()
     var markRelatedResult: DataResult<Int> = DataResult.Success(0)
@@ -40,18 +52,53 @@ class FakeNotificationRepository : NotificationRepository {
     override val hasMoreNotifications: StateFlow<Boolean> = hasMoreState
     override val pushEvents: SharedFlow<NotificationNavigationTarget> = pushEventState
 
-    override suspend fun refreshNotifications(): DataResult<List<AppNotification>> =
-        DataResult.Success(notificationState.value)
+    override suspend fun refreshNotifications(): DataResult<List<AppNotification>> {
+        refreshNotificationsCalls++
+        return refreshNotificationsResult ?: DataResult.Success(notificationState.value)
+    }
 
-    override suspend fun loadMoreNotifications(): DataResult<List<AppNotification>> =
-        DataResult.Success(emptyList())
+    override suspend fun loadMoreNotifications(): DataResult<List<AppNotification>> {
+        loadMoreNotificationsCalls++
+        return loadMoreNotificationsHandler?.invoke() ?: loadMoreNotificationsResult
+    }
 
-    override suspend fun refreshUnreadCount(): DataResult<Int> = DataResult.Success(unreadState.value)
+    override suspend fun refreshUnreadCount(): DataResult<Int> {
+        refreshUnreadCountCalls++
+        return refreshUnreadCountResult ?: DataResult.Success(unreadState.value)
+    }
 
-    override suspend fun markRead(notificationId: String): DataResult<AppNotification> =
-        error("Not required by this test fixture")
+    override suspend fun markRead(notificationId: String): DataResult<AppNotification> {
+        markedNotificationIds += notificationId
+        val notification =
+            markReadResult
+                ?: notificationState.value
+                    .first { it.notificationId == notificationId }
+                    .copy(isRead = true)
+                    .let { DataResult.Success(it) }
+        if (notification is DataResult.Success) {
+            val wasUnread = notificationState.value.any {
+                it.notificationId == notificationId && !it.isRead
+            }
+            notificationState.value =
+                notificationState.value.map { current ->
+                    if (current.notificationId == notificationId) notification.data else current
+                }
+            if (wasUnread) unreadState.value = (unreadState.value - 1).coerceAtLeast(0)
+        }
+        return notification
+    }
 
-    override suspend fun markAllRead(): DataResult<Int> = DataResult.Success(0)
+    override suspend fun markAllRead(): DataResult<Int> {
+        markAllReadCalls++
+        when (val result = markAllReadResult) {
+            is DataResult.Success -> {
+                notificationState.value = notificationState.value.map { it.copy(isRead = true) }
+                unreadState.value = result.data
+            }
+            is DataResult.Error -> Unit
+        }
+        return markAllReadResult
+    }
 
     override suspend fun markRelatedRead(target: NotificationTargetReference): DataResult<Int> {
         markedRelatedTargets += target

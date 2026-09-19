@@ -171,47 +171,47 @@ alinir.
 
 #### TEST-005 - Tur Duzenleme Kismi Basari Akisi
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - `GuideTourEditViewModel` icin yalniz session degisikligi ve content basarili
-  olduktan sonra session guncellemesinin basarisiz olmasi test edilecektir.
+  olduktan sonra session guncellemesinin basarisiz olmasi test edilmektedir.
   Retry sirasinda basarili content isleminin ikinci kez gonderilmedigi
   dogrulanacaktir.
 
 #### TEST-006 - Turist Ana Sayfa State Akisi
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - `TouristHomeViewModel` icin ilk yukleme, kategoriye gore dogru sorgu, hata
   davranisi ve review degisikliginden sonra popular tur ile rehber verilerinin
-  yenilenmesi test edilecektir.
+  yenilenmesi test edilmektedir.
 
 #### TEST-007 - Bildirim Ekrani State Akisi
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - `NotificationViewModel` icin ilk yukleme, cached icerik varken yenileme hatasi,
   load-more korumalari, tek bildirimi okuma ve tumunu okundu yapma state
-  gecisleri test edilecektir.
+  gecisleri test edilmektedir.
 
 #### TEST-008 - Sehir Arama State Akisi
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - `CityPickerViewModel` icin debounce, onceki aramanin iptali ve son sorgunun
   kazanmasi, kisa sorguda sonuclarin temizlenmesi, hata/retry ve secimin
-  tuketilmesi test edilecektir.
+  tuketilmesi test edilmektedir.
 
 #### TEST-009 - Cuzdan Hareketleri Sayfalama Akisi
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - Rehber ve turist cuzdan hareketleri ViewModel'lerinde ilk sayfa, sonraki
   sayfa, son sayfa korumasi ve append hatasinda mevcut icerigin korunmasi test
-  edilecektir. Ayni paging davranisi gereksiz yere farkli seviyelerde tekrar
+  edilmektedir. Ayni paging davranisi gereksiz yere farkli seviyelerde tekrar
   test edilmeyecektir.
 
 #### TEST-010 - Bildirim Intent ve Typed Hedef Koprusu
 
-- Durum: `BEKLIYOR`
+- Durum: `TAMAMLANDI`
 - `NotificationTargetParser` icin FCM data haritasindan typed hedef uretme,
   hedefi Intent extras'a yazip geri okuma, extras'i tek kullanimdan sonra
-  temizleme ve eksik/bilinmeyen veride guvenli fallback test edilecektir.
+  temizleme ve eksik/bilinmeyen veride guvenli fallback test edilmektedir.
 
 ### Part 4 - Test Mimarisi Temizligi ve Korunacak Kapsam
 
