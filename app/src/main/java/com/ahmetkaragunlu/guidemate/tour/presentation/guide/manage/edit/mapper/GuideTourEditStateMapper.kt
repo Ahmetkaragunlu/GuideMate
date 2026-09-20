@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit
+package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper
 
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyInput
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyMinorUnitsOrNull
@@ -17,7 +17,7 @@ import java.time.ZoneId
 
 internal fun TourDetails.toGuideTourEditUiState(sessionId: String): GuideTourEditUiState? {
     val selectedSession = session(sessionId) ?: return null
-    val zone = tour.timeZoneId.toZoneId()
+    val zone = tour.location.timeZoneId.toZoneId()
     return GuideTourEditUiState(
         identity =
             GuideTourEditIdentityState(
@@ -25,11 +25,11 @@ internal fun TourDetails.toGuideTourEditUiState(sessionId: String): GuideTourEdi
                 sessionId = selectedSession.id,
                 tourVersion = tour.version,
                 sessionVersion = selectedSession.version,
-                country = tour.country,
-                countryCode = tour.countryCode,
-                location = tour.city,
-                cityPlaceId = tour.cityPlaceId,
-                timeZoneId = tour.timeZoneId,
+                country = tour.location.country,
+                countryCode = tour.location.countryCode,
+                location = tour.location.city,
+                cityPlaceId = tour.location.cityPlaceId,
+                timeZoneId = tour.location.timeZoneId,
                 isTourIdentityLocked = true,
             ),
         content =
@@ -38,8 +38,8 @@ internal fun TourDetails.toGuideTourEditUiState(sessionId: String): GuideTourEdi
                 description = tour.description,
                 category = tour.category,
                 languages = tour.languages,
-                coverImageUrl = tour.coverImageUrl,
-                coverMediaId = tour.coverMediaId,
+                coverImageUrl = tour.cover?.imageUrl,
+                coverMediaId = tour.cover?.mediaAssetId,
             ),
         session =
             GuideTourEditSessionFormState(
@@ -53,53 +53,53 @@ internal fun TourDetails.toGuideTourEditUiState(sessionId: String): GuideTourEdi
             ),
         operation =
             GuideTourEditOperationState(
-                approvalStatus = tour.approvalStatus,
-                requiresReviewConfirmation = tour.approvalStatus == TourApprovalStatus.REJECTED,
+                approvalStatus = tour.publication.approvalStatus,
+                requiresReviewConfirmation = tour.publication.approvalStatus == TourApprovalStatus.REJECTED,
                 loadState = ContentLoadState.CONTENT,
             ),
     )
 }
 
 internal fun GuideTourEditUiState.toContentInputOrNull(coverMediaId: String?): TourContentInput? {
-    val selectedCategory = category ?: return null
+    val selectedCategory = content.category ?: return null
     if (
-        title.isBlank() ||
-        description.isBlank() ||
-        countryCode.isBlank() ||
-        cityPlaceId.isBlank() ||
-        location.isBlank() ||
-        timeZoneId.isBlank() ||
-        languages.isEmpty() ||
+        content.title.isBlank() ||
+        content.description.isBlank() ||
+        identity.countryCode.isBlank() ||
+        identity.cityPlaceId.isBlank() ||
+        identity.location.isBlank() ||
+        identity.timeZoneId.isBlank() ||
+        content.languages.isEmpty() ||
         coverMediaId.isNullOrBlank()
     ) {
         return null
     }
     return TourContentInput(
-        title = title.trim(),
-        description = description.trim(),
-        countryCode = countryCode,
-        cityPlaceId = cityPlaceId,
-        cityName = location,
-        timeZoneId = timeZoneId,
+        title = content.title.trim(),
+        description = content.description.trim(),
+        countryCode = identity.countryCode,
+        cityPlaceId = identity.cityPlaceId,
+        cityName = identity.location,
+        timeZoneId = identity.timeZoneId,
         category = selectedCategory,
-        languageCodes = languages.map { it.code },
+        languageCodes = content.languages.map { it.code },
         coverMediaId = coverMediaId,
     )
 }
 
 internal fun GuideTourEditUiState.toSessionInputOrNull(): TourSessionInput? {
-    val date = tourDate ?: return null
-    val time = startTime ?: return null
-    val duration = durationMinutes.toIntOrNull()?.takeIf { it > 0 } ?: return null
-    val amount = price.toCurrencyMinorUnitsOrNull()?.takeIf { it > 0 } ?: return null
-    val participantCapacity = capacity.toIntOrNull()?.takeIf { it > 0 } ?: return null
-    if (meetingPoint.isBlank() || participantCapacity < 1) return null
+    val date = session.tourDate ?: return null
+    val time = session.startTime ?: return null
+    val duration = session.durationMinutes.toIntOrNull()?.takeIf { it > 0 } ?: return null
+    val amount = session.price.toCurrencyMinorUnitsOrNull()?.takeIf { it > 0 } ?: return null
+    val participantCapacity = session.capacity.toIntOrNull()?.takeIf { it > 0 } ?: return null
+    if (session.meetingPoint.isBlank() || participantCapacity < 1) return null
     val startsAt =
         runCatching {
-            LocalDateTime.of(date, time).atZone(timeZoneId.toZoneId()).toInstant()
+            LocalDateTime.of(date, time).atZone(identity.timeZoneId.toZoneId()).toInstant()
         }.getOrNull() ?: return null
     return TourSessionInput(
-        meetingPoint = meetingPoint.trim(),
+        meetingPoint = session.meetingPoint.trim(),
         startsAt = startsAt,
         durationMinutes = duration,
         priceMinor = amount,
@@ -113,34 +113,34 @@ internal fun GuideTourEditUiState.hasChangesFrom(original: GuideTourEditUiState?
 internal fun GuideTourEditUiState.hasContentChangesFrom(original: GuideTourEditUiState?): Boolean =
     original != null &&
         (
-            title != original.title ||
-                description != original.description ||
-                category != original.category ||
-                languages != original.languages ||
-                selectedCoverImageUri != null
+            content.title != original.content.title ||
+                content.description != original.content.description ||
+                content.category != original.content.category ||
+                content.languages != original.content.languages ||
+                content.selectedCoverImageUri != null
         )
 
 internal fun GuideTourEditUiState.hasSessionChangesFrom(original: GuideTourEditUiState?): Boolean =
     original != null &&
         (
-            meetingPoint != original.meetingPoint ||
-                tourDate != original.tourDate ||
-                startTime != original.startTime ||
-                durationMinutes != original.durationMinutes ||
-                price != original.price ||
-                capacity != original.capacity
+            session.meetingPoint != original.session.meetingPoint ||
+                session.tourDate != original.session.tourDate ||
+                session.startTime != original.session.startTime ||
+                session.durationMinutes != original.session.durationMinutes ||
+                session.price != original.session.price ||
+                session.capacity != original.session.capacity
         )
 
 internal fun GuideTourEditUiState.withContentFrom(current: GuideTourEditUiState): GuideTourEditUiState =
     copy(
         content =
             content.copy(
-                title = current.title,
-                description = current.description,
-                category = current.category,
-                languages = current.languages,
-                coverMediaId = current.coverMediaId,
-                coverImageUrl = current.coverImageUrl,
+                title = current.content.title,
+                description = current.content.description,
+                category = current.content.category,
+                languages = current.content.languages,
+                coverMediaId = current.content.coverMediaId,
+                coverImageUrl = current.content.coverImageUrl,
                 selectedCoverImageUri = null,
             ),
     )
@@ -149,12 +149,12 @@ internal fun GuideTourEditUiState.withSessionFrom(current: GuideTourEditUiState)
     copy(
         session =
             session.copy(
-                meetingPoint = current.meetingPoint,
-                tourDate = current.tourDate,
-                startTime = current.startTime,
-                durationMinutes = current.durationMinutes,
-                price = current.price,
-                capacity = current.capacity,
+                meetingPoint = current.session.meetingPoint,
+                tourDate = current.session.tourDate,
+                startTime = current.session.startTime,
+                durationMinutes = current.session.durationMinutes,
+                price = current.session.price,
+                capacity = current.session.capacity,
             ),
     )
 

@@ -23,7 +23,7 @@ object LocaleSelectionCatalog {
             .toList()
 
     fun languages(locale: Locale): List<LanguageOption> =
-        REPRESENTATIVE_REGION_BY_LANGUAGE
+        representativeRegionByLanguage
             .asSequence()
             .map { (code, regionCode) ->
                 LanguageOption(
@@ -66,8 +66,8 @@ object LocaleSelectionCatalog {
 
 }
 
-private val REPRESENTATIVE_REGION_BY_LANGUAGE =
-    linkedMapOf(
+private val representativeRegionByLanguage =
+    mapOf(
         "af" to "ZA",
         "am" to "ET",
         "ar" to "SA",

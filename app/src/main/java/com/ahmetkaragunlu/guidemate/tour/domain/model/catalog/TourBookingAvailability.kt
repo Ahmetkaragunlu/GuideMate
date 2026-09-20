@@ -39,7 +39,7 @@ fun TourWithSession?.resolveBookingAvailability(
         session.status == TourSessionStatus.EXPIRED -> TourBookingAvailability.EXPIRED
         hasReservation -> TourBookingAvailability.ALREADY_RESERVED
         !session.startsAt.isAfter(now) -> TourBookingAvailability.STARTED
-        tour.approvalStatus != TourApprovalStatus.APPROVED ->
+        tour.publication.approvalStatus != TourApprovalStatus.APPROVED ->
             TourBookingAvailability.NOT_APPROVED
         session.status != TourSessionStatus.OPEN_FOR_BOOKING -> TourBookingAvailability.CLOSED
         session.bookedCount >= session.capacity -> TourBookingAvailability.FULL

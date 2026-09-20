@@ -3,6 +3,7 @@ package com.ahmetkaragunlu.guidemate.reservation.data.mapper
 import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
 import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
+import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.CancelReservationRequestDto
 import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationCancellationResponseDto
@@ -11,9 +12,16 @@ import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationRev
 import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationSnapshotResponseDto
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.CancelReservationInput
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationActor
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationDetails
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationPolicy
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationResult
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationAttendance
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationLocationSnapshot
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationPurchaseDetails
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRatingSummary
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundStatus
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationScheduleSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
@@ -39,26 +47,33 @@ fun ReservationResponseDto.toDomain(): TouristReservation =
         id = reservationId,
         tourSessionId = sessionId,
         version = version,
-        participantCount = participantCount,
-        unitPriceMinor = unitPriceMinor,
-        totalPriceMinor = totalPriceMinor,
-        currencyCode = currencyCode,
+        purchase =
+            ReservationPurchaseDetails(
+                participantCount = participantCount,
+                unitPriceMinor = unitPriceMinor,
+                totalPriceMinor = totalPriceMinor,
+                currencyCode = currencyCode,
+            ),
         snapshot = snapshot.toDomain(),
         status = TouristReservationStatus.valueOf(status),
         holdExpiresAt = holdExpiresAt?.let(Instant::parse),
-        cancellationActor = cancellationActor?.let(ReservationCancellationActor::valueOf),
-        cancellationReason = cancellationReason,
-        cancelledAt = cancelledAt?.let(Instant::parse),
-        refundEligibility =
-            cancellationRefundEligibility
-                ?.let(ReservationRefundEligibility::valueOf)
-                ?: ReservationRefundEligibility.NOT_APPLICABLE,
-        cancellationPolicyCode = cancellationPolicyCode,
-        cancellationPolicyVersion = cancellationPolicyVersion,
-        averageRating = averageRating,
-        reviewCount = reviewCount,
-        bookedCount = bookedCount,
-        capacity = capacity,
+        cancellation =
+            ReservationCancellationDetails(
+                actor = cancellationActor?.let(ReservationCancellationActor::valueOf),
+                reason = cancellationReason,
+                cancelledAt = cancelledAt?.let(Instant::parse),
+                refundEligibility =
+                    cancellationRefundEligibility
+                        ?.let(ReservationRefundEligibility::valueOf)
+                        ?: ReservationRefundEligibility.NOT_APPLICABLE,
+                policy =
+                    ReservationCancellationPolicy(
+                        code = cancellationPolicyCode,
+                        version = cancellationPolicyVersion,
+                    ),
+            ),
+        rating = ReservationRatingSummary(averageRating = averageRating, reviewCount = reviewCount),
+        attendance = ReservationAttendance(bookedCount = bookedCount, capacity = capacity),
         review = review?.toDomain(),
     )
 
@@ -88,19 +103,28 @@ private fun ReservationSnapshotResponseDto.toDomain(): TouristReservationSnapsho
             ),
         title = title,
         description = description,
-        countryCode = countryCode,
-        country = LocaleSelectionCatalog.country(countryCode, locale)?.displayName ?: countryCode,
-        cityPlaceId = cityPlaceId,
-        city = cityName,
-        timeZoneId = timeZoneId,
+        location =
+            ReservationLocationSnapshot(
+                countryCode = countryCode,
+                country = LocaleSelectionCatalog.country(countryCode, locale)?.displayName ?: countryCode,
+                cityPlaceId = cityPlaceId,
+                city = cityName,
+                timeZoneId = timeZoneId,
+            ),
         category = categoryCode.toTourCategory(),
         languages = languageCodes.map { it.toTourLanguage(locale) },
-        coverMediaId = cover?.mediaAssetId,
-        coverImageUrl = cover?.imageUrl,
-        startsAt = Instant.parse(startsAt),
-        durationMinutes = durationMinutes,
-        meetingPoint = meetingPoint,
-        unitPriceMinor = unitPriceMinor,
+        cover = cover?.let { media ->
+            MediaReference(
+                mediaAssetId = media.mediaAssetId,
+                imageUrl = media.imageUrl,
+            )
+        },
+        schedule =
+            ReservationScheduleSnapshot(
+                startsAt = Instant.parse(startsAt),
+                durationMinutes = durationMinutes,
+                meetingPoint = meetingPoint,
+            ),
     )
 }
 

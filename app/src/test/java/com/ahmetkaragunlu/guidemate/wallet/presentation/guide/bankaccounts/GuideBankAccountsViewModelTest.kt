@@ -4,10 +4,10 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideFinanceRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.emptyPage
-import com.ahmetkaragunlu.guidemate.testing.testBankAccount
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeGuideFinanceRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.common.emptyPage
+import com.ahmetkaragunlu.guidemate.testing.wallet.testBankAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.BankAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.iban.TurkishBankCatalog
 import com.ahmetkaragunlu.guidemate.wallet.domain.iban.TurkishIbanValidator
@@ -30,7 +30,7 @@ class GuideBankAccountsViewModelTest {
         runTest {
             val repository =
                 FakeGuideFinanceRepository().apply {
-                    bankAccountsResult = DataResult.Success(emptyPage())
+                    results.bankAccounts = DataResult.Success(emptyPage())
                 }
             val validator = TurkishIbanValidator()
             val viewModel =
@@ -50,9 +50,9 @@ class GuideBankAccountsViewModelTest {
 
             assertEquals(
                 "TR470000100100000350930001",
-                repository.addBankAccountRequest?.first,
+                repository.calls.addBankAccount?.iban,
             )
-            assertEquals("Ada Guide", repository.addBankAccountRequest?.second)
+            assertEquals("Ada Guide", repository.calls.addBankAccount?.accountHolderName)
             assertFalse(viewModel.uiState.value.isAddAccountSheetVisible)
         }
 
@@ -61,7 +61,7 @@ class GuideBankAccountsViewModelTest {
         runTest {
             val repository =
                 FakeGuideFinanceRepository().apply {
-                    bankAccountsResult =
+                    results.bankAccounts =
                         bankAccountPage(
                             testBankAccount(id = "bank-1"),
                             testBankAccount(id = "bank-2", isDefault = false),
@@ -69,7 +69,7 @@ class GuideBankAccountsViewModelTest {
                 }
             val viewModel = createViewModel(repository)
             runCurrent()
-            repository.bankAccountsResult =
+            repository.results.bankAccounts =
                 bankAccountPage(
                     testBankAccount(id = "bank-1", isDefault = false),
                     testBankAccount(id = "bank-2"),
@@ -79,8 +79,8 @@ class GuideBankAccountsViewModelTest {
             viewModel.confirmMakeDefaultAccount()
             runCurrent()
 
-            assertEquals(listOf("bank-2"), repository.makeDefaultBankAccountRequests)
-            assertEquals(2, repository.getBankAccountsCalls)
+            assertEquals(listOf("bank-2"), repository.calls.makeDefaultBankAccountRequests)
+            assertEquals(2, repository.calls.getBankAccounts)
             assertEquals(
                 "bank-2",
                 viewModel.uiState.value.bankAccounts.single { it.isDefault }.bankAccountId,
@@ -94,12 +94,12 @@ class GuideBankAccountsViewModelTest {
         runTest {
             val repository =
                 FakeGuideFinanceRepository().apply {
-                    bankAccountsResult =
+                    results.bankAccounts =
                         bankAccountPage(
                             testBankAccount(id = "bank-1"),
                             testBankAccount(id = "bank-2", isDefault = false),
                         )
-                    deleteBankAccountResult = DataResult.Error(AppError.NoInternet)
+                    results.deleteBankAccount = DataResult.Error(AppError.NoInternet)
                 }
             val viewModel = createViewModel(repository)
             runCurrent()
@@ -112,13 +112,13 @@ class GuideBankAccountsViewModelTest {
             assertNotNull(viewModel.uiState.value.errorMessage)
             assertEquals("bank-2", viewModel.uiState.value.showDeleteDialogFor)
 
-            repository.deleteBankAccountResult = DataResult.Success(Unit)
-            repository.bankAccountsResult = bankAccountPage(testBankAccount(id = "bank-1"))
+            repository.results.deleteBankAccount = DataResult.Success(Unit)
+            repository.results.bankAccounts = bankAccountPage(testBankAccount(id = "bank-1"))
             viewModel.confirmDeleteAccount()
             runCurrent()
 
-            assertEquals(listOf("bank-2", "bank-2"), repository.deleteBankAccountRequests)
-            assertEquals(2, repository.getBankAccountsCalls)
+            assertEquals(listOf("bank-2", "bank-2"), repository.calls.deleteBankAccountRequests)
+            assertEquals(2, repository.calls.getBankAccounts)
             assertEquals(
                 listOf("bank-1"),
                 viewModel.uiState.value.bankAccounts.map { it.bankAccountId },

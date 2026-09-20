@@ -33,11 +33,11 @@ class ReservationRepositoryImplTest {
         assertEquals(15, api.listSize)
         val reservation = (result as DataResult.Success).data.items.single()
         assertEquals("reservation-1", reservation.id)
-        assertEquals(ReservationRefundEligibility.NOT_APPLICABLE, reservation.refundEligibility)
-        assertEquals(4.8, reservation.averageRating, 0.0)
-        assertEquals(17L, reservation.reviewCount)
-        assertEquals(6, reservation.bookedCount)
-        assertEquals(10, reservation.capacity)
+        assertEquals(ReservationRefundEligibility.NOT_APPLICABLE, reservation.cancellation.refundEligibility)
+        assertEquals(4.8, reservation.rating.averageRating, 0.0)
+        assertEquals(17L, reservation.rating.reviewCount)
+        assertEquals(6, reservation.attendance.bookedCount)
+        assertEquals(10, reservation.attendance.capacity)
     }
 
     @Test
@@ -63,7 +63,7 @@ class ReservationRepositoryImplTest {
         )
         assertEquals(
             ReservationRefundEligibility.FULL_REFUND,
-            result.data.reservation.refundEligibility,
+            result.data.reservation.cancellation.refundEligibility,
         )
     }
 

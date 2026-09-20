@@ -4,9 +4,9 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeTourDiscoveryRepository
-import com.ahmetkaragunlu.guidemate.testing.testTourSearchItem
-import com.ahmetkaragunlu.guidemate.testing.tourSearchPage
+import com.ahmetkaragunlu.guidemate.testing.discovery.FakeTourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.testing.discovery.testTourSearchItem
+import com.ahmetkaragunlu.guidemate.testing.discovery.tourSearchPage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -28,7 +28,7 @@ class TouristGuideToursViewModelTest {
         runTest {
             val repository =
                 FakeTourDiscoveryRepository().apply {
-                    popularForGuideResults +=
+                    results.popularForGuideResults +=
                         DataResult.Success(
                             tourSearchPage(
                                 page = 0,
@@ -36,7 +36,7 @@ class TouristGuideToursViewModelTest {
                                 testTourSearchItem("tour-1", "session-1"),
                             ),
                         )
-                    popularForGuideResults +=
+                    results.popularForGuideResults +=
                         DataResult.Success(
                             tourSearchPage(
                                 page = 1,
@@ -61,7 +61,7 @@ class TouristGuideToursViewModelTest {
                 viewModel.uiState.value.tours.map { it.sessionId },
             )
             assertFalse(viewModel.uiState.value.canLoadMore)
-            assertEquals(listOf(0, 1), repository.popularForGuideRequests.map { it.page })
+            assertEquals(listOf(0, 1), repository.calls.popularForGuideRequests.map { it.page })
         }
 
     @Test
@@ -69,7 +69,7 @@ class TouristGuideToursViewModelTest {
         runTest {
             val repository =
                 FakeTourDiscoveryRepository().apply {
-                    popularForGuideResults +=
+                    results.popularForGuideResults +=
                         DataResult.Success(
                             tourSearchPage(
                                 page = 0,
@@ -77,7 +77,7 @@ class TouristGuideToursViewModelTest {
                                 testTourSearchItem("tour-1", "session-1"),
                             ),
                         )
-                    popularForGuideResults += DataResult.Error(AppError.NoInternet)
+                    results.popularForGuideResults += DataResult.Error(AppError.NoInternet)
                 }
             val viewModel = TouristGuideToursViewModel(repository)
 

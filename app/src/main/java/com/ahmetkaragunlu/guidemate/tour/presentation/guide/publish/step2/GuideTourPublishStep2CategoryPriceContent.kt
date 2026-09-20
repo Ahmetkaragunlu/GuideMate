@@ -66,20 +66,20 @@ fun GuideTourPublishStep2CategoryPriceContent(
 
             Step2Header()
             Step2CategoryField(
-                category = uiState.category,
+                category = uiState.content.category,
                 onClick = onCategoryClick,
             )
             GuideTourLanguageSelector(
-                languages = uiState.spokenLanguages,
+                languages = uiState.content.spokenLanguages,
                 onRemoveLanguage = onRemoveLanguageClick,
                 onAddLanguage = onAddLanguageClick,
             )
             GuideTourPriceField(
-                value = uiState.price,
+                value = uiState.session.price,
                 onValueChange = onPriceChange,
             )
             GuideTourCapacityField(
-                value = uiState.capacity,
+                value = uiState.session.capacity,
                 onValueChange = onCapacityChange,
             )
             GuideTourPublishValidationMessage(

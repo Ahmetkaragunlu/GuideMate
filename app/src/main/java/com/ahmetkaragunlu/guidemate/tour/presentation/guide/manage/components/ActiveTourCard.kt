@@ -50,8 +50,8 @@ fun ActiveTourCard(
     isToggleEnabled: Boolean = true,
 ) {
     TourBaseCard(
-        imageResId = tour.imageResId,
-        imageUrl = tour.imageUrl,
+        imageResId = tour.media.imageResId,
+        imageUrl = tour.media.imageUrl,
         modifier = modifier.clickable(onClick = onClick),
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -85,12 +85,12 @@ fun ActiveTourCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = colorResource(R.color.text_color),
                     )
-                    if (tour.languagesFlag.isNotEmpty()) {
+                    if (tour.languages.flags.isNotEmpty()) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = tour.languagesFlag)
+                            Text(text = tour.languages.flags)
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = tour.languagesText,
+                                text = tour.languages.shortCodes,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colorResource(R.color.text_color),
                             )
@@ -109,7 +109,7 @@ fun ActiveTourCard(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Switch(
-                            checked = tour.isBookingOpen,
+                            checked = tour.status.isBookingOpen,
                             onCheckedChange = onToggleLive.takeIf { isToggleEnabled },
                             colors =
                                 SwitchDefaults.colors(
@@ -121,7 +121,7 @@ fun ActiveTourCard(
                         )
                         Text(
                             text =
-                                if (tour.isBookingOpen) {
+                                if (tour.status.isBookingOpen) {
                                     stringResource(R.string.live)
                                 } else {
                                     stringResource(
@@ -129,7 +129,7 @@ fun ActiveTourCard(
                                     )
                                 },
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (tour.isBookingOpen) Color.Green else Color.LightGray,
+                            color = if (tour.status.isBookingOpen) Color.Green else Color.LightGray,
                         )
                     }
 
@@ -171,12 +171,12 @@ fun ActiveTourCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = tour.priceMinor.toPlatformCurrencyFromMinorUnit(),
+                        text = tour.pricing.priceMinor.toPlatformCurrencyFromMinorUnit(),
                         style = MaterialTheme.typography.titleMedium,
                         color = colorResource(R.color.brand_color),
                     )
 
-                    if (tour.rating != null && tour.reviewCount != null) {
+                    tour.rating?.let { rating ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Star,
@@ -186,7 +186,7 @@ fun ActiveTourCard(
                             )
                             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                             Text(
-                                text = stringResource(R.string.rating_review_format, tour.rating, tour.reviewCount),
+                                text = stringResource(R.string.rating_review_format, rating.value, rating.reviewCount),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colorResource(R.color.text_color),
                             )

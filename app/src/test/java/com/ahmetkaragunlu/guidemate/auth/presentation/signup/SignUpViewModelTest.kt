@@ -4,8 +4,9 @@ import com.ahmetkaragunlu.guidemate.auth.domain.validation.EmailPolicy
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.NumericPasswordPolicy
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.PersonalNamePolicy
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
-import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeAuthRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.auth.RegisterCall
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +28,7 @@ class SignUpViewModelTest {
             fillValidForm(viewModel)
 
             viewModel.onSignUpClick()
-            assertNull(repository.registerRequest)
+            assertNull(repository.calls.register)
 
             viewModel.markTermsAsRead()
             viewModel.acceptTerms()
@@ -35,8 +36,13 @@ class SignUpViewModelTest {
             runCurrent()
 
             assertEquals(
-                listOf("Ada", "Lovelace", "ada@example.com", "12345678"),
-                repository.registerRequest,
+                RegisterCall(
+                    firstName = "Ada",
+                    lastName = "Lovelace",
+                    email = "ada@example.com",
+                    password = "12345678",
+                ),
+                repository.calls.register,
             )
             assertTrue(viewModel.screenState.value.isRegistrationSuccess)
         }
@@ -73,7 +79,7 @@ class SignUpViewModelTest {
             viewModel.onSignUpClick()
             runCurrent()
 
-            assertNull(repository.registerRequest)
+            assertNull(repository.calls.register)
             assertTrue(viewModel.screenState.value.errorMessage != null)
         }
 

@@ -7,12 +7,12 @@ import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideFinanceRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
-import com.ahmetkaragunlu.guidemate.testing.testBankAccount
-import com.ahmetkaragunlu.guidemate.testing.testNotification
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeGuideFinanceRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeWalletRepository
+import com.ahmetkaragunlu.guidemate.testing.wallet.testBankAccount
+import com.ahmetkaragunlu.guidemate.testing.notification.testNotification
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.BankAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ class GuideMyWalletViewModelTest {
         runTest {
             val financeRepository =
                 FakeGuideFinanceRepository().apply {
-                    bankAccountsResult =
+                    results.bankAccounts =
                         DataResult.Success(
                             PagedResult(
                                 items = listOf(testBankAccount()),
@@ -65,9 +65,9 @@ class GuideMyWalletViewModelTest {
             viewModel.requestWithdrawal(5_000)
             runCurrent()
 
-            assertEquals("bank-1", financeRepository.withdrawalRequest?.first)
-            assertEquals(5_000L, financeRepository.withdrawalRequest?.second)
-            assertNotNull(financeRepository.withdrawalRequest?.third)
+            assertEquals("bank-1", financeRepository.calls.withdrawal?.bankAccountId)
+            assertEquals(5_000L, financeRepository.calls.withdrawal?.amountMinor)
+            assertNotNull(financeRepository.calls.withdrawal?.idempotencyKey)
             assertTrue(viewModel.uiState.value.isWithdrawalRequestSubmitted)
             assertFalse(viewModel.uiState.value.isWithdrawalInProgress)
             collection.cancel()
@@ -91,13 +91,13 @@ class GuideMyWalletViewModelTest {
 
             assertEquals(1, walletRepository.getWalletCalls)
 
-            notificationRepository.notificationState.value =
+            notificationRepository.state.notifications.value =
                 listOf(testNotification(type = NotificationType.CHAT_MESSAGE))
             runCurrent()
 
             assertEquals(1, walletRepository.getWalletCalls)
 
-            notificationRepository.notificationState.value =
+            notificationRepository.state.notifications.value =
                 listOf(
                     testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED),
                     testNotification(id = "chat", type = NotificationType.CHAT_MESSAGE),
@@ -106,7 +106,7 @@ class GuideMyWalletViewModelTest {
 
             assertEquals(2, walletRepository.getWalletCalls)
 
-            notificationRepository.notificationState.value =
+            notificationRepository.state.notifications.value =
                 listOf(
                     testNotification(id = "earning", type = NotificationType.EARNING_AVAILABLE),
                     testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED),
@@ -122,12 +122,12 @@ class GuideMyWalletViewModelTest {
         runTest {
             val financeRepository =
                 FakeGuideFinanceRepository().apply {
-                    bankAccountsResult =
+                    results.bankAccounts =
                         bankAccountPage(
                             testBankAccount(id = "bank-1"),
                             testBankAccount(id = "bank-2", isDefault = false),
                         )
-                    withdrawalResult = DataResult.Error(AppError.NoInternet)
+                    results.withdrawal = DataResult.Error(AppError.NoInternet)
                 }
             val viewModel =
                 GuideMyWalletViewModel(
@@ -145,22 +145,22 @@ class GuideMyWalletViewModelTest {
             viewModel.requestWithdrawal(5_000)
             runCurrent()
 
-            val firstAttemptKey = financeRepository.withdrawalRequests.first().third
+            val firstAttemptKey = financeRepository.calls.withdrawals.first().idempotencyKey
             assertEquals(
                 listOf(firstAttemptKey, firstAttemptKey),
-                financeRepository.withdrawalRequests.map { it.third },
+                financeRepository.calls.withdrawals.map { it.idempotencyKey },
             )
 
             viewModel.selectNextBankAccount()
             runCurrent()
             viewModel.requestWithdrawal(5_000)
             runCurrent()
-            val changedAccountKey = financeRepository.withdrawalRequests.last().third
+            val changedAccountKey = financeRepository.calls.withdrawals.last().idempotencyKey
             assertNotEquals(firstAttemptKey, changedAccountKey)
 
             viewModel.requestWithdrawal(6_000)
             runCurrent()
-            val changedAmountKey = financeRepository.withdrawalRequests.last().third
+            val changedAmountKey = financeRepository.calls.withdrawals.last().idempotencyKey
             assertNotEquals(changedAccountKey, changedAmountKey)
             assertFalse(viewModel.uiState.value.isWithdrawalInProgress)
             collection.cancel()

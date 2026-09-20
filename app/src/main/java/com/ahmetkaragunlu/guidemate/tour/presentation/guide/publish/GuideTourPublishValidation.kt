@@ -22,13 +22,13 @@ internal fun GuideTourPublishUiState.findValidationError(
     when (step) {
         GuideTourPublishStep.LOCATION_AND_TIME ->
             if (
-                countryCode.isBlank() ||
-                    country.isBlank() ||
-                    cityPlaceId.isBlank() ||
-                    city.isBlank() ||
-                    timeZoneId.isBlank() ||
+                location.countryCode.isBlank() ||
+                    location.country.isBlank() ||
+                    location.cityPlaceId.isBlank() ||
+                    location.city.isBlank() ||
+                    location.timeZoneId.isBlank() ||
                     toStartInstant()?.isAfter(Instant.now()) != true ||
-                    durationMinutes?.let { it > 0 } != true
+                    session.durationMinutes?.let { it > 0 } != true
             ) {
                 TourPublishValidationError(step, R.string.error_tour_step1_invalid)
             } else {
@@ -36,12 +36,12 @@ internal fun GuideTourPublishUiState.findValidationError(
             }
         GuideTourPublishStep.TECHNICAL_DETAILS ->
             when {
-                spokenLanguages.size > MAX_TOUR_LANGUAGE_COUNT ->
+                content.spokenLanguages.size > MAX_TOUR_LANGUAGE_COUNT ->
                     TourPublishValidationError(step, R.string.error_tour_languages_too_many)
-                category == null ||
-                    spokenLanguages.isEmpty() ||
-                    price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } != true ||
-                    capacity.toIntOrNull()?.let { it > 0 } != true ->
+                content.category == null ||
+                    content.spokenLanguages.isEmpty() ||
+                    session.price.toCurrencyMinorUnitsOrNull()?.let { it > 0 } != true ||
+                    session.capacity.toIntOrNull()?.let { it > 0 } != true ->
                     TourPublishValidationError(step, R.string.error_tour_step2_invalid)
                 else -> null
             }
@@ -51,15 +51,15 @@ internal fun GuideTourPublishUiState.findValidationError(
 
 private fun GuideTourPublishUiState.contentValidationError(): TourPublishValidationError? {
     val step = GuideTourPublishStep.CONTENT_AND_MEDIA
-    val trimmedTitle = tourName.trim()
-    val trimmedDescription = tourDescription.trim()
-    val trimmedMeetingPoint = meetingPoint.trim()
+    val trimmedTitle = content.tourName.trim()
+    val trimmedDescription = content.tourDescription.trim()
+    val trimmedMeetingPoint = session.meetingPoint.trim()
     return when {
         trimmedTitle.isEmpty() ->
             TourPublishValidationError(step, R.string.error_tour_title_required)
         trimmedTitle.length !in TOUR_TITLE_MIN_LENGTH..TOUR_TITLE_MAX_LENGTH ->
             TourPublishValidationError(step, R.string.error_tour_title_length)
-        selectedCoverImageUri == null ->
+        content.selectedCoverImageUri == null ->
             TourPublishValidationError(step, R.string.error_tour_cover_required)
         trimmedDescription.isEmpty() ->
             TourPublishValidationError(step, R.string.error_tour_description_required)

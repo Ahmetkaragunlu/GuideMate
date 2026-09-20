@@ -39,14 +39,14 @@ fun GuideTourPublishStep2CategoryPriceScreen(
 
     GuideTourCategorySelectionBottomSheet(
         isVisible = showCategoryPicker,
-        selectedCategory = uiState.category,
+        selectedCategory = uiState.content.category,
         onDismissRequest = { showCategoryPicker = false },
         onCategorySelected = onCategorySelected,
     )
 
     LanguageSelectionBottomSheet(
         isVisible = showLanguagePicker,
-        selectedLanguageCodes = uiState.spokenLanguages.mapTo(mutableSetOf()) { it.code },
+        selectedLanguageCodes = uiState.content.spokenLanguages.mapTo(mutableSetOf()) { it.code },
         onDismissRequest = { showLanguagePicker = false },
         onLanguagesSelected = { languages ->
             onLanguagesSelected(languages)

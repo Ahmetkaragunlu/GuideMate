@@ -70,14 +70,14 @@ class GuideTourPublishViewModel
 
         fun onTourDateSelected(date: LocalDate) {
             updateDraft {
-                val zoneId = timeZoneId.toZoneId()
+                val zoneId = location.timeZoneId.toZoneId()
                 val today = LocalDate.now(zoneId)
                 val currentTime = LocalTime.now(zoneId)
                 copy(
                     session =
                         session.copy(
                             tourDate = date,
-                            startTime = startTime?.takeIf { date != today || it.isAfter(currentTime) },
+                            startTime = session.startTime?.takeIf { date != today || it.isAfter(currentTime) },
                         ),
                 )
             }
@@ -120,13 +120,13 @@ class GuideTourPublishViewModel
 
         fun onRemoveLanguageClick(code: String) {
             updateDraft {
-                if (spokenLanguages.size <= 1) {
+                if (content.spokenLanguages.size <= 1) {
                     this
                 } else {
                     copy(
                         content =
                             content.copy(
-                                spokenLanguages = spokenLanguages.filterNot { it.code == code },
+                                spokenLanguages = content.spokenLanguages.filterNot { it.code == code },
                             ),
                     )
                 }
@@ -168,13 +168,13 @@ class GuideTourPublishViewModel
 
         fun onPublishClick() {
             val form = draftState.value
-            if (form.isPublishing || form.publishSucceeded) return
+            if (form.submission.isPublishing || form.submission.succeeded) return
             form.firstValidationError()?.let { error ->
                 showValidationError(error.messageResId, error.step)
                 return
             }
             val inputWithoutCover = form.toCreateInputOrNull(coverMediaId = null)
-            val imageUri = form.selectedCoverImageUri
+            val imageUri = form.content.selectedCoverImageUri
             if (inputWithoutCover == null || imageUri == null) {
                 showValidationError(R.string.error_tour_schedule_invalid, GuideTourPublishStep.PREVIEW)
                 return

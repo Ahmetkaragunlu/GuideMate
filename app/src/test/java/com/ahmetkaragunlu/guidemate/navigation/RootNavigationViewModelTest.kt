@@ -8,12 +8,12 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
 import com.ahmetkaragunlu.guidemate.notification.domain.push.NotificationForegroundState
 import com.ahmetkaragunlu.guidemate.session.domain.usecase.TerminateUserSessionUseCase
-import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeOnboardingRepository
-import com.ahmetkaragunlu.guidemate.testing.FakePaymentRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
-import com.ahmetkaragunlu.guidemate.testing.authenticatedUser
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeAuthRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeOnboardingRepository
+import com.ahmetkaragunlu.guidemate.testing.payment.FakePaymentRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.authenticatedUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -28,7 +28,7 @@ class RootNavigationViewModelTest {
     @Test
     fun noStoredSession_opensOnboardingAndClearsStaleSession() =
         runTest {
-            val authRepository = FakeAuthRepository().apply { storedSession = false }
+            val authRepository = FakeAuthRepository().apply { state.hasStoredSession = false }
             val viewModel =
                 createViewModel(
                     authRepository = authRepository,
@@ -42,7 +42,7 @@ class RootNavigationViewModelTest {
                 AuthStartDestination.ONBOARDING,
                 viewModel.uiState.value.authStartDestination,
             )
-            assertEquals(1, authRepository.clearLocalSessionCalls)
+            assertEquals(1, authRepository.calls.clearLocalSession)
         }
 
     @Test
@@ -51,8 +51,8 @@ class RootNavigationViewModelTest {
             val guide = authenticatedUser(role = UserRole.GUIDE)
             val authRepository =
                 FakeAuthRepository().apply {
-                    storedSession = true
-                    currentUserResult = com.ahmetkaragunlu.guidemate.common.result.DataResult.Success(guide)
+                    state.hasStoredSession = true
+                    results.currentUser = com.ahmetkaragunlu.guidemate.common.result.DataResult.Success(guide)
                 }
             val userRepository = FakeUserRepository(guide).apply { restoredUser = guide }
             val notificationRepository = FakeNotificationRepository()
@@ -80,10 +80,10 @@ class RootNavigationViewModelTest {
             viewModel.logout()
             runCurrent()
 
-            assertEquals(1, authRepository.logoutCalls)
-            assertEquals(1, notificationRepository.dismissSystemNotificationsCalls)
-            assertEquals(1, notificationRepository.clearLocalStateCalls)
-            assertEquals(1, paymentRepository.clearAllPendingPaymentCalls)
+            assertEquals(1, authRepository.calls.logout)
+            assertEquals(1, notificationRepository.calls.dismissSystemNotifications)
+            assertEquals(1, notificationRepository.calls.clearLocalState)
+            assertEquals(1, paymentRepository.calls.clearAllPendingPayments)
             assertEquals(null, navigationCoordinator.pendingTarget.value)
         }
 

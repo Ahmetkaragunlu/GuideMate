@@ -1,8 +1,8 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model
 
 import androidx.annotation.DrawableRes
-import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
+import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
 
 data class GuideTourCardUiModel(
@@ -11,21 +11,40 @@ data class GuideTourCardUiModel(
     val title: String,
     val date: String,
     val location: String,
-    @param:DrawableRes val imageResId: Int,
-    val imageUrl: String? = null,
+    val media: GuideTourCardMediaUiModel,
     val participantCount: Int,
-    val capacity: Int,
-    val languagesFlag: String,
-    val languagesText: String,
+    val languages: GuideTourCardLanguagesUiModel,
     val category: TourCategory,
+    val pricing: GuideTourCardPricingUiModel,
+    val rating: GuideTourCardRatingUiModel?,
+    val status: GuideTourCardStatusUiModel,
+)
+
+data class GuideTourCardMediaUiModel(
+    @param:DrawableRes val imageResId: Int,
+    val imageUrl: String?,
+)
+
+data class GuideTourCardLanguagesUiModel(
+    val flags: String,
+    val shortCodes: String,
+)
+
+data class GuideTourCardPricingUiModel(
     val priceMinor: Long,
-    val rating: Double?,
-    val reviewCount: Long?,
+    val earningsMinor: Long?,
+)
+
+data class GuideTourCardRatingUiModel(
+    val value: Double,
+    val reviewCount: Long,
+)
+
+data class GuideTourCardStatusUiModel(
     val approvalStatus: TourApprovalStatus,
     val sessionStatus: TourSessionStatus,
-    val rejectionReason: String? = null,
-    val canArchive: Boolean = false,
-    val earningsMinor: Long? = null,
+    val rejectionReason: String?,
+    val canArchive: Boolean,
 ) {
     val isBookingOpen: Boolean
         get() = sessionStatus == TourSessionStatus.OPEN_FOR_BOOKING

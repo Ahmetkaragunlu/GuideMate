@@ -6,10 +6,10 @@ import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeReviewRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.tour.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.review.FakeReviewRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReview
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import java.time.Instant
@@ -39,17 +39,17 @@ class GuideTourDetailViewModelTest {
             runCurrent()
 
             assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.loadState)
-            assertEquals("tour-1", notificationRepository.markedRelatedTargets.single().targetId)
+            assertEquals("tour-1", notificationRepository.calls.markedRelatedTargets.single().targetId)
             viewModel.cancelSession()
-            assertNull(repository.cancelSessionRequest)
+            assertNull(repository.calls.cancelSession)
 
             viewModel.onCancellationReasonChange("  Weather conditions  ")
             viewModel.cancelSession()
             runCurrent()
 
-            assertEquals("session-1", repository.cancelSessionRequest?.first)
-            assertEquals("Weather conditions", repository.cancelSessionRequest?.second)
-            assertNotNull(repository.cancelSessionRequest?.third)
+            assertEquals("session-1", repository.calls.cancelSession?.sessionId)
+            assertEquals("Weather conditions", repository.calls.cancelSession?.reason)
+            assertNotNull(repository.calls.cancelSession?.idempotencyKey)
             assertEquals(GuideTourTab.PAST, viewModel.uiState.value.finishedTab)
         }
 

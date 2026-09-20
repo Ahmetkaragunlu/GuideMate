@@ -43,8 +43,8 @@ fun TourSearchResultCard(
     modifier: Modifier = Modifier,
 ) {
     TourBaseCard(
-        imageResId = tour.imageResId,
-        imageUrl = tour.imageUrl,
+        imageResId = tour.media.imageResId,
+        imageUrl = tour.media.imageUrl,
         modifier = modifier.clickable(onClick = onClick),
     ) {
         Column(
@@ -88,7 +88,7 @@ fun TourSearchResultCard(
                         )
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                         Text(
-                            text = stringResource(R.string.rating_review_format, rating, tour.reviewCount),
+                            text = stringResource(R.string.rating_review_format, rating.value, rating.reviewCount),
                             style = MaterialTheme.typography.bodyMedium,
                             color = colorResource(R.color.text_color),
                         )
@@ -126,10 +126,10 @@ fun TourSearchResultCard(
             InfoRow(icon = TablerIcons.MapPin, text = tour.location)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = tour.languagesFlag)
+                Text(text = tour.languages.flags)
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = tour.languagesText,
+                    text = tour.languages.shortCodes,
                     style = MaterialTheme.typography.bodySmall,
                     color = colorResource(R.color.text_color),
                     maxLines = 1,
@@ -137,15 +137,15 @@ fun TourSearchResultCard(
                     modifier = Modifier.weight(1f),
                 )
                 GuideMateImage(
-                    fallbackImageResId = tour.guideImageResId,
-                    imageUrl = tour.guideImageUrl,
+                    fallbackImageResId = tour.guide.imageResId,
+                    imageUrl = tour.guide.imageUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(24.dp).clip(CircleShape),
                 )
                 Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                 Text(
-                    text = tour.guideName,
+                    text = tour.guide.name,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,

@@ -9,10 +9,10 @@ import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.AppFieldError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.R
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeGuideProfileRepository
+import com.ahmetkaragunlu.guidemate.testing.tour.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.media.FakeMediaRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.usecase.PublishGuideTourUseCase
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.publish.model.GuideTourPublishStep
@@ -44,7 +44,7 @@ class GuideTourPublishViewModelTest {
             runCurrent()
             assertEquals(
                 GuideTourPublishStep.LOCATION_AND_TIME,
-                viewModel.uiState.value.validationErrorStep,
+                viewModel.uiState.value.submission.validationErrorStep,
             )
             collection.cancel()
         }
@@ -64,9 +64,9 @@ class GuideTourPublishViewModelTest {
             runCurrent()
 
             assertEquals("content://cover", mediaRepository.uploadedUri)
-            assertNotNull(tourRepository.createInput)
-            assertTrue(viewModel.uiState.value.publishSucceeded)
-            assertFalse(viewModel.uiState.value.isPublishing)
+            assertNotNull(tourRepository.calls.create)
+            assertTrue(viewModel.uiState.value.submission.succeeded)
+            assertFalse(viewModel.uiState.value.submission.isPublishing)
             collection.cancel()
         }
 
@@ -75,7 +75,7 @@ class GuideTourPublishViewModelTest {
         runTest {
             val tourRepository =
                 FakeGuideTourRepository().apply {
-                    createResult =
+                    results.create =
                         DataResult.Error(
                             AppError.Backend(
                                 code = null,
@@ -101,13 +101,13 @@ class GuideTourPublishViewModelTest {
 
             assertEquals(
                 GuideTourPublishStep.CONTENT_AND_MEDIA,
-                viewModel.uiState.value.validationErrorStep,
+                viewModel.uiState.value.submission.validationErrorStep,
             )
             assertEquals(
                 R.string.error_tour_description_length,
-                viewModel.uiState.value.validationErrorResId,
+                viewModel.uiState.value.submission.validationErrorResId,
             )
-            assertFalse(viewModel.uiState.value.isPublishing)
+            assertFalse(viewModel.uiState.value.submission.isPublishing)
             collection.cancel()
         }
 

@@ -5,10 +5,10 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeReviewRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeTourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.review.FakeReviewRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.discovery.FakeTourDiscoveryRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -37,14 +37,14 @@ class TouristTourDetailViewModelTest {
             runCurrent()
 
             assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.loadState)
-            assertEquals("tour-1", notificationRepository.markedRelatedTargets.single().targetId)
+            assertEquals("tour-1", notificationRepository.calls.markedRelatedTargets.single().targetId)
         }
 
     @Test
     fun `failed detail load does not mark related notifications read`() =
         runTest {
             val tourRepository = FakeTourDiscoveryRepository().apply {
-                sessionResult = DataResult.Error(AppError.NoInternet)
+                results.sessionResult = DataResult.Error(AppError.NoInternet)
             }
             val notificationRepository = FakeNotificationRepository()
             val viewModel = createViewModel(tourRepository, notificationRepository)
@@ -52,7 +52,7 @@ class TouristTourDetailViewModelTest {
             runCurrent()
 
             assertEquals(ContentLoadState.ERROR, viewModel.uiState.value.loadState)
-            assertTrue(notificationRepository.markedRelatedTargets.isEmpty())
+            assertTrue(notificationRepository.calls.markedRelatedTargets.isEmpty())
         }
 
     @Test
@@ -61,7 +61,7 @@ class TouristTourDetailViewModelTest {
             val reviewRepository =
                 FakeReviewRepository().apply {
                     reviewsResults += DataResult.Error(AppError.NoInternet)
-                    reviewsResults += DataResult.Success(com.ahmetkaragunlu.guidemate.testing.emptyPage())
+                    reviewsResults += DataResult.Success(com.ahmetkaragunlu.guidemate.testing.common.emptyPage())
                 }
             val tourRepository = FakeTourDiscoveryRepository()
             val viewModel =

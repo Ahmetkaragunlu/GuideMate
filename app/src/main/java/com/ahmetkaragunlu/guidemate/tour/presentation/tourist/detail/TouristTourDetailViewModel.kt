@@ -123,7 +123,15 @@ class TouristTourDetailViewModel
                     ) {
                         is DataResult.Success -> {
                             val tourWithReviews =
-                                tour.copy(tour = tour.tour.copy(recentReviews = result.data.items))
+                                tour.copy(
+                                    tour =
+                                        tour.tour.copy(
+                                            reviews =
+                                                tour.tour.reviews.copy(
+                                                    recentReviews = result.data.items,
+                                                ),
+                                        ),
+                                )
                             _uiState.update {
                                 it.copy(
                                     detail = tourWithReviews.toTourDetailUiState(),

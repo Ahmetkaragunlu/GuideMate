@@ -16,42 +16,7 @@ data class GuideTourEditUiState(
     val content: GuideTourEditContentFormState = GuideTourEditContentFormState(),
     val session: GuideTourEditSessionFormState = GuideTourEditSessionFormState(),
     val operation: GuideTourEditOperationState = GuideTourEditOperationState(),
-) {
-    val tourId get() = identity.tourId
-    val sessionId get() = identity.sessionId
-    val tourVersion get() = identity.tourVersion
-    val sessionVersion get() = identity.sessionVersion
-    val country get() = identity.country
-    val countryCode get() = identity.countryCode
-    val location get() = identity.location
-    val cityPlaceId get() = identity.cityPlaceId
-    val timeZoneId get() = identity.timeZoneId
-    val isTourIdentityLocked get() = identity.isTourIdentityLocked
-    val title get() = content.title
-    val description get() = content.description
-    val category get() = content.category
-    val languages get() = content.languages
-    val coverImageResId get() = content.coverImageResId
-    val coverImageUrl get() = content.coverImageUrl
-    val coverMediaId get() = content.coverMediaId
-    val selectedCoverImageUri get() = content.selectedCoverImageUri
-    val meetingPoint get() = session.meetingPoint
-    val tourDate get() = session.tourDate
-    val startTime get() = session.startTime
-    val durationMinutes get() = session.durationMinutes
-    val price get() = session.price
-    val capacity get() = session.capacity
-    val hasBookings get() = session.hasBookings
-    val approvalStatus get() = operation.approvalStatus
-    val hasUnsavedChanges get() = operation.hasUnsavedChanges
-    val requiresReviewConfirmation get() = operation.requiresReviewConfirmation
-    val contentReviewSubmitted get() = operation.contentReviewSubmitted
-    val loadState get() = operation.loadState
-    val isSaving get() = operation.isSaving
-    val userMessage get() = operation.userMessage
-    val savedTargetTab get() = operation.savedTargetTab
-    val errorResId get() = operation.errorResId
-}
+)
 
 data class GuideTourEditIdentityState(
     val tourId: String = "",

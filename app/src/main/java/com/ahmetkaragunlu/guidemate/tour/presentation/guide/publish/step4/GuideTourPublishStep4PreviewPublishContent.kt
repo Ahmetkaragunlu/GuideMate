@@ -35,7 +35,7 @@ fun GuideTourPublishStep4PreviewPublishContent(
             GuideTourPublishValidationMessage(
                 errorResId = uiState.validationErrorFor(GuideTourPublishStep.PREVIEW),
             )
-            uiState.submissionErrorMessage?.let { message ->
+            uiState.submission.errorMessage?.let { message ->
                 Text(
                     text = message,
                     color = MaterialTheme.colorScheme.error,
@@ -43,7 +43,7 @@ fun GuideTourPublishStep4PreviewPublishContent(
                 )
             }
         },
-        isPrimaryActionLoading = uiState.isPublishing,
-        isPrimaryActionEnabled = !uiState.publishSucceeded,
+        isPrimaryActionLoading = uiState.submission.isPublishing,
+        isPrimaryActionEnabled = !uiState.submission.succeeded,
     )
 }

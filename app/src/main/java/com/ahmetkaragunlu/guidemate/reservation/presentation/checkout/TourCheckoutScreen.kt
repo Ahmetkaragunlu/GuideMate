@@ -24,8 +24,8 @@ fun TourCheckoutScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val termsSheetState = rememberModalBottomSheetState()
 
-    LaunchedEffect(uiState.paymentLaunch) {
-        uiState.paymentLaunch?.let { launch ->
+    LaunchedEffect(uiState.submission.paymentLaunch) {
+        uiState.submission.paymentLaunch?.let { launch ->
             viewModel.onPaymentNavigationHandled()
             onNavigateToPayment(launch.paymentId, launch.requiresHostedCheckout)
         }
@@ -53,12 +53,12 @@ fun TourCheckoutScreen(
         }
     }
 
-    if (uiState.showTermsSheet) {
+    if (uiState.terms.isSheetVisible) {
         AgreementBottomSheet(
             sheetState = termsSheetState,
             titleResId = R.string.reservation_agreement_title,
             bodyResId = R.string.reservation_agreement_full_text,
-            hasUserReadAgreement = uiState.hasUserReadTerms,
+            hasUserReadAgreement = uiState.terms.hasBeenRead,
             onDismiss = viewModel::dismissTermsSheet,
             onMarkAgreementAsRead = viewModel::markTermsAsRead,
             onAcceptAgreement = viewModel::acceptTerms,

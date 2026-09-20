@@ -15,38 +15,12 @@ data class GuideTourPublishUiState(
     val guide: TourPublishGuideState = TourPublishGuideState(),
     val submission: TourPublishSubmissionState = TourPublishSubmissionState(),
 ) {
-    val countryCode get() = location.countryCode
-    val country get() = location.country
-    val cityPlaceId get() = location.cityPlaceId
-    val city get() = location.city
-    val timeZoneId get() = location.timeZoneId
-    val tourDate get() = session.tourDate
-    val startTime get() = session.startTime
-    val durationMinutes get() = session.durationMinutes
-    val price get() = session.price
-    val capacity get() = session.capacity
-    val meetingPoint get() = session.meetingPoint
-    val category get() = content.category
-    val spokenLanguages get() = content.spokenLanguages
-    val tourName get() = content.tourName
-    val tourDescription get() = content.tourDescription
-    val selectedCoverImageUri get() = content.selectedCoverImageUri
-    val previewImageResId get() = content.previewImageResId
-    val guideName get() = guide.name
-    val guideImageResId get() = guide.imageResId
-    val guideImageUrl get() = guide.imageUrl
-    val validationErrorStep get() = submission.validationErrorStep
-    val validationErrorResId get() = submission.validationErrorResId
-    val isPublishing get() = submission.isPublishing
-    val submissionErrorMessage get() = submission.errorMessage
-    val publishSucceeded get() = submission.succeeded
-
     val locationDisplay: String
-        get() = listOf(country, city).filter { it.isNotBlank() }.joinToString(", ")
+        get() = listOf(location.country, location.city).filter { it.isNotBlank() }.joinToString(", ")
 
     @StringRes
     fun validationErrorFor(step: GuideTourPublishStep): Int? =
-        validationErrorResId.takeIf { validationErrorStep == step }
+        submission.validationErrorResId.takeIf { submission.validationErrorStep == step }
 }
 
 data class TourPublishLocationState(

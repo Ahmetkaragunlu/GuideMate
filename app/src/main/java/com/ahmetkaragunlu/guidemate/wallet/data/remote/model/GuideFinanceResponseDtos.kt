@@ -33,11 +33,6 @@ data class BankAccountResponseDto(
     @SerializedName("createdAt") val createdAt: Instant,
 )
 
-data class AddBankAccountRequestDto(
-    @SerializedName("iban") val iban: String,
-    @SerializedName("accountHolderName") val accountHolderName: String,
-)
-
 data class WithdrawalResponseDto(
     @SerializedName("withdrawalId") val withdrawalId: String,
     @SerializedName("bankAccountId") val bankAccountId: String,
@@ -49,9 +44,4 @@ data class WithdrawalResponseDto(
     @SerializedName("requestedAt") val requestedAt: Instant,
     @SerializedName("completedAt") val completedAt: Instant?,
     @SerializedName("failureCode") val failureCode: String?,
-)
-
-data class WithdrawalRequestDto(
-    @SerializedName("bankAccountId") val bankAccountId: String,
-    @SerializedName("amountMinor") val amountMinor: Long,
 )

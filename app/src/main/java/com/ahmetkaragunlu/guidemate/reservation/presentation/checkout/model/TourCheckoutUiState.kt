@@ -9,36 +9,57 @@ import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentLaunch
 
 data class TourCheckoutUiState(
     val loadState: ContentLoadState = ContentLoadState.LOADING,
-    val sessionId: String = "",
-    val tourTitle: String = "",
-    val date: String = "",
-    val location: String = "",
-    val unitPriceMinor: Long = 0,
+    val summary: TourCheckoutSummaryUiState = TourCheckoutSummaryUiState(),
     val participantCount: Int = 1,
-    val availableCapacity: Int = 0,
-    val walletBalanceMinor: Long = 0,
-    val walletCurrencyCode: String = "USD",
-    val chargeCurrencies: List<CheckoutCurrency> = emptyList(),
-    val selectedChargeCurrencyCode: String? = null,
-    val quote: PaymentQuote? = null,
-    val selectedMethod: PaymentMethod = PaymentMethod.HOSTED_CARD,
-    val termsAccepted: Boolean = false,
-    val showTermsSheet: Boolean = false,
-    val hasUserReadTerms: Boolean = false,
-    val isPaymentActionInProgress: Boolean = false,
-    val paymentActionError: String? = null,
-    val paymentLaunch: PaymentLaunch? = null,
-    @param:StringRes val validationErrorResId: Int? = null,
+    val wallet: CheckoutWalletUiState = CheckoutWalletUiState(),
+    val payment: CheckoutPaymentSelectionUiState = CheckoutPaymentSelectionUiState(),
+    val terms: CheckoutTermsUiState = CheckoutTermsUiState(),
+    val submission: CheckoutSubmissionUiState = CheckoutSubmissionUiState(),
 ) {
     val totalMinor: Long
-        get() = unitPriceMinor * participantCount
+        get() = summary.unitPriceMinor * participantCount
 
     val canDecreaseParticipants: Boolean
         get() = participantCount > 1
 
     val canIncreaseParticipants: Boolean
-        get() = participantCount < availableCapacity
+        get() = participantCount < summary.availableCapacity
 
     val isWalletPaymentVerifying: Boolean
-        get() = selectedMethod == PaymentMethod.WALLET && isPaymentActionInProgress
+        get() =
+            payment.selectedMethod == PaymentMethod.WALLET &&
+                submission.isPaymentActionInProgress
 }
+
+data class TourCheckoutSummaryUiState(
+    val tourTitle: String = "",
+    val date: String = "",
+    val location: String = "",
+    val unitPriceMinor: Long = 0,
+    val availableCapacity: Int = 0,
+)
+
+data class CheckoutWalletUiState(
+    val balanceMinor: Long = 0,
+    val currencyCode: String = "USD",
+)
+
+data class CheckoutPaymentSelectionUiState(
+    val chargeCurrencies: List<CheckoutCurrency> = emptyList(),
+    val selectedChargeCurrencyCode: String? = null,
+    val quote: PaymentQuote? = null,
+    val selectedMethod: PaymentMethod = PaymentMethod.HOSTED_CARD,
+)
+
+data class CheckoutTermsUiState(
+    val isAccepted: Boolean = false,
+    val isSheetVisible: Boolean = false,
+    val hasBeenRead: Boolean = false,
+)
+
+data class CheckoutSubmissionUiState(
+    val isPaymentActionInProgress: Boolean = false,
+    val paymentActionError: String? = null,
+    val paymentLaunch: PaymentLaunch? = null,
+    @param:StringRes val validationErrorResId: Int? = null,
+)

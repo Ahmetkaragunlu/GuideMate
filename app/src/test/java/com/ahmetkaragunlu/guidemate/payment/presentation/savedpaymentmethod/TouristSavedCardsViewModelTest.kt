@@ -6,7 +6,7 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.payment.domain.model.SavedPaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.SavedPaymentMethodRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

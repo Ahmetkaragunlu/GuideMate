@@ -4,9 +4,10 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
-import com.ahmetkaragunlu.guidemate.testing.testWalletTransaction
-import com.ahmetkaragunlu.guidemate.testing.walletTransactionPage
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeWalletRepository
+import com.ahmetkaragunlu.guidemate.testing.wallet.WalletTransactionsCall
+import com.ahmetkaragunlu.guidemate.testing.wallet.testWalletTransaction
+import com.ahmetkaragunlu.guidemate.testing.wallet.walletTransactionPage
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
@@ -46,7 +47,13 @@ class TouristWalletTransactionsViewModelTest {
             viewModel.loadNextPage()
             runCurrent()
 
-            assertEquals(listOf(0 to 20, 1 to 20), repository.transactionRequests)
+            assertEquals(
+                listOf(
+                    WalletTransactionsCall(page = 0, size = 20),
+                    WalletTransactionsCall(page = 1, size = 20),
+                ),
+                repository.transactionRequests,
+            )
             assertEquals(
                 listOf("top-up-1", "refund-1"),
                 viewModel.uiState.value.transactions.map { it.transactionId },

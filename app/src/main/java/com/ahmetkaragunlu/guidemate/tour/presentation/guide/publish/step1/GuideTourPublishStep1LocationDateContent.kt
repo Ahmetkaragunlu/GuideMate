@@ -52,8 +52,8 @@ fun GuideTourPublishStep1LocationDateContent(
     modifier: Modifier = Modifier,
 ) {
     val tourZoneId =
-        remember(uiState.timeZoneId) {
-            runCatching { ZoneId.of(uiState.timeZoneId) }.getOrDefault(ZoneId.systemDefault())
+        remember(uiState.location.timeZoneId) {
+            runCatching { ZoneId.of(uiState.location.timeZoneId) }.getOrDefault(ZoneId.systemDefault())
         }
     val today = LocalDate.now(tourZoneId)
 
@@ -85,7 +85,7 @@ fun GuideTourPublishStep1LocationDateContent(
             EditDatePickerField(
                 labelResId = R.string.guide_tour_publish_step1_date_label,
                 placeholderResId = R.string.select_tour_date,
-                selectedDate = uiState.tourDate,
+                selectedDate = uiState.session.tourDate,
                 minimumDate = today,
                 onDateSelected = onDateSelected,
                 leadingIcon = { Text(text = "🗓️") },
@@ -101,10 +101,10 @@ fun GuideTourPublishStep1LocationDateContent(
             EditTimePickerField(
                 labelResId = R.string.guide_tour_publish_step1_time_label,
                 placeholderResId = R.string.select_tour_time,
-                selectedTime = uiState.startTime,
+                selectedTime = uiState.session.startTime,
                 initialTime = LocalTime.now(tourZoneId),
                 isTimeSelectable = { selectedTime ->
-                    uiState.tourDate != today || selectedTime.isAfter(LocalTime.now(tourZoneId))
+                    uiState.session.tourDate != today || selectedTime.isAfter(LocalTime.now(tourZoneId))
                 },
                 onTimeSelected = onStartTimeSelected,
                 leadingIcon = { Text(text = "🕘") },
@@ -113,7 +113,7 @@ fun GuideTourPublishStep1LocationDateContent(
             EditDurationDropdown(
                 labelResId = R.string.guide_tour_publish_step1_duration_label,
                 placeholderResId = R.string.select_tour_duration,
-                selectedDurationMinutes = uiState.durationMinutes,
+                selectedDurationMinutes = uiState.session.durationMinutes,
                 onDurationSelected = onDurationSelected,
                 leadingIcon = { Text(text = "⏱️") },
                 modifier = Modifier.fillMaxWidth(),

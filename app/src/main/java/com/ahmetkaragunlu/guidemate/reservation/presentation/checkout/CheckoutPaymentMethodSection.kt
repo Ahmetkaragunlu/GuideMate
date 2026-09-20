@@ -49,19 +49,19 @@ internal fun CheckoutPaymentMethodSection(
             subtitle =
                 stringResource(
                     R.string.wallet_balance_format,
-                    uiState.walletBalanceMinor.toCurrencyFromMinorUnit(
-                        uiState.walletCurrencyCode,
+                    uiState.wallet.balanceMinor.toCurrencyFromMinorUnit(
+                        uiState.wallet.currencyCode,
                     ),
                 ),
             icon = Icons.Default.Wallet,
-            selected = uiState.selectedMethod == PaymentMethod.WALLET,
+            selected = uiState.payment.selectedMethod == PaymentMethod.WALLET,
             onClick = { onPaymentMethodSelected(PaymentMethod.WALLET) },
         )
         PaymentMethodOption(
             title = stringResource(R.string.hosted_card_payment),
             subtitle = stringResource(R.string.secure_payment_provider_short),
             icon = Icons.Default.CreditCard,
-            selected = uiState.selectedMethod == PaymentMethod.HOSTED_CARD,
+            selected = uiState.payment.selectedMethod == PaymentMethod.HOSTED_CARD,
             onClick = { onPaymentMethodSelected(PaymentMethod.HOSTED_CARD) },
         )
     }

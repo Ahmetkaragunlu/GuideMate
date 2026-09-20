@@ -14,6 +14,8 @@ import com.ahmetkaragunlu.guidemate.payment.data.remote.model.WalletTopUpQuoteRe
 import com.ahmetkaragunlu.guidemate.payment.data.remote.model.WalletTopUpRequestDto
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentRefundStatus
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservationStatus
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
 import java.math.BigDecimal
 import java.time.Instant
@@ -66,6 +68,25 @@ class PaymentRepositoryImplTest {
         assertTrue(result is DataResult.Success)
         assertEquals(PaymentStatus.SUCCEEDED, (result as DataResult.Success).data.status)
         assertNull(storage.value.value)
+    }
+
+    @Test
+    fun `maps flat payment response into cohesive domain details`() = runBlocking {
+        val repository = createRepository(FakePaymentApi(), FakePendingPaymentStorage())
+
+        val result = repository.getPayment("payment-1")
+
+        assertTrue(result is DataResult.Success)
+        val payment = (result as DataResult.Success).data
+        assertEquals("quote-1", payment.chargeDetails?.quoteId)
+        assertEquals(325_000L, payment.chargeDetails?.amountMinor)
+        assertEquals("TRY", payment.chargeDetails?.currencyCode)
+        assertEquals("https://sandbox.iyzipay.com/checkout", payment.hostedPayment?.pageUrl)
+        assertEquals("reservation-1", payment.reservation?.id)
+        assertEquals(PaymentReservationStatus.PENDING_PAYMENT, payment.reservation?.status)
+        assertEquals("refund-1", payment.refund?.id)
+        assertEquals(PaymentRefundStatus.REQUESTED, payment.refund?.status)
+        assertEquals(10_000L, payment.refund?.amountMinor)
     }
 
     @Test
@@ -165,7 +186,7 @@ class PaymentRepositoryImplTest {
         ): Response<PaymentResponseDto> = Response.success(paymentResponse())
 
         override suspend fun getPayment(paymentId: String): Response<PaymentResponseDto> =
-            Response.success(paymentResponse())
+            Response.success(paymentResponse(includeRefund = true))
 
         override suspend fun cancelPayment(paymentId: String): Response<PaymentResponseDto> =
             Response.success(paymentResponse(status = "CANCELLED"))
@@ -185,7 +206,10 @@ class PaymentRepositoryImplTest {
                 expiresAt = Instant.parse("2026-08-23T10:10:00Z"),
             )
 
-        private fun paymentResponse(status: String = paymentStatus): PaymentResponseDto =
+        private fun paymentResponse(
+            status: String = paymentStatus,
+            includeRefund: Boolean = false,
+        ): PaymentResponseDto =
             PaymentResponseDto(
                 paymentId = "payment-1",
                 purpose = "TOUR_BOOKING",
@@ -203,11 +227,11 @@ class PaymentRepositoryImplTest {
                 expiresAt = Instant.parse("2026-08-23T10:30:00Z"),
                 reservationId = "reservation-1",
                 reservationStatus = reservationStatus,
-                refundId = null,
-                refundStatus = null,
-                refundAmountMinor = null,
-                refundChargeAmountMinor = null,
-                refundChargeCurrencyCode = null,
+                refundId = if (includeRefund) "refund-1" else null,
+                refundStatus = if (includeRefund) "REQUESTED" else null,
+                refundAmountMinor = if (includeRefund) 10_000 else null,
+                refundChargeAmountMinor = if (includeRefund) 325_000 else null,
+                refundChargeCurrencyCode = if (includeRefund) "TRY" else null,
                 failureCode = null,
                 createdAt = Instant.parse("2026-08-23T10:00:00Z"),
                 updatedAt = Instant.parse("2026-08-23T10:00:01Z"),

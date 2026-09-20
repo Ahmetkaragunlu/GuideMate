@@ -58,8 +58,8 @@ fun PopularTourCard(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             GuideMateImage(
-                fallbackImageResId = tour.imageResId,
-                imageUrl = tour.imageUrl,
+                fallbackImageResId = tour.media.imageResId,
+                imageUrl = tour.media.imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier =
@@ -91,13 +91,13 @@ fun PopularTourCard(
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                     Text(
-                        text = tour.rating,
+                        text = tour.rating.value,
                         style = MaterialTheme.typography.bodyMedium,
                         color = colorResource(R.color.text_color),
                     )
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                     Text(
-                        text = tour.reviewCount,
+                        text = tour.rating.reviewCount,
                         style = MaterialTheme.typography.bodySmall,
                         color = colorResource(R.color.text_color),
                     )
@@ -108,10 +108,10 @@ fun PopularTourCard(
                     color = colorResource(R.color.brand_color),
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = tour.languagesFlag)
+                    Text(text = tour.languages.flags)
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = tour.languagesText,
+                        text = tour.languages.shortCodes,
                         modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
@@ -121,8 +121,8 @@ fun PopularTourCard(
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     GuideMateImage(
-                        fallbackImageResId = tour.guideImageResId,
-                        imageUrl = tour.guideImageUrl,
+                        fallbackImageResId = tour.guide.imageResId,
+                        imageUrl = tour.guide.imageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier =
@@ -144,7 +144,7 @@ fun PopularTourCard(
                                             fontWeight = FontWeight.Normal,
                                             color = colorResource(R.color.text_color),
                                         ),
-                                ) { append(tour.guideName) }
+                                ) { append(tour.guide.name) }
                             },
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,

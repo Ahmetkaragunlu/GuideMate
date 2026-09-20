@@ -2,8 +2,9 @@ package com.ahmetkaragunlu.guidemate.auth.presentation.changepassword
 
 import com.ahmetkaragunlu.guidemate.auth.domain.validation.NumericPasswordPolicy
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
-import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.auth.ChangePasswordCall
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeAuthRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,7 +35,13 @@ class ChangePasswordViewModelTest {
             viewModel.onChangePasswordClick()
             runCurrent()
 
-            assertEquals("12345678" to "87654321", repository.changePasswordRequest)
+            assertEquals(
+                ChangePasswordCall(
+                    currentPassword = "12345678",
+                    newPassword = "87654321",
+                ),
+                repository.calls.changePassword,
+            )
             assertTrue(viewModel.screenState.value.showSuccessDialog)
             assertTrue(viewModel.formState.value.currentPassword.isEmpty())
 
@@ -42,6 +49,6 @@ class ChangePasswordViewModelTest {
             runCurrent()
 
             assertFalse(viewModel.screenState.value.showSuccessDialog)
-            assertEquals(1, repository.clearLocalSessionCalls)
+            assertEquals(1, repository.calls.clearLocalSession)
         }
 }

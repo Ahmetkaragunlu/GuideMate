@@ -7,13 +7,11 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPayload
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferences
-import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
-import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 
 internal fun NotificationResponseDto.toDomain(): AppNotification =
     AppNotification(
         notificationId = id,
-        type = NotificationType.fromApiValue(type),
+        type = type.toNotificationType(),
         actorDisplayName = actorDisplayName,
         payload = payload.toNotificationPayload(),
         isRead = isRead,
@@ -57,7 +55,7 @@ private fun Map<String, Any?>?.toNotificationPayload(): NotificationPayload =
         rating = intValue("rating"),
         amountMinor = longValue("amountMinor"),
         currencyCode = stringValue("currencyCode"),
-        securityEvent = NotificationSecurityEvent.fromApiValue(stringValue("securityEvent")),
+        securityEvent = stringValue("securityEvent").toNotificationSecurityEvent(),
     )
 
 private fun Map<String, Any?>?.stringValue(key: String): String? =

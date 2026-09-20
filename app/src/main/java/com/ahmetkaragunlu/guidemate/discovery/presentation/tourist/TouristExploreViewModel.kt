@@ -6,7 +6,6 @@ import com.ahmetkaragunlu.guidemate.common.location.model.CityOption
 import com.ahmetkaragunlu.guidemate.common.location.model.CountryOption
 import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
-import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.model.ExploreTab
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.model.ExploreUiState
 import com.ahmetkaragunlu.guidemate.discovery.presentation.tourist.model.TourFilterUiState
@@ -42,14 +41,8 @@ class TouristExploreViewModel
         private val _uiState = MutableStateFlow(ExploreUiState())
         val uiState = _uiState.asStateFlow()
 
-        private var tourRequestJob: Job? = null
-        private var guideRequestJob: Job? = null
-        private var currentTourPage = 0
-        private var currentGuidePage = 0
-        private var tourRequestGeneration = 0L
-        private var guideRequestGeneration = 0L
-        private var loadedTourQuery: TourSearchQuery? = null
-        private var loadedGuideQuery: String? = null
+        private val tourRequest = SearchRequestTracker<TourSearchQuery>()
+        private val guideRequest = SearchRequestTracker<String>()
 
         val categories = TourCategoryCatalog.filterOptions
 
@@ -81,36 +74,37 @@ class TouristExploreViewModel
         }
 
         fun refreshTours() {
-            tourRequestJob?.cancel()
+            tourRequest.job?.cancel()
             val query = _uiState.value.toTourSearchQuery()
-            val generation = ++tourRequestGeneration
-            tourRequestJob = loadTours(query = query, page = 0, append = false, generation = generation)
+            val generation = ++tourRequest.generation
+            tourRequest.job =
+                loadTours(query = query, page = 0, append = false, generation = generation)
         }
 
         fun loadMoreTours() {
             val state = _uiState.value
             if (!state.tours.canLoadMore ||
                 state.tours.isLoadingMore ||
-                tourRequestJob?.isActive == true ||
-                loadedTourQuery != state.toTourSearchQuery()
+                tourRequest.job?.isActive == true ||
+                tourRequest.loadedQuery != state.toTourSearchQuery()
             ) {
                 return
             }
             val query = state.toTourSearchQuery()
-            tourRequestJob =
+            tourRequest.job =
                 loadTours(
                     query = query,
-                    page = currentTourPage + 1,
+                    page = tourRequest.currentPage + 1,
                     append = true,
-                    generation = tourRequestGeneration,
+                    generation = tourRequest.generation,
                 )
         }
 
         fun refreshGuides() {
-            guideRequestJob?.cancel()
+            guideRequest.job?.cancel()
             val query = _uiState.value.guides.searchQuery.trim()
-            val generation = ++guideRequestGeneration
-            guideRequestJob =
+            val generation = ++guideRequest.generation
+            guideRequest.job =
                 loadGuides(query = query, page = 0, append = false, generation = generation)
         }
 
@@ -118,18 +112,18 @@ class TouristExploreViewModel
             val state = _uiState.value
             if (!state.guides.canLoadMore ||
                 state.guides.isLoadingMore ||
-                guideRequestJob?.isActive == true ||
-                loadedGuideQuery != state.guides.searchQuery.trim()
+                guideRequest.job?.isActive == true ||
+                guideRequest.loadedQuery != state.guides.searchQuery.trim()
             ) {
                 return
             }
             val query = state.guides.searchQuery.trim()
-            guideRequestJob =
+            guideRequest.job =
                 loadGuides(
                     query = query,
-                    page = currentGuidePage + 1,
+                    page = guideRequest.currentPage + 1,
                     append = true,
-                    generation = guideRequestGeneration,
+                    generation = guideRequest.generation,
                 )
         }
 
@@ -229,28 +223,10 @@ class TouristExploreViewModel
             generation: Long,
         ): Job =
             viewModelScope.launch {
-                if (append) {
-                    _uiState.update {
-                        it.copy(
-                            tours = it.tours.copy(isLoadingMore = true, appendFailed = false),
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            tours =
-                                it.tours.copy(
-                                    loadState = ContentLoadState.LOADING,
-                                    results = emptyList(),
-                                    resultCount = 0,
-                                    isLoadingMore = false,
-                                    appendFailed = false,
-                                    canLoadMore = false,
-                                ),
-                        )
-                    }
-                    currentTourPage = 0
-                    loadedTourQuery = null
+                _uiState.update { it.startTourLoad(append) }
+                if (!append) {
+                    tourRequest.currentPage = 0
+                    tourRequest.loadedQuery = null
                 }
 
                 when (
@@ -264,40 +240,20 @@ class TouristExploreViewModel
                     is DataResult.Success -> {
                         if (!isCurrentTourRequest(generation, query)) return@launch
                         val mapped = result.data.items.map { it.toSearchResultUiModel() }
-                        currentTourPage = result.data.page
-                        loadedTourQuery = query
+                        tourRequest.currentPage = result.data.page
+                        tourRequest.loadedQuery = query
                         _uiState.update { current ->
-                            current.copy(
-                                tours =
-                                    current.tours.copy(
-                                        results =
-                                            if (append) current.tours.results + mapped else mapped,
-                                        resultCount = result.data.totalElements,
-                                        loadState = ContentLoadState.CONTENT,
-                                        isLoadingMore = false,
-                                        appendFailed = false,
-                                        canLoadMore = !result.data.isLast,
-                                    ),
+                            current.completeTourLoad(
+                                results = mapped,
+                                resultCount = result.data.totalElements,
+                                canLoadMore = !result.data.isLast,
+                                append = append,
                             )
                         }
                     }
                     is DataResult.Error -> {
                         if (!isCurrentTourRequest(generation, query)) return@launch
-                        _uiState.update { current ->
-                            current.copy(
-                                tours =
-                                    current.tours.copy(
-                                        loadState =
-                                            if (append || current.tours.results.isNotEmpty()) {
-                                                ContentLoadState.CONTENT
-                                            } else {
-                                                ContentLoadState.ERROR
-                                            },
-                                        isLoadingMore = false,
-                                        appendFailed = append,
-                                    ),
-                            )
-                        }
+                        _uiState.update { it.failTourLoad(append) }
                     }
                 }
             }
@@ -309,27 +265,10 @@ class TouristExploreViewModel
             generation: Long,
         ): Job =
             viewModelScope.launch {
-                if (append) {
-                    _uiState.update {
-                        it.copy(
-                            guides = it.guides.copy(isLoadingMore = true, appendFailed = false),
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            guides =
-                                it.guides.copy(
-                                    loadState = ContentLoadState.LOADING,
-                                    results = emptyList(),
-                                    isLoadingMore = false,
-                                    appendFailed = false,
-                                    canLoadMore = false,
-                                ),
-                        )
-                    }
-                    currentGuidePage = 0
-                    loadedGuideQuery = null
+                _uiState.update { it.startGuideLoad(append) }
+                if (!append) {
+                    guideRequest.currentPage = 0
+                    guideRequest.loadedQuery = null
                 }
 
                 when (
@@ -343,39 +282,19 @@ class TouristExploreViewModel
                     is DataResult.Success -> {
                         if (!isCurrentGuideRequest(generation, query)) return@launch
                         val mapped = result.data.items.map { it.toGuideResultUiModel() }
-                        currentGuidePage = result.data.page
-                        loadedGuideQuery = query
+                        guideRequest.currentPage = result.data.page
+                        guideRequest.loadedQuery = query
                         _uiState.update { current ->
-                            current.copy(
-                                guides =
-                                    current.guides.copy(
-                                        results =
-                                            if (append) current.guides.results + mapped else mapped,
-                                        loadState = ContentLoadState.CONTENT,
-                                        isLoadingMore = false,
-                                        appendFailed = false,
-                                        canLoadMore = !result.data.isLast,
-                                    ),
+                            current.completeGuideLoad(
+                                results = mapped,
+                                canLoadMore = !result.data.isLast,
+                                append = append,
                             )
                         }
                     }
                     is DataResult.Error -> {
                         if (!isCurrentGuideRequest(generation, query)) return@launch
-                        _uiState.update { current ->
-                            current.copy(
-                                guides =
-                                    current.guides.copy(
-                                        loadState =
-                                            if (append || current.guides.results.isNotEmpty()) {
-                                                ContentLoadState.CONTENT
-                                            } else {
-                                                ContentLoadState.ERROR
-                                            },
-                                        isLoadingMore = false,
-                                        appendFailed = append,
-                                    ),
-                            )
-                        }
+                        _uiState.update { it.failGuideLoad(append) }
                     }
                 }
             }
@@ -384,13 +303,14 @@ class TouristExploreViewModel
             generation: Long,
             query: TourSearchQuery,
         ): Boolean =
-            generation == tourRequestGeneration && query == _uiState.value.toTourSearchQuery()
+            generation == tourRequest.generation && query == _uiState.value.toTourSearchQuery()
 
         private fun isCurrentGuideRequest(
             generation: Long,
             query: String,
         ): Boolean =
-            generation == guideRequestGeneration && query == _uiState.value.guides.searchQuery.trim()
+            generation == guideRequest.generation &&
+                query == _uiState.value.guides.searchQuery.trim()
 
         private fun updateDraftFilters(transform: TourFilterUiState.() -> TourFilterUiState) {
             _uiState.update { it.copy(draftFilters = it.draftFilters.transform()) }
@@ -408,3 +328,10 @@ private data class TourSearchTrigger(
     val query: String,
     val filters: TourFilterUiState,
 )
+
+private class SearchRequestTracker<Query> {
+    var job: Job? = null
+    var currentPage: Int = 0
+    var generation: Long = 0L
+    var loadedQuery: Query? = null
+}

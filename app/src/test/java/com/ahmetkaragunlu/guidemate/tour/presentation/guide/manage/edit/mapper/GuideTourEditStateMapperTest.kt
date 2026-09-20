@@ -1,7 +1,7 @@
-package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit
+package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper
 
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.testTourDetails
+import com.ahmetkaragunlu.guidemate.testing.tour.testTourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLanguage
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditUiState
@@ -31,23 +31,26 @@ class GuideTourEditStateMapperTest {
             )
         val localizedDetails =
             details.copy(
-                tour = details.tour.copy(timeZoneId = "Europe/Istanbul"),
+                tour =
+                    details.tour.copy(
+                        location = details.tour.location.copy(timeZoneId = "Europe/Istanbul"),
+                    ),
                 sessions = listOf(session),
             )
 
         val state = localizedDetails.toGuideTourEditUiState(session.id)
 
         assertNotNull(state)
-        assertEquals(details.tour.id, state?.tourId)
-        assertEquals(details.tour.title, state?.title)
-        assertEquals(LocalDate.of(2099, 5, 24), state?.tourDate)
-        assertEquals(LocalTime.of(12, 30), state?.startTime)
-        assertEquals("125", state?.price)
-        assertEquals("12", state?.capacity)
-        assertTrue(state?.hasBookings == true)
-        assertEquals(details.tour.languages, state?.languages)
-        assertEquals(details.tour.coverMediaId, state?.coverMediaId)
-        assertEquals(ContentLoadState.CONTENT, state?.loadState)
+        assertEquals(details.tour.id, state?.identity?.tourId)
+        assertEquals(details.tour.title, state?.content?.title)
+        assertEquals(LocalDate.of(2099, 5, 24), state?.session?.tourDate)
+        assertEquals(LocalTime.of(12, 30), state?.session?.startTime)
+        assertEquals("125", state?.session?.price)
+        assertEquals("12", state?.session?.capacity)
+        assertTrue(state?.session?.hasBookings == true)
+        assertEquals(details.tour.languages, state?.content?.languages)
+        assertEquals(details.tour.cover?.mediaAssetId, state?.content?.coverMediaId)
+        assertEquals(ContentLoadState.CONTENT, state?.operation?.loadState)
     }
 
     @Test

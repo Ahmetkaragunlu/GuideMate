@@ -1,9 +1,10 @@
-package com.ahmetkaragunlu.guidemate.testing
+package com.ahmetkaragunlu.guidemate.testing.discovery
 
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
+import com.ahmetkaragunlu.guidemate.testing.tour.testTourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
@@ -12,39 +13,56 @@ import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchQuery
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.TourDiscoveryRepository
 import java.time.Instant
 
-class FakeTourDiscoveryRepository : TourDiscoveryRepository {
+data class PopularToursCall(
+    val page: Int,
+    val size: Int,
+)
+
+class DiscoveryFakeResults {
     val searchResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
-    val searchRequests = mutableListOf<SearchRequest>()
     var popularResult: DataResult<PagedResult<TourSearchItem>> =
         DataResult.Success(tourSearchPage(page = 0, isLast = true))
     val popularResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
-    val popularRequests = mutableListOf<Pair<Int, Int>>()
-    var searchHandler: (suspend (TourSearchQuery, Int, Int) -> DataResult<PagedResult<TourSearchItem>>)? =
-        null
     var popularForGuideResult: DataResult<PagedResult<TourSearchItem>> =
         DataResult.Success(tourSearchPage(page = 0, isLast = true))
     val popularForGuideResults = ArrayDeque<DataResult<PagedResult<TourSearchItem>>>()
-    val popularForGuideRequests = mutableListOf<GuidePopularRequest>()
     var sessionResult: DataResult<TourWithSession> =
         testTourDetails().let { details ->
             DataResult.Success(TourWithSession(details.tour, details.sessions.first()))
         }
+}
+
+class DiscoveryFakeCalls {
+    val searchRequests = mutableListOf<SearchRequest>()
+    val popularRequests = mutableListOf<PopularToursCall>()
+    val popularForGuideRequests = mutableListOf<GuidePopularRequest>()
+}
+
+class DiscoveryFakeHandlers {
+    var search: (suspend (TourSearchQuery, Int, Int) -> DataResult<PagedResult<TourSearchItem>>)? =
+        null
+}
+
+class FakeTourDiscoveryRepository : TourDiscoveryRepository {
+    val results = DiscoveryFakeResults()
+    val calls = DiscoveryFakeCalls()
+    val handlers = DiscoveryFakeHandlers()
 
     override suspend fun searchTours(
         query: TourSearchQuery,
         page: Int,
         size: Int,
     ): DataResult<PagedResult<TourSearchItem>> {
-        searchRequests += SearchRequest(query, page, size)
-        return searchHandler?.invoke(query, page, size) ?: searchResults.removeFirst()
+        calls.searchRequests += SearchRequest(query, page, size)
+        return handlers.search?.invoke(query, page, size) ?: results.searchResults.removeFirst()
     }
 
     override suspend fun getPopularTours(
         page: Int,
         size: Int,
     ): DataResult<PagedResult<TourSearchItem>> {
-        popularRequests += page to size
-        return popularResults.removeFirstOrNull() ?: popularResult
+        calls.popularRequests += PopularToursCall(page = page, size = size)
+        return results.popularResults.removeFirstOrNull() ?: results.popularResult
     }
 
     override suspend fun getPopularToursForGuide(
@@ -52,11 +70,11 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
         page: Int,
         size: Int,
     ): DataResult<PagedResult<TourSearchItem>> {
-        popularForGuideRequests += GuidePopularRequest(guideId, page, size)
-        return if (popularForGuideResults.isEmpty()) {
-            popularForGuideResult
+        calls.popularForGuideRequests += GuidePopularRequest(guideId, page, size)
+        return if (results.popularForGuideResults.isEmpty()) {
+            results.popularForGuideResult
         } else {
-            popularForGuideResults.removeFirst()
+            results.popularForGuideResults.removeFirst()
         }
     }
 
@@ -64,7 +82,7 @@ class FakeTourDiscoveryRepository : TourDiscoveryRepository {
         error("Not required by this test fixture")
 
     override suspend fun getSession(sessionId: String): DataResult<TourWithSession> =
-        sessionResult
+        results.sessionResult
 }
 
 data class SearchRequest(

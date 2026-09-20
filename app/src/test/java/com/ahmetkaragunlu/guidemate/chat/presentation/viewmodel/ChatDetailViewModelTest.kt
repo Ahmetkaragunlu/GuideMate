@@ -11,10 +11,10 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
-import com.ahmetkaragunlu.guidemate.testing.authenticatedUser
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.authenticatedUser
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -43,8 +43,8 @@ class ChatDetailViewModelTest {
             runCurrent()
 
             assertEquals(1, repository.markReadCalls)
-            assertEquals(NotificationTargetType.CHAT, notificationRepository.markedRelatedTargets.single().type)
-            assertEquals(CHAT_ID, notificationRepository.markedRelatedTargets.single().targetId)
+            assertEquals(NotificationTargetType.CHAT, notificationRepository.calls.markedRelatedTargets.single().type)
+            assertEquals(CHAT_ID, notificationRepository.calls.markedRelatedTargets.single().targetId)
 
             repository.updateMessages(message("local-pending", CURRENT_USER_ID, ChatMessageDeliveryStatus.PENDING))
             runCurrent()
@@ -93,7 +93,7 @@ class ChatDetailViewModelTest {
             runCurrent()
 
             assertEquals(0, repository.markReadCalls)
-            assertTrue(notificationRepository.markedRelatedTargets.isEmpty())
+            assertTrue(notificationRepository.calls.markedRelatedTargets.isEmpty())
         }
 
     private fun createViewModel(

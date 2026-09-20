@@ -3,8 +3,8 @@ package com.ahmetkaragunlu.guidemate.tour.domain.usecase
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
+import com.ahmetkaragunlu.guidemate.testing.tour.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.media.FakeMediaRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourContentInput
 import kotlinx.coroutines.test.runTest
@@ -30,7 +30,7 @@ class SubmitGuideTourContentChangeUseCaseTest {
 
         assertTrue(result is DataResult.Success)
         assertEquals(MediaPurpose.TOUR_COVER, mediaRepository.uploadedPurpose)
-        assertEquals("media-1", tourRepository.submitChangeInput?.content?.coverMediaId)
+        assertEquals("media-1", tourRepository.calls.submitChange?.content?.coverMediaId)
         assertTrue(mediaRepository.deletedMediaIds.isEmpty())
     }
 
@@ -50,14 +50,14 @@ class SubmitGuideTourContentChangeUseCaseTest {
 
         assertTrue(result is DataResult.Success)
         assertNull(mediaRepository.uploadedUri)
-        assertEquals("old-media", tourRepository.submitChangeInput?.content?.coverMediaId)
+        assertEquals("old-media", tourRepository.calls.submitChange?.content?.coverMediaId)
     }
 
     @Test
     fun `failed change deletes newly uploaded cover`() = runTest {
         val tourRepository =
             FakeGuideTourRepository().apply {
-                submitChangeResult = DataResult.Error(AppError.GenericFailure)
+                results.submitChange = DataResult.Error(AppError.GenericFailure)
             }
         val mediaRepository = FakeMediaRepository()
         val useCase = SubmitGuideTourContentChangeUseCase(tourRepository, mediaRepository)
@@ -80,7 +80,7 @@ class SubmitGuideTourContentChangeUseCaseTest {
         assertTrue(
             useCase("tour-1", 3, validContent(), "content://cover") is DataResult.Error,
         )
-        assertNull(tourRepository.submitChangeInput)
+        assertNull(tourRepository.calls.submitChange)
     }
 
     private fun validContent() =

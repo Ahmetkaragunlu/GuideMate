@@ -8,8 +8,9 @@ import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.BackendErrorCode
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.result.AppFieldError
-import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeAuthRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.LoginCall
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -35,7 +36,10 @@ class SignInViewModelTest {
         viewModel.onSignInClick()
         runCurrent()
 
-        assertEquals("User@Example.com" to "12345678", repository.loginRequest)
+        assertEquals(
+            LoginCall(email = "User@Example.com", password = "12345678"),
+            repository.calls.login,
+        )
         assertFalse(viewModel.screenState.value.isLoading)
     }
 
@@ -44,7 +48,7 @@ class SignInViewModelTest {
         runTest(mainDispatcherRule.dispatcher) {
             val repository =
                 FakeAuthRepository().apply {
-                    loginResult =
+                    results.login =
                         DataResult.Error(
                             AppError.Backend(
                                 code = BackendErrorCode.ACCOUNT_PENDING_VERIFICATION,
@@ -68,7 +72,7 @@ class SignInViewModelTest {
         runTest(mainDispatcherRule.dispatcher) {
             val repository =
                 FakeAuthRepository().apply {
-                    loginResult =
+                    results.login =
                         DataResult.Error(
                             AppError.Backend(
                                 code = BackendErrorCode.RATE_LIMITED,
@@ -85,10 +89,10 @@ class SignInViewModelTest {
             runCurrent()
             assertEquals(2, viewModel.screenState.value.loginRetryAfterSeconds)
 
-            repository.loginRequest = null
+            repository.calls.login = null
             viewModel.onSignInClick()
             runCurrent()
-            assertNull(repository.loginRequest)
+            assertNull(repository.calls.login)
 
             advanceTimeBy(2_000)
             runCurrent()
@@ -100,7 +104,7 @@ class SignInViewModelTest {
         runTest(mainDispatcherRule.dispatcher) {
             val repository =
                 FakeAuthRepository().apply {
-                    loginResult =
+                    results.login =
                         DataResult.Error(
                             AppError.Backend(
                                 code = BackendErrorCode.VALIDATION_FAILED,

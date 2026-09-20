@@ -19,8 +19,14 @@ import com.ahmetkaragunlu.guidemate.tour.data.remote.model.UpdateTourSessionRequ
 import com.ahmetkaragunlu.guidemate.tour.domain.model.Tour
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourLocation
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourPublication
+import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReviews
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
+import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCardPricing
+import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCardSchedule
+import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCardStats
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.TourReviewSubmission
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.CreateGuideTourInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.SubmitTourChangeInput
@@ -51,21 +57,30 @@ fun GuideTourCardResponseDto.toDomain(): GuideTourCard =
         tourVersion = tourVersion,
         sessionVersion = sessionVersion,
         title = title,
-        cityName = cityName,
-        countryCode = countryCode,
-        timeZoneId = timeZoneId,
+        schedule =
+            GuideTourCardSchedule(
+                cityName = cityName,
+                countryCode = countryCode,
+                timeZoneId = timeZoneId,
+                startsAt = Instant.parse(startsAt),
+                durationMinutes = durationMinutes,
+            ),
         category = categoryCode.toTourCategory(),
         languageCodes = languageCodes,
         cover = cover.toDomain(),
-        startsAt = Instant.parse(startsAt),
-        durationMinutes = durationMinutes,
-        priceMinor = priceMinor,
-        currencyCode = currencyCode,
-        bookedCount = bookedCount,
-        capacity = capacity,
-        averageRating = averageRating,
-        reviewCount = reviewCount,
-        netEarningsMinor = netEarningsMinor,
+        pricing =
+            GuideTourCardPricing(
+                priceMinor = priceMinor,
+                currencyCode = currencyCode,
+                netEarningsMinor = netEarningsMinor,
+            ),
+        stats =
+            GuideTourCardStats(
+                bookedCount = bookedCount,
+                capacity = capacity,
+                averageRating = averageRating,
+                reviewCount = reviewCount,
+            ),
         approvalStatus = TourApprovalStatus.valueOf(approvalStatus),
         sessionStatus = TourSessionStatus.valueOf(sessionStatus),
         rejectionReason = rejectionReason,
@@ -87,24 +102,32 @@ fun TourDetailResponseDto.toDomain(): TourDetails {
                         id = guide.guideId,
                         displayName = guide.displayName,
                         profileImageUrl = guide.avatar?.imageUrl,
-                    ),
+                ),
                 title = title,
                 description = description,
-                countryCode = countryCode,
-                country = country,
-                cityPlaceId = cityPlaceId,
-                city = cityName,
-                timeZoneId = timeZoneId,
+                location =
+                    TourLocation(
+                        countryCode = countryCode,
+                        country = country,
+                        cityPlaceId = cityPlaceId,
+                        city = cityName,
+                        timeZoneId = timeZoneId,
+                    ),
                 category = categoryCode.toTourCategory(),
                 languages = languageCodes.map { it.toTourLanguage(locale) },
-                coverMediaId = cover.mediaAssetId,
-                coverImageUrl = cover.imageUrl,
-                approvalStatus = TourApprovalStatus.valueOf(approvalStatus),
-                approvalSubmittedAt = submittedAt?.let(Instant::parse),
-                publishedAt = publishedAt?.let(Instant::parse),
-                rejectionReason = rejectionReason,
-                averageRating = averageRating.takeIf { reviewCount > 0 },
-                reviewCount = reviewCount,
+                cover = cover.toDomain(),
+                publication =
+                    TourPublication(
+                        approvalStatus = TourApprovalStatus.valueOf(approvalStatus),
+                        approvalSubmittedAt = submittedAt?.let(Instant::parse),
+                        publishedAt = publishedAt?.let(Instant::parse),
+                        rejectionReason = rejectionReason,
+                    ),
+                reviews =
+                    TourReviews(
+                        averageRating = averageRating.takeIf { reviewCount > 0 },
+                        reviewCount = reviewCount,
+                    ),
             ),
         sessions = sessions.map(TourSessionResponseDto::toDomain),
     )

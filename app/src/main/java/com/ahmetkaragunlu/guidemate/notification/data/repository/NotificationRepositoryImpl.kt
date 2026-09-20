@@ -20,6 +20,7 @@ import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPrefer
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
 import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -75,7 +76,7 @@ constructor(
     private val notificationStateMutex = Mutex()
     private var currentPage = -1
     private var realtimeEventsJob: Job? = null
-    @Volatile private var sessionGeneration = 0L
+    private val sessionGeneration = AtomicLong(0L)
 
     init {
         observeAuthenticatedUser()
@@ -271,7 +272,7 @@ constructor(
     }
 
     override fun clearLocalState() {
-        sessionGeneration++
+        sessionGeneration.incrementAndGet()
         currentPage = -1
         mutableNotifications.value = emptyList()
         mutableUnreadCount.value = 0
@@ -313,11 +314,11 @@ constructor(
     private fun currentSession(): SessionSnapshot =
         SessionSnapshot(
             userId = userRepository.userState.value.userId,
-            generation = sessionGeneration,
+            generation = sessionGeneration.get(),
         )
 
     private fun SessionSnapshot.isCurrent(): Boolean =
-        generation == sessionGeneration && userId == userRepository.userState.value.userId
+        generation == sessionGeneration.get() && userId == userRepository.userState.value.userId
 
     private data class SessionSnapshot(
         val userId: Long?,

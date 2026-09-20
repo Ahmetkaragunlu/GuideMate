@@ -1,9 +1,9 @@
 package com.ahmetkaragunlu.guidemate.notification.data.push
 
 import android.content.Intent
+import com.ahmetkaragunlu.guidemate.notification.data.mapper.toNotificationSecurityEvent
+import com.ahmetkaragunlu.guidemate.notification.data.mapper.toNotificationType
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
-import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
-import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -67,13 +67,13 @@ class NotificationTargetParser @Inject constructor() {
         if (notificationId.isNullOrBlank() && type.isNullOrBlank()) return null
         return NotificationNavigationTarget(
             notificationId = notificationId,
-            type = NotificationType.fromApiValue(type),
+            type = type.toNotificationType(),
             chatId = chatId,
             tourId = tourId,
             sessionId = sessionId,
             reservationId = reservationId,
             paymentId = paymentId,
-            securityEvent = NotificationSecurityEvent.fromApiValue(securityEvent),
+            securityEvent = securityEvent.toNotificationSecurityEvent(),
         )
     }
 

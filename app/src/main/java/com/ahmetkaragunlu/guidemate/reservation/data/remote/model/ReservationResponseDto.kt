@@ -64,8 +64,3 @@ data class ReservationCancellationResponseDto(
     @SerializedName("refundId") val refundId: String?,
     @SerializedName("refundStatus") val refundStatus: String?,
 )
-
-data class CancelReservationRequestDto(
-    @SerializedName("version") val version: Long,
-    @SerializedName("reason") val reason: String?,
-)

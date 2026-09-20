@@ -5,9 +5,9 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.defaultNotificationPreferences
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.notification.defaultNotificationPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -41,7 +41,7 @@ class NotificationPreferencesViewModelTest {
         runTest {
             val repository =
                 FakeNotificationRepository().apply {
-                    updatePreferencesResult =
+                    results.updatePreferences =
                         com.ahmetkaragunlu.guidemate.common.result.DataResult.Success(
                             defaultNotificationPreferences(chatMessagesEnabled = false)
                         )
@@ -53,8 +53,8 @@ class NotificationPreferencesViewModelTest {
             viewModel.updateChatMessages(false)
             runCurrent()
 
-            assertFalse(repository.lastPreferenceUpdate?.chatMessagesEnabled ?: true)
-            assertNull(repository.lastPreferenceUpdate?.upcomingTourRemindersEnabled)
+            assertFalse(repository.calls.lastPreferenceUpdate?.chatMessagesEnabled ?: true)
+            assertNull(repository.calls.lastPreferenceUpdate?.upcomingTourRemindersEnabled)
             assertFalse(viewModel.uiState.value.preferences?.chatMessagesEnabled ?: true)
             collection.cancel()
         }
@@ -65,8 +65,8 @@ class NotificationPreferencesViewModelTest {
             val originalPreferences = defaultNotificationPreferences(chatMessagesEnabled = true)
             val repository =
                 FakeNotificationRepository().apply {
-                    refreshPreferencesResult = DataResult.Success(originalPreferences)
-                    updatePreferencesResult = DataResult.Error(AppError.NoInternet)
+                    results.refreshPreferences = DataResult.Success(originalPreferences)
+                    results.updatePreferences = DataResult.Error(AppError.NoInternet)
                 }
             val viewModel = NotificationPreferencesViewModel(repository, FakeResourceProvider())
             val collection = backgroundScope.launch { viewModel.uiState.collect {} }

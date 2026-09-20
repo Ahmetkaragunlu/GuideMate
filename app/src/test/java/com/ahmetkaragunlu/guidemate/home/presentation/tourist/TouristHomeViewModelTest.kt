@@ -4,13 +4,14 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeReviewRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeTourDiscoveryRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
-import com.ahmetkaragunlu.guidemate.testing.testGuideSearchResult
-import com.ahmetkaragunlu.guidemate.testing.testTourSearchItem
-import com.ahmetkaragunlu.guidemate.testing.tourSearchPage
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeGuideProfileRepository
+import com.ahmetkaragunlu.guidemate.testing.review.FakeReviewRepository
+import com.ahmetkaragunlu.guidemate.testing.discovery.FakeTourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.testing.discovery.PopularToursCall
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.profile.testGuideSearchResult
+import com.ahmetkaragunlu.guidemate.testing.discovery.testTourSearchItem
+import com.ahmetkaragunlu.guidemate.testing.discovery.tourSearchPage
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchSort
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,7 +31,7 @@ class TouristHomeViewModelTest {
         runTest {
             val tourRepository =
                 FakeTourDiscoveryRepository().apply {
-                    popularResult =
+                    results.popularResult =
                         DataResult.Success(
                             tourSearchPage(
                                 page = 0,
@@ -41,7 +42,7 @@ class TouristHomeViewModelTest {
                 }
             val profileRepository =
                 FakeGuideProfileRepository().apply {
-                    topGuidesResult = DataResult.Success(listOf(testGuideSearchResult()))
+                    results.topGuides = DataResult.Success(listOf(testGuideSearchResult()))
                 }
 
             val viewModel =
@@ -55,8 +56,11 @@ class TouristHomeViewModelTest {
             assertEquals("session-1", viewModel.uiState.value.popularTours.single().id)
             assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.bestGuidesLoadState)
             assertEquals(7L, viewModel.uiState.value.bestGuides.single().guideId)
-            assertEquals(listOf(0 to 10), tourRepository.popularRequests)
-            assertEquals(listOf(4), profileRepository.topGuideLimits)
+            assertEquals(
+                listOf(PopularToursCall(page = 0, size = 10)),
+                tourRepository.calls.popularRequests,
+            )
+            assertEquals(listOf(4), profileRepository.calls.topGuideLimits)
         }
 
     @Test
@@ -65,13 +69,13 @@ class TouristHomeViewModelTest {
             val tourRepository = FakeTourDiscoveryRepository()
             val viewModel = createViewModel(tourRepository = tourRepository)
             runCurrent()
-            tourRepository.searchResults +=
+            tourRepository.results.searchResults +=
                 DataResult.Success(tourSearchPage(page = 0, isLast = true))
 
             viewModel.updateSelectedCategory(TourCategory.CULTURE)
             runCurrent()
 
-            val request = tourRepository.searchRequests.single()
+            val request = tourRepository.calls.searchRequests.single()
             assertEquals(TourCategory.CULTURE.code, request.query.categoryCode)
             assertEquals(TourSearchSort.RATING_DESC, request.query.sort)
             assertEquals(0, request.page)
@@ -83,11 +87,11 @@ class TouristHomeViewModelTest {
         runTest {
             val tourRepository =
                 FakeTourDiscoveryRepository().apply {
-                    popularResult = DataResult.Error(AppError.NoInternet)
+                    results.popularResult = DataResult.Error(AppError.NoInternet)
                 }
             val profileRepository =
                 FakeGuideProfileRepository().apply {
-                    topGuidesResult = DataResult.Error(AppError.NoInternet)
+                    results.topGuides = DataResult.Error(AppError.NoInternet)
                 }
 
             val viewModel =
@@ -119,8 +123,8 @@ class TouristHomeViewModelTest {
             reviewRepository.publishReviewChange()
             runCurrent()
 
-            assertEquals(2, tourRepository.popularRequests.size)
-            assertEquals(2, profileRepository.topGuideLimits.size)
+            assertEquals(2, tourRepository.calls.popularRequests.size)
+            assertEquals(2, profileRepository.calls.topGuideLimits.size)
         }
 
     private fun createViewModel(

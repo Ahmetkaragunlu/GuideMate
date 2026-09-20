@@ -53,7 +53,7 @@ class HostedPaymentViewModel
                         mutableUiState.update { it.copy(loadState = ContentLoadState.ERROR) }
                     is DataResult.Success -> {
                         val payment = result.data
-                        val url = payment.paymentPageUrl
+                        val url = payment.hostedPayment?.pageUrl
                         if (payment.status != PaymentStatus.REQUIRES_ACTION || url == null) {
                             mutableUiState.update {
                                 it.copy(

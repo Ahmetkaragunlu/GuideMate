@@ -80,7 +80,7 @@ class GuideMyToursViewModel
                                     state.tours.map { tour ->
                                         if (tour.id == sessionId) {
                                             tour.copy(
-                                                sessionStatus = status,
+                                                status = tour.status.copy(sessionStatus = status),
                                             )
                                         } else {
                                             tour

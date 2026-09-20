@@ -3,9 +3,9 @@ package com.ahmetkaragunlu.guidemate.session.domain.usecase
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.notification.domain.navigation.NotificationNavigationCoordinator
-import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakePaymentRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeAuthRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.payment.FakePaymentRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -17,7 +17,7 @@ class TerminateUserSessionUseCaseTest {
     fun `logout result failure does not skip local cleanup`() = runTest {
         val authRepository =
             FakeAuthRepository().apply {
-                logoutResult = DataResult.Error(AppError.NoResponseFromServer)
+                results.logout = DataResult.Error(AppError.NoResponseFromServer)
             }
         val notificationRepository = FakeNotificationRepository()
         val paymentRepository = FakePaymentRepository()
@@ -25,18 +25,18 @@ class TerminateUserSessionUseCaseTest {
 
         useCase()
 
-        assertEquals(1, authRepository.logoutCalls)
-        assertEquals(1, notificationRepository.dismissSystemNotificationsCalls)
-        assertEquals(1, notificationRepository.clearLocalStateCalls)
-        assertEquals(1, paymentRepository.clearAllPendingPaymentCalls)
+        assertEquals(1, authRepository.calls.logout)
+        assertEquals(1, notificationRepository.calls.dismissSystemNotifications)
+        assertEquals(1, notificationRepository.calls.clearLocalState)
+        assertEquals(1, paymentRepository.calls.clearAllPendingPayments)
     }
 
     @Test
     fun `one local cleanup failure does not skip remaining cleanup`() = runTest {
         val notificationRepository =
             FakeNotificationRepository().apply {
-                dismissSystemNotificationsException = IllegalStateException("system unavailable")
-                clearLocalStateException = IllegalStateException("storage unavailable")
+                failures.dismissSystemNotifications = IllegalStateException("system unavailable")
+                failures.clearLocalState = IllegalStateException("storage unavailable")
             }
         val authRepository = FakeAuthRepository()
         val paymentRepository = FakePaymentRepository()
@@ -49,17 +49,17 @@ class TerminateUserSessionUseCaseTest {
 
         useCase()
 
-        assertEquals(1, authRepository.logoutCalls)
-        assertEquals(1, notificationRepository.dismissSystemNotificationsCalls)
-        assertEquals(1, notificationRepository.clearLocalStateCalls)
-        assertEquals(1, paymentRepository.clearAllPendingPaymentCalls)
+        assertEquals(1, authRepository.calls.logout)
+        assertEquals(1, notificationRepository.calls.dismissSystemNotifications)
+        assertEquals(1, notificationRepository.calls.clearLocalState)
+        assertEquals(1, paymentRepository.calls.clearAllPendingPayments)
     }
 
     @Test
     fun `logout cancellation is rethrown after local cleanup`() = runTest {
         val authRepository =
             FakeAuthRepository().apply {
-                logoutException = CancellationException("cancelled")
+                failures.logout = CancellationException("cancelled")
             }
         val notificationRepository = FakeNotificationRepository()
         val paymentRepository = FakePaymentRepository()
@@ -69,8 +69,8 @@ class TerminateUserSessionUseCaseTest {
             useCase()
             fail("CancellationException expected")
         } catch (_: CancellationException) {
-            assertEquals(1, notificationRepository.clearLocalStateCalls)
-            assertEquals(1, paymentRepository.clearAllPendingPaymentCalls)
+            assertEquals(1, notificationRepository.calls.clearLocalState)
+            assertEquals(1, paymentRepository.calls.clearAllPendingPayments)
         }
     }
 

@@ -8,12 +8,12 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeReviewRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeTourDiscoveryRepository
-import com.ahmetkaragunlu.guidemate.testing.testTourSearchItem
-import com.ahmetkaragunlu.guidemate.testing.tourSearchPage
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeGuideProfileRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.review.FakeReviewRepository
+import com.ahmetkaragunlu.guidemate.testing.discovery.FakeTourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.testing.discovery.testTourSearchItem
+import com.ahmetkaragunlu.guidemate.testing.discovery.tourSearchPage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,8 +36,8 @@ class GuidePublicProfileViewModelTest {
             val profileRepository = FakeGuideProfileRepository()
             val tourRepository =
                 FakeTourDiscoveryRepository().apply {
-                    popularForGuideResults += DataResult.Error(AppError.NoInternet)
-                    popularForGuideResults +=
+                    results.popularForGuideResults += DataResult.Error(AppError.NoInternet)
+                    results.popularForGuideResults +=
                         DataResult.Success(
                             tourSearchPage(
                                 page = 0,
@@ -66,8 +66,8 @@ class GuidePublicProfileViewModelTest {
             viewModel.retryPopularTours()
             advanceUntilIdle()
 
-            assertEquals(listOf(7L), profileRepository.publicProfileRequests)
-            assertEquals(2, tourRepository.popularForGuideRequests.size)
+            assertEquals(listOf(7L), profileRepository.calls.publicProfileGuideIds)
+            assertEquals(2, tourRepository.calls.popularForGuideRequests.size)
             assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.popularToursLoadState)
             assertEquals("session-1", viewModel.uiState.value.popularTours.single().id)
         }

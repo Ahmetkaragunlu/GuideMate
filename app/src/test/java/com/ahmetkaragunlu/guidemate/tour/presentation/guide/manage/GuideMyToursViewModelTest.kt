@@ -3,9 +3,10 @@ package com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.testGuideTourCard
+import com.ahmetkaragunlu.guidemate.testing.tour.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.tour.GuideTourListCall
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.tour.testGuideTourCard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourListType
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +30,7 @@ class GuideMyToursViewModelTest {
         runTest {
             val repository =
                 FakeGuideTourRepository().apply {
-                    listResults +=
+                    results.lists +=
                         DataResult.Success(
                             guideTourPage(
                                 page = 0,
@@ -37,7 +38,7 @@ class GuideMyToursViewModelTest {
                                 testGuideTourCard("tour-1", "session-1"),
                             )
                         )
-                    listResults +=
+                    results.lists +=
                         DataResult.Success(
                             guideTourPage(
                                 page = 1,
@@ -62,8 +63,11 @@ class GuideMyToursViewModelTest {
             assertEquals(listOf("session-1", "session-2"), viewModel.uiState.value.tours.map { it.id })
             assertFalse(viewModel.uiState.value.canLoadMore)
             assertEquals(
-                listOf(GuideTourListType.ACTIVE to 0, GuideTourListType.ACTIVE to 1),
-                repository.listRequests,
+                listOf(
+                    GuideTourListCall(GuideTourListType.ACTIVE, 0),
+                    GuideTourListCall(GuideTourListType.ACTIVE, 1),
+                ),
+                repository.calls.listRequests,
             )
         }
 
@@ -72,11 +76,11 @@ class GuideMyToursViewModelTest {
         runTest {
             val repository =
                 FakeGuideTourRepository().apply {
-                    listResults +=
+                    results.lists +=
                         DataResult.Success(
                             guideTourPage(page = 0, isLast = true)
                         )
-                    listResults +=
+                    results.lists +=
                         DataResult.Success(
                             guideTourPage(
                                 page = 0,
@@ -98,8 +102,11 @@ class GuideMyToursViewModelTest {
             assertEquals(GuideTourTab.REVIEW, viewModel.uiState.value.selectedTab)
             assertEquals(listOf("session-review"), viewModel.uiState.value.tours.map { it.id })
             assertEquals(
-                listOf(GuideTourListType.ACTIVE to 0, GuideTourListType.REVIEW to 0),
-                repository.listRequests,
+                listOf(
+                    GuideTourListCall(GuideTourListType.ACTIVE, 0),
+                    GuideTourListCall(GuideTourListType.REVIEW, 0),
+                ),
+                repository.calls.listRequests,
             )
         }
 

@@ -36,7 +36,7 @@ fun GuideTourPublishStep1LocationDateScreen(
 
     LocationSelectionBottomSheet(
         isVisible = showLocationPicker,
-        selectedCountryCode = uiState.countryCode,
+        selectedCountryCode = uiState.location.countryCode,
         onDismissRequest = { showLocationPicker = false },
         onLocationSelected = { location ->
             onLocationSelected(location)

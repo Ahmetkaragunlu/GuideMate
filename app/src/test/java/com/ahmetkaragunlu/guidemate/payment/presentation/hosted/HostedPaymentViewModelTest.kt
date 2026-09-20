@@ -7,9 +7,9 @@ import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.PAYMENT_ID_ARGUMENT
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
-import com.ahmetkaragunlu.guidemate.testing.FakePaymentRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.testTopUpPayment
+import com.ahmetkaragunlu.guidemate.testing.payment.FakePaymentRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.payment.testTopUpPayment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -29,8 +29,8 @@ class HostedPaymentViewModelTest {
         runTest {
             val repository =
                 FakePaymentRepository().apply {
-                    paymentResults += DataResult.Success(testTopUpPayment())
-                    paymentResults +=
+                    results.payments += DataResult.Success(testTopUpPayment())
+                    results.payments +=
                         DataResult.Success(testTopUpPayment().copy(status = PaymentStatus.SUCCEEDED))
                 }
             val viewModel =
@@ -67,9 +67,9 @@ class HostedPaymentViewModelTest {
         runTest {
             val repository =
                 FakePaymentRepository().apply {
-                    paymentResults += DataResult.Success(testTopUpPayment())
-                    paymentResults += DataResult.Success(testTopUpPayment())
-                    paymentResults +=
+                    results.payments += DataResult.Success(testTopUpPayment())
+                    results.payments += DataResult.Success(testTopUpPayment())
+                    results.payments +=
                         DataResult.Success(testTopUpPayment().copy(status = PaymentStatus.SUCCEEDED))
                 }
             val viewModel = createViewModel(repository)
@@ -92,7 +92,7 @@ class HostedPaymentViewModelTest {
         runTest {
             val repository =
                 FakePaymentRepository().apply {
-                    paymentResults += DataResult.Success(testTopUpPayment())
+                    results.payments += DataResult.Success(testTopUpPayment())
                 }
             val viewModel = createViewModel(repository)
             runCurrent()
@@ -101,7 +101,7 @@ class HostedPaymentViewModelTest {
             advanceTimeBy(60_000)
             runCurrent()
 
-            assertEquals(listOf("payment-1"), repository.requestedPaymentIds)
+            assertEquals(listOf("payment-1"), repository.calls.requestedPaymentIds)
             assertFalse(viewModel.uiState.value.shouldVerifyPayment)
         }
 
@@ -110,7 +110,7 @@ class HostedPaymentViewModelTest {
         runTest {
             val repository =
                 FakePaymentRepository().apply {
-                    repeat(8) { paymentResults += DataResult.Success(testTopUpPayment()) }
+                    repeat(8) { results.payments += DataResult.Success(testTopUpPayment()) }
                 }
             val viewModel = createViewModel(repository)
             runCurrent()
@@ -120,7 +120,7 @@ class HostedPaymentViewModelTest {
             runCurrent()
 
             assertTrue(viewModel.uiState.value.shouldVerifyPayment)
-            assertTrue(repository.requestedPaymentIds.size > 1)
+            assertTrue(repository.calls.requestedPaymentIds.size > 1)
         }
 
     @Test
@@ -128,7 +128,7 @@ class HostedPaymentViewModelTest {
         runTest {
             val repository =
                 FakePaymentRepository().apply {
-                    paymentResults += DataResult.Success(testTopUpPayment())
+                    results.payments += DataResult.Success(testTopUpPayment())
                 }
             val viewModel = createViewModel(repository)
             runCurrent()
@@ -136,7 +136,7 @@ class HostedPaymentViewModelTest {
             viewModel.cancelPayment()
             runCurrent()
 
-            assertEquals("payment-1", repository.cancelledPaymentId)
+            assertEquals("payment-1", repository.calls.cancelledPaymentId)
             assertFalse(viewModel.uiState.value.isCancelling)
             assertTrue(viewModel.uiState.value.shouldVerifyPayment)
         }
@@ -146,8 +146,8 @@ class HostedPaymentViewModelTest {
         runTest {
             val repository =
                 FakePaymentRepository().apply {
-                    paymentResults += DataResult.Success(testTopUpPayment())
-                    cancelResult = DataResult.Error(AppError.NoInternet)
+                    results.payments += DataResult.Success(testTopUpPayment())
+                    results.cancel = DataResult.Error(AppError.NoInternet)
                 }
             val viewModel = createViewModel(repository)
             runCurrent()

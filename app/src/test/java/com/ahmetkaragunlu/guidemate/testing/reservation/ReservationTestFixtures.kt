@@ -1,18 +1,32 @@
-package com.ahmetkaragunlu.guidemate.testing
+package com.ahmetkaragunlu.guidemate.testing.reservation
 
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
+import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.CancelReservationInput
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationResult
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationAttendance
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationDetails
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationPolicy
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationLocationSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationListType
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationPurchaseDetails
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRatingSummary
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationScheduleSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
 import com.ahmetkaragunlu.guidemate.reservation.domain.repository.ReservationRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import java.time.Instant
+
+data class ReservationCancellationCall(
+    val reservationId: String,
+    val input: CancelReservationInput,
+    val idempotencyKey: String,
+)
 
 class FakeReservationRepository : ReservationRepository {
     val reservationPages = ArrayDeque<DataResult<PagedResult<TouristReservation>>>()
@@ -29,7 +43,7 @@ class FakeReservationRepository : ReservationRepository {
         )
     val listRequests = mutableListOf<ReservationListType>()
     val reservationRequests = mutableListOf<String>()
-    var cancellationRequest: Triple<String, CancelReservationInput, String>? = null
+    var cancellationRequest: ReservationCancellationCall? = null
 
     override suspend fun getMyReservations(
         type: ReservationListType,
@@ -50,7 +64,12 @@ class FakeReservationRepository : ReservationRepository {
         input: CancelReservationInput,
         idempotencyKey: String,
     ): DataResult<ReservationCancellationResult> {
-        cancellationRequest = Triple(reservationId, input, idempotencyKey)
+        cancellationRequest =
+            ReservationCancellationCall(
+                reservationId = reservationId,
+                input = input,
+                idempotencyKey = idempotencyKey,
+            )
         return cancellationResult
     }
 }
@@ -62,37 +81,48 @@ fun testReservation(
         id = "reservation-1",
         tourSessionId = "session-1",
         version = 4,
-        participantCount = 2,
-        unitPriceMinor = 10_000,
-        totalPriceMinor = 20_000,
-        currencyCode = "USD",
+        purchase =
+            ReservationPurchaseDetails(
+                participantCount = 2,
+                unitPriceMinor = 10_000,
+                totalPriceMinor = 20_000,
+                currencyCode = "USD",
+            ),
         snapshot =
             TouristReservationSnapshot(
                 tourId = "tour-1",
                 guide = GuidePublicSummary(1L, "Ada Guide"),
                 title = "City Walk",
                 description = "Historic route",
-                countryCode = "TR",
-                country = "Turkiye",
-                cityPlaceId = "istanbul-place-id",
-                city = "Istanbul",
-                timeZoneId = "UTC",
+                location =
+                    ReservationLocationSnapshot(
+                        countryCode = "TR",
+                        country = "Turkiye",
+                        cityPlaceId = "istanbul-place-id",
+                        city = "Istanbul",
+                        timeZoneId = "UTC",
+                    ),
                 category = TourCategory.CULTURE,
                 languages = emptyList(),
-                coverMediaId = "media-1",
-                coverImageUrl = "https://example.com/tour.jpg",
-                startsAt = Instant.parse("2099-01-01T12:00:00Z"),
-                durationMinutes = 120,
-                meetingPoint = "Main square",
-                unitPriceMinor = 10_000,
+                cover = MediaReference("media-1", "https://example.com/tour.jpg"),
+                schedule =
+                    ReservationScheduleSnapshot(
+                        startsAt = Instant.parse("2099-01-01T12:00:00Z"),
+                        durationMinutes = 120,
+                        meetingPoint = "Main square",
+                    ),
             ),
         status = status,
-        cancellationPolicyCode = "FULL_REFUND_48_HOURS",
-        cancellationPolicyVersion = 1,
-        averageRating = 4.8,
-        reviewCount = 17,
-        bookedCount = 6,
-        capacity = 10,
+        cancellation =
+            ReservationCancellationDetails(
+                actor = null,
+                reason = null,
+                cancelledAt = null,
+                refundEligibility = ReservationRefundEligibility.NOT_APPLICABLE,
+                policy = ReservationCancellationPolicy("FULL_REFUND_48_HOURS", 1),
+            ),
+        rating = ReservationRatingSummary(averageRating = 4.8, reviewCount = 17),
+        attendance = ReservationAttendance(bookedCount = 6, capacity = 10),
     )
 
 fun reservationPage(

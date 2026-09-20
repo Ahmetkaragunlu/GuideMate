@@ -5,11 +5,12 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakePaymentRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeSavedPaymentMethodRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
-import com.ahmetkaragunlu.guidemate.testing.testTopUpQuote
+import com.ahmetkaragunlu.guidemate.testing.payment.FakePaymentRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.payment.FakeSavedPaymentMethodRepository
+import com.ahmetkaragunlu.guidemate.testing.payment.WalletTopUpQuoteCall
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeWalletRepository
+import com.ahmetkaragunlu.guidemate.testing.payment.testTopUpQuote
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
@@ -44,15 +45,18 @@ class TouristWalletViewModelTest {
             viewModel.continueTopUp(5_000)
             runCurrent()
 
-            assertEquals(5_000L to "USD", paymentRepository.quotedTopUp)
+            assertEquals(
+                WalletTopUpQuoteCall(amountMinor = 5_000, currencyCode = "USD"),
+                paymentRepository.calls.topUpQuote,
+            )
             assertNotNull(viewModel.uiState.value.topUpQuote)
             assertNull(viewModel.uiState.value.paymentLaunch)
 
             viewModel.continueTopUp(5_000)
             runCurrent()
 
-            assertEquals("quote-1", paymentRepository.checkedOutQuoteId)
-            assertNotNull(paymentRepository.checkoutIdempotencyKey)
+            assertEquals("quote-1", paymentRepository.calls.topUpCheckout?.quoteId)
+            assertNotNull(paymentRepository.calls.topUpCheckout?.idempotencyKey)
             assertEquals("payment-1", viewModel.uiState.value.paymentLaunch?.paymentId)
             assertFalse(viewModel.uiState.value.isPaymentActionInProgress)
         }
@@ -82,7 +86,7 @@ class TouristWalletViewModelTest {
         runTest {
             val paymentRepository =
                 FakePaymentRepository().apply {
-                    topUpCheckoutResult = DataResult.Error(AppError.NoInternet)
+                    results.topUpCheckout = DataResult.Error(AppError.NoInternet)
                 }
             val viewModel =
                 TouristWalletViewModel(
@@ -101,21 +105,21 @@ class TouristWalletViewModelTest {
             viewModel.continueTopUp(5_000)
             runCurrent()
 
-            val firstAttemptKey = paymentRepository.topUpCheckoutIdempotencyKeys.first()
+            val firstAttemptKey = paymentRepository.calls.topUpCheckouts.first().idempotencyKey
             assertEquals(
                 listOf(firstAttemptKey, firstAttemptKey),
-                paymentRepository.topUpCheckoutIdempotencyKeys,
+                paymentRepository.calls.topUpCheckouts.map { it.idempotencyKey },
             )
 
             viewModel.onTopUpAmountChange("60")
-            paymentRepository.topUpQuoteResult =
+            paymentRepository.results.topUpQuote =
                 DataResult.Success(testTopUpQuote(id = "quote-2", baseAmountMinor = 6_000))
             viewModel.continueTopUp(6_000)
             runCurrent()
             viewModel.continueTopUp(6_000)
             runCurrent()
 
-            val changedAmountKey = paymentRepository.topUpCheckoutIdempotencyKeys.last()
+            val changedAmountKey = paymentRepository.calls.topUpCheckouts.last().idempotencyKey
             assertNotEquals(firstAttemptKey, changedAmountKey)
             assertFalse(viewModel.uiState.value.isPaymentActionInProgress)
         }

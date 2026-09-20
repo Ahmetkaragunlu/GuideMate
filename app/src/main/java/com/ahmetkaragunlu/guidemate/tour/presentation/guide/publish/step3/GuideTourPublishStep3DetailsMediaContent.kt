@@ -84,19 +84,19 @@ fun GuideTourPublishStep3DetailsMediaContent(
             )
             Step3Header()
             Step3TourNameField(
-                value = uiState.tourName,
+                value = uiState.content.tourName,
                 onTourNameChange = onTourNameChange,
             )
             Step3UploadArea(
-                selectedImageUri = uiState.selectedCoverImageUri,
+                selectedImageUri = uiState.content.selectedCoverImageUri,
                 onClick = onUploadPhotosClick,
             )
             Step3DescriptionField(
-                description = uiState.tourDescription,
+                description = uiState.content.tourDescription,
                 onDescriptionChange = onDescriptionChange,
             )
             GuideTourMeetingPointField(
-                value = uiState.meetingPoint,
+                value = uiState.session.meetingPoint,
                 onValueChange = onMeetingPointChange,
             )
             GuideTourPublishValidationMessage(

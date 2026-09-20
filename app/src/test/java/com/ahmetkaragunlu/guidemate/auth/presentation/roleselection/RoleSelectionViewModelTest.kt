@@ -2,8 +2,8 @@ package com.ahmetkaragunlu.guidemate.auth.presentation.roleselection
 
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
-import com.ahmetkaragunlu.guidemate.testing.FakeAuthRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeAuthRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,13 +23,13 @@ class RoleSelectionViewModelTest {
         val viewModel = RoleSelectionViewModel(repository, FakeResourceProvider())
 
         viewModel.confirmRoleSelection()
-        assertNull(repository.selectedRole)
+        assertNull(repository.calls.selectedRole)
         assertTrue(viewModel.screenState.value.errorMessage != null)
 
         viewModel.selectRole(UserRole.GUIDE)
         viewModel.confirmRoleSelection()
         runCurrent()
 
-        assertEquals(UserRole.GUIDE, repository.selectedRole)
+        assertEquals(UserRole.GUIDE, repository.calls.selectedRole)
     }
 }

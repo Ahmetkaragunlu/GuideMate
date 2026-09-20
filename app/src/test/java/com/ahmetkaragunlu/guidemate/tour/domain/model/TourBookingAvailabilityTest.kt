@@ -25,12 +25,15 @@ class TourBookingAvailabilityTest {
                         guide = GuidePublicSummary(1L, "Test Guide"),
                         title = "Test Tour",
                         description = "Test description",
-                        country = "Türkiye",
-                        city = "İstanbul",
-                        timeZoneId = "Europe/Istanbul",
+                        location =
+                            TourLocation(
+                                country = "Türkiye",
+                                city = "İstanbul",
+                                timeZoneId = "Europe/Istanbul",
+                            ),
                         category = TourCategory.CULTURE,
                         languages = emptyList(),
-                        approvalStatus = TourApprovalStatus.APPROVED,
+                        publication = TourPublication(approvalStatus = TourApprovalStatus.APPROVED),
                     ),
                 session =
                     TourSession(
@@ -68,7 +71,15 @@ class TourBookingAvailabilityTest {
         assertEquals(
             TourBookingAvailability.NOT_APPROVED,
             availableTour
-                .copy(tour = availableTour.tour.copy(approvalStatus = TourApprovalStatus.PENDING_REVIEW))
+                .copy(
+                    tour =
+                        availableTour.tour.copy(
+                            publication =
+                                availableTour.tour.publication.copy(
+                                    approvalStatus = TourApprovalStatus.PENDING_REVIEW,
+                                ),
+                        ),
+                )
                 .resolveBookingAvailability(hasReservation = false, now = NOW),
         )
         assertEquals(

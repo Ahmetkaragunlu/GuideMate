@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.detail.mapper
 
-import com.ahmetkaragunlu.guidemate.testing.testTourDetails
+import com.ahmetkaragunlu.guidemate.testing.tour.testTourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus

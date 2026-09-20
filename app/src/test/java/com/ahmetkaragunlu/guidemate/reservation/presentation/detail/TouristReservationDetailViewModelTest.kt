@@ -7,12 +7,12 @@ import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
-import com.ahmetkaragunlu.guidemate.testing.FakeReservationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeReviewRepository
-import com.ahmetkaragunlu.guidemate.testing.testReservation
-import com.ahmetkaragunlu.guidemate.testing.testSubmittedReview
+import com.ahmetkaragunlu.guidemate.testing.reservation.FakeReservationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.review.FakeReviewRepository
+import com.ahmetkaragunlu.guidemate.testing.reservation.testReservation
+import com.ahmetkaragunlu.guidemate.testing.review.testSubmittedReview
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReview
 import java.time.Instant
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -57,25 +57,30 @@ class TouristReservationDetailViewModelTest {
             assertTrue(viewModel.uiState.value.canSubmitReview)
             assertEquals(
                 "reservation-1",
-                notificationRepository.markedRelatedTargets.single().targetId,
+                notificationRepository.calls.markedRelatedTargets.single().targetId,
             )
             viewModel.showReviewForm()
             viewModel.updateReviewRating(5)
             viewModel.updateReviewComment("Excellent tour")
             reservationRepository.reservationResult =
                 com.ahmetkaragunlu.guidemate.common.result.DataResult.Success(
-                    testReservation(status = TouristReservationStatus.COMPLETED).copy(
-                        averageRating = 4.9,
-                        reviewCount = 18,
-                        review = testSubmittedReview(),
-                    )
+                    testReservation(status = TouristReservationStatus.COMPLETED).let { reservation ->
+                        reservation.copy(
+                            rating =
+                                reservation.rating.copy(
+                                    averageRating = 4.9,
+                                    reviewCount = 18,
+                                ),
+                            review = testSubmittedReview(),
+                        )
+                    }
                 )
             viewModel.submitReview()
             runCurrent()
 
-            assertEquals("reservation-1", reviewRepository.submittedReview?.first)
-            assertEquals(5, reviewRepository.submittedReview?.second?.rating)
-            assertEquals("Excellent tour", reviewRepository.submittedReview?.second?.comment)
+            assertEquals("reservation-1", reviewRepository.submittedReview?.reservationId)
+            assertEquals(5, reviewRepository.submittedReview?.input?.rating)
+            assertEquals("Excellent tour", reviewRepository.submittedReview?.input?.comment)
             assertTrue(viewModel.uiState.value.reviewForm.showSuccessDialog)
             val detail = requireNotNull(viewModel.uiState.value.detail)
             assertEquals(4.9, detail.tour.rating ?: 0.0, 0.0)

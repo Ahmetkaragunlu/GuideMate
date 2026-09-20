@@ -2,10 +2,10 @@ package com.ahmetkaragunlu.guidemate.wallet.presentation.guide.earnings
 
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideFinanceRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.testNotification
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeGuideFinanceRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.notification.testNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.MonthlyGuideEarning
 import java.time.YearMonth
@@ -26,7 +26,7 @@ class GuideEarningsViewModelTest {
             val currentPeriod = YearMonth.now()
             val repository =
                 FakeGuideFinanceRepository().apply {
-                    monthlyEarningsResult =
+                    results.monthlyEarnings =
                         DataResult.Success(
                             listOf(
                                 MonthlyGuideEarning(
@@ -73,17 +73,17 @@ class GuideEarningsViewModelTest {
             runCurrent()
             assertEquals(previousYear, viewModel.uiState.value.selectedYear)
 
-            notificationRepository.notificationState.value =
+            notificationRepository.state.notifications.value =
                 listOf(testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED))
             runCurrent()
 
             assertEquals(
                 listOf(previousYear, currentYear),
-                repository.requestedMonthlyEarningsYears,
+                repository.calls.requestedMonthlyEarningsYears,
             )
             assertEquals(previousYear, viewModel.uiState.value.selectedYear)
 
-            notificationRepository.notificationState.value =
+            notificationRepository.state.notifications.value =
                 listOf(
                     testNotification(id = "earning", type = NotificationType.EARNING_AVAILABLE),
                     testNotification(id = "purchase", type = NotificationType.TOUR_PURCHASED),
@@ -92,7 +92,7 @@ class GuideEarningsViewModelTest {
 
             assertEquals(
                 listOf(previousYear, currentYear, currentYear),
-                repository.requestedMonthlyEarningsYears,
+                repository.calls.requestedMonthlyEarningsYears,
             )
             assertEquals(previousYear, viewModel.uiState.value.selectedYear)
         }

@@ -35,7 +35,7 @@ internal fun Payment.toStatusUiModel(walletProjectionVerified: Boolean = true): 
     )
 
 private fun Payment.resolveUiStatus(walletProjectionVerified: Boolean): PaymentUiStatus =
-    when (refundStatus) {
+    when (refund?.status) {
         PaymentRefundStatus.MANUAL_REVIEW -> PaymentUiStatus.MANUAL_REVIEW
         PaymentRefundStatus.REQUESTED,
         PaymentRefundStatus.PROCESSING,
@@ -60,7 +60,7 @@ private fun Payment.resolveUiStatus(walletProjectionVerified: Boolean): PaymentU
                                 PaymentUiStatus.VERIFYING
                             }
                         PaymentPurpose.TOUR_BOOKING ->
-                            if (reservationStatus == PaymentReservationStatus.CONFIRMED) {
+                            if (reservation?.status == PaymentReservationStatus.CONFIRMED) {
                                 PaymentUiStatus.SUCCEEDED
                             } else {
                                 PaymentUiStatus.VERIFYING
@@ -68,4 +68,3 @@ private fun Payment.resolveUiStatus(walletProjectionVerified: Boolean): PaymentU
                     }
             }
     }
-

@@ -78,26 +78,26 @@ internal fun TourCheckoutContent(
                 uiState = uiState,
                 onPaymentMethodSelected = onPaymentMethodSelected,
             )
-            if (uiState.selectedMethod == PaymentMethod.HOSTED_CARD) {
+            if (uiState.payment.selectedMethod == PaymentMethod.HOSTED_CARD) {
                 PaymentCurrencySelector(
-                    currencies = uiState.chargeCurrencies,
-                    selectedCurrencyCode = uiState.selectedChargeCurrencyCode,
+                    currencies = uiState.payment.chargeCurrencies,
+                    selectedCurrencyCode = uiState.payment.selectedChargeCurrencyCode,
                     onCurrencySelected = onChargeCurrencySelected,
                 )
-                uiState.quote?.let { PaymentQuoteSummary(quote = it) }
+                uiState.payment.quote?.let { PaymentQuoteSummary(quote = it) }
             }
             TermsRow(
-                checked = uiState.termsAccepted,
+                checked = uiState.terms.isAccepted,
                 onClick = onTermsClick,
             )
-            uiState.validationErrorResId?.let { errorResId ->
+            uiState.submission.validationErrorResId?.let { errorResId ->
                 Text(
                     text = stringResource(errorResId),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
             }
-            uiState.paymentActionError?.let { errorMessage ->
+            uiState.submission.paymentActionError?.let { errorMessage ->
                 Text(
                     text = errorMessage,
                     style = MaterialTheme.typography.bodySmall,
@@ -110,15 +110,15 @@ internal fun TourCheckoutContent(
         EditButton(
             text =
                 if (
-                    uiState.selectedMethod == PaymentMethod.HOSTED_CARD &&
-                        uiState.quote == null
+                    uiState.payment.selectedMethod == PaymentMethod.HOSTED_CARD &&
+                        uiState.payment.quote == null
                 ) {
                     R.string.payment_get_quote
                 } else {
                     R.string.continue_to_secure_payment
                 },
             onClick = onContinue,
-            isLoading = uiState.isPaymentActionInProgress,
+            isLoading = uiState.submission.isPaymentActionInProgress,
             modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_extra_large)),
         )
     }
@@ -158,12 +158,12 @@ private fun TourSummaryCard(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
         ) {
             Text(
-                text = uiState.tourTitle,
+                text = uiState.summary.tourTitle,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
             Text(
-                text = "${uiState.date} • ${uiState.location}",
+                text = "${uiState.summary.date} • ${uiState.summary.location}",
                 style = MaterialTheme.typography.bodySmall,
                 color = colorResource(R.color.text_color),
             )
@@ -182,7 +182,7 @@ private fun TourSummaryCard(
                         text =
                             stringResource(
                                 R.string.checkout_remaining_capacity,
-                                uiState.availableCapacity,
+                                uiState.summary.availableCapacity,
                             ),
                         style = MaterialTheme.typography.bodySmall,
                         color = colorResource(R.color.text_color),
@@ -217,7 +217,7 @@ private fun TourSummaryCard(
                     color = colorResource(R.color.text_color),
                 )
                 Text(
-                    text = uiState.unitPriceMinor.toPlatformCurrencyFromMinorUnit(),
+                    text = uiState.summary.unitPriceMinor.toPlatformCurrencyFromMinorUnit(),
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.brand_color),
                 )

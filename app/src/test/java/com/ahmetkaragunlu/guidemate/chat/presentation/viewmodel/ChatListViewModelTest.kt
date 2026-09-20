@@ -9,10 +9,10 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetType
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
-import com.ahmetkaragunlu.guidemate.testing.authenticatedUser
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.authenticatedUser
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -45,8 +45,8 @@ class ChatListViewModelTest {
 
         assertEquals(listOf(CHAT_ID), chatRepository.clearRequests)
         assertEquals(0, viewModel.uiState.value.chats.size)
-        assertEquals(NotificationTargetType.CHAT, notificationRepository.markedRelatedTargets.single().type)
-        assertEquals(CHAT_ID, notificationRepository.markedRelatedTargets.single().targetId)
+        assertEquals(NotificationTargetType.CHAT, notificationRepository.calls.markedRelatedTargets.single().type)
+        assertEquals(CHAT_ID, notificationRepository.calls.markedRelatedTargets.single().targetId)
     }
 
     @Test

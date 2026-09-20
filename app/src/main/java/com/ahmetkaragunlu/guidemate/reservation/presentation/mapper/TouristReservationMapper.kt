@@ -24,12 +24,12 @@ fun TouristReservation.toTripUiModel(): TripUiModel {
         location = detail.tour.location,
         imageResId = detail.tour.imageResId,
         imageUrl = detail.tour.imageUrl,
-        participantCount = participantCount,
+        participantCount = purchase.participantCount,
         category = checkNotNull(detail.tour.category),
         languagesFlag = detail.tour.languagesFlag,
         languagesText = detail.tour.languagesText,
-        totalPriceMinor = totalPriceMinor,
-        startsAt = snapshot.startsAt,
+        totalPriceMinor = purchase.totalPriceMinor,
+        startsAt = snapshot.schedule.startsAt,
         sessionStatus = detail.session.status,
         cancellationTitleResId = cancellationTitleResId(),
         cancellationReason = detail.session.cancellationReason,
@@ -45,11 +45,11 @@ fun TouristReservation.toTourDetailUiState(
                 id = snapshot.tourId,
                 title = snapshot.title,
                 imageResId = R.drawable.ic_image_unavailable,
-                imageUrl = snapshot.coverImageUrl,
-                rating = averageRating.takeIf { reviewCount > 0 },
-                reviewCount = reviewCount,
+                imageUrl = snapshot.cover?.imageUrl,
+                rating = rating.averageRating.takeIf { rating.reviewCount > 0 },
+                reviewCount = rating.reviewCount,
                 location =
-                    listOf(snapshot.city, snapshot.country)
+                    listOf(snapshot.location.city, snapshot.location.country)
                         .filter(String::isNotBlank)
                         .joinToString(", "),
                 languagesFlag =
@@ -62,14 +62,14 @@ fun TouristReservation.toTourDetailUiState(
         session =
             TourDetailSessionUiState(
                 sessionId = tourSessionId,
-                date = snapshot.startsAt.formatTourDateTime(snapshot.timeZoneId),
-                durationMinutes = snapshot.durationMinutes,
-                priceMinor = unitPriceMinor,
-                bookedCount = bookedCount,
-                capacity = capacity,
-                meetingPoint = snapshot.meetingPoint,
+                date = snapshot.schedule.startsAt.formatTourDateTime(snapshot.location.timeZoneId),
+                durationMinutes = snapshot.schedule.durationMinutes,
+                priceMinor = purchase.unitPriceMinor,
+                bookedCount = attendance.bookedCount,
+                capacity = attendance.capacity,
+                meetingPoint = snapshot.schedule.meetingPoint,
                 status = status.toDetailStatus(),
-                cancellationReason = cancellationReason,
+                cancellationReason = cancellation.reason,
             ),
         guide =
             TourDetailGuideUiState(
@@ -93,7 +93,7 @@ private fun TouristReservationStatus.toDetailStatus(): TourDetailStatus? =
 
 private fun TouristReservation.cancellationTitleResId(): Int? {
     if (status != TouristReservationStatus.CANCELLED) return null
-    return if (cancellationActor == ReservationCancellationActor.TOURIST) {
+    return if (cancellation.actor == ReservationCancellationActor.TOURIST) {
         R.string.reservation_cancelled_success
     } else {
         R.string.tour_cancelled_status

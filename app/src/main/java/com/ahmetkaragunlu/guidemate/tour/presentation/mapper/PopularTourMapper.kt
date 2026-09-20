@@ -2,11 +2,17 @@ package com.ahmetkaragunlu.guidemate.tour.presentation.mapper
 
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
+import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toRatingText
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchItem
 import com.ahmetkaragunlu.guidemate.tour.presentation.formatting.formatTourDateTime
 import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourCardUiModel
+import com.ahmetkaragunlu.guidemate.tour.presentation.model.PopularTourRatingUiModel
+import com.ahmetkaragunlu.guidemate.tour.presentation.model.TourCardGuideUiModel
+import com.ahmetkaragunlu.guidemate.tour.presentation.model.TourCardLanguagesUiModel
+import com.ahmetkaragunlu.guidemate.tour.presentation.model.TourCardMediaUiModel
 import com.ahmetkaragunlu.guidemate.tour.presentation.model.TourSearchResultUiModel
+import com.ahmetkaragunlu.guidemate.tour.presentation.model.TourSearchRatingUiModel
 import java.util.Locale
 
 fun TourSearchItem.toPopularTourCardUiModel(
@@ -16,16 +22,24 @@ fun TourSearchItem.toPopularTourCardUiModel(
     return PopularTourCardUiModel(
         id = sessionId,
         title = title,
-        imageResId = R.drawable.ic_image_unavailable,
-        imageUrl = cover.imageUrl,
-        rating = averageRating?.toRatingText(locale) ?: "-",
-        reviewCount = "($reviewCount)",
+        media =
+            TourCardMediaUiModel(
+                imageResId = R.drawable.ic_image_unavailable,
+                imageUrl = cover.imageUrl,
+            ),
+        rating =
+            PopularTourRatingUiModel(
+                value = averageRating?.toRatingText(locale) ?: "-",
+                reviewCount = "($reviewCount)",
+            ),
         priceMinor = priceMinor,
-        languagesFlag = languages.joinToString(separator = " ") { it.flagEmoji },
-        languagesText = languages.joinToString(separator = ", ") { it.shortCode },
-        guideName = guide.displayName,
-        guideImageResId = R.drawable.ic_default_avatar,
-        guideImageUrl = guide.profileImageUrl,
+        languages = languages.toTourCardLanguagesUiModel(),
+        guide =
+            TourCardGuideUiModel(
+                name = guide.displayName,
+                imageResId = R.drawable.ic_default_avatar,
+                imageUrl = guide.profileImageUrl,
+            ),
     )
 }
 
@@ -39,26 +53,42 @@ fun TourSearchItem.toSearchResultUiModel(
     return TourSearchResultUiModel(
         sessionId = sessionId,
         title = title,
-        imageResId = R.drawable.ic_image_unavailable,
-        imageUrl = cover.imageUrl,
-        rating = averageRating,
-        reviewCount = reviewCount,
+        media =
+            TourCardMediaUiModel(
+                imageResId = R.drawable.ic_image_unavailable,
+                imageUrl = cover.imageUrl,
+            ),
+        rating =
+            averageRating?.let { value ->
+                TourSearchRatingUiModel(
+                    value = value,
+                    reviewCount = reviewCount,
+                )
+            },
         priceMinor = priceMinor,
         date = startsAt.formatTourDateTime(timeZoneId),
         location = listOf(cityName, country).filter(String::isNotBlank).joinToString(", "),
-        languagesFlag = languages.joinToString(separator = " ") { it.flagEmoji },
-        languagesText = languages.joinToString(separator = ", ") { it.shortCode },
+        languages = languages.toTourCardLanguagesUiModel(),
         availableCapacity = availableCapacity,
-        guideName = guide.displayName,
-        guideImageResId = R.drawable.ic_default_avatar,
-        guideImageUrl = guide.profileImageUrl,
+        guide =
+            TourCardGuideUiModel(
+                name = guide.displayName,
+                imageResId = R.drawable.ic_default_avatar,
+                imageUrl = guide.profileImageUrl,
+            ),
     )
 }
+
+private fun List<LanguageOption>.toTourCardLanguagesUiModel() =
+    TourCardLanguagesUiModel(
+        flags = joinToString(separator = " ") { it.flagEmoji },
+        shortCodes = joinToString(separator = ", ") { it.shortCode },
+    )
 
 private fun TourSearchItem.localizedLanguages(locale: Locale) =
     languageCodes.map { code ->
         LocaleSelectionCatalog.language(code, locale)
-            ?: com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption(
+            ?: LanguageOption(
                 code = code,
                 displayName = code.uppercase(Locale.ROOT),
                 flagEmoji = "🌐",

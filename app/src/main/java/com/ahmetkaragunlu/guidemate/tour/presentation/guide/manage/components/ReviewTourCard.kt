@@ -43,8 +43,8 @@ fun ReviewTourCard(
     modifier: Modifier = Modifier,
 ) {
     TourBaseCard(
-        imageResId = tour.imageResId,
-        imageUrl = tour.imageUrl,
+        imageResId = tour.media.imageResId,
+        imageUrl = tour.media.imageUrl,
         modifier = modifier.clickable(onClick = onClick),
     ) {
         Column(
@@ -66,7 +66,7 @@ fun ReviewTourCard(
             Text(
                 text =
                     stringResource(
-                        if (tour.approvalStatus == TourApprovalStatus.PENDING_REVIEW) {
+                        if (tour.status.approvalStatus == TourApprovalStatus.PENDING_REVIEW) {
                             R.string.pending_review
                         } else {
                             R.string.rejected
@@ -75,26 +75,26 @@ fun ReviewTourCard(
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 color =
-                    if (tour.approvalStatus == TourApprovalStatus.PENDING_REVIEW) {
+                    if (tour.status.approvalStatus == TourApprovalStatus.PENDING_REVIEW) {
                         colorResource(R.color.pending_status_color)
                     } else {
                         MaterialTheme.colorScheme.error
                     },
             )
-            tour.rejectionReason?.let { reason ->
+            tour.status.rejectionReason?.let { reason ->
                 Text(
                     text = stringResource(R.string.rejection_reason_format, reason),
                     style = MaterialTheme.typography.bodySmall,
                     color = colorResource(R.color.text_color),
                 )
             }
-            if (tour.approvalStatus == TourApprovalStatus.REJECTED) {
+            if (tour.status.approvalStatus == TourApprovalStatus.REJECTED) {
                 Row(
                     modifier = Modifier.align(Alignment.End),
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (tour.canArchive) {
+                    if (tour.status.canArchive) {
                         ReviewCardAction(
                             textResId = R.string.archive_tour_draft,
                             icon = TablerIcons.Trash,

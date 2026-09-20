@@ -2,8 +2,8 @@ package com.ahmetkaragunlu.guidemate.profile.presentation.guide.account.about
 
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.location.model.LanguageOption
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeGuideProfileRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -32,12 +32,12 @@ class GuideAboutViewModelTest {
             viewModel.onSaveClick()
             runCurrent()
 
-            assertEquals("City Historian", repository.lastUpdate?.specialtyTitle)
+            assertEquals("City Historian", repository.calls.update?.specialtyTitle)
             assertEquals(
                 "A sufficiently detailed biography for visitors.",
-                repository.lastUpdate?.biography,
+                repository.calls.update?.biography,
             )
-            assertEquals(listOf("tr"), repository.lastUpdate?.languageCodes)
+            assertEquals(listOf("tr"), repository.calls.update?.languageCodes)
             assertTrue(viewModel.uiState.value.saveCompleted)
         }
 }

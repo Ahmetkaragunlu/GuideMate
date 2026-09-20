@@ -92,7 +92,7 @@ class PaymentStatusViewModel
                         if (
                             openHostedIfRequired &&
                                 payment.status == PaymentStatus.REQUIRES_ACTION &&
-                                payment.paymentPageUrl != null
+                                payment.hostedPayment?.pageUrl != null
                         ) {
                             mutableUiState.value =
                                 PaymentStatusUiState(

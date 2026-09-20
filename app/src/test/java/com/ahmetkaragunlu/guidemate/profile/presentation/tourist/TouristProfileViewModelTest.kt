@@ -3,11 +3,11 @@ package com.ahmetkaragunlu.guidemate.profile.presentation.tourist
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserAvatarRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.media.FakeMediaRepository
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeUserAvatarRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeWalletRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import com.ahmetkaragunlu.guidemate.profile.domain.usecase.UpdateUserAvatarUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi

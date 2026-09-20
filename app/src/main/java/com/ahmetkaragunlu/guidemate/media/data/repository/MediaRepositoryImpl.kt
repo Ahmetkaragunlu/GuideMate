@@ -35,12 +35,10 @@ class MediaRepositoryImpl @Inject constructor(
                 return DataResult.Error(exception.error, exception)
             }
 
-        return try {
+        return preparedPart.use { preparedPart ->
             execute {
                 api.upload(file = preparedPart.part, purpose = purpose.name).toMediaResult(purpose)
             }
-        } finally {
-            preparedPart.close()
         }
     }
 

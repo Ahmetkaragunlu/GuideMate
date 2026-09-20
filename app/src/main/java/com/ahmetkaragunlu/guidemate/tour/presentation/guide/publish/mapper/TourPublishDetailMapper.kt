@@ -14,32 +14,32 @@ fun GuideTourPublishUiState.toPreviewDetailUiState(): TourDetailUiState =
     TourDetailUiState(
         tour =
             TourDetailTourUiState(
-                title = tourName,
-                imageResId = previewImageResId,
-                imageUrl = selectedCoverImageUri,
+                title = content.tourName,
+                imageResId = content.previewImageResId,
+                imageUrl = content.selectedCoverImageUri,
                 location = locationDisplay,
-                languagesFlag = spokenLanguages.joinToString(separator = " ") { it.flagEmoji },
-                languagesText = spokenLanguages.joinToString(separator = ", ") { it.shortCode },
-                category = category,
-                description = tourDescription,
+                languagesFlag = content.spokenLanguages.joinToString(separator = " ") { it.flagEmoji },
+                languagesText = content.spokenLanguages.joinToString(separator = ", ") { it.shortCode },
+                category = content.category,
+                description = content.tourDescription,
             ),
         session =
             TourDetailSessionUiState(
                 date =
                     listOfNotNull(
-                        tourDate?.format(localizedDateFormatter()),
-                        startTime?.format(localizedTimeFormatter()),
+                        session.tourDate?.format(localizedDateFormatter()),
+                        session.startTime?.format(localizedTimeFormatter()),
                     ).joinToString(" "),
-                durationMinutes = durationMinutes ?: 0,
-                priceMinor = price.toCurrencyMinorUnitsOrNull() ?: 0,
-                capacity = capacity.toIntOrNull() ?: 0,
-                meetingPoint = meetingPoint,
+                durationMinutes = session.durationMinutes ?: 0,
+                priceMinor = session.price.toCurrencyMinorUnitsOrNull() ?: 0,
+                capacity = session.capacity.toIntOrNull() ?: 0,
+                meetingPoint = session.meetingPoint,
             ),
         guide =
             TourDetailGuideUiState(
-                name = guideName,
-                imageResId = guideImageResId,
-                imageUrl = guideImageUrl,
+                name = guide.name,
+                imageResId = guide.imageResId,
+                imageUrl = guide.imageUrl,
             ),
     )
 

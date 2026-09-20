@@ -11,15 +11,18 @@ import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.OPEN_HOSTED_IF_RE
 import com.ahmetkaragunlu.guidemate.navigation.tourist.payment.PAYMENT_ID_ARGUMENT
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrencies
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutLocale
+import com.ahmetkaragunlu.guidemate.payment.domain.model.HostedPaymentDetails
 import com.ahmetkaragunlu.guidemate.payment.domain.model.Payment
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentChargeDetails
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentPurpose
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentQuote
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservation
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservationStatus
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
 import com.ahmetkaragunlu.guidemate.payment.domain.repository.PaymentRepository
 import com.ahmetkaragunlu.guidemate.payment.presentation.status.model.PaymentUiStatus
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransaction
 import com.ahmetkaragunlu.guidemate.wallet.domain.repository.WalletRepository
@@ -45,7 +48,8 @@ class PaymentStatusViewModelTest {
     @Test
     fun `requires action opens hosted checkout only with backend url`() =
         runTest(mainDispatcherRule.dispatcher) {
-            val repository = FakePaymentRepository(payment(status = PaymentStatus.REQUIRES_ACTION))
+            val repository =
+                FakePaymentRepository(paymentResult(status = PaymentStatus.REQUIRES_ACTION))
             val viewModel = createViewModel(repository, openHostedIfRequired = true)
 
             advanceUntilIdle()
@@ -60,8 +64,8 @@ class PaymentStatusViewModelTest {
         runTest(mainDispatcherRule.dispatcher) {
             val repository =
                 FakePaymentRepository(
-                    payment(status = PaymentStatus.VERIFYING),
-                    payment(
+                    paymentResult(status = PaymentStatus.VERIFYING),
+                    paymentResult(
                         status = PaymentStatus.SUCCEEDED,
                         reservationStatus = PaymentReservationStatus.CONFIRMED,
                     ),
@@ -78,8 +82,8 @@ class PaymentStatusViewModelTest {
 
             assertEquals(PaymentUiStatus.SUCCEEDED, viewModel.uiState.value.payment?.status)
             assertEquals(listOf("payment-1"), repository.clearedPaymentIds)
-            assertEquals(1, notificationRepository.markedRelatedTargets.size)
-            assertEquals("payment-1", notificationRepository.markedRelatedTargets.single().targetId)
+            assertEquals(1, notificationRepository.calls.markedRelatedTargets.size)
+            assertEquals("payment-1", notificationRepository.calls.markedRelatedTargets.single().targetId)
         }
 
     @Test
@@ -108,8 +112,8 @@ class PaymentStatusViewModelTest {
         runTest(mainDispatcherRule.dispatcher) {
             val repository =
                 FakePaymentRepository(
-                    payment(status = PaymentStatus.TIMEOUT),
-                    payment(status = PaymentStatus.TIMEOUT),
+                    paymentResult(status = PaymentStatus.TIMEOUT),
+                    paymentResult(status = PaymentStatus.TIMEOUT),
                 )
             val viewModel = createViewModel(repository)
             advanceUntilIdle()
@@ -124,7 +128,8 @@ class PaymentStatusViewModelTest {
     @Test
     fun `local polling timeout keeps pending payment and retry uses same id`() =
         runTest(mainDispatcherRule.dispatcher) {
-            val repository = FakePaymentRepository(payment(status = PaymentStatus.VERIFYING))
+            val repository =
+                FakePaymentRepository(paymentResult(status = PaymentStatus.VERIFYING))
             val viewModel = createViewModel(repository)
 
             advanceUntilIdle()
@@ -171,27 +176,41 @@ class PaymentStatusViewModelTest {
             status = status,
             amountMinor = 10_000,
             currencyCode = "USD",
-            quoteId = "quote-1",
-            chargeAmountMinor = 325_000,
-            chargeCurrencyCode = "TRY",
-            fxRate = null,
-            fxRateSource = null,
-            fxQuotedAt = null,
-            paymentPageUrl = "https://sandbox.iyzipay.com/checkout",
-            expiresAt = null,
-            reservationId = reservationStatus?.let { "reservation-1" },
-            reservationStatus = reservationStatus,
-            refundId = null,
-            refundStatus = null,
-            refundAmountMinor = null,
-            refundChargeAmountMinor = null,
-            refundChargeCurrencyCode = null,
+            chargeDetails =
+                PaymentChargeDetails(
+                    quoteId = "quote-1",
+                    amountMinor = 325_000,
+                    currencyCode = "TRY",
+                    fxRate = null,
+                    fxRateSource = null,
+                    fxQuotedAt = null,
+                ),
+            hostedPayment =
+                HostedPaymentDetails(
+                    pageUrl = "https://sandbox.iyzipay.com/checkout",
+                    expiresAt = null,
+                ),
+            reservation =
+                reservationStatus?.let {
+                    PaymentReservation(
+                        id = "reservation-1",
+                        status = it,
+                    )
+                },
+            refund = null,
             failureCode = null,
             createdAt = TEST_INSTANT,
             updatedAt = TEST_INSTANT,
         )
 
-    private class FakePaymentRepository(vararg results: Any) : PaymentRepository {
+    private fun paymentResult(
+        status: PaymentStatus,
+        reservationStatus: PaymentReservationStatus? = null,
+    ): DataResult<Payment> = DataResult.Success(payment(status, reservationStatus))
+
+    private class FakePaymentRepository(
+        vararg results: DataResult<Payment>,
+    ) : PaymentRepository {
         private val responses = ArrayDeque(results.toList())
         val clearedPaymentIds = mutableListOf<String>()
         val requestedPaymentIds = mutableListOf<String>()
@@ -199,9 +218,7 @@ class PaymentStatusViewModelTest {
 
         override suspend fun getPayment(paymentId: String): DataResult<Payment> {
             requestedPaymentIds += paymentId
-            val next = if (responses.size > 1) responses.removeFirst() else responses.first()
-            @Suppress("UNCHECKED_CAST") return next as? DataResult<Payment>
-                ?: DataResult.Success(next as Payment)
+            return if (responses.size > 1) responses.removeFirst() else responses.first()
         }
 
         override suspend fun clearPendingPayment(paymentId: String) {

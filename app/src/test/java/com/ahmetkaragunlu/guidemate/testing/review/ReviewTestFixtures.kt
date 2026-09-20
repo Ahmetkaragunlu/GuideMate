@@ -1,14 +1,20 @@
-package com.ahmetkaragunlu.guidemate.testing
+package com.ahmetkaragunlu.guidemate.testing.review
 
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.review.domain.model.ReviewSubmissionInput
 import com.ahmetkaragunlu.guidemate.review.domain.model.SubmittedReview
 import com.ahmetkaragunlu.guidemate.review.domain.repository.ReviewRepository
+import com.ahmetkaragunlu.guidemate.testing.common.emptyPage
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReview
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+
+data class ReviewSubmissionCall(
+    val reservationId: String,
+    val input: ReviewSubmissionInput,
+)
 
 class FakeReviewRepository : ReviewRepository {
     val reviewChangeEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -17,7 +23,7 @@ class FakeReviewRepository : ReviewRepository {
     var reviewsResult: DataResult<PagedResult<TourReview>> = DataResult.Success(emptyPage())
     val reviewsResults = ArrayDeque<DataResult<PagedResult<TourReview>>>()
     val tourReviewRequests = mutableListOf<String>()
-    var submittedReview: Pair<String, ReviewSubmissionInput>? = null
+    var submittedReview: ReviewSubmissionCall? = null
     var ownedTourReviewsRequested = false
 
     fun publishReviewChange() {
@@ -28,7 +34,7 @@ class FakeReviewRepository : ReviewRepository {
         reservationId: String,
         input: ReviewSubmissionInput,
     ): DataResult<SubmittedReview> {
-        submittedReview = reservationId to input
+        submittedReview = ReviewSubmissionCall(reservationId = reservationId, input = input)
         return submitResult
     }
 

@@ -18,11 +18,11 @@ fun TourWithSession.toTourDetailUiState(): TourDetailUiState =
                 id = tour.id,
                 title = tour.title,
                 imageResId = R.drawable.ic_image_unavailable,
-                imageUrl = tour.coverImageUrl,
-                rating = tour.averageRating,
-                reviewCount = tour.reviewCount,
+                imageUrl = tour.cover?.imageUrl,
+                rating = tour.reviews.averageRating,
+                reviewCount = tour.reviews.reviewCount,
                 location =
-                    listOf(tour.city, tour.country)
+                    listOf(tour.location.city, tour.location.country)
                         .filter(String::isNotBlank)
                         .joinToString(", "),
                 languagesFlag = tour.languages.joinToString(separator = " ") { it.flagEmoji },
@@ -33,7 +33,7 @@ fun TourWithSession.toTourDetailUiState(): TourDetailUiState =
         session =
             TourDetailSessionUiState(
                 sessionId = session.id,
-                date = session.startsAt.formatTourDateTime(tour.timeZoneId),
+                date = session.startsAt.formatTourDateTime(tour.location.timeZoneId),
                 durationMinutes = session.durationMinutes,
                 priceMinor = session.priceMinor,
                 bookedCount = session.bookedCount,
@@ -56,7 +56,7 @@ fun TourWithSession.toTourDetailUiState(): TourDetailUiState =
                 imageUrl = tour.guide.profileImageUrl,
             ),
         reviews =
-            tour.recentReviews.map { review ->
+            tour.reviews.recentReviews.map { review ->
                 TourDetailReviewUiModel(
                     id = review.id,
                     reviewerName = review.reviewerName,

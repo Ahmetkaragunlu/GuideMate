@@ -11,28 +11,29 @@ import java.time.ZoneId
 internal fun GuideTourPublishUiState.toCreateInputOrNull(
     coverMediaId: String?,
 ): CreateGuideTourInput? {
+
     if (firstValidationError() != null) return null
-    val selectedCategory = category ?: return null
+    val selectedCategory = content.category ?: return null
     val startsAt = toStartInstant() ?: return null
-    val duration = durationMinutes ?: return null
-    val amount = price.toCurrencyMinorUnitsOrNull() ?: return null
-    val participantCapacity = capacity.toIntOrNull() ?: return null
+    val duration = session.durationMinutes ?: return null
+    val amount = session.price.toCurrencyMinorUnitsOrNull() ?: return null
+    val participantCapacity = session.capacity.toIntOrNull() ?: return null
     return CreateGuideTourInput(
         content =
             TourContentInput(
-                title = tourName.trim(),
-                description = tourDescription.trim(),
-                countryCode = countryCode,
-                cityPlaceId = cityPlaceId,
-                cityName = city,
-                timeZoneId = timeZoneId,
+                title = content.tourName.trim(),
+                description = content.tourDescription.trim(),
+                countryCode = location.countryCode,
+                cityPlaceId = location.cityPlaceId,
+                cityName = location.city,
+                timeZoneId = location.timeZoneId,
                 category = selectedCategory,
-                languageCodes = spokenLanguages.map { it.code },
+                languageCodes = content.spokenLanguages.map { it.code },
                 coverMediaId = coverMediaId.orEmpty(),
             ),
         session =
             TourSessionInput(
-                meetingPoint = meetingPoint.trim(),
+                meetingPoint = session.meetingPoint.trim(),
                 startsAt = startsAt,
                 durationMinutes = duration,
                 priceMinor = amount,
@@ -42,9 +43,11 @@ internal fun GuideTourPublishUiState.toCreateInputOrNull(
 }
 
 internal fun GuideTourPublishUiState.toStartInstant(): Instant? {
-    val date = tourDate ?: return null
-    val time = startTime ?: return null
-    return runCatching { date.atTime(time).atZone(timeZoneId.toZoneId()).toInstant() }.getOrNull()
+    val date = session.tourDate ?: return null
+    val time = session.startTime ?: return null
+    return runCatching {
+        date.atTime(time).atZone(location.timeZoneId.toZoneId()).toInstant()
+    }.getOrNull()
 }
 
 internal fun String.toZoneId(): ZoneId =

@@ -55,6 +55,10 @@ fun GuideTourEditContent(
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val identity = uiState.identity
+    val content = uiState.content
+    val session = uiState.session
+    val operation = uiState.operation
     Column(
         modifier =
             modifier
@@ -73,31 +77,31 @@ fun GuideTourEditContent(
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             TourEditField(
                 labelResId = R.string.guide_tour_publish_step3_name_label,
-                value = uiState.title,
+                value = content.title,
                 onValueChange = onTitleChange,
                 placeholderResId = R.string.guide_tour_publish_step3_name_placeholder,
             )
             TourEditMultilineField(
                 labelResId = R.string.guide_tour_publish_step3_description_label,
-                value = uiState.description,
+                value = content.description,
                 onValueChange = onDescriptionChange,
                 placeholderResId = R.string.guide_tour_publish_step3_description_placeholder,
                 height = 170.dp,
             )
             TourMediaEditor(
-                uiState = uiState,
+                content = content,
                 onChangePhotos = onChangePhotos,
             )
             TourEditDropdownField(
                 labelResId = R.string.guide_tour_publish_step1_location_label,
-                value = listOf(uiState.country, uiState.location).joinToString(", "),
+                value = listOf(identity.country, identity.location).joinToString(", "),
                 placeholderResId = R.string.guide_tour_publish_step1_location_label,
                 leadingText = "🌍",
             )
             TourEditDropdownField(
                 labelResId = R.string.guide_tour_publish_step2_category_label,
                 value =
-                    uiState.category
+                    content.category
                         ?.let(TourCategoryCatalog::uiModelFor)
                         ?.let { stringResource(it.titleResId) }
                         .orEmpty(),
@@ -105,7 +109,7 @@ fun GuideTourEditContent(
                 leadingText = "🏷️",
                 onClick = onCategoryClick,
             )
-            if (uiState.isTourIdentityLocked) {
+            if (identity.isTourIdentityLocked) {
                 Text(
                     text = stringResource(R.string.published_tour_identity_edit_lock),
                     style = MaterialTheme.typography.bodySmall,
@@ -113,23 +117,23 @@ fun GuideTourEditContent(
                 )
             }
             GuideTourLanguageSelector(
-                languages = uiState.languages,
+                languages = content.languages,
                 onRemoveLanguage = onRemoveLanguage,
                 onAddLanguage = onAddLanguage,
             )
             val tourZone =
-                remember(uiState.timeZoneId) {
-                    runCatching { ZoneId.of(uiState.timeZoneId) }
+                remember(identity.timeZoneId) {
+                    runCatching { ZoneId.of(identity.timeZoneId) }
                         .getOrDefault(ZoneId.systemDefault())
                 }
             val today = LocalDate.now(tourZone)
             EditDatePickerField(
                 labelResId = R.string.guide_tour_publish_step1_date_label,
                 placeholderResId = R.string.select_tour_date,
-                selectedDate = uiState.tourDate,
+                selectedDate = session.tourDate,
                 minimumDate = today,
                 onDateSelected = onDateSelected,
-                enabled = !uiState.hasBookings,
+                enabled = !session.hasBookings,
                 leadingIcon = { Text(text = "🗓️") },
                 trailingIcon = {
                     Icon(
@@ -143,33 +147,33 @@ fun GuideTourEditContent(
             EditTimePickerField(
                 labelResId = R.string.guide_tour_publish_step1_time_label,
                 placeholderResId = R.string.select_tour_time,
-                selectedTime = uiState.startTime,
+                selectedTime = session.startTime,
                 initialTime = LocalTime.now(tourZone),
                 onTimeSelected = onStartTimeSelected,
-                enabled = !uiState.hasBookings,
+                enabled = !session.hasBookings,
                 isTimeSelectable = { selectedTime ->
-                    uiState.tourDate != today || selectedTime.isAfter(LocalTime.now(tourZone))
+                    session.tourDate != today || selectedTime.isAfter(LocalTime.now(tourZone))
                 },
                 leadingIcon = { Text(text = "🕘") },
                 modifier = Modifier.fillMaxWidth(),
             )
             TourEditField(
                 labelResId = R.string.guide_tour_publish_step1_duration_label,
-                value = uiState.durationMinutes,
+                value = session.durationMinutes,
                 onValueChange = onDurationChange,
-                enabled = !uiState.hasBookings,
+                enabled = !session.hasBookings,
                 leadingText = "⏱️",
                 keyboardType = KeyboardType.Number,
             )
             TourEditMultilineField(
                 labelResId = R.string.guide_tour_publish_step3_meeting_label,
-                value = uiState.meetingPoint,
+                value = session.meetingPoint,
                 onValueChange = onMeetingPointChange,
                 placeholderResId = R.string.guide_tour_publish_step3_meeting_placeholder,
-                enabled = !uiState.hasBookings,
+                enabled = !session.hasBookings,
                 height = 130.dp,
             )
-            if (uiState.hasBookings) {
+            if (session.hasBookings) {
                 Text(
                     text = stringResource(R.string.active_booking_edit_lock),
                     style = MaterialTheme.typography.bodySmall,
@@ -178,19 +182,19 @@ fun GuideTourEditContent(
             }
             TourEditNumericField(
                 labelResId = R.string.guide_tour_publish_step2_price_label,
-                value = uiState.price,
+                value = session.price,
                 onValueChange = onPriceChange,
                 leadingText = platformCurrencySymbol(),
                 useBrandTextColor = true,
             )
             TourEditNumericField(
                 labelResId = R.string.guide_tour_publish_step2_capacity_label,
-                value = uiState.capacity,
+                value = session.capacity,
                 onValueChange = onCapacityChange,
                 leadingText = "👥",
                 useBrandTextColor = false,
             )
-            uiState.errorResId?.let { errorResId ->
+            operation.errorResId?.let { errorResId ->
                 Text(
                     text = stringResource(errorResId),
                     style = MaterialTheme.typography.bodySmall,
@@ -200,13 +204,13 @@ fun GuideTourEditContent(
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             EditButton(
                 text =
-                    if (uiState.approvalStatus == TourApprovalStatus.REJECTED) {
+                    if (operation.approvalStatus == TourApprovalStatus.REJECTED) {
                         R.string.resubmit_for_review
                     } else {
                         R.string.save_changes
                     },
                 onClick = onSave,
-                isLoading = uiState.isSaving,
+                isLoading = operation.isSaving,
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
         }

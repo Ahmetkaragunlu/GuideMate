@@ -3,7 +3,14 @@ package com.ahmetkaragunlu.guidemate.reservation.presentation.mapper
 import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationActor
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationDetails
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationPolicy
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationLocationSnapshot
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationPurchaseDetails
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRatingSummary
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationAttendance
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
+import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationScheduleSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservation
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationSnapshot
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
@@ -28,13 +35,13 @@ class TouristReservationMapperTest {
         assertEquals(trip.imageUrl, detail.tour.imageUrl)
         assertEquals(trip.category, detail.tour.category)
         assertEquals(trip.languagesText, detail.tour.languagesText)
-        assertEquals(reservation.unitPriceMinor, detail.session.priceMinor)
-        assertEquals(reservation.totalPriceMinor, trip.totalPriceMinor)
+        assertEquals(reservation.purchase.unitPriceMinor, detail.session.priceMinor)
+        assertEquals(reservation.purchase.totalPriceMinor, trip.totalPriceMinor)
         assertEquals(null, detail.session.reservedParticipantCount)
-        assertEquals(reservation.averageRating, detail.tour.rating ?: 0.0, 0.0)
-        assertEquals(reservation.reviewCount, detail.tour.reviewCount)
-        assertEquals(reservation.bookedCount, detail.session.bookedCount)
-        assertEquals(reservation.capacity, detail.session.capacity)
+        assertEquals(reservation.rating.averageRating, detail.tour.rating ?: 0.0, 0.0)
+        assertEquals(reservation.rating.reviewCount, detail.tour.reviewCount)
+        assertEquals(reservation.attendance.bookedCount, detail.session.bookedCount)
+        assertEquals(reservation.attendance.capacity, detail.session.capacity)
         assertEquals(reservation.snapshot.guide.id, detail.guide.id)
     }
 
@@ -43,9 +50,12 @@ class TouristReservationMapperTest {
         val reservation =
             reservation().copy(
                 status = TouristReservationStatus.CANCELLED,
-                cancellationActor = ReservationCancellationActor.GUIDE,
-                cancellationReason = "Olumsuz hava koşulları",
-                refundEligibility = ReservationRefundEligibility.FULL_REFUND,
+                cancellation =
+                    reservation().cancellation.copy(
+                        actor = ReservationCancellationActor.GUIDE,
+                        reason = "Olumsuz hava koşulları",
+                        refundEligibility = ReservationRefundEligibility.FULL_REFUND,
+                    ),
             )
 
         val trip = reservation.toTripUiModel()
@@ -61,7 +71,7 @@ class TouristReservationMapperTest {
             reservation()
                 .copy(
                     status = TouristReservationStatus.CANCELLED,
-                    cancellationActor = ReservationCancellationActor.TOURIST,
+                    cancellation = reservation().cancellation.copy(actor = ReservationCancellationActor.TOURIST),
                 ).toTripUiModel()
 
         assertEquals(R.string.reservation_cancelled_success, trip.cancellationTitleResId)
@@ -75,7 +85,7 @@ class TouristReservationMapperTest {
 
         assertEquals(TourDetailStatus.COMPLETED, detail.session.status)
         assertEquals(reservation.snapshot.title, detail.tour.title)
-        assertEquals(reservation.snapshot.meetingPoint, detail.session.meetingPoint)
+        assertEquals(reservation.snapshot.schedule.meetingPoint, detail.session.meetingPoint)
     }
 
     private fun reservation(): TouristReservation =
@@ -83,17 +93,24 @@ class TouristReservationMapperTest {
             id = "reservation-1",
             tourSessionId = "session-1",
             version = 2,
-            participantCount = 2,
-            unitPriceMinor = 10_000,
-            totalPriceMinor = 20_000,
-            currencyCode = "USD",
+            purchase =
+                ReservationPurchaseDetails(
+                    participantCount = 2,
+                    unitPriceMinor = 10_000,
+                    totalPriceMinor = 20_000,
+                    currencyCode = "USD",
+                ),
             status = TouristReservationStatus.CONFIRMED,
-            cancellationPolicyCode = "FULL_REFUND_48_HOURS",
-            cancellationPolicyVersion = 1,
-            averageRating = 4.7,
-            reviewCount = 12,
-            bookedCount = 5,
-            capacity = 8,
+            cancellation =
+                ReservationCancellationDetails(
+                    actor = null,
+                    reason = null,
+                    cancelledAt = null,
+                    refundEligibility = ReservationRefundEligibility.NOT_APPLICABLE,
+                    policy = ReservationCancellationPolicy("FULL_REFUND_48_HOURS", 1),
+                ),
+            rating = ReservationRatingSummary(averageRating = 4.7, reviewCount = 12),
+            attendance = ReservationAttendance(bookedCount = 5, capacity = 8),
             snapshot =
                 TouristReservationSnapshot(
                     tourId = "tour-1",
@@ -104,19 +121,23 @@ class TouristReservationMapperTest {
                         ),
                     title = "Kapadokya Turu",
                     description = "Tur açıklaması",
-                    countryCode = "TR",
-                    country = "Türkiye",
-                    cityPlaceId = "city-1",
-                    city = "Nevşehir",
-                    timeZoneId = "Europe/Istanbul",
+                    location =
+                        ReservationLocationSnapshot(
+                            countryCode = "TR",
+                            country = "Türkiye",
+                            cityPlaceId = "city-1",
+                            city = "Nevşehir",
+                            timeZoneId = "Europe/Istanbul",
+                        ),
                     category = TourCategory.CULTURE,
                     languages = listOf(TourLanguage("tr", "🇹🇷", "Türkçe", "TR")),
-                    coverMediaId = null,
-                    coverImageUrl = null,
-                    startsAt = Instant.parse("2027-05-24T06:00:00Z"),
-                    durationMinutes = 180,
-                    meetingPoint = "Göreme merkez",
-                    unitPriceMinor = 10_000,
+                    cover = null,
+                    schedule =
+                        ReservationScheduleSnapshot(
+                            startsAt = Instant.parse("2027-05-24T06:00:00Z"),
+                            durationMinutes = 180,
+                            meetingPoint = "Göreme merkez",
+                        ),
                 ),
         )
 }

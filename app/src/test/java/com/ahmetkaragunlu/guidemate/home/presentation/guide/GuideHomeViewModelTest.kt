@@ -5,9 +5,9 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.tour.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
@@ -25,8 +25,8 @@ class GuideHomeViewModelTest {
         runTest {
             val tourRepository =
                 FakeGuideTourRepository().apply {
-                    dashboardResults += DataResult.Success(dashboard(active = 0, pending = 1))
-                    dashboardResults += DataResult.Success(dashboard(active = 1, pending = 0))
+                    results.dashboards += DataResult.Success(dashboard(active = 0, pending = 1))
+                    results.dashboards += DataResult.Success(dashboard(active = 1, pending = 0))
                 }
             val notificationRepository = FakeNotificationRepository()
             val viewModel =
@@ -37,7 +37,7 @@ class GuideHomeViewModelTest {
                 )
             runCurrent()
 
-            notificationRepository.pushEventState.emit(
+            notificationRepository.state.pushEvents.emit(
                 NotificationNavigationTarget(
                     notificationId = "notification-1",
                     type = NotificationType.TOUR_APPROVED,
@@ -46,7 +46,7 @@ class GuideHomeViewModelTest {
             )
             runCurrent()
 
-            assertEquals(2, tourRepository.dashboardRequests)
+            assertEquals(2, tourRepository.calls.dashboardRequests)
             assertEquals(1L, viewModel.uiState.value.activeCount)
             assertEquals(0L, viewModel.uiState.value.pendingCount)
         }

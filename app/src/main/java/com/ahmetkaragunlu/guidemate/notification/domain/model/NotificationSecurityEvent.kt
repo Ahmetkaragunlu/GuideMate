@@ -5,9 +5,4 @@ enum class NotificationSecurityEvent {
     PASSWORD_RESET,
     UNKNOWN,
     ;
-
-    companion object {
-        fun fromApiValue(value: String?): NotificationSecurityEvent =
-            entries.firstOrNull { it.name == value?.trim()?.uppercase() } ?: UNKNOWN
-    }
 }

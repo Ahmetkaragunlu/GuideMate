@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.notification.domain.model
 
 enum class NotificationType {
+    // Tour, reservation, and review lifecycle
     TOUR_APPROVED,
     TOUR_REJECTED,
     TOUR_CHANGE_APPROVED,
@@ -13,6 +14,8 @@ enum class NotificationType {
     REVIEW_REQUEST,
     RATING_RECEIVED,
     COMMENT_RECEIVED,
+
+    // Payments, refunds, and guide earnings
     PAYMENT_SUCCEEDED,
     PAYMENT_FAILED,
     REFUND_REQUESTED,
@@ -21,14 +24,12 @@ enum class NotificationType {
     REFUND_MANUAL_REVIEW,
     EARNING_AVAILABLE,
     WITHDRAWAL_COMPLETED,
+
+    // Communication, reminders, and security
     CHAT_MESSAGE,
     UPCOMING_TOUR_REMINDER,
     SECURITY_ALERT,
+
     UNKNOWN,
     ;
-
-    companion object {
-        fun fromApiValue(value: String?): NotificationType =
-            entries.firstOrNull { it.name == value } ?: UNKNOWN
-    }
 }

@@ -6,10 +6,10 @@ import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.testTourDetails
+import com.ahmetkaragunlu.guidemate.testing.tour.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.media.FakeMediaRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.tour.testTourDetails
 import com.ahmetkaragunlu.guidemate.tour.domain.usecase.SubmitGuideTourContentChangeUseCase
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,12 +36,15 @@ class GuideTourEditViewModelTest {
             val viewModel = createViewModel(repository)
             runCurrent()
 
-            assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.loadState)
+            assertEquals(ContentLoadState.CONTENT, viewModel.uiState.value.operation.loadState)
             viewModel.saveChanges()
 
-            assertEquals(R.string.error_tour_edit_no_changes, viewModel.uiState.value.errorResId)
-            assertNull(repository.submitChangeInput)
-            assertNull(repository.updateSessionInput)
+            assertEquals(
+                R.string.error_tour_edit_no_changes,
+                viewModel.uiState.value.operation.errorResId,
+            )
+            assertNull(repository.calls.submitChange)
+            assertNull(repository.calls.updateSession)
         }
 
     @Test
@@ -52,16 +55,16 @@ class GuideTourEditViewModelTest {
             runCurrent()
 
             viewModel.onTitleChange("Updated city walk")
-            assertTrue(viewModel.uiState.value.hasUnsavedChanges)
-            assertTrue(viewModel.uiState.value.requiresReviewConfirmation)
+            assertTrue(viewModel.uiState.value.operation.hasUnsavedChanges)
+            assertTrue(viewModel.uiState.value.operation.requiresReviewConfirmation)
 
             viewModel.saveChanges()
             runCurrent()
 
-            assertEquals("Updated city walk", repository.submitChangeInput?.content?.title)
-            assertNull(repository.updateSessionInput)
-            assertEquals(GuideTourTab.REVIEW, viewModel.uiState.value.savedTargetTab)
-            assertFalse(viewModel.uiState.value.hasUnsavedChanges)
+            assertEquals("Updated city walk", repository.calls.submitChange?.content?.title)
+            assertNull(repository.calls.updateSession)
+            assertEquals(GuideTourTab.REVIEW, viewModel.uiState.value.operation.savedTargetTab)
+            assertFalse(viewModel.uiState.value.operation.hasUnsavedChanges)
         }
 
     @Test
@@ -69,7 +72,7 @@ class GuideTourEditViewModelTest {
         runTest {
             val repository =
                 FakeGuideTourRepository().apply {
-                    updateSessionResult = DataResult.Error(AppError.NoInternet)
+                    results.updateSession = DataResult.Error(AppError.NoInternet)
                 }
             val viewModel = createViewModel(repository)
             runCurrent()
@@ -79,20 +82,20 @@ class GuideTourEditViewModelTest {
             viewModel.saveChanges()
             runCurrent()
 
-            assertEquals(1, repository.submitChangeInputs.size)
-            assertEquals(1, repository.updateSessionInputs.size)
-            assertTrue(viewModel.uiState.value.contentReviewSubmitted)
-            assertFalse(viewModel.uiState.value.isSaving)
+            assertEquals(1, repository.calls.submitChangeInputs.size)
+            assertEquals(1, repository.calls.updateSessionInputs.size)
+            assertTrue(viewModel.uiState.value.operation.contentReviewSubmitted)
+            assertFalse(viewModel.uiState.value.operation.isSaving)
 
-            repository.updateSessionResult =
+            repository.results.updateSession =
                 DataResult.Success(testTourDetails().sessions.first().copy(version = 6))
             viewModel.saveChanges()
             runCurrent()
 
-            assertEquals(1, repository.submitChangeInputs.size)
-            assertEquals(2, repository.updateSessionInputs.size)
-            assertEquals(GuideTourTab.REVIEW, viewModel.uiState.value.savedTargetTab)
-            assertFalse(viewModel.uiState.value.hasUnsavedChanges)
+            assertEquals(1, repository.calls.submitChangeInputs.size)
+            assertEquals(2, repository.calls.updateSessionInputs.size)
+            assertEquals(GuideTourTab.REVIEW, viewModel.uiState.value.operation.savedTargetTab)
+            assertFalse(viewModel.uiState.value.operation.hasUnsavedChanges)
         }
 
     private fun createViewModel(repository: FakeGuideTourRepository) =

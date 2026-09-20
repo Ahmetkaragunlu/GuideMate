@@ -9,7 +9,6 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.common.ui.error.toMessage
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.isValidCurrencyInput
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyInput
-import com.ahmetkaragunlu.guidemate.common.ui.formatting.toCurrencyMinorUnitsOrNull
 import com.ahmetkaragunlu.guidemate.common.ui.resource.ResourceProvider
 import com.ahmetkaragunlu.guidemate.common.ui.state.ContentLoadState
 import com.ahmetkaragunlu.guidemate.navigation.guide.tours.GuideTourDestination
@@ -20,16 +19,15 @@ import com.ahmetkaragunlu.guidemate.review.domain.repository.ReviewRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
-import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.mapper.toTourDetailUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailMode
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.detail.mapper.toTourSessionInputOrNull
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.detail.model.GuideTourDetailActionUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.detail.model.GuideTourDetailScreenState
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.detail.model.NewTourSessionFormState
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -88,7 +86,7 @@ class GuideTourDetailViewModel
                                     detail = tourWithReviews.toTourDetailUiState(),
                                     mode =
                                         when {
-                                            result.data.tour.approvalStatus !=
+                                            result.data.tour.publication.approvalStatus !=
                                                 TourApprovalStatus.APPROVED ->
                                                 TourDetailMode.GUIDE_REVIEW
                                             session.status.isTerminal ->
@@ -127,7 +125,13 @@ class GuideTourDetailViewModel
                         size = REVIEW_PREVIEW_SIZE,
                     )
             ) {
-                is DataResult.Success -> copy(tour = tour.copy(recentReviews = result.data.items))
+                is DataResult.Success ->
+                    copy(
+                        tour =
+                            tour.copy(
+                                reviews = tour.reviews.copy(recentReviews = result.data.items),
+                            ),
+                    )
                 is DataResult.Error -> this
             }
 
@@ -201,7 +205,7 @@ class GuideTourDetailViewModel
                             isNewSessionSheetVisible = true,
                             newSessionForm =
                                 NewTourSessionFormState(
-                                    timeZoneId = current.tour.timeZoneId,
+                                    timeZoneId = current.tour.location.timeZoneId,
                                     durationMinutes = session.durationMinutes,
                                     meetingPoint = session.meetingPoint,
                                     price = session.priceMinor.toCurrencyInput(),
@@ -257,27 +261,11 @@ class GuideTourDetailViewModel
 
         fun addNewSession() {
             val form = _uiState.value.action.newSessionForm
-            if (!form.canSubmit || _uiState.value.action.isSubmitting) {
+            val input = form.toTourSessionInputOrNull()
+            if (input == null || _uiState.value.action.isSubmitting) {
                 showNewSessionError()
                 return
             }
-            val selectedDate = form.selectedDate ?: return showNewSessionError()
-            val selectedTime = form.selectedTime ?: return showNewSessionError()
-            val startsAt =
-                runCatching {
-                    selectedDate
-                        .atTime(selectedTime)
-                        .atZone(ZoneId.of(form.timeZoneId))
-                        .toInstant()
-                }.getOrNull() ?: return showNewSessionError()
-            val input =
-                TourSessionInput(
-                    meetingPoint = form.meetingPoint.trim(),
-                    startsAt = startsAt,
-                    durationMinutes = form.durationMinutes ?: return showNewSessionError(),
-                    priceMinor = form.price.toCurrencyMinorUnitsOrNull() ?: return showNewSessionError(),
-                    capacity = form.capacity.toIntOrNull() ?: return showNewSessionError(),
-                )
             setSubmitting(true)
             viewModelScope.launch {
                 when (val result = repository.addSession(route.tourId, input)) {

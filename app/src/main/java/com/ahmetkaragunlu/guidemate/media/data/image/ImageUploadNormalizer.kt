@@ -23,6 +23,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.max
+import androidx.core.graphics.scale
+import androidx.core.graphics.createBitmap
 
 private const val NORMALIZED_IMAGE_DIRECTORY = "normalized_uploads"
 
@@ -187,18 +189,16 @@ private fun Bitmap.scaleToUploadBounds(): Bitmap {
     if (longestEdge <= MAX_IMAGE_UPLOAD_DIMENSION_PX) return this
 
     val scale = MAX_IMAGE_UPLOAD_DIMENSION_PX.toFloat() / longestEdge
-    return Bitmap.createScaledBitmap(
-        this,
+    return this.scale(
         (width * scale).toInt().coerceAtLeast(1),
         (height * scale).toInt().coerceAtLeast(1),
-        true,
     )
 }
 
 private fun Bitmap.toOpaqueBitmap(): Bitmap {
     if (!hasAlpha()) return this
 
-    return Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { output ->
+    return createBitmap(width, height).also { output ->
         Canvas(output).apply {
             drawColor(Color.WHITE)
             drawBitmap(this@toOpaqueBitmap, 0f, 0f, null)

@@ -16,6 +16,7 @@ import com.ahmetkaragunlu.guidemate.payment.presentation.currency.preferredCharg
 import com.ahmetkaragunlu.guidemate.payment.presentation.locale.currentCheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.presentation.model.PaymentLaunch
 import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.checkoutErrorResId
+import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.TourCheckoutSummaryUiState
 import com.ahmetkaragunlu.guidemate.reservation.presentation.checkout.model.TourCheckoutUiState
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.TourWithSession
 import com.ahmetkaragunlu.guidemate.tour.domain.model.catalog.resolveBookingAvailability
@@ -31,10 +32,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -50,8 +49,8 @@ class TourCheckoutViewModel
     ) : ViewModel() {
         private val sessionId =
             savedStateHandle.toRoute<TouristPaymentDestination.Checkout>().sessionId
-        private val currentTour = MutableStateFlow<TourWithSession?>(null)
-        private val actionState = MutableStateFlow(TourCheckoutUiState(sessionId = sessionId))
+        private var currentTour: TourWithSession? = null
+        private val mutableUiState = MutableStateFlow(TourCheckoutUiState())
         private var loadJob: Job? = null
         private var paymentJob: Job? = null
         private var checkoutIdempotencyKey: String?
@@ -60,28 +59,7 @@ class TourCheckoutViewModel
                 savedStateHandle[CHECKOUT_IDEMPOTENCY_KEY] = value
             }
 
-        val uiState: StateFlow<TourCheckoutUiState> =
-            combine(currentTour, actionState) { tourWithSession, action ->
-                val detail = tourWithSession?.toTourDetailUiState()
-                val availableCapacity = tourWithSession?.session?.availableCapacity ?: 0
-
-                action.copy(
-                    tourTitle = detail?.tour?.title.orEmpty(),
-                    date = detail?.session?.date.orEmpty(),
-                    location = detail?.tour?.location.orEmpty(),
-                    unitPriceMinor = detail?.session?.priceMinor ?: 0,
-                    participantCount =
-                        action.participantCount.coerceIn(
-                            minimumValue = 1,
-                            maximumValue = availableCapacity.coerceAtLeast(1),
-                        ),
-                    availableCapacity = availableCapacity,
-                )
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = actionState.value,
-            )
+        val uiState: StateFlow<TourCheckoutUiState> = mutableUiState.asStateFlow()
 
         init {
             refreshTour()
@@ -91,7 +69,7 @@ class TourCheckoutViewModel
             if (loadJob?.isActive == true) return
             loadJob =
                 viewModelScope.launch {
-                    actionState.update { it.copy(loadState = ContentLoadState.LOADING) }
+                    mutableUiState.update { it.copy(loadState = ContentLoadState.LOADING) }
                     val tour = tourRepository.getSession(sessionId)
                     val wallet = walletRepository.getWallet()
                     val currencies = paymentRepository.getCheckoutCurrencies()
@@ -100,106 +78,153 @@ class TourCheckoutViewModel
                             wallet !is DataResult.Success ||
                             currencies !is DataResult.Success
                     ) {
-                        currentTour.value = null
-                        actionState.update { it.copy(loadState = ContentLoadState.ERROR) }
+                        currentTour = null
+                        mutableUiState.update {
+                            it.copy(
+                                loadState = ContentLoadState.ERROR,
+                                summary = TourCheckoutSummaryUiState(),
+                                participantCount = 1,
+                            )
+                        }
                         return@launch
                     }
 
-                    currentTour.value = tour.data
-                    actionState.update { current ->
+                    currentTour = tour.data
+                    val detail = tour.data.toTourDetailUiState()
+                    val availableCapacity = tour.data.session.availableCapacity
+                    mutableUiState.update { current ->
                         current.copy(
                             loadState = ContentLoadState.CONTENT,
-                            walletBalanceMinor = wallet.data.balanceMinor,
-                            walletCurrencyCode = wallet.data.currencyCode,
-                            chargeCurrencies = currencies.data.chargeCurrencies,
-                            selectedChargeCurrencyCode =
-                                current.selectedChargeCurrencyCode
+                            summary =
+                                current.summary.copy(
+                                    tourTitle = detail.tour.title,
+                                    date = detail.session.date,
+                                    location = detail.tour.location,
+                                    unitPriceMinor = detail.session.priceMinor,
+                                    availableCapacity = availableCapacity,
+                                ),
+                            participantCount =
+                                current.participantCount.coerceIn(
+                                    minimumValue = 1,
+                                    maximumValue = availableCapacity.coerceAtLeast(1),
+                                ),
+                            wallet =
+                                current.wallet.copy(
+                                    balanceMinor = wallet.data.balanceMinor,
+                                    currencyCode = wallet.data.currencyCode,
+                                ),
+                            payment =
+                                current.payment.copy(
+                                    chargeCurrencies = currencies.data.chargeCurrencies,
+                                    selectedChargeCurrencyCode =
+                                        current.payment.selectedChargeCurrencyCode
                                     ?.takeIf { code ->
                                         currencies.data.chargeCurrencies.any {
                                             it.currencyCode == code
                                         }
                                     } ?: currencies.data.preferredChargeCurrencyCode(),
+                                ),
                         )
                     }
                 }
         }
 
         fun decreaseParticipantCount() {
-            actionState.update { current ->
+            mutableUiState.update { current ->
                 current.copy(
                     participantCount = (current.participantCount - 1).coerceAtLeast(1),
-                    quote = null,
-                    validationErrorResId = null,
-                    paymentActionError = null,
+                    payment = current.payment.copy(quote = null),
+                    submission =
+                        current.submission.copy(
+                            validationErrorResId = null,
+                            paymentActionError = null,
+                        ),
                 )
             }
             checkoutIdempotencyKey = null
         }
 
         fun increaseParticipantCount() {
-            actionState.update { current ->
+            mutableUiState.update { current ->
                 current.copy(
                     participantCount =
                         (current.participantCount + 1).coerceAtMost(
-                            uiState.value.availableCapacity.coerceAtLeast(1),
+                            uiState.value.summary.availableCapacity.coerceAtLeast(1),
                         ),
-                    quote = null,
-                    validationErrorResId = null,
-                    paymentActionError = null,
+                    payment = current.payment.copy(quote = null),
+                    submission =
+                        current.submission.copy(
+                            validationErrorResId = null,
+                            paymentActionError = null,
+                        ),
                 )
             }
             checkoutIdempotencyKey = null
         }
 
         fun onPaymentMethodSelected(method: PaymentMethod) {
-            actionState.update {
+            mutableUiState.update {
                 it.copy(
-                    selectedMethod = method,
-                    quote = null,
-                    validationErrorResId = null,
-                    paymentActionError = null,
+                    payment = it.payment.copy(selectedMethod = method, quote = null),
+                    submission =
+                        it.submission.copy(
+                            validationErrorResId = null,
+                            paymentActionError = null,
+                        ),
                 )
             }
             checkoutIdempotencyKey = null
         }
 
         fun onChargeCurrencySelected(currencyCode: String) {
-            if (currencyCode == actionState.value.selectedChargeCurrencyCode) return
-            actionState.update {
+            if (currencyCode == mutableUiState.value.payment.selectedChargeCurrencyCode) return
+            mutableUiState.update {
                 it.copy(
-                    selectedChargeCurrencyCode = currencyCode,
-                    quote = null,
-                    paymentActionError = null,
+                    payment =
+                        it.payment.copy(
+                            selectedChargeCurrencyCode = currencyCode,
+                            quote = null,
+                        ),
+                    submission = it.submission.copy(paymentActionError = null),
                 )
             }
             checkoutIdempotencyKey = null
         }
 
         fun onTermsCheckboxClicked() {
-            actionState.update { current ->
-                if (current.termsAccepted) {
-                    current.copy(termsAccepted = false, validationErrorResId = null)
+            mutableUiState.update { current ->
+                if (current.terms.isAccepted) {
+                    current.copy(
+                        terms = current.terms.copy(isAccepted = false),
+                        submission = current.submission.copy(validationErrorResId = null),
+                    )
                 } else {
-                    current.copy(showTermsSheet = true, validationErrorResId = null)
+                    current.copy(
+                        terms = current.terms.copy(isSheetVisible = true),
+                        submission = current.submission.copy(validationErrorResId = null),
+                    )
                 }
             }
         }
 
         fun dismissTermsSheet() {
-            actionState.update { it.copy(showTermsSheet = false) }
+            mutableUiState.update {
+                it.copy(terms = it.terms.copy(isSheetVisible = false))
+            }
         }
 
         fun markTermsAsRead() {
-            actionState.update { it.copy(hasUserReadTerms = true) }
+            mutableUiState.update {
+                it.copy(terms = it.terms.copy(hasBeenRead = true))
+            }
         }
 
         fun acceptTerms() {
-            if (!actionState.value.hasUserReadTerms) return
-            actionState.update {
+            if (!mutableUiState.value.terms.hasBeenRead) return
+            mutableUiState.update {
                 it.copy(
-                    termsAccepted = true,
-                    showTermsSheet = false,
-                    validationErrorResId = null,
+                    terms = it.terms.copy(isAccepted = true, isSheetVisible = false),
+                    submission = it.submission.copy(validationErrorResId = null),
                 )
             }
         }
@@ -209,17 +234,25 @@ class TourCheckoutViewModel
             val state = uiState.value
             val errorResId = validate(state)
             if (errorResId != null) {
-                actionState.update { it.copy(validationErrorResId = errorResId) }
+                mutableUiState.update {
+                    it.copy(submission = it.submission.copy(validationErrorResId = errorResId))
+                }
                 return
             }
 
             paymentJob =
                 viewModelScope.launch {
-                    actionState.update {
-                        it.copy(isPaymentActionInProgress = true, paymentActionError = null)
+                    mutableUiState.update {
+                        it.copy(
+                            submission =
+                                it.submission.copy(
+                                    isPaymentActionInProgress = true,
+                                    paymentActionError = null,
+                                ),
+                        )
                     }
-                    if (state.selectedMethod == PaymentMethod.HOSTED_CARD) {
-                        val quote = state.quote
+                    if (state.payment.selectedMethod == PaymentMethod.HOSTED_CARD) {
+                        val quote = state.payment.quote
                         if (quote == null || quote.isExpired(Instant.now())) {
                             requestQuote(state)
                             return@launch
@@ -230,11 +263,13 @@ class TourCheckoutViewModel
         }
 
         fun onPaymentNavigationHandled() {
-            actionState.update { it.copy(paymentLaunch = null) }
+            mutableUiState.update {
+                it.copy(submission = it.submission.copy(paymentLaunch = null))
+            }
         }
 
         private suspend fun requestQuote(state: TourCheckoutUiState) {
-            val currencyCode = checkNotNull(state.selectedChargeCurrencyCode)
+            val currencyCode = checkNotNull(state.payment.selectedChargeCurrencyCode)
             when (
                 val result =
                     paymentRepository.quoteTour(
@@ -244,10 +279,11 @@ class TourCheckoutViewModel
                     )
             ) {
                 is DataResult.Success ->
-                    actionState.update {
+                    mutableUiState.update {
                         it.copy(
-                            quote = result.data,
-                            isPaymentActionInProgress = false,
+                            payment = it.payment.copy(quote = result.data),
+                            submission =
+                                it.submission.copy(isPaymentActionInProgress = false),
                         )
                     }
                 is DataResult.Error -> showPaymentError(result)
@@ -262,7 +298,7 @@ class TourCheckoutViewModel
             val result =
                 coroutineScope {
                     val minimumVerificationDuration =
-                        if (state.selectedMethod == PaymentMethod.WALLET) {
+                        if (state.payment.selectedMethod == PaymentMethod.WALLET) {
                             async { delay(MINIMUM_WALLET_VERIFICATION_MILLIS) }
                         } else {
                             null
@@ -271,8 +307,8 @@ class TourCheckoutViewModel
                         paymentRepository.checkoutTour(
                             sessionId = sessionId,
                             participantCount = state.participantCount,
-                            method = state.selectedMethod,
-                            quoteId = state.quote?.id,
+                            method = state.payment.selectedMethod,
+                            quoteId = state.payment.quote?.id,
                             locale = currentCheckoutLocale(),
                             idempotencyKey = idempotencyKey,
                         )
@@ -282,15 +318,18 @@ class TourCheckoutViewModel
             when (result) {
                 is DataResult.Success -> {
                     checkoutIdempotencyKey = null
-                    actionState.update {
+                    mutableUiState.update {
                         it.copy(
-                            quote = null,
-                            isPaymentActionInProgress = false,
-                            paymentLaunch =
-                                PaymentLaunch(
-                                    paymentId = result.data.id,
-                                    requiresHostedCheckout =
-                                        result.data.method == PaymentMethod.HOSTED_CARD,
+                            payment = it.payment.copy(quote = null),
+                            submission =
+                                it.submission.copy(
+                                    isPaymentActionInProgress = false,
+                                    paymentLaunch =
+                                        PaymentLaunch(
+                                            paymentId = result.data.id,
+                                            requiresHostedCheckout =
+                                                result.data.method == PaymentMethod.HOSTED_CARD,
+                                        ),
                                 ),
                         )
                     }
@@ -300,7 +339,7 @@ class TourCheckoutViewModel
         }
 
         private fun validate(state: TourCheckoutUiState): Int? {
-            val tourWithSession = currentTour.value
+            val tourWithSession = currentTour
             val bookingAvailability =
                 tourWithSession.resolveBookingAvailability(hasReservation = false)
             val currentAvailableCapacity = tourWithSession?.session?.availableCapacity ?: 0
@@ -308,22 +347,25 @@ class TourCheckoutViewModel
                 !bookingAvailability.isBookable -> bookingAvailability.checkoutErrorResId
                 currentAvailableCapacity < state.participantCount ->
                     R.string.checkout_error_capacity_changed
-                !state.termsAccepted -> R.string.checkout_error_terms_required
-                state.selectedMethod == PaymentMethod.WALLET &&
-                    state.walletBalanceMinor < state.totalMinor ->
+                !state.terms.isAccepted -> R.string.checkout_error_terms_required
+                state.payment.selectedMethod == PaymentMethod.WALLET &&
+                    state.wallet.balanceMinor < state.totalMinor ->
                     R.string.checkout_error_insufficient_balance
-                state.selectedMethod == PaymentMethod.HOSTED_CARD &&
-                    state.selectedChargeCurrencyCode == null ->
+                state.payment.selectedMethod == PaymentMethod.HOSTED_CARD &&
+                    state.payment.selectedChargeCurrencyCode == null ->
                     R.string.payment_currency_required
                 else -> null
             }
         }
 
         private fun showPaymentError(error: DataResult.Error) {
-            actionState.update {
+            mutableUiState.update {
                 it.copy(
-                    isPaymentActionInProgress = false,
-                    paymentActionError = error.error.toMessage(resourceProvider),
+                    submission =
+                        it.submission.copy(
+                            isPaymentActionInProgress = false,
+                            paymentActionError = error.error.toMessage(resourceProvider),
+                        ),
                 )
             }
         }

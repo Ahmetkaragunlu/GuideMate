@@ -3,8 +3,8 @@ package com.ahmetkaragunlu.guidemate.tour.domain.usecase
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideTourRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
+import com.ahmetkaragunlu.guidemate.testing.tour.FakeGuideTourRepository
+import com.ahmetkaragunlu.guidemate.testing.media.FakeMediaRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.model.category.TourCategory
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.CreateGuideTourInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourContentInput
@@ -27,7 +27,7 @@ class PublishGuideTourUseCaseTest {
 
         assertTrue(result is DataResult.Success)
         assertEquals(MediaPurpose.TOUR_COVER, mediaRepository.uploadedPurpose)
-        assertEquals("media-1", tourRepository.createInput?.content?.coverMediaId)
+        assertEquals("media-1", tourRepository.calls.create?.content?.coverMediaId)
         assertTrue(mediaRepository.deletedMediaIds.isEmpty())
     }
 
@@ -35,7 +35,7 @@ class PublishGuideTourUseCaseTest {
     fun `failed publish deletes uploaded cover`() = runTest {
         val tourRepository =
             FakeGuideTourRepository().apply {
-                createResult = DataResult.Error(AppError.GenericFailure)
+                results.create = DataResult.Error(AppError.GenericFailure)
             }
         val mediaRepository = FakeMediaRepository()
         val useCase = PublishGuideTourUseCase(tourRepository, mediaRepository)
@@ -54,7 +54,7 @@ class PublishGuideTourUseCaseTest {
         val useCase = PublishGuideTourUseCase(tourRepository, mediaRepository)
 
         assertTrue(useCase("content://cover", validInput()) is DataResult.Error)
-        assertNull(tourRepository.createInput)
+        assertNull(tourRepository.calls.create)
     }
 
     private fun validInput() =

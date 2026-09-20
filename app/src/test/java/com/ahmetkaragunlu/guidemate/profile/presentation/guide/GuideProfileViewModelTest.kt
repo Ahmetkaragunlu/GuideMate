@@ -1,13 +1,13 @@
 package com.ahmetkaragunlu.guidemate.profile.presentation.guide
 
 import com.ahmetkaragunlu.guidemate.common.coroutines.MainDispatcherRule
-import com.ahmetkaragunlu.guidemate.testing.FakeGuideProfileRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeNotificationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeTourDiscoveryRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserAvatarRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeGuideProfileRepository
+import com.ahmetkaragunlu.guidemate.testing.media.FakeMediaRepository
+import com.ahmetkaragunlu.guidemate.testing.notification.FakeNotificationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.discovery.FakeTourDiscoveryRepository
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeUserAvatarRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
 import com.ahmetkaragunlu.guidemate.profile.domain.usecase.UpdateUserAvatarUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -78,7 +78,7 @@ class GuideProfileViewModelTest {
             )
             runCurrent()
 
-            assertEquals(1, profileRepository.refreshOwnProfileRequestCount)
-            assertEquals(1, tourRepository.popularForGuideRequests.size)
+            assertEquals(1, profileRepository.calls.refreshOwnProfile)
+            assertEquals(1, tourRepository.calls.popularForGuideRequests.size)
         }
 }

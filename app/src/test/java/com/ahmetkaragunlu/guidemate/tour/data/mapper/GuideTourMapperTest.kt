@@ -35,9 +35,9 @@ class GuideTourMapperTest {
         assertEquals("tour-1", card.tourId)
         assertEquals(7L, card.tourVersion)
         assertEquals(3L, card.sessionVersion)
-        assertEquals(12, card.capacity)
-        assertEquals(4, card.bookedCount)
-        assertEquals(98_00L, card.netEarningsMinor)
+        assertEquals(12, card.stats.capacity)
+        assertEquals(4, card.stats.bookedCount)
+        assertEquals(98_00L, card.pricing.netEarningsMinor)
         assertEquals(TourSessionStatus.OPEN_FOR_BOOKING, card.sessionStatus)
     }
 
@@ -63,9 +63,9 @@ class GuideTourMapperTest {
 
         assertEquals("tour-1", result.tour.id)
         assertEquals(7L, result.tour.version)
-        assertEquals("media-cover", result.tour.coverMediaId)
-        assertEquals(TourApprovalStatus.APPROVED, result.tour.approvalStatus)
-        assertEquals(46L, result.tour.reviewCount)
+        assertEquals("media-cover", result.tour.cover?.mediaAssetId)
+        assertEquals(TourApprovalStatus.APPROVED, result.tour.publication.approvalStatus)
+        assertEquals(46L, result.tour.reviews.reviewCount)
         assertEquals(12, result.session("session-1")?.capacity)
         assertEquals("USD", result.session("session-1")?.currencyCode)
     }

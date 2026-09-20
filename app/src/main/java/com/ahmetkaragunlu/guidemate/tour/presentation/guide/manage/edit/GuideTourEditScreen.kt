@@ -32,6 +32,14 @@ import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.category.Guid
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 
+private enum class GuideTourEditOverlay {
+    DISCARD_CONFIRMATION,
+    REVIEW_CONFIRMATION,
+    PHOTO_SOURCE,
+    CATEGORY_PICKER,
+    LANGUAGE_PICKER,
+}
+
 @Composable
 fun GuideTourEditScreen(
     onSaved: (GuideTourTab) -> Unit,
@@ -41,44 +49,42 @@ fun GuideTourEditScreen(
     viewModel: GuideTourEditViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showDiscardDialog by rememberSaveable { mutableStateOf(false) }
-    var showReviewConfirmationDialog by rememberSaveable { mutableStateOf(false) }
-    var showPhotoSourceSheet by rememberSaveable { mutableStateOf(false) }
-    var showCategoryPicker by rememberSaveable { mutableStateOf(false) }
-    var showLanguagePicker by rememberSaveable { mutableStateOf(false) }
+    val content = uiState.content
+    val operation = uiState.operation
+    var activeOverlay by rememberSaveable { mutableStateOf<GuideTourEditOverlay?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val requestExit = {
-        if (uiState.isSaving) {
+        if (operation.isSaving) {
             Unit
-        } else if (uiState.hasUnsavedChanges) {
-            showDiscardDialog = true
+        } else if (operation.hasUnsavedChanges) {
+            activeOverlay = GuideTourEditOverlay.DISCARD_CONFIRMATION
         } else {
             onNavigateBack()
         }
     }
 
-    LaunchedEffect(uiState.userMessage) {
-        uiState.userMessage?.let { message ->
+    LaunchedEffect(operation.userMessage) {
+        operation.userMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
             viewModel.onUserMessageShown()
         }
     }
-    LaunchedEffect(uiState.savedTargetTab) {
-        uiState.savedTargetTab?.let { tab ->
+    LaunchedEffect(operation.savedTargetTab) {
+        operation.savedTargetTab?.let { tab ->
             viewModel.onSavedHandled()
             onSaved(tab)
         }
     }
 
     BackHandler(onBack = requestExit)
-    DisposableEffect(uiState.hasUnsavedChanges) {
+    DisposableEffect(operation.hasUnsavedChanges) {
         onBackActionChanged(requestExit)
         onDispose { onBackActionChanged(null) }
     }
 
     Box(modifier = modifier.fillMaxSize()) {
         GuideMateContentState(
-            state = uiState.loadState,
+            state = operation.loadState,
             onRetry = viewModel::refresh,
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -86,7 +92,7 @@ fun GuideTourEditScreen(
                 uiState = uiState,
                 onTitleChange = viewModel::onTitleChange,
                 onDescriptionChange = viewModel::onDescriptionChange,
-                onCategoryClick = { showCategoryPicker = true },
+                onCategoryClick = { activeOverlay = GuideTourEditOverlay.CATEGORY_PICKER },
                 onDateSelected = viewModel::onTourDateSelected,
                 onStartTimeSelected = viewModel::onStartTimeSelected,
                 onMeetingPointChange = viewModel::onMeetingPointChange,
@@ -94,11 +100,11 @@ fun GuideTourEditScreen(
                 onPriceChange = viewModel::onPriceChange,
                 onCapacityChange = viewModel::onCapacityChange,
                 onRemoveLanguage = viewModel::removeLanguage,
-                onAddLanguage = { showLanguagePicker = true },
-                onChangePhotos = { showPhotoSourceSheet = true },
+                onAddLanguage = { activeOverlay = GuideTourEditOverlay.LANGUAGE_PICKER },
+                onChangePhotos = { activeOverlay = GuideTourEditOverlay.PHOTO_SOURCE },
                 onSave = {
-                    if (uiState.requiresReviewConfirmation) {
-                        showReviewConfirmationDialog = true
+                    if (operation.requiresReviewConfirmation) {
+                        activeOverlay = GuideTourEditOverlay.REVIEW_CONFIRMATION
                     } else {
                         viewModel.saveChanges()
                     }
@@ -114,33 +120,33 @@ fun GuideTourEditScreen(
     }
 
     ImageSourcePicker(
-        isVisible = showPhotoSourceSheet,
+        isVisible = activeOverlay == GuideTourEditOverlay.PHOTO_SOURCE,
         titleResId = R.string.tour_cover_photo_source_title,
-        onDismissRequest = { showPhotoSourceSheet = false },
+        onDismissRequest = { activeOverlay = null },
         onImageSelected = viewModel::onCoverImageSelected,
         onError = viewModel::onCoverImageSelectionError,
     )
 
     GuideTourCategorySelectionBottomSheet(
-        isVisible = showCategoryPicker,
-        selectedCategory = uiState.category,
-        onDismissRequest = { showCategoryPicker = false },
+        isVisible = activeOverlay == GuideTourEditOverlay.CATEGORY_PICKER,
+        selectedCategory = content.category,
+        onDismissRequest = { activeOverlay = null },
         onCategorySelected = viewModel::onCategorySelected,
     )
 
     LanguageSelectionBottomSheet(
-        isVisible = showLanguagePicker,
-        selectedLanguageCodes = uiState.languages.mapTo(mutableSetOf()) { it.code },
-        onDismissRequest = { showLanguagePicker = false },
+        isVisible = activeOverlay == GuideTourEditOverlay.LANGUAGE_PICKER,
+        selectedLanguageCodes = content.languages.mapTo(mutableSetOf()) { it.code },
+        onDismissRequest = { activeOverlay = null },
         onLanguagesSelected = { languages ->
             viewModel.onLanguagesSelected(languages)
-            showLanguagePicker = false
+            activeOverlay = null
         },
     )
 
-    if (showDiscardDialog) {
+    if (activeOverlay == GuideTourEditOverlay.DISCARD_CONFIRMATION) {
         EditAlertDialog(
-            onDismissRequest = { showDiscardDialog = false },
+            onDismissRequest = { activeOverlay = null },
             title = R.string.unsaved_tour_changes_title,
             text = R.string.unsaved_tour_changes_message,
             confirmButton = {
@@ -156,7 +162,7 @@ fun GuideTourEditScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showDiscardDialog = false },
+                    onClick = { activeOverlay = null },
                     colors =
                         ButtonDefaults.textButtonColors(
                             contentColor = colorResource(R.color.brand_color),
@@ -168,25 +174,25 @@ fun GuideTourEditScreen(
         )
     }
 
-    if (showReviewConfirmationDialog) {
+    if (activeOverlay == GuideTourEditOverlay.REVIEW_CONFIRMATION) {
         EditAlertDialog(
             title =
-                if (uiState.approvalStatus == TourApprovalStatus.REJECTED) {
+                if (operation.approvalStatus == TourApprovalStatus.REJECTED) {
                     R.string.resubmit_for_review_confirmation_title
                 } else {
                     R.string.tour_edit_review_confirmation_title
                 },
             text =
-                if (uiState.approvalStatus == TourApprovalStatus.REJECTED) {
+                if (operation.approvalStatus == TourApprovalStatus.REJECTED) {
                     R.string.resubmit_for_review_confirmation_message
                 } else {
                     R.string.tour_edit_review_confirmation_message
                 },
-            onDismissRequest = { showReviewConfirmationDialog = false },
+            onDismissRequest = { activeOverlay = null },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        showReviewConfirmationDialog = false
+                        activeOverlay = null
                         viewModel.saveChanges()
                     },
                     colors =
@@ -199,7 +205,7 @@ fun GuideTourEditScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showReviewConfirmationDialog = false },
+                    onClick = { activeOverlay = null },
                     colors =
                         ButtonDefaults.textButtonColors(
                             contentColor = colorResource(R.color.text_color),

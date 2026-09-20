@@ -3,9 +3,9 @@ package com.ahmetkaragunlu.guidemate.profile.domain.usecase
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
-import com.ahmetkaragunlu.guidemate.testing.FakeMediaRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserAvatarRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeUserRepository
+import com.ahmetkaragunlu.guidemate.testing.media.FakeMediaRepository
+import com.ahmetkaragunlu.guidemate.testing.profile.FakeUserAvatarRepository
+import com.ahmetkaragunlu.guidemate.testing.auth.FakeUserRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

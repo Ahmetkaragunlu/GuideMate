@@ -1,4 +1,4 @@
-package com.ahmetkaragunlu.guidemate.testing
+package com.ahmetkaragunlu.guidemate.testing.notification
 
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
@@ -15,110 +15,126 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class FakeNotificationRepository : NotificationRepository {
-    val notificationState = MutableStateFlow<List<AppNotification>>(emptyList())
-    val unreadState = MutableStateFlow(0)
-    val preferenceState = MutableStateFlow<NotificationPreferences?>(null)
-    val hasMoreState = MutableStateFlow(false)
-    val pushEventState = MutableSharedFlow<NotificationNavigationTarget>()
+class NotificationFakeState {
+    val notifications = MutableStateFlow<List<AppNotification>>(emptyList())
+    val unreadCount = MutableStateFlow(0)
+    val preferences = MutableStateFlow<NotificationPreferences?>(null)
+    val hasMoreNotifications = MutableStateFlow(false)
+    val pushEvents = MutableSharedFlow<NotificationNavigationTarget>()
+}
 
-    var refreshPreferencesResult: DataResult<NotificationPreferences> =
+class NotificationFakeResults {
+    var refreshPreferences: DataResult<NotificationPreferences> =
         DataResult.Success(defaultNotificationPreferences())
-    var updatePreferencesResult: DataResult<NotificationPreferences> =
+    var updatePreferences: DataResult<NotificationPreferences> =
         DataResult.Success(defaultNotificationPreferences())
-    var refreshNotificationsResult: DataResult<List<AppNotification>>? = null
-    var loadMoreNotificationsResult: DataResult<List<AppNotification>> =
-        DataResult.Success(emptyList())
+    var refreshNotifications: DataResult<List<AppNotification>>? = null
+    var loadMoreNotifications: DataResult<List<AppNotification>> = DataResult.Success(emptyList())
     var loadMoreNotificationsHandler: (suspend () -> DataResult<List<AppNotification>>)? = null
-    var refreshUnreadCountResult: DataResult<Int>? = null
-    var markReadResult: DataResult<AppNotification>? = null
-    var markAllReadResult: DataResult<Int> = DataResult.Success(0)
-    var refreshNotificationsCalls = 0
-    var loadMoreNotificationsCalls = 0
-    var refreshUnreadCountCalls = 0
+    var refreshUnreadCount: DataResult<Int>? = null
+    var markRead: DataResult<AppNotification>? = null
+    var markAllRead: DataResult<Int> = DataResult.Success(0)
+    var markRelatedRead: DataResult<Int> = DataResult.Success(0)
+}
+
+class NotificationFakeCalls {
+    var refreshNotifications = 0
+    var loadMoreNotifications = 0
+    var refreshUnreadCount = 0
     val markedNotificationIds = mutableListOf<String>()
-    var markAllReadCalls = 0
+    var markAllRead = 0
     var lastPreferenceUpdate: NotificationPreferenceUpdate? = null
     val markedRelatedTargets = mutableListOf<NotificationTargetReference>()
-    var markRelatedResult: DataResult<Int> = DataResult.Success(0)
-    var clearLocalStateCalls = 0
-    var dismissSystemNotificationsCalls = 0
-    var dismissSystemNotificationsException: Throwable? = null
-    var clearLocalStateException: Throwable? = null
+    var clearLocalState = 0
+    var dismissSystemNotifications = 0
+}
 
-    override val notifications: StateFlow<List<AppNotification>> = notificationState
-    override val unreadCount: StateFlow<Int> = unreadState
-    override val preferences: StateFlow<NotificationPreferences?> = preferenceState
-    override val hasMoreNotifications: StateFlow<Boolean> = hasMoreState
-    override val pushEvents: SharedFlow<NotificationNavigationTarget> = pushEventState
+class NotificationFakeFailures {
+    var dismissSystemNotifications: Throwable? = null
+    var clearLocalState: Throwable? = null
+}
+
+class FakeNotificationRepository : NotificationRepository {
+    val state = NotificationFakeState()
+    val results = NotificationFakeResults()
+    val calls = NotificationFakeCalls()
+    val failures = NotificationFakeFailures()
+
+    override val notifications: StateFlow<List<AppNotification>> = state.notifications
+    override val unreadCount: StateFlow<Int> = state.unreadCount
+    override val preferences: StateFlow<NotificationPreferences?> = state.preferences
+    override val hasMoreNotifications: StateFlow<Boolean> = state.hasMoreNotifications
+    override val pushEvents: SharedFlow<NotificationNavigationTarget> = state.pushEvents
 
     override suspend fun refreshNotifications(): DataResult<List<AppNotification>> {
-        refreshNotificationsCalls++
-        return refreshNotificationsResult ?: DataResult.Success(notificationState.value)
+        calls.refreshNotifications++
+        return results.refreshNotifications ?: DataResult.Success(state.notifications.value)
     }
 
     override suspend fun loadMoreNotifications(): DataResult<List<AppNotification>> {
-        loadMoreNotificationsCalls++
-        return loadMoreNotificationsHandler?.invoke() ?: loadMoreNotificationsResult
+        calls.loadMoreNotifications++
+        return results.loadMoreNotificationsHandler?.invoke() ?: results.loadMoreNotifications
     }
 
     override suspend fun refreshUnreadCount(): DataResult<Int> {
-        refreshUnreadCountCalls++
-        return refreshUnreadCountResult ?: DataResult.Success(unreadState.value)
+        calls.refreshUnreadCount++
+        return results.refreshUnreadCount ?: DataResult.Success(state.unreadCount.value)
     }
 
     override suspend fun markRead(notificationId: String): DataResult<AppNotification> {
-        markedNotificationIds += notificationId
+        calls.markedNotificationIds += notificationId
         val notification =
-            markReadResult
-                ?: notificationState.value
+            results.markRead
+                ?: state.notifications.value
                     .first { it.notificationId == notificationId }
                     .copy(isRead = true)
                     .let { DataResult.Success(it) }
         if (notification is DataResult.Success) {
-            val wasUnread = notificationState.value.any {
+            val wasUnread = state.notifications.value.any {
                 it.notificationId == notificationId && !it.isRead
             }
-            notificationState.value =
-                notificationState.value.map { current ->
+            state.notifications.value =
+                state.notifications.value.map { current ->
                     if (current.notificationId == notificationId) notification.data else current
                 }
-            if (wasUnread) unreadState.value = (unreadState.value - 1).coerceAtLeast(0)
+            if (wasUnread) {
+                state.unreadCount.value = (state.unreadCount.value - 1).coerceAtLeast(0)
+            }
         }
         return notification
     }
 
     override suspend fun markAllRead(): DataResult<Int> {
-        markAllReadCalls++
-        when (val result = markAllReadResult) {
+        calls.markAllRead++
+        when (val result = results.markAllRead) {
             is DataResult.Success -> {
-                notificationState.value = notificationState.value.map { it.copy(isRead = true) }
-                unreadState.value = result.data
+                state.notifications.value = state.notifications.value.map { it.copy(isRead = true) }
+                state.unreadCount.value = result.data
             }
             is DataResult.Error -> Unit
         }
-        return markAllReadResult
+        return results.markAllRead
     }
 
     override suspend fun markRelatedRead(target: NotificationTargetReference): DataResult<Int> {
-        markedRelatedTargets += target
-        val result = markRelatedResult
-        if (result is DataResult.Success) unreadState.value = result.data
+        calls.markedRelatedTargets += target
+        val result = results.markRelatedRead
+        if (result is DataResult.Success) state.unreadCount.value = result.data
         return result
     }
 
     override suspend fun refreshPreferences(): DataResult<NotificationPreferences> {
-        val result = refreshPreferencesResult
-        if (result is DataResult.Success) preferenceState.value = result.data
+        val result = results.refreshPreferences
+        if (result is DataResult.Success) state.preferences.value = result.data
         return result
     }
 
     override suspend fun updatePreferences(
         update: NotificationPreferenceUpdate
     ): DataResult<NotificationPreferences> {
-        lastPreferenceUpdate = update
-        val result = updatePreferencesResult
-        if (result is DataResult.Success) preferenceState.value = result.data
+        calls.lastPreferenceUpdate = update
+        val result = results.updatePreferences
+        if (result is DataResult.Success) state.preferences.value = result.data
         return result
     }
 
@@ -128,13 +144,13 @@ class FakeNotificationRepository : NotificationRepository {
     override fun onPushReceived(target: NotificationNavigationTarget) = Unit
 
     override fun dismissSystemNotifications() {
-        dismissSystemNotificationsCalls++
-        dismissSystemNotificationsException?.let { throw it }
+        calls.dismissSystemNotifications++
+        failures.dismissSystemNotifications?.let { throw it }
     }
 
     override fun clearLocalState() {
-        clearLocalStateCalls++
-        clearLocalStateException?.let { throw it }
+        calls.clearLocalState++
+        failures.clearLocalState?.let { throw it }
     }
 }
 

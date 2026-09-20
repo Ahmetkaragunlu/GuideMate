@@ -1,19 +1,13 @@
 package com.ahmetkaragunlu.guidemate.tour.presentation.detail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,8 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -33,45 +25,13 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.formatting.toPlatformCurrencyFromMinorUnit
 import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
 import com.ahmetkaragunlu.guidemate.tour.presentation.category.TourCategoryCatalog
-import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailMode
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailStatus
 import com.ahmetkaragunlu.guidemate.tour.presentation.detail.model.TourDetailUiState
 import compose.icons.TablerIcons
 import compose.icons.tablericons.Users
 
 @Composable
-internal fun TourDetailSummary(
-    uiState: TourDetailUiState,
-    mode: TourDetailMode,
-    topContent: (@Composable () -> Unit)?,
-    onGuideProfileClick: (() -> Unit)?,
-) {
-    topContent?.invoke()
-    if (mode.showPreviewBanner) PreviewBanner()
-    HeroSection(uiState = uiState)
-    uiState.session.status?.let { status ->
-        TourStatusSection(
-            status = status,
-            cancellationReason = uiState.session.cancellationReason,
-        )
-    }
-    TourDetailSectionDivider()
-    DateLocationRow(uiState = uiState)
-    TourDetailSectionDivider()
-    LanguageCategoryRow(uiState = uiState)
-    TourDetailSectionDivider()
-    PriceRow(uiState = uiState)
-    if (mode.showGuideInfo) {
-        TourDetailSectionDivider()
-        GuideInfoRow(
-            uiState = uiState,
-            onGuideProfileClick = onGuideProfileClick,
-        )
-    }
-}
-
-@Composable
-private fun TourStatusSection(
+internal fun TourStatusSection(
     status: TourDetailStatus,
     cancellationReason: String?,
 ) {
@@ -110,101 +70,7 @@ private fun TourStatusSection(
 }
 
 @Composable
-internal fun TourDetailSectionDivider() {
-    HorizontalDivider(color = colorResource(R.color.divider_color), thickness = 1.dp)
-}
-
-@Composable
-private fun PreviewBanner() {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.spacing_medium))
-                .background(
-                    color = Color(0xFFF4F7FC),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-                )
-                .padding(
-                    horizontal = dimensionResource(R.dimen.spacing_medium),
-                    vertical = dimensionResource(R.dimen.spacing_small),
-                ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.guide_tour_publish_step4_preview_banner),
-            style = MaterialTheme.typography.labelLarge,
-            color = colorResource(R.color.text_color),
-        )
-    }
-}
-
-@Composable
-private fun HeroSection(uiState: TourDetailUiState) {
-    Box(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(220.dp)
-                .padding(top = dimensionResource(R.dimen.spacing_medium)),
-    ) {
-        GuideMateImage(
-            fallbackImageResId = uiState.tour.imageResId,
-            imageUrl = uiState.tour.imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-        Box(
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(
-                        brush =
-                            Brush.verticalGradient(
-                                colors =
-                                    listOf(
-                                        Color.Transparent,
-                                        Color.Black.copy(alpha = 0.72f),
-                                    ),
-                            ),
-                    ),
-        )
-        Column(
-            modifier =
-                Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(dimensionResource(R.dimen.spacing_medium)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
-        ) {
-            Text(
-                text = uiState.tour.title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-            )
-            if (uiState.tour.rating != null && uiState.tour.reviewCount > 0) {
-                Text(
-                    text =
-                        "⭐ ${
-                            stringResource(
-                                R.string.rating_review_format,
-                                uiState.tour.rating,
-                                uiState.tour.reviewCount,
-                            )
-                        }",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DateLocationRow(uiState: TourDetailUiState) {
+internal fun DateLocationRow(uiState: TourDetailUiState) {
     Column(
         modifier =
             Modifier
@@ -240,7 +106,7 @@ private fun DateLocationRow(uiState: TourDetailUiState) {
 }
 
 @Composable
-private fun LanguageCategoryRow(uiState: TourDetailUiState) {
+internal fun LanguageCategoryRow(uiState: TourDetailUiState) {
     Row(
         modifier =
             Modifier
@@ -280,7 +146,7 @@ private fun EmojiLabelItem(
 }
 
 @Composable
-private fun PriceRow(uiState: TourDetailUiState) {
+internal fun PriceRow(uiState: TourDetailUiState) {
     Row(
         modifier =
             Modifier
@@ -328,7 +194,7 @@ private fun PriceRow(uiState: TourDetailUiState) {
 }
 
 @Composable
-private fun GuideInfoRow(
+internal fun GuideInfoRow(
     uiState: TourDetailUiState,
     onGuideProfileClick: (() -> Unit)?,
 ) {

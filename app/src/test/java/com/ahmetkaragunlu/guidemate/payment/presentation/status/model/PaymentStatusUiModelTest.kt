@@ -3,7 +3,9 @@ package com.ahmetkaragunlu.guidemate.payment.presentation.status.model
 import com.ahmetkaragunlu.guidemate.payment.domain.model.Payment
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentPurpose
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentRefund
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentRefundStatus
+import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservation
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservationStatus
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
 import java.time.Instant
@@ -58,24 +60,27 @@ class PaymentStatusUiModelTest {
             status = PaymentStatus.SUCCEEDED,
             amountMinor = 10_000,
             currencyCode = "USD",
-            quoteId = null,
-            chargeAmountMinor = null,
-            chargeCurrencyCode = null,
-            fxRate = null,
-            fxRateSource = null,
-            fxQuotedAt = null,
-            paymentPageUrl = null,
-            expiresAt = null,
-            reservationId = null,
-            reservationStatus = reservationStatus,
-            refundId = null,
-            refundStatus = refundStatus,
-            refundAmountMinor = null,
-            refundChargeAmountMinor = null,
-            refundChargeCurrencyCode = null,
+            chargeDetails = null,
+            hostedPayment = null,
+            reservation =
+                reservationStatus?.let {
+                    PaymentReservation(
+                        id = null,
+                        status = it,
+                    )
+                },
+            refund =
+                refundStatus?.let {
+                    PaymentRefund(
+                        id = null,
+                        status = it,
+                        amountMinor = null,
+                        chargeAmountMinor = null,
+                        chargeCurrencyCode = null,
+                    )
+                },
             failureCode = null,
             createdAt = Instant.EPOCH,
             updatedAt = Instant.EPOCH,
         )
 }
-

@@ -269,15 +269,18 @@ class TouristReservationDetailViewModel
             status == TouristReservationStatus.COMPLETED && review == null
 
         private fun TouristReservation.noticeResId(): Int? =
-            when {
-                status == TouristReservationStatus.COMPLETED && review != null ->
+            when (status) {
+                TouristReservationStatus.COMPLETED if review != null ->
                     R.string.tour_review_submitted_notice
-                status == TouristReservationStatus.CANCELLED &&
-                    refundEligibility == ReservationRefundEligibility.FULL_REFUND ->
+
+                TouristReservationStatus.CANCELLED if
+                    cancellation.refundEligibility == ReservationRefundEligibility.FULL_REFUND ->
                     R.string.reservation_detail_full_refund_notice
-                status == TouristReservationStatus.CANCELLED &&
-                    refundEligibility == ReservationRefundEligibility.NO_REFUND ->
+
+                TouristReservationStatus.CANCELLED if
+                    cancellation.refundEligibility == ReservationRefundEligibility.NO_REFUND ->
                     R.string.reservation_detail_no_refund_notice
+
                 else -> null
             }
 

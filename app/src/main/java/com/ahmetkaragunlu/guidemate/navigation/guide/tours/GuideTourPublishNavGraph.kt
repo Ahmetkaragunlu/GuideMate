@@ -80,8 +80,8 @@ internal fun NavGraphBuilder.guideTourPublishNavGraph(
         composable<GuideTourDestination.PublishStep4> { backStackEntry ->
             val viewModel = backStackEntry.guideTourPublishViewModel(navController)
             val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-            LaunchedEffect(uiState.value.publishSucceeded) {
-                if (uiState.value.publishSucceeded) {
+            LaunchedEffect(uiState.value.submission.succeeded) {
+                if (uiState.value.submission.succeeded) {
                     viewModel.onPublishSucceededHandled()
                     navController.returnToMyTours(GuideTourTab.REVIEW)
                 }

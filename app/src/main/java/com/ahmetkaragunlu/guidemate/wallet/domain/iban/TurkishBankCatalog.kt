@@ -8,7 +8,7 @@ class TurkishBankCatalog
         fun bankName(bankCode: String?): String? = bankCode?.let(banksByCode::get)
 
         private companion object {
-            // TCMB Odeme Sistemleri Katilimcilari listesi, 25.07.2026.
+            // Source: CBRT Payment Systems Participants list, 2026-07-25.
             val banksByCode =
                 mapOf(
                     "00215" to "Adil Katılım Bankası",

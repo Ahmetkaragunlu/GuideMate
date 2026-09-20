@@ -20,6 +20,15 @@ import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.UpdateTourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.repository.GuideTourRepository
 import com.ahmetkaragunlu.guidemate.tour.domain.usecase.SubmitGuideTourContentChangeUseCase
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.hasChangesFrom
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.hasContentChangesFrom
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.hasSessionChangesFrom
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.toContentInputOrNull
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.toGuideTourEditUiState
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.toSessionInputOrNull
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.toZoneId
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.withContentFrom
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.mapper.withSessionFrom
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditUiState
 import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.model.GuideTourTab
 import com.ahmetkaragunlu.guidemate.tour.presentation.mapper.toTourLanguage
@@ -85,14 +94,17 @@ class GuideTourEditViewModel
 
         fun onTourDateSelected(date: LocalDate) {
             updateForm {
-                val zone = timeZoneId.toZoneId()
+                val zone = identity.timeZoneId.toZoneId()
                 val today = LocalDate.now(zone)
                 val currentTime = LocalTime.now(zone)
                 copy(
                     session =
                         session.copy(
                             tourDate = date,
-                            startTime = startTime?.takeIf { date != today || it.isAfter(currentTime) },
+                            startTime =
+                                session.startTime?.takeIf {
+                                    date != today || it.isAfter(currentTime)
+                                },
                         ),
                 )
             }
@@ -123,9 +135,14 @@ class GuideTourEditViewModel
         }
 
         fun removeLanguage(code: String) {
-            if (_uiState.value.languages.size > 1) {
+            if (_uiState.value.content.languages.size > 1) {
                 updateForm {
-                    copy(content = content.copy(languages = languages.filterNot { it.code == code }))
+                    copy(
+                        content =
+                            content.copy(
+                                languages = content.languages.filterNot { it.code == code },
+                            ),
+                    )
                 }
             }
         }
@@ -149,7 +166,7 @@ class GuideTourEditViewModel
 
         fun saveChanges() {
             val state = _uiState.value
-            if (state.isSaving) return
+            if (state.operation.isSaving) return
             val contentChanged = state.hasContentChangesFrom(originalState)
             val sessionChanged = state.hasSessionChangesFrom(originalState)
             val mustResubmit = originalApprovalStatus == TourApprovalStatus.REJECTED
@@ -165,7 +182,7 @@ class GuideTourEditViewModel
             viewModelScope.launch {
                 val current = _uiState.value
                 val shouldSubmitContent =
-                    !current.contentReviewSubmitted && (contentChanged || mustResubmit)
+                    !current.operation.contentReviewSubmitted && (contentChanged || mustResubmit)
                 val contentUpdatedState =
                     if (shouldSubmitContent) {
                         submitContentChanges(current) ?: return@launch
@@ -182,7 +199,7 @@ class GuideTourEditViewModel
                                 hasUnsavedChanges = false,
                                 isSaving = false,
                                 savedTargetTab =
-                                    if (savedState.contentReviewSubmitted) {
+                                    if (savedState.operation.contentReviewSubmitted) {
                                         GuideTourTab.REVIEW
                                     } else {
                                         GuideTourTab.ACTIVE
@@ -195,7 +212,7 @@ class GuideTourEditViewModel
         private suspend fun submitContentChanges(
             state: GuideTourEditUiState,
         ): GuideTourEditUiState? {
-            val coverMediaId = state.coverMediaId ?: state.selectedCoverImageUri
+            val coverMediaId = state.content.coverMediaId ?: state.content.selectedCoverImageUri
             val content = state.toContentInputOrNull(coverMediaId)
             if (content == null) {
                 showError()
@@ -208,9 +225,9 @@ class GuideTourEditViewModel
                 val change =
                     submitTourContentChange(
                         tourId = route.tourId,
-                        baseVersion = state.tourVersion,
+                        baseVersion = state.identity.tourVersion,
                         content = content,
-                        newCoverImageUri = state.selectedCoverImageUri,
+                        newCoverImageUri = state.content.selectedCoverImageUri,
                     )
             ) {
                 is DataResult.Error -> {
@@ -224,8 +241,8 @@ class GuideTourEditViewModel
                                 state.identity.copy(tourVersion = change.data.details.tour.version),
                             content =
                                 state.content.copy(
-                                    coverMediaId = change.data.details.tour.coverMediaId,
-                                    coverImageUrl = change.data.details.tour.coverImageUrl,
+                                    coverMediaId = change.data.details.tour.cover?.mediaAssetId,
+                                    coverImageUrl = change.data.details.tour.cover?.imageUrl,
                                     selectedCoverImageUri = null,
                                 ),
                             operation =
@@ -253,7 +270,7 @@ class GuideTourEditViewModel
                         sessionId = route.sessionId,
                         input =
                             UpdateTourSessionInput(
-                                version = state.sessionVersion,
+                                version = state.identity.sessionVersion,
                                 session = sessionInput,
                             ),
                     )
@@ -261,7 +278,7 @@ class GuideTourEditViewModel
                 is DataResult.Error -> {
                     val message = result.error.toMessage(resourceProvider)
                     finishWithError(
-                        if (state.contentReviewSubmitted) {
+                        if (state.operation.contentReviewSubmitted) {
                             resourceProvider.getString(R.string.tour_edit_partial_success, message)
                         } else {
                             message
@@ -307,7 +324,7 @@ class GuideTourEditViewModel
                 }
                 return
             }
-            originalApprovalStatus = details.tour.approvalStatus
+            originalApprovalStatus = details.tour.publication.approvalStatus
             originalState = state
             _uiState.value = state
         }

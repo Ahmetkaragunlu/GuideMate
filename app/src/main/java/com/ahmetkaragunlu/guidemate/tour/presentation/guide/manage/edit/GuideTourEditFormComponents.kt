@@ -30,11 +30,11 @@ import com.ahmetkaragunlu.guidemate.R
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditDropdown
 import com.ahmetkaragunlu.guidemate.common.ui.components.EditTextField
 import com.ahmetkaragunlu.guidemate.common.ui.image.GuideMateImage
-import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditUiState
+import com.ahmetkaragunlu.guidemate.tour.presentation.guide.manage.edit.model.GuideTourEditContentFormState
 
 @Composable
 internal fun TourMediaEditor(
-    uiState: GuideTourEditUiState,
+    content: GuideTourEditContentFormState,
     onChangePhotos: () -> Unit,
 ) {
     Text(
@@ -52,8 +52,8 @@ internal fun TourMediaEditor(
         contentAlignment = Alignment.BottomCenter,
     ) {
         GuideMateImage(
-            fallbackImageResId = uiState.coverImageResId,
-            imageUrl = uiState.selectedCoverImageUri ?: uiState.coverImageUrl,
+            fallbackImageResId = content.coverImageResId,
+            imageUrl = content.selectedCoverImageUri ?: content.coverImageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),

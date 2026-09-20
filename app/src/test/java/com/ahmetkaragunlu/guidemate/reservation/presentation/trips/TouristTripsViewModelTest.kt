@@ -9,11 +9,11 @@ import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEl
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundStatus
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.TouristReservationStatus
 import com.ahmetkaragunlu.guidemate.reservation.presentation.trips.model.TripTab
-import com.ahmetkaragunlu.guidemate.testing.FakeReservationRepository
-import com.ahmetkaragunlu.guidemate.testing.FakeResourceProvider
-import com.ahmetkaragunlu.guidemate.testing.FakeWalletRepository
-import com.ahmetkaragunlu.guidemate.testing.reservationPage
-import com.ahmetkaragunlu.guidemate.testing.testReservation
+import com.ahmetkaragunlu.guidemate.testing.reservation.FakeReservationRepository
+import com.ahmetkaragunlu.guidemate.testing.common.FakeResourceProvider
+import com.ahmetkaragunlu.guidemate.testing.wallet.FakeWalletRepository
+import com.ahmetkaragunlu.guidemate.testing.reservation.reservationPage
+import com.ahmetkaragunlu.guidemate.testing.reservation.testReservation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -44,9 +44,9 @@ class TouristTripsViewModelTest {
             viewModel.cancelReservation("reservation-1")
             runCurrent()
 
-            assertEquals("reservation-1", repository.cancellationRequest?.first)
-            assertEquals(4L, repository.cancellationRequest?.second?.version)
-            assertNotNull(repository.cancellationRequest?.third)
+            assertEquals("reservation-1", repository.cancellationRequest?.reservationId)
+            assertEquals(4L, repository.cancellationRequest?.input?.version)
+            assertNotNull(repository.cancellationRequest?.idempotencyKey)
             assertEquals(TripTab.PAST, viewModel.uiState.value.selectedTab)
             assertTrue(viewModel.uiState.value.cancellationFeedback?.isSuccess == true)
             assertEquals(1, walletRepository.getWalletCalls)

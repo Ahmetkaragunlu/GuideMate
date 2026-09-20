@@ -48,8 +48,8 @@ fun PastTourCard(
     val matrix = ColorMatrix().apply { setToSaturation(0.7f) }
 
     TourBaseCard(
-        imageResId = tour.imageResId,
-        imageUrl = tour.imageUrl,
+        imageResId = tour.media.imageResId,
+        imageUrl = tour.media.imageUrl,
         modifier = modifier.clickable(onClick = onClick),
         colorFilter = ColorFilter.colorMatrix(matrix),
         alpha = 0.85f,
@@ -78,7 +78,7 @@ fun PastTourCard(
                     Text(
                         text =
                             stringResource(
-                                when (tour.sessionStatus) {
+                                when (tour.status.sessionStatus) {
                                     TourSessionStatus.CANCELLED -> R.string.tour_status_cancelled
                                     TourSessionStatus.EXPIRED -> R.string.tour_status_expired
                                     else -> R.string.tour_status_completed
@@ -87,7 +87,7 @@ fun PastTourCard(
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color =
-                            if (tour.sessionStatus == TourSessionStatus.CANCELLED) {
+                            if (tour.status.sessionStatus == TourSessionStatus.CANCELLED) {
                                 MaterialTheme.colorScheme.error
                             } else {
                                 colorResource(R.color.brand_color)
@@ -125,7 +125,7 @@ fun PastTourCard(
                             .fillMaxWidth()
                             .padding(horizontal = dimensionResource(R.dimen.spacing_medium)),
                     horizontalArrangement =
-                        if (tour.sessionStatus != TourSessionStatus.COMPLETED) {
+                        if (tour.status.sessionStatus != TourSessionStatus.COMPLETED) {
                             Arrangement.End
                         } else {
                             Arrangement.SpaceBetween
@@ -133,21 +133,21 @@ fun PastTourCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (
-                        tour.sessionStatus == TourSessionStatus.COMPLETED &&
-                            tour.earningsMinor != null
+                        tour.status.sessionStatus == TourSessionStatus.COMPLETED &&
+                            tour.pricing.earningsMinor != null
                     ) {
                         Text(
                             text =
                                 stringResource(
                                     R.string.earnings_format,
-                                    tour.earningsMinor.toPlatformCurrencyFromMinorUnit(),
+                                    tour.pricing.earningsMinor.toPlatformCurrencyFromMinorUnit(),
                                 ),
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.Green,
                         )
                     }
 
-                    if (tour.rating != null && tour.reviewCount != null) {
+                    tour.rating?.let { rating ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Star,
@@ -157,7 +157,7 @@ fun PastTourCard(
                             )
                             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
                             Text(
-                                text = stringResource(R.string.rating_review_format, tour.rating, tour.reviewCount),
+                                text = stringResource(R.string.rating_review_format, rating.value, rating.reviewCount),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colorResource(R.color.text_color),
                             )

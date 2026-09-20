@@ -1,6 +1,7 @@
 package com.ahmetkaragunlu.guidemate.common.result
 
 enum class BackendErrorCode {
+    // Account and credentials
     USER_NOT_FOUND,
     EMAIL_ALREADY_EXISTS,
     ACCOUNT_PENDING_VERIFICATION,
@@ -12,6 +13,8 @@ enum class BackendErrorCode {
     PASSWORDS_DO_NOT_MATCH,
     ROLE_ALREADY_SELECTED,
     ROLE_NOT_FOUND,
+
+    // Installation and token lifecycle
     INVALID_INSTALLATION_ID,
     INVALID_TOKEN,
     TOKEN_EXPIRED,
@@ -19,9 +22,13 @@ enum class BackendErrorCode {
     INVALID_REFRESH_TOKEN,
     REFRESH_TOKEN_EXPIRED,
     REFRESH_TOKEN_REPLAY,
+
+    // Google authentication
     GOOGLE_LOGIN_FAILED,
     GOOGLE_ACCOUNT_NOT_FOUND,
     GOOGLE_ACCOUNT_MISMATCH,
+
+    // Shared request failures
     UNAUTHORIZED,
     FORBIDDEN,
     VALIDATION_FAILED,
@@ -29,6 +36,8 @@ enum class BackendErrorCode {
     DATA_CONFLICT,
     RATE_LIMITED,
     EMAIL_DELIVERY_FAILED,
+
+    // Media and guide profile
     MEDIA_NOT_FOUND,
     MEDIA_INVALID_TYPE,
     MEDIA_TOO_LARGE,
@@ -37,6 +46,8 @@ enum class BackendErrorCode {
     MEDIA_PURPOSE_MISMATCH,
     GUIDE_PROFILE_NOT_FOUND,
     INVALID_LANGUAGE_CODE,
+
+    // Tour lifecycle and metadata
     TOUR_NOT_FOUND,
     TOUR_NOT_APPROVED,
     TOUR_CHANGE_PENDING,
@@ -47,6 +58,8 @@ enum class BackendErrorCode {
     INVALID_CATEGORY_CODE,
     INVALID_COUNTRY_CODE,
     INVALID_TIME_ZONE,
+
+    // Tour sessions and capacity
     SESSION_NOT_FOUND,
     SESSION_NOT_BOOKABLE,
     SESSION_ALREADY_STARTED,
@@ -56,11 +69,15 @@ enum class BackendErrorCode {
     SESSION_STATUS_NOT_MANAGEABLE,
     SCHEDULE_CONFLICT,
     CONCURRENT_UPDATE,
+
+    // Reservations and reviews
     RESERVATION_NOT_FOUND,
     RESERVATION_ALREADY_EXISTS,
     RESERVATION_NOT_CANCELLABLE,
     REVIEW_NOT_ALLOWED,
     REVIEW_ALREADY_EXISTS,
+
+    // Payments and foreign exchange
     IDEMPOTENCY_CONFLICT,
     PAYMENT_NOT_FOUND,
     PAYMENT_INITIALIZATION_FAILED,
@@ -72,6 +89,8 @@ enum class BackendErrorCode {
     CARD_INSUFFICIENT_FUNDS,
     PAYMENT_METHOD_DECLINED,
     INVALID_AMOUNT,
+
+    // Wallet, bank accounts, saved cards, and refunds
     INSUFFICIENT_WALLET_BALANCE,
     INSUFFICIENT_WITHDRAWABLE_BALANCE,
     BANK_ACCOUNT_NOT_FOUND,
@@ -82,11 +101,15 @@ enum class BackendErrorCode {
     SAVED_CARD_PROVIDER_UNAVAILABLE,
     REFUND_FAILED,
     REFUND_AMOUNT_EXCEEDED,
+
+    // Notifications and chat
     NOTIFICATION_NOT_FOUND,
     CHAT_NOT_FOUND,
     CHAT_PARTICIPANT_INVALID,
     CHAT_MESSAGE_NOT_FOUND,
     CHAT_MESSAGE_TOO_LONG,
+
+    // Unexpected server failures
     INTERNAL_SERVER_ERROR,
     ;
 
