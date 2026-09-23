@@ -2,6 +2,7 @@ package com.ahmetkaragunlu.guidemate.notification.data.push
 
 import android.annotation.SuppressLint
 import com.ahmetkaragunlu.guidemate.common.coroutines.ApplicationScope
+import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.notification.domain.repository.NotificationRepository
 import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class GuideMateFirebaseMessagingService : FirebaseMessagingService() {
     @Inject lateinit var notificationRepository: NotificationRepository
+    @Inject lateinit var userRepository: UserRepository
     @Inject lateinit var targetParser: NotificationTargetParser
     @Inject lateinit var systemNotificationController: SystemNotificationController
     @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
@@ -29,6 +31,7 @@ class GuideMateFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+        if (!PushRecipientPolicy.targetsActiveUser(message.data, userRepository.userState.value)) return
         val target = targetParser.fromData(message.data) ?: return
         notificationRepository.onPushReceived(target)
         systemNotificationController.show(target)
