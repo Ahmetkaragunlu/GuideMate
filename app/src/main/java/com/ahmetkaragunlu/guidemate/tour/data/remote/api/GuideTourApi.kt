@@ -21,59 +21,59 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface GuideTourApi {
-    @GET("api/v1/guide/tours")
+    @GET("api/v1/guides/me/tours")
     suspend fun getTours(
         @Query("tab") tab: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Response<ApiPageResponse<GuideTourCardResponseDto>>
 
-    @GET("api/v1/guide/tours/{tourId}")
+    @GET("api/v1/guides/me/tours/{tourId}")
     suspend fun getTour(
         @Path("tourId") tourId: String,
     ): Response<TourDetailResponseDto>
 
-    @POST("api/v1/guide/tours")
+    @POST("api/v1/guides/me/tours")
     suspend fun createTour(
         @Body request: CreateGuideTourRequestDto,
     ): Response<TourReviewSubmissionResponseDto>
 
-    @POST("api/v1/guide/tours/{tourId}/change-requests")
+    @POST("api/v1/guides/me/tours/{tourId}/change-requests")
     suspend fun submitChange(
         @Path("tourId") tourId: String,
         @Body request: SubmitTourChangeRequestDto,
     ): Response<TourReviewSubmissionResponseDto>
 
-    @POST("api/v1/guide/tours/{tourId}/sessions")
+    @POST("api/v1/guides/me/tours/{tourId}/sessions")
     suspend fun addSession(
         @Path("tourId") tourId: String,
         @Body request: TourSessionRequestDto,
     ): Response<TourSessionResponseDto>
 
-    @PATCH("api/v1/guide/sessions/{sessionId}")
+    @PATCH("api/v1/guides/me/sessions/{sessionId}")
     suspend fun updateSession(
         @Path("sessionId") sessionId: String,
         @Body request: UpdateTourSessionRequestDto,
     ): Response<TourSessionResponseDto>
 
-    @POST("api/v1/guide/sessions/{sessionId}/open")
+    @POST("api/v1/guides/me/sessions/{sessionId}/open")
     suspend fun openSession(
         @Path("sessionId") sessionId: String,
     ): Response<TourSessionResponseDto>
 
-    @POST("api/v1/guide/sessions/{sessionId}/close")
+    @POST("api/v1/guides/me/sessions/{sessionId}/close")
     suspend fun closeSession(
         @Path("sessionId") sessionId: String,
     ): Response<TourSessionResponseDto>
 
-    @POST("api/v1/guide/sessions/{sessionId}/cancel")
+    @POST("api/v1/guides/me/sessions/{sessionId}/cancel")
     suspend fun cancelSession(
         @Path("sessionId") sessionId: String,
         @Header("Idempotency-Key") idempotencyKey: String,
         @Body request: CancelTourSessionRequestDto,
     ): Response<TourSessionResponseDto>
 
-    @POST("api/v1/guide/tours/{tourId}/archive")
+    @POST("api/v1/guides/me/tours/{tourId}/archive")
     suspend fun archiveTour(
         @Path("tourId") tourId: String,
     ): Response<TourDetailResponseDto>

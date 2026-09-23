@@ -17,46 +17,46 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface GuideFinanceApi {
-    @GET("api/v1/guide/earnings")
+    @GET("api/v1/guides/me/earnings")
     suspend fun getEarnings(
         @Query("year") year: Int,
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Response<ApiPageResponse<GuideEarningResponseDto>>
 
-    @GET("api/v1/guide/earnings/monthly")
+    @GET("api/v1/guides/me/earnings/monthly")
     suspend fun getMonthlyEarnings(
         @Query("year") year: Int,
     ): Response<List<MonthlyGuideEarningResponseDto>>
 
-    @GET("api/v1/guide/bank-accounts")
+    @GET("api/v1/guides/me/bank-accounts")
     suspend fun getBankAccounts(
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Response<ApiPageResponse<BankAccountResponseDto>>
 
-    @POST("api/v1/guide/bank-accounts")
+    @POST("api/v1/guides/me/bank-accounts")
     suspend fun addBankAccount(
         @Body request: AddBankAccountRequestDto,
     ): Response<BankAccountResponseDto>
 
-    @POST("api/v1/guide/bank-accounts/{bankAccountId}/default")
+    @POST("api/v1/guides/me/bank-accounts/{bankAccountId}/default")
     suspend fun makeDefaultBankAccount(
         @Path("bankAccountId") bankAccountId: String,
     ): Response<BankAccountResponseDto>
 
-    @DELETE("api/v1/guide/bank-accounts/{bankAccountId}")
+    @DELETE("api/v1/guides/me/bank-accounts/{bankAccountId}")
     suspend fun deleteBankAccount(
         @Path("bankAccountId") bankAccountId: String,
     ): Response<Unit>
 
-    @GET("api/v1/guide/withdrawals")
+    @GET("api/v1/guides/me/withdrawals")
     suspend fun getWithdrawals(
         @Query("page") page: Int,
         @Query("size") size: Int,
     ): Response<ApiPageResponse<WithdrawalResponseDto>>
 
-    @POST("api/v1/guide/withdrawals")
+    @POST("api/v1/guides/me/withdrawals")
     suspend fun requestWithdrawal(
         @Header("Idempotency-Key") idempotencyKey: String,
         @Body request: WithdrawalRequestDto,

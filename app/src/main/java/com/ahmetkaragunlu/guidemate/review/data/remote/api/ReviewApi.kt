@@ -25,7 +25,7 @@ interface ReviewApi {
         @Query("size") size: Int,
     ): Response<ApiPageResponse<TourReviewResponseDto>>
 
-    @GET("api/v1/guide/tours/{tourId}/reviews")
+    @GET("api/v1/guides/me/tours/{tourId}/reviews")
     suspend fun getOwnedTourReviews(
         @Path("tourId") tourId: String,
         @Query("page") page: Int,
