@@ -1,14 +1,14 @@
 package com.ahmetkaragunlu.guidemate.notification.data.mapper
 
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationPreferencesResponseDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationResponseDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.UpdateNotificationPreferencesRequestDto
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.response.NotificationPreferencesResponse
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.response.NotificationResponse
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.request.UpdateNotificationPreferencesRequest
 import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPayload
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferences
 
-internal fun NotificationResponseDto.toDomain(): AppNotification =
+internal fun NotificationResponse.toDomain(): AppNotification =
     AppNotification(
         notificationId = id,
         type = type.toNotificationType(),
@@ -18,7 +18,7 @@ internal fun NotificationResponseDto.toDomain(): AppNotification =
         createdAt = createdAt,
     )
 
-internal fun NotificationPreferencesResponseDto.toDomain(): NotificationPreferences =
+internal fun NotificationPreferencesResponse.toDomain(): NotificationPreferences =
     NotificationPreferences(
         upcomingTourRemindersEnabled = upcomingTourRemindersEnabled,
         chatMessagesEnabled = chatMessagesEnabled,
@@ -29,8 +29,8 @@ internal fun NotificationPreferencesResponseDto.toDomain(): NotificationPreferen
         securityAlertsEnabled = securityAlertsEnabled,
     )
 
-internal fun NotificationPreferenceUpdate.toDto(): UpdateNotificationPreferencesRequestDto =
-    UpdateNotificationPreferencesRequestDto(
+internal fun NotificationPreferenceUpdate.toDto(): UpdateNotificationPreferencesRequest =
+    UpdateNotificationPreferencesRequest(
         upcomingTourRemindersEnabled = upcomingTourRemindersEnabled,
         chatMessagesEnabled = chatMessagesEnabled,
         reservationUpdatesEnabled = reservationUpdatesEnabled,

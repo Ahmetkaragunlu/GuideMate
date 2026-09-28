@@ -1,12 +1,12 @@
 package com.ahmetkaragunlu.guidemate.review.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.review.data.remote.api.ReviewApi
-import com.ahmetkaragunlu.guidemate.review.data.remote.model.ReviewSubmissionRequestDto
-import com.ahmetkaragunlu.guidemate.review.data.remote.model.SubmittedReviewResponseDto
-import com.ahmetkaragunlu.guidemate.review.data.remote.model.TourReviewResponseDto
+import com.ahmetkaragunlu.guidemate.review.data.remote.model.request.ReviewSubmissionRequest
+import com.ahmetkaragunlu.guidemate.review.data.remote.model.response.SubmittedReviewResponse
+import com.ahmetkaragunlu.guidemate.review.data.remote.model.response.TourReviewResponse
 import com.ahmetkaragunlu.guidemate.review.domain.model.ReviewSubmissionInput
 import java.time.Instant
 import kotlinx.coroutines.CoroutineStart
@@ -68,7 +68,7 @@ class ReviewRepositoryImplTest {
 
     private class FakeReviewApi : ReviewApi {
         var reservationId: String? = null
-        var submission: ReviewSubmissionRequestDto? = null
+        var submission: ReviewSubmissionRequest? = null
         var tourId: String? = null
         var page: Int? = null
         var size: Int? = null
@@ -76,12 +76,12 @@ class ReviewRepositoryImplTest {
 
         override suspend fun submitReview(
             reservationId: String,
-            request: ReviewSubmissionRequestDto,
-        ): Response<SubmittedReviewResponseDto> {
+            request: ReviewSubmissionRequest,
+        ): Response<SubmittedReviewResponse> {
             this.reservationId = reservationId
             submission = request
             return Response.success(
-                SubmittedReviewResponseDto(
+                SubmittedReviewResponse(
                     reviewId = "review-1",
                     rating = request.rating,
                     comment = request.comment,
@@ -94,7 +94,7 @@ class ReviewRepositoryImplTest {
             tourId: String,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<TourReviewResponseDto>> {
+        ): Response<ApiPageResponse<TourReviewResponse>> {
             this.tourId = tourId
             this.page = page
             this.size = size
@@ -102,7 +102,7 @@ class ReviewRepositoryImplTest {
                 ApiPageResponse(
                     content =
                         listOf(
-                            TourReviewResponseDto(
+                            TourReviewResponse(
                                 reviewId = "review-1",
                                 reviewerDisplayName = "reviewer",
                                 reviewerAvatar = null,
@@ -125,7 +125,7 @@ class ReviewRepositoryImplTest {
             tourId: String,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<TourReviewResponseDto>> {
+        ): Response<ApiPageResponse<TourReviewResponse>> {
             ownedTourReviewsRequested = true
             return getTourReviews(tourId = tourId, page = page, size = size)
         }

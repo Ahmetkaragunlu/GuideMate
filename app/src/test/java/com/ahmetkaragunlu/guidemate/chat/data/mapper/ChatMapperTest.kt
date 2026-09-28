@@ -1,8 +1,8 @@
 package com.ahmetkaragunlu.guidemate.chat.data.mapper
 
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatConversationResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessageResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatConversationResponse
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatMessageResponse
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatParticipantResponse
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -13,10 +13,10 @@ class ChatMapperTest {
     fun `maps conversation projection without inventing participant data`() {
         val sentAt = Instant.parse("2026-08-25T10:15:30Z")
         val response =
-            ChatConversationResponseDto(
+            ChatConversationResponse(
                 chatId = "chat-1",
-                guide = ChatParticipantResponseDto(10, "Ahmet Karagünlü", null),
-                tourist = ChatParticipantResponseDto(20, "Elif Demir", "https://example.com/a.jpg"),
+                guide = ChatParticipantResponse(10, "Ahmet Karagünlü", null),
+                tourist = ChatParticipantResponse(20, "Elif Demir", "https://example.com/a.jpg"),
                 lastMessage = messageResponse(sentAt),
                 unreadCount = 3,
                 createdAt = sentAt.minusSeconds(60),
@@ -32,8 +32,8 @@ class ChatMapperTest {
         assertEquals("Merhaba", conversation.lastMessage?.text)
     }
 
-    private fun messageResponse(sentAt: Instant): ChatMessageResponseDto =
-        ChatMessageResponseDto(
+    private fun messageResponse(sentAt: Instant): ChatMessageResponse =
+        ChatMessageResponse(
             messageId = "message-1",
             chatId = "chat-1",
             senderId = 20,

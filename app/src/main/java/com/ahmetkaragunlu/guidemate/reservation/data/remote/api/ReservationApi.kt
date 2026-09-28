@@ -1,9 +1,9 @@
 package com.ahmetkaragunlu.guidemate.reservation.data.remote.api
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.CancelReservationRequestDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationCancellationResponseDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationResponseDto
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.request.CancelReservationRequest
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationCancellationResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -18,17 +18,17 @@ interface ReservationApi {
         @Query("status") status: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Response<ApiPageResponse<ReservationResponseDto>>
+    ): Response<ApiPageResponse<ReservationResponse>>
 
     @GET("api/v1/reservations/{reservationId}")
     suspend fun getReservation(
         @Path("reservationId") reservationId: String,
-    ): Response<ReservationResponseDto>
+    ): Response<ReservationResponse>
 
     @POST("api/v1/reservations/{reservationId}/cancel")
     suspend fun cancelReservation(
         @Path("reservationId") reservationId: String,
         @Header("Idempotency-Key") idempotencyKey: String,
-        @Body request: CancelReservationRequestDto,
-    ): Response<ReservationCancellationResponseDto>
+        @Body request: CancelReservationRequest,
+    ): Response<ReservationCancellationResponse>
 }

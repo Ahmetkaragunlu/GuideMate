@@ -1,21 +1,21 @@
 package com.ahmetkaragunlu.guidemate.tour.data.repository
 
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaReferenceResponse
 import com.ahmetkaragunlu.guidemate.tour.data.remote.api.GuideTourApi
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CancelTourSessionRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CreateGuideTourRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideDashboardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideTourCardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.PublicGuideSummaryResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.SubmitTourChangeRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourDetailResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourReviewSubmissionResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.UpdateTourSessionRequestDto
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.CancelTourSessionRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.CreateGuideTourRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideDashboardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideTourCardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.PublicGuideSummaryResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.SubmitTourChangeRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourDetailResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourReviewSubmissionResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.TourSessionRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourSessionResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.UpdateTourSessionRequest
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourListType
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.TourSessionInput
 import com.ahmetkaragunlu.guidemate.tour.domain.model.operation.UpdateTourSessionInput
@@ -78,13 +78,13 @@ class GuideTourRepositoryImplTest {
 
     private class FakeGuideTourApi : GuideTourApi {
         var requestedTab: String? = null
-        var lastSessionUpdate: UpdateTourSessionRequestDto? = null
+        var lastSessionUpdate: UpdateTourSessionRequest? = null
 
         override suspend fun getTours(
             tab: String,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<GuideTourCardResponseDto>> {
+        ): Response<ApiPageResponse<GuideTourCardResponse>> {
             requestedTab = tab
             return Response.success(
                 ApiPageResponse(
@@ -99,42 +99,42 @@ class GuideTourRepositoryImplTest {
             )
         }
 
-        override suspend fun getTour(tourId: String): Response<TourDetailResponseDto> =
+        override suspend fun getTour(tourId: String): Response<TourDetailResponse> =
             Response.success(detailResponse())
 
         override suspend fun createTour(
-            request: CreateGuideTourRequestDto,
-        ): Response<TourReviewSubmissionResponseDto> = Response.success(reviewResponse())
+            request: CreateGuideTourRequest,
+        ): Response<TourReviewSubmissionResponse> = Response.success(reviewResponse())
 
         override suspend fun submitChange(
             tourId: String,
-            request: SubmitTourChangeRequestDto,
-        ): Response<TourReviewSubmissionResponseDto> = Response.success(reviewResponse())
+            request: SubmitTourChangeRequest,
+        ): Response<TourReviewSubmissionResponse> = Response.success(reviewResponse())
 
         override suspend fun addSession(
             tourId: String,
-            request: TourSessionRequestDto,
-        ): Response<TourSessionResponseDto> = Response.success(sessionResponse())
+            request: TourSessionRequest,
+        ): Response<TourSessionResponse> = Response.success(sessionResponse())
 
         override suspend fun updateSession(
             sessionId: String,
-            request: UpdateTourSessionRequestDto,
-        ): Response<TourSessionResponseDto> {
+            request: UpdateTourSessionRequest,
+        ): Response<TourSessionResponse> {
             lastSessionUpdate = request
             return Response.success(sessionResponse().copy(version = request.version + 1))
         }
 
-        override suspend fun openSession(sessionId: String): Response<TourSessionResponseDto> =
+        override suspend fun openSession(sessionId: String): Response<TourSessionResponse> =
             Response.success(sessionResponse())
 
-        override suspend fun closeSession(sessionId: String): Response<TourSessionResponseDto> =
+        override suspend fun closeSession(sessionId: String): Response<TourSessionResponse> =
             Response.success(sessionResponse().copy(status = "CLOSED"))
 
         override suspend fun cancelSession(
             sessionId: String,
             idempotencyKey: String,
-            request: CancelTourSessionRequestDto,
-        ): Response<TourSessionResponseDto> =
+            request: CancelTourSessionRequest,
+        ): Response<TourSessionResponse> =
             Response.success(
                 sessionResponse().copy(
                     status = "CANCELLED",
@@ -143,12 +143,12 @@ class GuideTourRepositoryImplTest {
                 ),
             )
 
-        override suspend fun archiveTour(tourId: String): Response<TourDetailResponseDto> =
+        override suspend fun archiveTour(tourId: String): Response<TourDetailResponse> =
             Response.success(detailResponse().copy(approvalStatus = "ARCHIVED"))
 
-        override suspend fun getDashboard(): Response<GuideDashboardResponseDto> =
+        override suspend fun getDashboard(): Response<GuideDashboardResponse> =
             Response.success(
-                GuideDashboardResponseDto(
+                GuideDashboardResponse(
                     activeSessionCount = 2,
                     pendingReviewCount = 1,
                     completedSessionCount = 12,
@@ -161,16 +161,16 @@ class GuideTourRepositoryImplTest {
                 ),
             )
 
-        private fun reviewResponse(): TourReviewSubmissionResponseDto =
-            TourReviewSubmissionResponseDto(
+        private fun reviewResponse(): TourReviewSubmissionResponse =
+            TourReviewSubmissionResponse(
                 reviewId = "review-1",
                 reviewType = "CREATE",
                 reviewStatus = "PENDING",
                 tour = detailResponse(),
             )
 
-        private fun cardResponse(): GuideTourCardResponseDto =
-            GuideTourCardResponseDto(
+        private fun cardResponse(): GuideTourCardResponse =
+            GuideTourCardResponse(
                 tourId = "tour-1",
                 sessionId = "session-1",
                 tourVersion = 7,
@@ -181,7 +181,7 @@ class GuideTourRepositoryImplTest {
                 timeZoneId = "Europe/Istanbul",
                 categoryCode = "culture",
                 languageCodes = listOf("tr", "en"),
-                cover = MediaReferenceResponseDto("media-cover", "https://example.com/cover"),
+                cover = MediaReferenceResponse("media-cover", "https://example.com/cover"),
                 startsAt = "2027-05-24T06:00:00Z",
                 durationMinutes = 180,
                 priceMinor = 15_000,
@@ -197,11 +197,11 @@ class GuideTourRepositoryImplTest {
                 canArchive = false,
             )
 
-        private fun detailResponse(): TourDetailResponseDto =
-            TourDetailResponseDto(
+        private fun detailResponse(): TourDetailResponse =
+            TourDetailResponse(
                 tourId = "tour-1",
                 version = 7,
-                guide = PublicGuideSummaryResponseDto(42, "Ahmet Karagünlü", null),
+                guide = PublicGuideSummaryResponse(42, "Ahmet Karagünlü", null),
                 title = "Tarihi İstanbul",
                 description = "İstanbul'un tarihi rotalarını birlikte keşfedin.",
                 countryCode = "TR",
@@ -210,7 +210,7 @@ class GuideTourRepositoryImplTest {
                 timeZoneId = "Europe/Istanbul",
                 categoryCode = "culture",
                 languageCodes = listOf("tr", "en"),
-                cover = MediaReferenceResponseDto("media-cover", "https://example.com/cover"),
+                cover = MediaReferenceResponse("media-cover", "https://example.com/cover"),
                 approvalStatus = "APPROVED",
                 submittedAt = "2026-08-01T10:00:00Z",
                 publishedAt = "2026-08-02T10:00:00Z",
@@ -221,8 +221,8 @@ class GuideTourRepositoryImplTest {
                 sessions = listOf(sessionResponse()),
             )
 
-        private fun sessionResponse(): TourSessionResponseDto =
-            TourSessionResponseDto(
+        private fun sessionResponse(): TourSessionResponse =
+            TourSessionResponse(
                 sessionId = "session-1",
                 tourId = "tour-1",
                 version = 3,

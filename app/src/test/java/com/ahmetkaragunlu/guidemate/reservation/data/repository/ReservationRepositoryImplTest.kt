@@ -1,14 +1,14 @@
 package com.ahmetkaragunlu.guidemate.reservation.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.reservation.data.remote.api.ReservationApi
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.CancelReservationRequestDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationCancellationResponseDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationGuideResponseDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationResponseDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationSnapshotResponseDto
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.request.CancelReservationRequest
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationCancellationResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationGuideResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationSnapshotResponse
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.CancelReservationInput
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationListType
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationRefundEligibility
@@ -73,13 +73,13 @@ class ReservationRepositoryImplTest {
         var listSize: Int? = null
         var cancelReservationId: String? = null
         var cancelIdempotencyKey: String? = null
-        var cancelRequest: CancelReservationRequestDto? = null
+        var cancelRequest: CancelReservationRequest? = null
 
         override suspend fun getMyReservations(
             status: String,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<ReservationResponseDto>> {
+        ): Response<ApiPageResponse<ReservationResponse>> {
             listStatus = status
             listPage = page
             listSize = size
@@ -98,18 +98,18 @@ class ReservationRepositoryImplTest {
 
         override suspend fun getReservation(
             reservationId: String,
-        ): Response<ReservationResponseDto> = Response.success(reservation())
+        ): Response<ReservationResponse> = Response.success(reservation())
 
         override suspend fun cancelReservation(
             reservationId: String,
             idempotencyKey: String,
-            request: CancelReservationRequestDto,
-        ): Response<ReservationCancellationResponseDto> {
+            request: CancelReservationRequest,
+        ): Response<ReservationCancellationResponse> {
             cancelReservationId = reservationId
             cancelIdempotencyKey = idempotencyKey
             cancelRequest = request
             return Response.success(
-                ReservationCancellationResponseDto(
+                ReservationCancellationResponse(
                     reservation =
                         reservation().copy(
                             status = "CANCELLED",
@@ -125,8 +125,8 @@ class ReservationRepositoryImplTest {
             )
         }
 
-        private fun reservation(): ReservationResponseDto =
-            ReservationResponseDto(
+        private fun reservation(): ReservationResponse =
+            ReservationResponse(
                 reservationId = "reservation-1",
                 sessionId = "session-1",
                 version = 4,
@@ -147,10 +147,10 @@ class ReservationRepositoryImplTest {
                 bookedCount = 6,
                 capacity = 10,
                 snapshot =
-                    ReservationSnapshotResponseDto(
+                    ReservationSnapshotResponse(
                         tourId = "tour-1",
                         guide =
-                            ReservationGuideResponseDto(
+                            ReservationGuideResponse(
                                 guideId = 9,
                                 displayName = "Guide Name",
                                 avatar = null,

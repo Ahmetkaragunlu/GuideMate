@@ -1,10 +1,10 @@
 package com.ahmetkaragunlu.guidemate.profile.data.mapper
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuidePerformanceResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideProfileResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideSearchItemResponseDto
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuidePerformanceResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuideProfileResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuideSearchItemResponse
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaReferenceResponse
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -44,8 +44,8 @@ class GuideProfileMapperTest {
         assertEquals(42L, result.items.single().guideId)
     }
 
-    private fun profileResponse(): GuideProfileResponseDto =
-        GuideProfileResponseDto(
+    private fun profileResponse(): GuideProfileResponse =
+        GuideProfileResponse(
             guideId = 42,
             firstName = "Ahmet",
             lastName = "Karagünlü",
@@ -53,9 +53,9 @@ class GuideProfileMapperTest {
             specialtyTitle = "Tarih Rehberi",
             biography = "İstanbul'un tarihini yerel hikayelerle anlatan profesyonel rehber.",
             languageCodes = listOf("tr", "en"),
-            avatar = MediaReferenceResponseDto("media-1", "https://example.com/avatar"),
+            avatar = MediaReferenceResponse("media-1", "https://example.com/avatar"),
             performance =
-                GuidePerformanceResponseDto(
+                GuidePerformanceResponse(
                     completedSessionCount = 25,
                     totalParticipantCount = 180,
                     averageRating = 4.8,
@@ -64,8 +64,8 @@ class GuideProfileMapperTest {
                 ),
         )
 
-    private fun searchItem(): GuideSearchItemResponseDto =
-        GuideSearchItemResponseDto(
+    private fun searchItem(): GuideSearchItemResponse =
+        GuideSearchItemResponse(
             guideId = 42,
             displayName = "Ahmet Karagünlü",
             specialtyTitle = "Tarih Rehberi",

@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.notification.data.mapper
 
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationResponseDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationPreferencesResponseDto
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.response.NotificationResponse
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.response.NotificationPreferencesResponse
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationPreferenceUpdate
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationSecurityEvent
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationType
@@ -14,7 +14,7 @@ class NotificationMapperTest {
     @Test
     fun `payload maps typed identifiers and numeric values`() {
         val notification =
-            NotificationResponseDto(
+            NotificationResponse(
                     id = "notification-1",
                     type = "PAYMENT_SUCCEEDED",
                     actorId = 7,
@@ -44,7 +44,7 @@ class NotificationMapperTest {
     @Test
     fun `unknown type and blank payload values fall back safely`() {
         val notification =
-            NotificationResponseDto(
+            NotificationResponse(
                     id = "notification-2",
                     type = "NEW_BACKEND_TYPE",
                     actorId = null,
@@ -95,7 +95,7 @@ class NotificationMapperTest {
     @Test
     fun `preference response preserves every backend flag`() {
         val preferences =
-            NotificationPreferencesResponseDto(
+            NotificationPreferencesResponse(
                     upcomingTourRemindersEnabled = true,
                     chatMessagesEnabled = false,
                     reservationUpdatesEnabled = true,
@@ -116,7 +116,7 @@ class NotificationMapperTest {
     }
 
     private fun securityNotification(securityEvent: String) =
-        NotificationResponseDto(
+        NotificationResponse(
                 id = "security-notification",
                 type = "SECURITY_ALERT",
                 actorId = null,

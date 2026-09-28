@@ -4,13 +4,13 @@ import com.ahmetkaragunlu.guidemate.auth.domain.model.UserRole
 import com.ahmetkaragunlu.guidemate.auth.domain.model.UserState
 import com.ahmetkaragunlu.guidemate.auth.domain.repository.UserRepository
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.profile.data.remote.api.GuideProfileApi
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuidePerformanceResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideProfileResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideSearchItemResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.UpdateGuideProfileRequestDto
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuidePerformanceResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuideProfileResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuideSearchItemResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.request.UpdateGuideProfileRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -80,22 +80,22 @@ class GuideProfileRepositoryImplTest {
     }
 
     private class FakeGuideProfileApi : GuideProfileApi {
-        override suspend fun getOwnProfile(): Response<GuideProfileResponseDto> =
+        override suspend fun getOwnProfile(): Response<GuideProfileResponse> =
             Response.success(profileResponse())
 
         override suspend fun updateOwnProfile(
-            request: UpdateGuideProfileRequestDto,
-        ): Response<GuideProfileResponseDto> = Response.success(profileResponse())
+            request: UpdateGuideProfileRequest,
+        ): Response<GuideProfileResponse> = Response.success(profileResponse())
 
         override suspend fun getPublicProfile(
             guideId: Long,
-        ): Response<GuideProfileResponseDto> = Response.success(profileResponse())
+        ): Response<GuideProfileResponse> = Response.success(profileResponse())
 
         override suspend fun searchGuides(
             query: String?,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<GuideSearchItemResponseDto>> =
+        ): Response<ApiPageResponse<GuideSearchItemResponse>> =
             Response.success(
                 ApiPageResponse(
                     content = emptyList(),
@@ -110,10 +110,10 @@ class GuideProfileRepositoryImplTest {
 
         override suspend fun getTopGuides(
             limit: Int,
-        ): Response<List<GuideSearchItemResponseDto>> = Response.success(emptyList())
+        ): Response<List<GuideSearchItemResponse>> = Response.success(emptyList())
 
-        private fun profileResponse(): GuideProfileResponseDto =
-            GuideProfileResponseDto(
+        private fun profileResponse(): GuideProfileResponse =
+            GuideProfileResponse(
                 guideId = 42,
                 firstName = "Ahmet",
                 lastName = "Karagünlü",
@@ -123,7 +123,7 @@ class GuideProfileRepositoryImplTest {
                 languageCodes = listOf("tr", "en"),
                 avatar = null,
                 performance =
-                    GuidePerformanceResponseDto(
+                    GuidePerformanceResponse(
                         completedSessionCount = 25,
                         totalParticipantCount = 180,
                         averageRating = 4.8,

@@ -1,11 +1,11 @@
 package com.ahmetkaragunlu.guidemate.wallet.data.mapper
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.BankAccountResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.GuideEarningResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.MonthlyGuideEarningResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalResponseDto
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.BankAccountResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.GuideEarningResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.MonthlyGuideEarningResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.WithdrawalResponse
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.BankAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.GuideEarning
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.GuideEarningStatus
@@ -14,16 +14,16 @@ import com.ahmetkaragunlu.guidemate.wallet.domain.model.PayoutMode
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.Withdrawal
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WithdrawalStatus
 
-fun ApiPageResponse<GuideEarningResponseDto>.toGuideEarningsDomain(): PagedResult<GuideEarning> =
-    toPagedResult(GuideEarningResponseDto::toDomain)
+fun ApiPageResponse<GuideEarningResponse>.toGuideEarningsDomain(): PagedResult<GuideEarning> =
+    toPagedResult(GuideEarningResponse::toDomain)
 
-fun ApiPageResponse<BankAccountResponseDto>.toBankAccountsDomain(): PagedResult<BankAccount> =
-    toPagedResult(BankAccountResponseDto::toDomain)
+fun ApiPageResponse<BankAccountResponse>.toBankAccountsDomain(): PagedResult<BankAccount> =
+    toPagedResult(BankAccountResponse::toDomain)
 
-fun ApiPageResponse<WithdrawalResponseDto>.toWithdrawalsDomain(): PagedResult<Withdrawal> =
-    toPagedResult(WithdrawalResponseDto::toDomain)
+fun ApiPageResponse<WithdrawalResponse>.toWithdrawalsDomain(): PagedResult<Withdrawal> =
+    toPagedResult(WithdrawalResponse::toDomain)
 
-fun GuideEarningResponseDto.toDomain(): GuideEarning =
+fun GuideEarningResponse.toDomain(): GuideEarning =
     GuideEarning(
         id = earningId,
         reservationId = reservationId,
@@ -36,7 +36,7 @@ fun GuideEarningResponseDto.toDomain(): GuideEarning =
         createdAt = createdAt,
     )
 
-fun MonthlyGuideEarningResponseDto.toDomain(): MonthlyGuideEarning =
+fun MonthlyGuideEarningResponse.toDomain(): MonthlyGuideEarning =
     MonthlyGuideEarning(
         year = year,
         month = month,
@@ -45,7 +45,7 @@ fun MonthlyGuideEarningResponseDto.toDomain(): MonthlyGuideEarning =
         pendingEarningsMinor = pendingEarningsMinor,
     )
 
-fun BankAccountResponseDto.toDomain(): BankAccount =
+fun BankAccountResponse.toDomain(): BankAccount =
     BankAccount(
         id = bankAccountId,
         maskedIban = maskedIban,
@@ -56,7 +56,7 @@ fun BankAccountResponseDto.toDomain(): BankAccount =
         createdAt = createdAt,
     )
 
-fun WithdrawalResponseDto.toDomain(): Withdrawal =
+fun WithdrawalResponse.toDomain(): Withdrawal =
     Withdrawal(
         id = withdrawalId,
         bankAccountId = bankAccountId,

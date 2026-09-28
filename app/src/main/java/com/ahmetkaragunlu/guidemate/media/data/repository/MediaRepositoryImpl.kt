@@ -8,8 +8,8 @@ import com.ahmetkaragunlu.guidemate.media.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.media.data.multipart.MediaPartFactory
 import com.ahmetkaragunlu.guidemate.media.data.multipart.MediaPreparationException
 import com.ahmetkaragunlu.guidemate.media.data.remote.api.MediaApi
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaDeletionResponse
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaUploadResponse
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaDeletionResponse
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaUploadResponse
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaAsset
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaPurpose
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaStatus

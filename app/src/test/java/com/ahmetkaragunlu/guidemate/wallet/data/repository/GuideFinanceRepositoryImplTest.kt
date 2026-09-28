@@ -1,15 +1,15 @@
 package com.ahmetkaragunlu.guidemate.wallet.data.repository
 
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.wallet.data.remote.api.GuideFinanceApi
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.AddBankAccountRequestDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.BankAccountResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.GuideEarningResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.MonthlyGuideEarningResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalRequestDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalResponseDto
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.request.AddBankAccountRequest
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.BankAccountResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.GuideEarningResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.MonthlyGuideEarningResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.request.WithdrawalRequest
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.WithdrawalResponse
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.PayoutMode
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WithdrawalStatus
 import java.time.Instant
@@ -80,13 +80,13 @@ class GuideFinanceRepositoryImplTest {
         var earningsPage: Int? = null
         var earningsSize: Int? = null
         var withdrawalIdempotencyKey: String? = null
-        var withdrawalRequest: WithdrawalRequestDto? = null
+        var withdrawalRequest: WithdrawalRequest? = null
 
         override suspend fun getEarnings(
             year: Int,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<GuideEarningResponseDto>> {
+        ): Response<ApiPageResponse<GuideEarningResponse>> {
             earningsYear = year
             earningsPage = page
             earningsSize = size
@@ -95,10 +95,10 @@ class GuideFinanceRepositoryImplTest {
 
         override suspend fun getMonthlyEarnings(
             year: Int,
-        ): Response<List<MonthlyGuideEarningResponseDto>> =
+        ): Response<List<MonthlyGuideEarningResponse>> =
             Response.success(
                 listOf(
-                    MonthlyGuideEarningResponseDto(
+                    MonthlyGuideEarningResponse(
                         year = year,
                         month = 8,
                         netEarningsMinor = 45_000,
@@ -111,15 +111,15 @@ class GuideFinanceRepositoryImplTest {
         override suspend fun getBankAccounts(
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<BankAccountResponseDto>> = Response.success(emptyPage(page, size))
+        ): Response<ApiPageResponse<BankAccountResponse>> = Response.success(emptyPage(page, size))
 
         override suspend fun addBankAccount(
-            request: AddBankAccountRequestDto,
-        ): Response<BankAccountResponseDto> = Response.success(bankAccount())
+            request: AddBankAccountRequest,
+        ): Response<BankAccountResponse> = Response.success(bankAccount())
 
         override suspend fun makeDefaultBankAccount(
             bankAccountId: String,
-        ): Response<BankAccountResponseDto> = Response.success(bankAccount())
+        ): Response<BankAccountResponse> = Response.success(bankAccount())
 
         override suspend fun deleteBankAccount(bankAccountId: String): Response<Unit> =
             Response.success(Unit)
@@ -127,19 +127,19 @@ class GuideFinanceRepositoryImplTest {
         override suspend fun getWithdrawals(
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<WithdrawalResponseDto>> = Response.success(emptyPage(page, size))
+        ): Response<ApiPageResponse<WithdrawalResponse>> = Response.success(emptyPage(page, size))
 
         override suspend fun requestWithdrawal(
             idempotencyKey: String,
-            request: WithdrawalRequestDto,
-        ): Response<WithdrawalResponseDto> {
+            request: WithdrawalRequest,
+        ): Response<WithdrawalResponse> {
             withdrawalIdempotencyKey = idempotencyKey
             withdrawalRequest = request
             return Response.success(withdrawal())
         }
 
-        private fun bankAccount(): BankAccountResponseDto =
-            BankAccountResponseDto(
+        private fun bankAccount(): BankAccountResponse =
+            BankAccountResponse(
                 bankAccountId = "bank-account-1",
                 maskedIban = "TR** **** 1234",
                 bankCode = "00010",
@@ -149,8 +149,8 @@ class GuideFinanceRepositoryImplTest {
                 createdAt = TEST_INSTANT,
             )
 
-        private fun withdrawal(): WithdrawalResponseDto =
-            WithdrawalResponseDto(
+        private fun withdrawal(): WithdrawalResponse =
+            WithdrawalResponse(
                 withdrawalId = "withdrawal-1",
                 bankAccountId = "bank-account-1",
                 maskedIban = "TR** **** 1234",

@@ -1,9 +1,9 @@
 package com.ahmetkaragunlu.guidemate.payment.data.mapper
 
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.SavedPaymentMethodResponseDto
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.SavedPaymentMethodResponse
 import com.ahmetkaragunlu.guidemate.payment.domain.model.SavedPaymentMethod
 
-fun SavedPaymentMethodResponseDto.toDomain(): SavedPaymentMethod =
+fun SavedPaymentMethodResponse.toDomain(): SavedPaymentMethod =
     SavedPaymentMethod(
         id = savedPaymentMethodId,
         alias = alias,

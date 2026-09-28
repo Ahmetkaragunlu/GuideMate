@@ -1,8 +1,8 @@
 package com.ahmetkaragunlu.guidemate.chat.data.realtime
 
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessageResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantProfileUpdatedResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatRealtimeErrorResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatMessageResponse
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatParticipantProfileUpdatedResponse
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatRealtimeErrorResponse
 import com.ahmetkaragunlu.guidemate.common.network.realtime.RealtimeClient
 import com.ahmetkaragunlu.guidemate.common.network.realtime.RealtimeDestination
 import com.ahmetkaragunlu.guidemate.common.network.realtime.RealtimeEvent
@@ -39,15 +39,15 @@ constructor(
             when (destination) {
                 RealtimeDestination.CHAT_MESSAGES ->
                     ChatRealtimeEvent.MessageReceived(
-                        gson.fromJson(body, ChatMessageResponseDto::class.java),
+                        gson.fromJson(body, ChatMessageResponse::class.java),
                     )
                 RealtimeDestination.CHAT_PARTICIPANT_UPDATES ->
                     ChatRealtimeEvent.ParticipantProfileUpdated(
-                        gson.fromJson(body, ChatParticipantProfileUpdatedResponseDto::class.java),
+                        gson.fromJson(body, ChatParticipantProfileUpdatedResponse::class.java),
                     )
                 RealtimeDestination.CHAT_ERRORS ->
                     ChatRealtimeEvent.Error(
-                        gson.fromJson(body, ChatRealtimeErrorResponseDto::class.java).code,
+                        gson.fromJson(body, ChatRealtimeErrorResponse::class.java).code,
                     )
                 else -> null
             }

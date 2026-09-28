@@ -1,6 +1,6 @@
 package com.ahmetkaragunlu.guidemate.payment.data.remote.api
 
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.SavedPaymentMethodResponseDto
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.SavedPaymentMethodResponse
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -8,7 +8,7 @@ import retrofit2.http.Path
 
 interface SavedPaymentMethodApi {
     @GET("api/v1/payment-methods/cards")
-    suspend fun getCards(): Response<List<SavedPaymentMethodResponseDto>>
+    suspend fun getCards(): Response<List<SavedPaymentMethodResponse>>
 
     @DELETE("api/v1/payment-methods/cards/{savedPaymentMethodId}")
     suspend fun delete(

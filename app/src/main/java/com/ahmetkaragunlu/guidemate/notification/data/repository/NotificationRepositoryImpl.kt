@@ -10,8 +10,8 @@ import com.ahmetkaragunlu.guidemate.notification.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.notification.data.mapper.toDto
 import com.ahmetkaragunlu.guidemate.notification.data.realtime.NotificationRealtimeClient
 import com.ahmetkaragunlu.guidemate.notification.data.remote.api.NotificationApi
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.MarkRelatedNotificationsReadRequestDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.RegisterDeviceRequestDto
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.request.MarkRelatedNotificationsReadRequest
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.request.RegisterDeviceRequest
 import com.ahmetkaragunlu.guidemate.notification.domain.device.PushInstallationIdProvider
 import com.ahmetkaragunlu.guidemate.notification.domain.model.AppNotification
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
@@ -190,7 +190,7 @@ constructor(
             apiCallExecutor.execute(
                 request = {
                     api.markRelatedRead(
-                        MarkRelatedNotificationsReadRequestDto(
+                        MarkRelatedNotificationsReadRequest(
                             targetType = target.type.name,
                             targetId = target.targetId,
                         ),
@@ -249,7 +249,7 @@ constructor(
         if (!session.isCurrent()) return DataResult.Success(Unit)
         return apiCallExecutor.executeUnit {
             api.registerDevice(
-                RegisterDeviceRequestDto(
+                RegisterDeviceRequest(
                     installationId = installationId,
                     firebaseInstallationId = firebaseInstallationId,
                 ),

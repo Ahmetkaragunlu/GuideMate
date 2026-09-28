@@ -5,10 +5,10 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.payment.data.local.PendingPaymentStorage
 import com.ahmetkaragunlu.guidemate.payment.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.payment.data.remote.api.PaymentApi
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.TourCheckoutRequestDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.TourPaymentQuoteRequestDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.WalletTopUpQuoteRequestDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.WalletTopUpRequestDto
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.TourCheckoutRequest
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.TourPaymentQuoteRequest
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.WalletTopUpQuoteRequest
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.WalletTopUpRequest
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrencies
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.domain.model.Payment
@@ -37,7 +37,7 @@ class PaymentRepositoryImpl @Inject constructor(
         apiCallExecutor.execute(
             request = {
                 api.quoteTour(
-                    TourPaymentQuoteRequestDto(
+                    TourPaymentQuoteRequest(
                         sessionId = sessionId,
                         participantCount = participantCount,
                         chargeCurrencyCode = chargeCurrencyCode,
@@ -54,7 +54,7 @@ class PaymentRepositoryImpl @Inject constructor(
         apiCallExecutor.execute(
             request = {
                 api.quoteWalletTopUp(
-                    WalletTopUpQuoteRequestDto(
+                    WalletTopUpQuoteRequest(
                         amountMinor = amountMinor,
                         chargeCurrencyCode = chargeCurrencyCode,
                     ),
@@ -75,7 +75,7 @@ class PaymentRepositoryImpl @Inject constructor(
             api.checkoutTour(
                 idempotencyKey = idempotencyKey,
                 request =
-                    TourCheckoutRequestDto(
+                    TourCheckoutRequest(
                         sessionId = sessionId,
                         participantCount = participantCount,
                         method = method.name,
@@ -93,7 +93,7 @@ class PaymentRepositoryImpl @Inject constructor(
         executeTrackedPayment {
             api.checkoutWalletTopUp(
                 idempotencyKey = idempotencyKey,
-                request = WalletTopUpRequestDto(quoteId = quoteId, locale = locale.name),
+                request = WalletTopUpRequest(quoteId = quoteId, locale = locale.name),
             )
         }
 
@@ -112,14 +112,14 @@ class PaymentRepositoryImpl @Inject constructor(
     }
 
     private suspend fun executeTrackedPayment(
-        request: suspend () -> Response<com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentResponseDto>,
+        request: suspend () -> Response<com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.PaymentResponse>,
     ): DataResult<Payment> =
         executePayment(request).also { result ->
             if (result is DataResult.Success) pendingPaymentStorage.save(result.data.id)
         }
 
     private suspend fun executePayment(
-        request: suspend () -> Response<com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentResponseDto>,
+        request: suspend () -> Response<com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.PaymentResponse>,
     ): DataResult<Payment> =
         apiCallExecutor.execute(request = request, transform = { it.toDomain() })
 }

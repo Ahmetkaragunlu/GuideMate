@@ -8,8 +8,8 @@ import com.ahmetkaragunlu.guidemate.wallet.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.wallet.data.mapper.toGuideEarningsDomain
 import com.ahmetkaragunlu.guidemate.wallet.data.mapper.toWithdrawalsDomain
 import com.ahmetkaragunlu.guidemate.wallet.data.remote.api.GuideFinanceApi
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.AddBankAccountRequestDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalRequestDto
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.request.AddBankAccountRequest
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.request.WithdrawalRequest
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.BankAccount
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.GuideEarning
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.MonthlyGuideEarning
@@ -61,7 +61,7 @@ class GuideFinanceRepositoryImpl @Inject constructor(
         apiCallExecutor.execute(
             request = {
                 api.addBankAccount(
-                    AddBankAccountRequestDto(
+                    AddBankAccountRequest(
                         iban = iban,
                         accountHolderName = accountHolderName,
                     ),
@@ -101,7 +101,7 @@ class GuideFinanceRepositoryImpl @Inject constructor(
                 api.requestWithdrawal(
                     idempotencyKey = idempotencyKey,
                     request =
-                        WithdrawalRequestDto(
+                        WithdrawalRequest(
                             bankAccountId = bankAccountId,
                             amountMinor = amountMinor,
                         ),

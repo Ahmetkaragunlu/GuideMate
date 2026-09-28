@@ -1,21 +1,21 @@
 package com.ahmetkaragunlu.guidemate.tour.data.mapper
 
 import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.media.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CreateGuideTourRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideDashboardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideTourCardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.SubmitTourChangeRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourContentRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourDetailResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourReviewSubmissionResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.UpdateTourSessionRequestDto
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.CreateGuideTourRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideDashboardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideTourCardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.SubmitTourChangeRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.TourContentRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourDetailResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourReviewSubmissionResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.TourSessionRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourSessionResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.UpdateTourSessionRequest
 import com.ahmetkaragunlu.guidemate.tour.domain.model.Tour
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
@@ -39,9 +39,9 @@ import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
 import java.time.Instant
 import java.util.Locale
 
-fun ApiPageResponse<GuideTourCardResponseDto>.toDomain(): PagedResult<GuideTourCard> =
+fun ApiPageResponse<GuideTourCardResponse>.toDomain(): PagedResult<GuideTourCard> =
     PagedResult(
-        items = content.map(GuideTourCardResponseDto::toDomain),
+        items = content.map(GuideTourCardResponse::toDomain),
         page = page,
         size = size,
         totalElements = totalElements,
@@ -50,7 +50,7 @@ fun ApiPageResponse<GuideTourCardResponseDto>.toDomain(): PagedResult<GuideTourC
         isLast = isLast,
     )
 
-fun GuideTourCardResponseDto.toDomain(): GuideTourCard =
+fun GuideTourCardResponse.toDomain(): GuideTourCard =
     GuideTourCard(
         tourId = tourId,
         sessionId = sessionId,
@@ -87,7 +87,7 @@ fun GuideTourCardResponseDto.toDomain(): GuideTourCard =
         canArchive = canArchive,
     )
 
-fun TourDetailResponseDto.toDomain(): TourDetails {
+fun TourDetailResponse.toDomain(): TourDetails {
     val locale = Locale.getDefault()
     val country =
         LocaleSelectionCatalog.country(countryCode, locale)?.displayName
@@ -129,11 +129,11 @@ fun TourDetailResponseDto.toDomain(): TourDetails {
                         reviewCount = reviewCount,
                     ),
             ),
-        sessions = sessions.map(TourSessionResponseDto::toDomain),
+        sessions = sessions.map(TourSessionResponse::toDomain),
     )
 }
 
-fun TourSessionResponseDto.toDomain(): TourSession =
+fun TourSessionResponse.toDomain(): TourSession =
     TourSession(
         id = sessionId,
         tourId = tourId,
@@ -151,7 +151,7 @@ fun TourSessionResponseDto.toDomain(): TourSession =
         cancelledAt = cancelledAt?.let(Instant::parse),
     )
 
-fun GuideDashboardResponseDto.toDomain(): GuideDashboard =
+fun GuideDashboardResponse.toDomain(): GuideDashboard =
     GuideDashboard(
         activeSessionCount = activeSessionCount,
         pendingReviewCount = pendingReviewCount,
@@ -164,7 +164,7 @@ fun GuideDashboardResponseDto.toDomain(): GuideDashboard =
         currencyCode = currencyCode,
     )
 
-fun TourReviewSubmissionResponseDto.toDomain(): TourReviewSubmission =
+fun TourReviewSubmissionResponse.toDomain(): TourReviewSubmission =
     TourReviewSubmission(
         reviewId = reviewId,
         reviewType = reviewType,
@@ -172,20 +172,20 @@ fun TourReviewSubmissionResponseDto.toDomain(): TourReviewSubmission =
         details = tour.toDomain(),
     )
 
-fun CreateGuideTourInput.toDto(): CreateGuideTourRequestDto =
-    CreateGuideTourRequestDto(
+fun CreateGuideTourInput.toDto(): CreateGuideTourRequest =
+    CreateGuideTourRequest(
         tour = content.toDto(),
         session = session.toDto(),
     )
 
-fun SubmitTourChangeInput.toDto(): SubmitTourChangeRequestDto =
-    SubmitTourChangeRequestDto(
+fun SubmitTourChangeInput.toDto(): SubmitTourChangeRequest =
+    SubmitTourChangeRequest(
         baseVersion = baseVersion,
         proposedTour = content.toDto(),
     )
 
-fun UpdateTourSessionInput.toDto(): UpdateTourSessionRequestDto =
-    UpdateTourSessionRequestDto(
+fun UpdateTourSessionInput.toDto(): UpdateTourSessionRequest =
+    UpdateTourSessionRequest(
         version = version,
         meetingPoint = session.meetingPoint,
         startsAt = session.startsAt.toString(),
@@ -194,8 +194,8 @@ fun UpdateTourSessionInput.toDto(): UpdateTourSessionRequestDto =
         capacity = session.capacity,
     )
 
-fun TourSessionInput.toDto(): TourSessionRequestDto =
-    TourSessionRequestDto(
+fun TourSessionInput.toDto(): TourSessionRequest =
+    TourSessionRequest(
         meetingPoint = meetingPoint,
         startsAt = startsAt.toString(),
         durationMinutes = durationMinutes,
@@ -203,8 +203,8 @@ fun TourSessionInput.toDto(): TourSessionRequestDto =
         capacity = capacity,
     )
 
-private fun TourContentInput.toDto(): TourContentRequestDto =
-    TourContentRequestDto(
+private fun TourContentInput.toDto(): TourContentRequest =
+    TourContentRequest(
         title = title,
         description = description,
         countryCode = countryCode,

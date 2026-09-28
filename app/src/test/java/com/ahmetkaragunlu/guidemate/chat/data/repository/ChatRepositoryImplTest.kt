@@ -6,7 +6,7 @@ import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeClient
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeEvent
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeSessionManager
 import com.ahmetkaragunlu.guidemate.chat.data.remote.api.ChatApi
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantProfileUpdatedResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatParticipantProfileUpdatedResponse
 import com.ahmetkaragunlu.guidemate.chat.data.state.ChatStateStore
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
@@ -209,7 +209,7 @@ class ChatRepositoryImplTest {
 
         realtimeClient.emit(
             ChatRealtimeEvent.ParticipantProfileUpdated(
-                ChatParticipantProfileUpdatedResponseDto(
+                ChatParticipantProfileUpdatedResponse(
                     userId = 99,
                     avatarUrl = "https://example.com/new-avatar.jpg",
                 ),

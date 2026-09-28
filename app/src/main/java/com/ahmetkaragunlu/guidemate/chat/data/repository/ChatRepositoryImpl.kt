@@ -6,8 +6,8 @@ import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeEvent
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatRealtimeSessionManager
 import com.ahmetkaragunlu.guidemate.chat.data.realtime.ChatSessionSnapshot
 import com.ahmetkaragunlu.guidemate.chat.data.remote.api.ChatApi
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ClearChatRequestDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.SendChatMessageRequestDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.request.ClearChatRequest
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.request.SendChatMessageRequest
 import com.ahmetkaragunlu.guidemate.chat.data.state.ChatStateStore
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatConversation
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessage
@@ -184,7 +184,7 @@ class ChatRepositoryImpl @Inject constructor(
             request = {
                 api.clearConversation(
                     chatId = chatId,
-                    request = ClearChatRequestDto(clientRequestId = UUID.randomUUID().toString()),
+                    request = ClearChatRequest(clientRequestId = UUID.randomUUID().toString()),
                 )
             },
             transform = { it.unreadCount.toSafeInt() },
@@ -221,7 +221,7 @@ class ChatRepositoryImpl @Inject constructor(
                     api.sendMessage(
                         chatId = message.chatId,
                         request =
-                            SendChatMessageRequestDto(
+                            SendChatMessageRequest(
                                 clientMessageId = message.clientMessageId,
                                 body = message.text,
                             ),

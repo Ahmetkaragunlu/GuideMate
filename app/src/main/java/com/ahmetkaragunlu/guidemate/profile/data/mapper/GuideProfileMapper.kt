@@ -1,19 +1,19 @@
 package com.ahmetkaragunlu.guidemate.profile.data.mapper
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.media.data.mapper.toDomain
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuidePerformanceResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideProfileResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.GuideSearchItemResponseDto
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.UpdateGuideProfileRequestDto
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuidePerformanceResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuideProfileResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.response.GuideSearchItemResponse
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.request.UpdateGuideProfileRequest
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfile
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideProfileUpdate
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuideSearchResult
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
 import com.ahmetkaragunlu.guidemate.profile.domain.model.performance.GuidePerformanceSummary
 
-fun GuideProfileResponseDto.toDomain(): GuideProfile =
+fun GuideProfileResponse.toDomain(): GuideProfile =
     GuideProfile(
         guideId = guideId,
         firstName = firstName,
@@ -26,7 +26,7 @@ fun GuideProfileResponseDto.toDomain(): GuideProfile =
         performance = performance.toDomain(),
     )
 
-fun GuideSearchItemResponseDto.toDomain(): GuideSearchResult =
+fun GuideSearchItemResponse.toDomain(): GuideSearchResult =
     GuideSearchResult(
         guideId = guideId,
         displayName = displayName,
@@ -40,9 +40,9 @@ fun GuideSearchItemResponseDto.toDomain(): GuideSearchResult =
         level = GuideLevelTier.valueOf(level),
     )
 
-fun ApiPageResponse<GuideSearchItemResponseDto>.toDomain(): PagedResult<GuideSearchResult> =
+fun ApiPageResponse<GuideSearchItemResponse>.toDomain(): PagedResult<GuideSearchResult> =
     PagedResult(
-        items = content.map(GuideSearchItemResponseDto::toDomain),
+        items = content.map(GuideSearchItemResponse::toDomain),
         page = page,
         size = size,
         totalElements = totalElements,
@@ -51,14 +51,14 @@ fun ApiPageResponse<GuideSearchItemResponseDto>.toDomain(): PagedResult<GuideSea
         isLast = isLast,
     )
 
-fun GuideProfileUpdate.toDto(): UpdateGuideProfileRequestDto =
-    UpdateGuideProfileRequestDto(
+fun GuideProfileUpdate.toDto(): UpdateGuideProfileRequest =
+    UpdateGuideProfileRequest(
         specialtyTitle = specialtyTitle,
         biography = biography,
         languageCodes = languageCodes,
     )
 
-private fun GuidePerformanceResponseDto.toDomain(): GuidePerformanceSummary =
+private fun GuidePerformanceResponse.toDomain(): GuidePerformanceSummary =
     GuidePerformanceSummary(
         completedSessionCount = completedSessionCount,
         totalParticipantCount = totalParticipantCount,

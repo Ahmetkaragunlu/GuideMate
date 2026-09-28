@@ -1,16 +1,16 @@
 package com.ahmetkaragunlu.guidemate.tour.data.remote.api
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CancelTourSessionRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CreateGuideTourRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideDashboardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideTourCardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.SubmitTourChangeRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourDetailResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourReviewSubmissionResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionRequestDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.UpdateTourSessionRequestDto
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.CancelTourSessionRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.CreateGuideTourRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideDashboardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideTourCardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.SubmitTourChangeRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourDetailResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourReviewSubmissionResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.TourSessionRequest
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourSessionResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.UpdateTourSessionRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -26,58 +26,58 @@ interface GuideTourApi {
         @Query("tab") tab: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Response<ApiPageResponse<GuideTourCardResponseDto>>
+    ): Response<ApiPageResponse<GuideTourCardResponse>>
 
     @GET("api/v1/guides/me/tours/{tourId}")
     suspend fun getTour(
         @Path("tourId") tourId: String,
-    ): Response<TourDetailResponseDto>
+    ): Response<TourDetailResponse>
 
     @POST("api/v1/guides/me/tours")
     suspend fun createTour(
-        @Body request: CreateGuideTourRequestDto,
-    ): Response<TourReviewSubmissionResponseDto>
+        @Body request: CreateGuideTourRequest,
+    ): Response<TourReviewSubmissionResponse>
 
     @POST("api/v1/guides/me/tours/{tourId}/change-requests")
     suspend fun submitChange(
         @Path("tourId") tourId: String,
-        @Body request: SubmitTourChangeRequestDto,
-    ): Response<TourReviewSubmissionResponseDto>
+        @Body request: SubmitTourChangeRequest,
+    ): Response<TourReviewSubmissionResponse>
 
     @POST("api/v1/guides/me/tours/{tourId}/sessions")
     suspend fun addSession(
         @Path("tourId") tourId: String,
-        @Body request: TourSessionRequestDto,
-    ): Response<TourSessionResponseDto>
+        @Body request: TourSessionRequest,
+    ): Response<TourSessionResponse>
 
     @PATCH("api/v1/guides/me/sessions/{sessionId}")
     suspend fun updateSession(
         @Path("sessionId") sessionId: String,
-        @Body request: UpdateTourSessionRequestDto,
-    ): Response<TourSessionResponseDto>
+        @Body request: UpdateTourSessionRequest,
+    ): Response<TourSessionResponse>
 
     @POST("api/v1/guides/me/sessions/{sessionId}/open")
     suspend fun openSession(
         @Path("sessionId") sessionId: String,
-    ): Response<TourSessionResponseDto>
+    ): Response<TourSessionResponse>
 
     @POST("api/v1/guides/me/sessions/{sessionId}/close")
     suspend fun closeSession(
         @Path("sessionId") sessionId: String,
-    ): Response<TourSessionResponseDto>
+    ): Response<TourSessionResponse>
 
     @POST("api/v1/guides/me/sessions/{sessionId}/cancel")
     suspend fun cancelSession(
         @Path("sessionId") sessionId: String,
         @Header("Idempotency-Key") idempotencyKey: String,
-        @Body request: CancelTourSessionRequestDto,
-    ): Response<TourSessionResponseDto>
+        @Body request: CancelTourSessionRequest,
+    ): Response<TourSessionResponse>
 
     @POST("api/v1/guides/me/tours/{tourId}/archive")
     suspend fun archiveTour(
         @Path("tourId") tourId: String,
-    ): Response<TourDetailResponseDto>
+    ): Response<TourDetailResponse>
 
     @GET("api/v1/guides/me/dashboard")
-    suspend fun getDashboard(): Response<GuideDashboardResponseDto>
+    suspend fun getDashboard(): Response<GuideDashboardResponse>
 }

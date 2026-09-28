@@ -1,8 +1,8 @@
 package com.ahmetkaragunlu.guidemate.payment.data.mapper
 
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.CheckoutCurrenciesResponseDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentQuoteResponseDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentResponseDto
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.CheckoutCurrenciesResponse
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.PaymentQuoteResponse
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.PaymentResponse
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrencies
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutCurrency
 import com.ahmetkaragunlu.guidemate.payment.domain.model.HostedPaymentDetails
@@ -17,7 +17,7 @@ import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservation
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentReservationStatus
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentStatus
 
-internal fun CheckoutCurrenciesResponseDto.toDomain(): CheckoutCurrencies =
+internal fun CheckoutCurrenciesResponse.toDomain(): CheckoutCurrencies =
     CheckoutCurrencies(
         baseCurrencyCode = baseCurrencyCode,
         chargeCurrencies =
@@ -29,7 +29,7 @@ internal fun CheckoutCurrenciesResponseDto.toDomain(): CheckoutCurrencies =
             },
     )
 
-internal fun PaymentQuoteResponseDto.toDomain(): PaymentQuote =
+internal fun PaymentQuoteResponse.toDomain(): PaymentQuote =
     PaymentQuote(
         id = quoteId,
         purpose = enumValueOf(purpose),
@@ -44,7 +44,7 @@ internal fun PaymentQuoteResponseDto.toDomain(): PaymentQuote =
         expiresAt = expiresAt,
     )
 
-internal fun PaymentResponseDto.toDomain(): Payment =
+internal fun PaymentResponse.toDomain(): Payment =
     Payment(
         id = paymentId,
         purpose = enumValueOf<PaymentPurpose>(purpose),
@@ -61,7 +61,7 @@ internal fun PaymentResponseDto.toDomain(): Payment =
         updatedAt = updatedAt,
     )
 
-private fun PaymentResponseDto.toChargeDetails(): PaymentChargeDetails? =
+private fun PaymentResponse.toChargeDetails(): PaymentChargeDetails? =
     if (
         quoteId == null &&
             chargeAmountMinor == null &&
@@ -82,7 +82,7 @@ private fun PaymentResponseDto.toChargeDetails(): PaymentChargeDetails? =
         )
     }
 
-private fun PaymentResponseDto.toHostedPaymentDetails(): HostedPaymentDetails? =
+private fun PaymentResponse.toHostedPaymentDetails(): HostedPaymentDetails? =
     if (paymentPageUrl == null && expiresAt == null) {
         null
     } else {
@@ -92,7 +92,7 @@ private fun PaymentResponseDto.toHostedPaymentDetails(): HostedPaymentDetails? =
         )
     }
 
-private fun PaymentResponseDto.toPaymentReservation(): PaymentReservation? =
+private fun PaymentResponse.toPaymentReservation(): PaymentReservation? =
     if (reservationId == null && reservationStatus == null) {
         null
     } else {
@@ -102,7 +102,7 @@ private fun PaymentResponseDto.toPaymentReservation(): PaymentReservation? =
         )
     }
 
-private fun PaymentResponseDto.toPaymentRefund(): PaymentRefund? =
+private fun PaymentResponse.toPaymentRefund(): PaymentRefund? =
     if (
         refundId == null &&
             refundStatus == null &&

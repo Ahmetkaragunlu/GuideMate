@@ -1,7 +1,7 @@
 package com.ahmetkaragunlu.guidemate.media.data.remote.api
 
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaDeletionResponse
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaUploadResponse
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaDeletionResponse
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaUploadResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.DELETE

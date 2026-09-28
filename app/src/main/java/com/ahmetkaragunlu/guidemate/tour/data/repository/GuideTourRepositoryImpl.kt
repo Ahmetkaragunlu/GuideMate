@@ -6,7 +6,7 @@ import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.tour.data.mapper.toDomain
 import com.ahmetkaragunlu.guidemate.tour.data.mapper.toDto
 import com.ahmetkaragunlu.guidemate.tour.data.remote.api.GuideTourApi
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.CancelTourSessionRequestDto
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.request.CancelTourSessionRequest
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideDashboard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.guide.GuideTourCard
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourDetails
@@ -86,7 +86,7 @@ class GuideTourRepositoryImpl @Inject constructor(
                 api.cancelSession(
                     sessionId = sessionId,
                     idempotencyKey = idempotencyKey,
-                    request = CancelTourSessionRequestDto(reason.trim()),
+                    request = CancelTourSessionRequest(reason.trim()),
                 )
             },
             transform = { it.toDomain() },

@@ -3,7 +3,7 @@ package com.ahmetkaragunlu.guidemate.payment.data.repository
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.payment.data.remote.api.SavedPaymentMethodApi
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.SavedPaymentMethodResponseDto
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.SavedPaymentMethodResponse
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -56,7 +56,7 @@ class SavedPaymentMethodRepositoryImplTest {
     private class FakeSavedPaymentMethodApi : SavedPaymentMethodApi {
         var deletedCardId: String? = null
 
-        override suspend fun getCards(): Response<List<SavedPaymentMethodResponseDto>> =
+        override suspend fun getCards(): Response<List<SavedPaymentMethodResponse>> =
             Response.success(listOf(cardResponse()))
 
         override suspend fun delete(savedPaymentMethodId: String): Response<Unit> {
@@ -64,8 +64,8 @@ class SavedPaymentMethodRepositoryImplTest {
             return Response.success(Unit)
         }
 
-        private fun cardResponse(id: String = "saved-card-1"): SavedPaymentMethodResponseDto =
-            SavedPaymentMethodResponseDto(
+        private fun cardResponse(id: String = "saved-card-1"): SavedPaymentMethodResponse =
+            SavedPaymentMethodResponse(
                 savedPaymentMethodId = id,
                 alias = "Seyahat kartım",
                 bankName = "Test Bankası",

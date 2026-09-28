@@ -1,23 +1,23 @@
 package com.ahmetkaragunlu.guidemate.chat.data.mapper
 
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatConversationResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessagePageResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatMessageResponseDto
-import com.ahmetkaragunlu.guidemate.chat.data.remote.model.ChatParticipantResponseDto
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatConversationResponse
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatMessagePageResponse
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatMessageResponse
+import com.ahmetkaragunlu.guidemate.chat.data.remote.model.response.ChatParticipantResponse
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatConversation
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessage
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageDeliveryStatus
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatMessageHistory
 import com.ahmetkaragunlu.guidemate.chat.domain.model.ChatParticipant
 
-fun ChatParticipantResponseDto.toDomain(): ChatParticipant =
+fun ChatParticipantResponse.toDomain(): ChatParticipant =
     ChatParticipant(
         userId = userId,
         displayName = displayName,
         avatarUrl = avatarUrl,
     )
 
-fun ChatMessageResponseDto.toDomain(): ChatMessage =
+fun ChatMessageResponse.toDomain(): ChatMessage =
     ChatMessage(
         messageId = messageId,
         chatId = chatId,
@@ -28,7 +28,7 @@ fun ChatMessageResponseDto.toDomain(): ChatMessage =
         deliveryStatus = deliveryStatus.toDeliveryStatus(),
     )
 
-fun ChatConversationResponseDto.toDomain(): ChatConversation =
+fun ChatConversationResponse.toDomain(): ChatConversation =
     ChatConversation(
         chatId = chatId,
         guide = guide.toDomain(),
@@ -39,9 +39,9 @@ fun ChatConversationResponseDto.toDomain(): ChatConversation =
         lastActivityAt = lastActivityAt,
     )
 
-fun ChatMessagePageResponseDto.toDomain(): ChatMessageHistory =
+fun ChatMessagePageResponse.toDomain(): ChatMessageHistory =
     ChatMessageHistory(
-        messages = content.map(ChatMessageResponseDto::toDomain),
+        messages = content.map(ChatMessageResponse::toDomain),
         nextCursor = nextCursor,
         hasMore = hasNext,
     )

@@ -1,8 +1,8 @@
 package com.ahmetkaragunlu.guidemate.review.data.mapper
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
-import com.ahmetkaragunlu.guidemate.review.data.remote.model.TourReviewResponseDto
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaReferenceResponse
+import com.ahmetkaragunlu.guidemate.review.data.remote.model.response.TourReviewResponse
 import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -14,11 +14,11 @@ class TourReviewMapperTest {
             ApiPageResponse(
                 content =
                     listOf(
-                        TourReviewResponseDto(
+                        TourReviewResponse(
                             reviewId = "review-1",
                             reviewerDisplayName = "Elif Demir",
                             reviewerAvatar =
-                                MediaReferenceResponseDto(
+                                MediaReferenceResponse(
                                     mediaAssetId = "avatar-1",
                                     imageUrl = "https://example.com/avatar",
                                 ),

@@ -1,8 +1,8 @@
 package com.ahmetkaragunlu.guidemate.tour.data.remote.api
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourDetailResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSearchItemResponseDto
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourDetailResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourSearchItemResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -22,22 +22,22 @@ interface TourDiscoveryApi {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String,
-    ): Response<ApiPageResponse<TourSearchItemResponseDto>>
+    ): Response<ApiPageResponse<TourSearchItemResponse>>
 
     @GET("api/v1/tours/popular")
     suspend fun getPopularTours(
         @Query("guideId") guideId: Long?,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Response<ApiPageResponse<TourSearchItemResponseDto>>
+    ): Response<ApiPageResponse<TourSearchItemResponse>>
 
     @GET("api/v1/tours/{tourId}")
     suspend fun getTour(
         @Path("tourId") tourId: String,
-    ): Response<TourDetailResponseDto>
+    ): Response<TourDetailResponse>
 
     @GET("api/v1/tour-sessions/{sessionId}")
     suspend fun getSession(
         @Path("sessionId") sessionId: String,
-    ): Response<TourDetailResponseDto>
+    ): Response<TourDetailResponse>
 }

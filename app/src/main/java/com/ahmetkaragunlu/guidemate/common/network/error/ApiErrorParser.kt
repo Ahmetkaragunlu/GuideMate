@@ -1,5 +1,7 @@
 package com.ahmetkaragunlu.guidemate.common.network.error
 
+import com.ahmetkaragunlu.guidemate.common.network.error.response.ApiErrorResponse
+
 import com.ahmetkaragunlu.guidemate.common.result.AppError
 import com.ahmetkaragunlu.guidemate.common.result.AppFieldError
 import com.ahmetkaragunlu.guidemate.common.result.BackendErrorCode

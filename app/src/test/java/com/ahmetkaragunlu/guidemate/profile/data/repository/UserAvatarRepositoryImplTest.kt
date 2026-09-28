@@ -2,9 +2,9 @@ package com.ahmetkaragunlu.guidemate.profile.data.repository
 
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaReferenceResponse
 import com.ahmetkaragunlu.guidemate.profile.data.remote.api.UserAvatarApi
-import com.ahmetkaragunlu.guidemate.profile.data.remote.model.UpdateUserAvatarRequestDto
+import com.ahmetkaragunlu.guidemate.profile.data.remote.model.request.UpdateUserAvatarRequest
 import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -40,16 +40,16 @@ class UserAvatarRepositoryImplTest {
     }
 
     private class FakeUserAvatarApi(
-        var response: Response<MediaReferenceResponseDto> =
+        var response: Response<MediaReferenceResponse> =
             Response.success(
-                MediaReferenceResponseDto("media-1", "https://example.com/avatar.jpg"),
+                MediaReferenceResponse("media-1", "https://example.com/avatar.jpg"),
             ),
     ) : UserAvatarApi {
-        var lastRequest: UpdateUserAvatarRequestDto? = null
+        var lastRequest: UpdateUserAvatarRequest? = null
 
         override suspend fun updateAvatar(
-            request: UpdateUserAvatarRequestDto,
-        ): Response<MediaReferenceResponseDto> {
+            request: UpdateUserAvatarRequest,
+        ): Response<MediaReferenceResponse> {
             lastRequest = request
             return response
         }

@@ -1,14 +1,14 @@
 package com.ahmetkaragunlu.guidemate.tour.data.repository
 
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaReferenceResponse
 import com.ahmetkaragunlu.guidemate.tour.data.remote.api.TourDiscoveryApi
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.PublicGuideSummaryResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourDetailResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSearchItemResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionResponseDto
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.PublicGuideSummaryResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourDetailResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourSearchItemResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourSessionResponse
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchQuery
 import com.ahmetkaragunlu.guidemate.tour.domain.model.discovery.TourSearchSort
 import kotlinx.coroutines.runBlocking
@@ -105,7 +105,7 @@ class TourDiscoveryRepositoryImplTest {
             page: Int,
             size: Int,
             sort: String,
-        ): Response<ApiPageResponse<TourSearchItemResponseDto>> {
+        ): Response<ApiPageResponse<TourSearchItemResponse>> {
             this.query = query
             this.countryCode = countryCode
             this.cityPlaceId = cityPlaceId
@@ -129,7 +129,7 @@ class TourDiscoveryRepositoryImplTest {
             guideId: Long?,
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<TourSearchItemResponseDto>> {
+        ): Response<ApiPageResponse<TourSearchItemResponse>> {
             popularGuideId = guideId
             return Response.success(
                 ApiPageResponse(
@@ -144,7 +144,7 @@ class TourDiscoveryRepositoryImplTest {
             )
         }
 
-        override suspend fun getTour(tourId: String): Response<TourDetailResponseDto> =
+        override suspend fun getTour(tourId: String): Response<TourDetailResponse> =
             Response.success(
                 detailResponse(
                     sessions =
@@ -155,11 +155,11 @@ class TourDiscoveryRepositoryImplTest {
                 ),
             )
 
-        override suspend fun getSession(sessionId: String): Response<TourDetailResponseDto> =
+        override suspend fun getSession(sessionId: String): Response<TourDetailResponse> =
             Response.success(detailResponse(sessions = listOf(sessionResponse(sessionId))))
 
-        private fun searchItemResponse(): TourSearchItemResponseDto =
-            TourSearchItemResponseDto(
+        private fun searchItemResponse(): TourSearchItemResponse =
+            TourSearchItemResponse(
                 tourId = "tour-1",
                 sessionId = "session-1",
                 title = "Tarihi İstanbul",
@@ -181,9 +181,9 @@ class TourDiscoveryRepositoryImplTest {
             )
 
         private fun detailResponse(
-            sessions: List<TourSessionResponseDto>,
-        ): TourDetailResponseDto =
-            TourDetailResponseDto(
+            sessions: List<TourSessionResponse>,
+        ): TourDetailResponse =
+            TourDetailResponse(
                 tourId = "tour-1",
                 version = 7,
                 guide = guideResponse(),
@@ -206,8 +206,8 @@ class TourDiscoveryRepositoryImplTest {
                 sessions = sessions,
             )
 
-        private fun sessionResponse(sessionId: String): TourSessionResponseDto =
-            TourSessionResponseDto(
+        private fun sessionResponse(sessionId: String): TourSessionResponse =
+            TourSessionResponse(
                 sessionId = sessionId,
                 tourId = "tour-1",
                 version = 3,
@@ -225,15 +225,15 @@ class TourDiscoveryRepositoryImplTest {
                 cancelledAt = null,
             )
 
-        private fun guideResponse(): PublicGuideSummaryResponseDto =
-            PublicGuideSummaryResponseDto(
+        private fun guideResponse(): PublicGuideSummaryResponse =
+            PublicGuideSummaryResponse(
                 guideId = 42,
                 displayName = "Ahmet Karagünlü",
                 avatar = null,
             )
 
-        private fun mediaResponse(): MediaReferenceResponseDto =
-            MediaReferenceResponseDto(
+        private fun mediaResponse(): MediaReferenceResponse =
+            MediaReferenceResponse(
                 mediaAssetId = "media-cover",
                 imageUrl = "https://example.com/cover",
             )

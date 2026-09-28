@@ -1,15 +1,15 @@
 package com.ahmetkaragunlu.guidemate.reservation.data.mapper
 
 import com.ahmetkaragunlu.guidemate.common.location.locale.LocaleSelectionCatalog
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
 import com.ahmetkaragunlu.guidemate.media.domain.model.MediaReference
 import com.ahmetkaragunlu.guidemate.profile.domain.model.GuidePublicSummary
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.CancelReservationRequestDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationCancellationResponseDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationResponseDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationReviewResponseDto
-import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.ReservationSnapshotResponseDto
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.request.CancelReservationRequest
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationCancellationResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationReviewResponse
+import com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response.ReservationSnapshotResponse
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.CancelReservationInput
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationActor
 import com.ahmetkaragunlu.guidemate.reservation.domain.model.ReservationCancellationDetails
@@ -31,9 +31,9 @@ import com.ahmetkaragunlu.guidemate.tour.data.mapper.toTourLanguage
 import java.time.Instant
 import java.util.Locale
 
-fun ApiPageResponse<ReservationResponseDto>.toDomain(): PagedResult<TouristReservation> =
+fun ApiPageResponse<ReservationResponse>.toDomain(): PagedResult<TouristReservation> =
     PagedResult(
-        items = content.map(ReservationResponseDto::toDomain),
+        items = content.map(ReservationResponse::toDomain),
         page = page,
         size = size,
         totalElements = totalElements,
@@ -42,7 +42,7 @@ fun ApiPageResponse<ReservationResponseDto>.toDomain(): PagedResult<TouristReser
         isLast = isLast,
     )
 
-fun ReservationResponseDto.toDomain(): TouristReservation =
+fun ReservationResponse.toDomain(): TouristReservation =
     TouristReservation(
         id = reservationId,
         tourSessionId = sessionId,
@@ -77,7 +77,7 @@ fun ReservationResponseDto.toDomain(): TouristReservation =
         review = review?.toDomain(),
     )
 
-fun ReservationCancellationResponseDto.toDomain(): ReservationCancellationResult =
+fun ReservationCancellationResponse.toDomain(): ReservationCancellationResult =
     ReservationCancellationResult(
         reservation = reservation.toDomain(),
         refundEligibility = ReservationRefundEligibility.valueOf(refundEligibility),
@@ -85,13 +85,13 @@ fun ReservationCancellationResponseDto.toDomain(): ReservationCancellationResult
         refundStatus = refundStatus?.let(ReservationRefundStatus::valueOf),
     )
 
-fun CancelReservationInput.toDto(): CancelReservationRequestDto =
-    CancelReservationRequestDto(
+fun CancelReservationInput.toDto(): CancelReservationRequest =
+    CancelReservationRequest(
         version = version,
         reason = reason?.trim()?.takeIf(String::isNotEmpty),
     )
 
-private fun ReservationSnapshotResponseDto.toDomain(): TouristReservationSnapshot {
+private fun ReservationSnapshotResponse.toDomain(): TouristReservationSnapshot {
     val locale = Locale.getDefault()
     return TouristReservationSnapshot(
         tourId = tourId,
@@ -128,7 +128,7 @@ private fun ReservationSnapshotResponseDto.toDomain(): TouristReservationSnapsho
     )
 }
 
-private fun ReservationReviewResponseDto.toDomain(): SubmittedReview =
+private fun ReservationReviewResponse.toDomain(): SubmittedReview =
     SubmittedReview(
         id = reviewId,
         rating = rating,

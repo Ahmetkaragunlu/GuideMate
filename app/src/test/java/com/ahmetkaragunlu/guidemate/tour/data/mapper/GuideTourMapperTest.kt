@@ -1,13 +1,13 @@
 package com.ahmetkaragunlu.guidemate.tour.data.mapper
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
-import com.ahmetkaragunlu.guidemate.media.data.remote.model.MediaReferenceResponseDto
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaReferenceResponse
 import com.ahmetkaragunlu.guidemate.profile.domain.model.level.GuideLevelTier
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideDashboardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.GuideTourCardResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.PublicGuideSummaryResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourDetailResponseDto
-import com.ahmetkaragunlu.guidemate.tour.data.remote.model.TourSessionResponseDto
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideDashboardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.GuideTourCardResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.PublicGuideSummaryResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourDetailResponse
+import com.ahmetkaragunlu.guidemate.tour.data.remote.model.response.TourSessionResponse
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourApprovalStatus
 import com.ahmetkaragunlu.guidemate.tour.domain.model.session.TourSessionStatus
 import org.junit.Assert.assertEquals
@@ -73,7 +73,7 @@ class GuideTourMapperTest {
     @Test
     fun `maps dashboard projection as a single source of guide counters`() {
         val result =
-            GuideDashboardResponseDto(
+            GuideDashboardResponse(
                 activeSessionCount = 2,
                 pendingReviewCount = 1,
                 completedSessionCount = 12,
@@ -91,8 +91,8 @@ class GuideTourMapperTest {
         assertEquals(12_500L, result.currentMonthEarningsMinor)
     }
 
-    private fun cardResponse(): GuideTourCardResponseDto =
-        GuideTourCardResponseDto(
+    private fun cardResponse(): GuideTourCardResponse =
+        GuideTourCardResponse(
             tourId = "tour-1",
             sessionId = "session-1",
             tourVersion = 7,
@@ -103,7 +103,7 @@ class GuideTourMapperTest {
             timeZoneId = "Europe/Istanbul",
             categoryCode = "culture",
             languageCodes = listOf("tr", "en"),
-            cover = MediaReferenceResponseDto("media-cover", "https://example.com/cover"),
+            cover = MediaReferenceResponse("media-cover", "https://example.com/cover"),
             startsAt = "2027-05-24T06:00:00Z",
             durationMinutes = 180,
             priceMinor = 15_000,
@@ -119,12 +119,12 @@ class GuideTourMapperTest {
             canArchive = false,
         )
 
-    private fun detailResponse(): TourDetailResponseDto =
-        TourDetailResponseDto(
+    private fun detailResponse(): TourDetailResponse =
+        TourDetailResponse(
             tourId = "tour-1",
             version = 7,
             guide =
-                PublicGuideSummaryResponseDto(
+                PublicGuideSummaryResponse(
                     guideId = 42,
                     displayName = "Ahmet Karagünlü",
                     avatar = null,
@@ -137,7 +137,7 @@ class GuideTourMapperTest {
             timeZoneId = "Europe/Istanbul",
             categoryCode = "culture",
             languageCodes = emptyList(),
-            cover = MediaReferenceResponseDto("media-cover", "https://example.com/cover"),
+            cover = MediaReferenceResponse("media-cover", "https://example.com/cover"),
             approvalStatus = "APPROVED",
             submittedAt = "2026-08-01T10:00:00Z",
             publishedAt = "2026-08-02T10:00:00Z",
@@ -148,8 +148,8 @@ class GuideTourMapperTest {
             sessions = listOf(sessionResponse()),
         )
 
-    private fun sessionResponse(): TourSessionResponseDto =
-        TourSessionResponseDto(
+    private fun sessionResponse(): TourSessionResponse =
+        TourSessionResponse(
             sessionId = "session-1",
             tourId = "tour-1",
             version = 3,

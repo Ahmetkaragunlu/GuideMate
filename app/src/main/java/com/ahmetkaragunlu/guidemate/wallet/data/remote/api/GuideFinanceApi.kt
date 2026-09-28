@@ -1,12 +1,12 @@
 package com.ahmetkaragunlu.guidemate.wallet.data.remote.api
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.AddBankAccountRequestDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.BankAccountResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.GuideEarningResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.MonthlyGuideEarningResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalRequestDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WithdrawalResponseDto
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.request.AddBankAccountRequest
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.BankAccountResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.GuideEarningResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.MonthlyGuideEarningResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.request.WithdrawalRequest
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.WithdrawalResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -22,28 +22,28 @@ interface GuideFinanceApi {
         @Query("year") year: Int,
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Response<ApiPageResponse<GuideEarningResponseDto>>
+    ): Response<ApiPageResponse<GuideEarningResponse>>
 
     @GET("api/v1/guides/me/earnings/monthly")
     suspend fun getMonthlyEarnings(
         @Query("year") year: Int,
-    ): Response<List<MonthlyGuideEarningResponseDto>>
+    ): Response<List<MonthlyGuideEarningResponse>>
 
     @GET("api/v1/guides/me/bank-accounts")
     suspend fun getBankAccounts(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Response<ApiPageResponse<BankAccountResponseDto>>
+    ): Response<ApiPageResponse<BankAccountResponse>>
 
     @POST("api/v1/guides/me/bank-accounts")
     suspend fun addBankAccount(
-        @Body request: AddBankAccountRequestDto,
-    ): Response<BankAccountResponseDto>
+        @Body request: AddBankAccountRequest,
+    ): Response<BankAccountResponse>
 
     @POST("api/v1/guides/me/bank-accounts/{bankAccountId}/default")
     suspend fun makeDefaultBankAccount(
         @Path("bankAccountId") bankAccountId: String,
-    ): Response<BankAccountResponseDto>
+    ): Response<BankAccountResponse>
 
     @DELETE("api/v1/guides/me/bank-accounts/{bankAccountId}")
     suspend fun deleteBankAccount(
@@ -54,11 +54,11 @@ interface GuideFinanceApi {
     suspend fun getWithdrawals(
         @Query("page") page: Int,
         @Query("size") size: Int,
-    ): Response<ApiPageResponse<WithdrawalResponseDto>>
+    ): Response<ApiPageResponse<WithdrawalResponse>>
 
     @POST("api/v1/guides/me/withdrawals")
     suspend fun requestWithdrawal(
         @Header("Idempotency-Key") idempotencyKey: String,
-        @Body request: WithdrawalRequestDto,
-    ): Response<WithdrawalResponseDto>
+        @Body request: WithdrawalRequest,
+    ): Response<WithdrawalResponse>
 }

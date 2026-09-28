@@ -1,14 +1,14 @@
 package com.ahmetkaragunlu.guidemate.notification.data.repository
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.notification.data.realtime.NotificationRealtimeClient
 import com.ahmetkaragunlu.guidemate.notification.data.remote.api.NotificationApi
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.MarkRelatedNotificationsReadRequestDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationPreferencesResponseDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.NotificationResponseDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.RegisterDeviceRequestDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.UnreadCountResponseDto
-import com.ahmetkaragunlu.guidemate.notification.data.remote.model.UpdateNotificationPreferencesRequestDto
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.request.MarkRelatedNotificationsReadRequest
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.response.NotificationPreferencesResponse
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.response.NotificationResponse
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.request.RegisterDeviceRequest
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.response.UnreadCountResponse
+import com.ahmetkaragunlu.guidemate.notification.data.remote.model.request.UpdateNotificationPreferencesRequest
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationNavigationTarget
 import com.ahmetkaragunlu.guidemate.notification.domain.model.NotificationTargetReference
 import com.ahmetkaragunlu.guidemate.notification.domain.push.SystemNotificationController
@@ -62,8 +62,8 @@ internal class FakeNotificationApi(
     private val unreadCount: Long = 0,
 ) : NotificationApi {
     val requestedPages = mutableListOf<Int>()
-    var deviceRequest: RegisterDeviceRequestDto? = null
-    var relatedReadRequest: MarkRelatedNotificationsReadRequestDto? = null
+    var deviceRequest: RegisterDeviceRequest? = null
+    var relatedReadRequest: MarkRelatedNotificationsReadRequest? = null
     var notificationRequestStarted: CompletableDeferred<Unit>? = null
     var notificationResponseGate: CompletableDeferred<Unit>? = null
     var markReadCalls = 0
@@ -72,7 +72,7 @@ internal class FakeNotificationApi(
     override suspend fun getNotifications(
         page: Int,
         size: Int,
-    ): Response<ApiPageResponse<NotificationResponseDto>> {
+    ): Response<ApiPageResponse<NotificationResponse>> {
         requestedPages += page
         val notificationId = firstPageNotificationId
         notificationRequestStarted?.complete(Unit)
@@ -99,35 +99,35 @@ internal class FakeNotificationApi(
         )
     }
 
-    override suspend fun getUnreadCount(): Response<UnreadCountResponseDto> =
-        Response.success(UnreadCountResponseDto(unreadCount))
+    override suspend fun getUnreadCount(): Response<UnreadCountResponse> =
+        Response.success(UnreadCountResponse(unreadCount))
 
     override suspend fun markRead(
         notificationId: String,
-    ): Response<NotificationResponseDto> {
+    ): Response<NotificationResponse> {
         markReadCalls++
         return Response.success(notification(notificationId, minute = 1, isRead = true))
     }
 
-    override suspend fun markAllRead(): Response<UnreadCountResponseDto> =
-        Response.success(UnreadCountResponseDto(0))
+    override suspend fun markAllRead(): Response<UnreadCountResponse> =
+        Response.success(UnreadCountResponse(0))
 
     override suspend fun markRelatedRead(
-        request: MarkRelatedNotificationsReadRequestDto,
-    ): Response<UnreadCountResponseDto> {
+        request: MarkRelatedNotificationsReadRequest,
+    ): Response<UnreadCountResponse> {
         relatedReadRequest = request
-        return Response.success(UnreadCountResponseDto(unreadCount))
+        return Response.success(UnreadCountResponse(unreadCount))
     }
 
-    override suspend fun getPreferences(): Response<NotificationPreferencesResponseDto> =
+    override suspend fun getPreferences(): Response<NotificationPreferencesResponse> =
         Response.success(preferences())
 
     override suspend fun updatePreferences(
-        request: UpdateNotificationPreferencesRequestDto,
-    ): Response<NotificationPreferencesResponseDto> = Response.success(preferences())
+        request: UpdateNotificationPreferencesRequest,
+    ): Response<NotificationPreferencesResponse> = Response.success(preferences())
 
     override suspend fun registerDevice(
-        request: RegisterDeviceRequestDto,
+        request: RegisterDeviceRequest,
     ): Response<ResponseBody> {
         deviceRequest = request
         return Response.success("".toResponseBody())
@@ -137,8 +137,8 @@ internal class FakeNotificationApi(
         id: String,
         minute: Int,
         isRead: Boolean,
-    ): NotificationResponseDto =
-        NotificationResponseDto(
+    ): NotificationResponse =
+        NotificationResponse(
             id = id,
             type = "CHAT_MESSAGE",
             actorId = 9,
@@ -149,8 +149,8 @@ internal class FakeNotificationApi(
             createdAt = Instant.parse("2026-08-25T12:0${minute}:00Z"),
         )
 
-    private fun preferences(): NotificationPreferencesResponseDto =
-        NotificationPreferencesResponseDto(
+    private fun preferences(): NotificationPreferencesResponse =
+        NotificationPreferencesResponse(
             upcomingTourRemindersEnabled = true,
             chatMessagesEnabled = true,
             reservationUpdatesEnabled = true,

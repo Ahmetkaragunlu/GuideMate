@@ -1,18 +1,18 @@
 package com.ahmetkaragunlu.guidemate.review.data.mapper
 
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.pagination.PagedResult
-import com.ahmetkaragunlu.guidemate.review.data.remote.model.ReviewSubmissionRequestDto
-import com.ahmetkaragunlu.guidemate.review.data.remote.model.SubmittedReviewResponseDto
-import com.ahmetkaragunlu.guidemate.review.data.remote.model.TourReviewResponseDto
+import com.ahmetkaragunlu.guidemate.review.data.remote.model.request.ReviewSubmissionRequest
+import com.ahmetkaragunlu.guidemate.review.data.remote.model.response.SubmittedReviewResponse
+import com.ahmetkaragunlu.guidemate.review.data.remote.model.response.TourReviewResponse
 import com.ahmetkaragunlu.guidemate.review.domain.model.ReviewSubmissionInput
 import com.ahmetkaragunlu.guidemate.review.domain.model.SubmittedReview
 import com.ahmetkaragunlu.guidemate.tour.domain.model.TourReview
 import java.time.Instant
 
-fun ApiPageResponse<TourReviewResponseDto>.toDomain(): PagedResult<TourReview> =
+fun ApiPageResponse<TourReviewResponse>.toDomain(): PagedResult<TourReview> =
     PagedResult(
-        items = content.map(TourReviewResponseDto::toDomain),
+        items = content.map(TourReviewResponse::toDomain),
         page = page,
         size = size,
         totalElements = totalElements,
@@ -21,7 +21,7 @@ fun ApiPageResponse<TourReviewResponseDto>.toDomain(): PagedResult<TourReview> =
         isLast = isLast,
     )
 
-private fun TourReviewResponseDto.toDomain(): TourReview =
+private fun TourReviewResponse.toDomain(): TourReview =
     TourReview(
         id = reviewId,
         reviewerName = reviewerDisplayName,
@@ -31,13 +31,13 @@ private fun TourReviewResponseDto.toDomain(): TourReview =
         submittedAt = Instant.parse(submittedAt),
     )
 
-fun ReviewSubmissionInput.toDto(): ReviewSubmissionRequestDto =
-    ReviewSubmissionRequestDto(
+fun ReviewSubmissionInput.toDto(): ReviewSubmissionRequest =
+    ReviewSubmissionRequest(
         rating = rating,
         comment = comment.trim().takeIf(String::isNotEmpty),
     )
 
-fun SubmittedReviewResponseDto.toDomain(): SubmittedReview =
+fun SubmittedReviewResponse.toDomain(): SubmittedReview =
     SubmittedReview(
         id = reviewId,
         rating = rating,

@@ -1,0 +1,66 @@
+package com.ahmetkaragunlu.guidemate.reservation.data.remote.model.response
+
+import com.ahmetkaragunlu.guidemate.media.data.remote.model.response.MediaReferenceResponse
+import com.google.gson.annotations.SerializedName
+
+data class ReservationResponse(
+    @SerializedName("reservationId") val reservationId: String,
+    @SerializedName("sessionId") val sessionId: String,
+    @SerializedName("version") val version: Long,
+    @SerializedName("participantCount") val participantCount: Int,
+    @SerializedName("unitPriceMinor") val unitPriceMinor: Long,
+    @SerializedName("totalPriceMinor") val totalPriceMinor: Long,
+    @SerializedName("currencyCode") val currencyCode: String,
+    @SerializedName("status") val status: String,
+    @SerializedName("holdExpiresAt") val holdExpiresAt: String?,
+    @SerializedName("cancellationActor") val cancellationActor: String?,
+    @SerializedName("cancellationReason") val cancellationReason: String?,
+    @SerializedName("cancelledAt") val cancelledAt: String?,
+    @SerializedName("cancellationRefundEligibility") val cancellationRefundEligibility: String?,
+    @SerializedName("cancellationPolicyCode") val cancellationPolicyCode: String,
+    @SerializedName("cancellationPolicyVersion") val cancellationPolicyVersion: Int,
+    @SerializedName("averageRating") val averageRating: Double,
+    @SerializedName("reviewCount") val reviewCount: Long,
+    @SerializedName("bookedCount") val bookedCount: Int,
+    @SerializedName("capacity") val capacity: Int,
+    @SerializedName("snapshot") val snapshot: ReservationSnapshotResponse,
+    @SerializedName("review") val review: ReservationReviewResponse?,
+)
+
+data class ReservationSnapshotResponse(
+    @SerializedName("tourId") val tourId: String,
+    @SerializedName("guide") val guide: ReservationGuideResponse,
+    @SerializedName("title") val title: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("countryCode") val countryCode: String,
+    @SerializedName("cityPlaceId") val cityPlaceId: String,
+    @SerializedName("cityName") val cityName: String,
+    @SerializedName("timeZoneId") val timeZoneId: String,
+    @SerializedName("categoryCode") val categoryCode: String,
+    @SerializedName("languageCodes") val languageCodes: List<String>,
+    @SerializedName("cover") val cover: MediaReferenceResponse?,
+    @SerializedName("startsAt") val startsAt: String,
+    @SerializedName("durationMinutes") val durationMinutes: Int,
+    @SerializedName("meetingPoint") val meetingPoint: String,
+    @SerializedName("unitPriceMinor") val unitPriceMinor: Long,
+)
+
+data class ReservationGuideResponse(
+    @SerializedName("guideId") val guideId: Long,
+    @SerializedName("displayName") val displayName: String,
+    @SerializedName("avatar") val avatar: MediaReferenceResponse?,
+)
+
+data class ReservationReviewResponse(
+    @SerializedName("reviewId") val reviewId: String,
+    @SerializedName("rating") val rating: Int,
+    @SerializedName("comment") val comment: String?,
+    @SerializedName("submittedAt") val submittedAt: String,
+)
+
+data class ReservationCancellationResponse(
+    @SerializedName("reservation") val reservation: ReservationResponse,
+    @SerializedName("refundEligibility") val refundEligibility: String,
+    @SerializedName("refundId") val refundId: String?,
+    @SerializedName("refundStatus") val refundStatus: String?,
+)

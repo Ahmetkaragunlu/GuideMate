@@ -4,14 +4,14 @@ import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.payment.data.local.PendingPaymentStorage
 import com.ahmetkaragunlu.guidemate.payment.data.remote.api.PaymentApi
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.CheckoutCurrenciesResponseDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.CheckoutCurrencyOptionResponseDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentQuoteResponseDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.PaymentResponseDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.TourCheckoutRequestDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.TourPaymentQuoteRequestDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.WalletTopUpQuoteRequestDto
-import com.ahmetkaragunlu.guidemate.payment.data.remote.model.WalletTopUpRequestDto
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.CheckoutCurrenciesResponse
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.CheckoutCurrencyOptionResponse
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.PaymentQuoteResponse
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.response.PaymentResponse
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.TourCheckoutRequest
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.TourPaymentQuoteRequest
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.WalletTopUpQuoteRequest
+import com.ahmetkaragunlu.guidemate.payment.data.remote.model.request.WalletTopUpRequest
 import com.ahmetkaragunlu.guidemate.payment.domain.model.CheckoutLocale
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentMethod
 import com.ahmetkaragunlu.guidemate.payment.domain.model.PaymentRefundStatus
@@ -147,15 +147,15 @@ class PaymentRepositoryImplTest {
         private val reservationStatus: String? = "PENDING_PAYMENT",
     ) : PaymentApi {
         var checkoutIdempotencyKey: String? = null
-        var checkoutRequest: TourCheckoutRequestDto? = null
+        var checkoutRequest: TourCheckoutRequest? = null
 
-        override suspend fun getCheckoutCurrencies(): Response<CheckoutCurrenciesResponseDto> =
+        override suspend fun getCheckoutCurrencies(): Response<CheckoutCurrenciesResponse> =
             Response.success(
-                CheckoutCurrenciesResponseDto(
+                CheckoutCurrenciesResponse(
                     baseCurrencyCode = "USD",
                     chargeCurrencies =
                         listOf(
-                            CheckoutCurrencyOptionResponseDto(
+                            CheckoutCurrencyOptionResponse(
                                 currencyCode = "TRY",
                                 fractionDigits = 2,
                             ),
@@ -164,17 +164,17 @@ class PaymentRepositoryImplTest {
             )
 
         override suspend fun quoteTour(
-            request: TourPaymentQuoteRequestDto,
-        ): Response<PaymentQuoteResponseDto> = Response.success(quoteResponse())
+            request: TourPaymentQuoteRequest,
+        ): Response<PaymentQuoteResponse> = Response.success(quoteResponse())
 
         override suspend fun quoteWalletTopUp(
-            request: WalletTopUpQuoteRequestDto,
-        ): Response<PaymentQuoteResponseDto> = Response.success(quoteResponse())
+            request: WalletTopUpQuoteRequest,
+        ): Response<PaymentQuoteResponse> = Response.success(quoteResponse())
 
         override suspend fun checkoutTour(
             idempotencyKey: String,
-            request: TourCheckoutRequestDto,
-        ): Response<PaymentResponseDto> {
+            request: TourCheckoutRequest,
+        ): Response<PaymentResponse> {
             checkoutIdempotencyKey = idempotencyKey
             checkoutRequest = request
             return Response.success(paymentResponse())
@@ -182,17 +182,17 @@ class PaymentRepositoryImplTest {
 
         override suspend fun checkoutWalletTopUp(
             idempotencyKey: String,
-            request: WalletTopUpRequestDto,
-        ): Response<PaymentResponseDto> = Response.success(paymentResponse())
+            request: WalletTopUpRequest,
+        ): Response<PaymentResponse> = Response.success(paymentResponse())
 
-        override suspend fun getPayment(paymentId: String): Response<PaymentResponseDto> =
+        override suspend fun getPayment(paymentId: String): Response<PaymentResponse> =
             Response.success(paymentResponse(includeRefund = true))
 
-        override suspend fun cancelPayment(paymentId: String): Response<PaymentResponseDto> =
+        override suspend fun cancelPayment(paymentId: String): Response<PaymentResponse> =
             Response.success(paymentResponse(status = "CANCELLED"))
 
-        private fun quoteResponse(): PaymentQuoteResponseDto =
-            PaymentQuoteResponseDto(
+        private fun quoteResponse(): PaymentQuoteResponse =
+            PaymentQuoteResponse(
                 quoteId = "quote-1",
                 purpose = "WALLET_TOP_UP",
                 baseAmountMinor = 10_000,
@@ -209,8 +209,8 @@ class PaymentRepositoryImplTest {
         private fun paymentResponse(
             status: String = paymentStatus,
             includeRefund: Boolean = false,
-        ): PaymentResponseDto =
-            PaymentResponseDto(
+        ): PaymentResponse =
+            PaymentResponse(
                 paymentId = "payment-1",
                 purpose = "TOUR_BOOKING",
                 method = "HOSTED_CARD",

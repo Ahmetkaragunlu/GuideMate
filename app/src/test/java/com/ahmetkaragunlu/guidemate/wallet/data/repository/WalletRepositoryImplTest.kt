@@ -1,11 +1,11 @@
 package com.ahmetkaragunlu.guidemate.wallet.data.repository
 
 import com.ahmetkaragunlu.guidemate.common.network.testApiCallExecutor
-import com.ahmetkaragunlu.guidemate.common.network.model.ApiPageResponse
+import com.ahmetkaragunlu.guidemate.common.network.model.response.ApiPageResponse
 import com.ahmetkaragunlu.guidemate.common.result.DataResult
 import com.ahmetkaragunlu.guidemate.wallet.data.remote.api.WalletApi
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WalletResponseDto
-import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.WalletTransactionResponseDto
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.WalletResponse
+import com.ahmetkaragunlu.guidemate.wallet.data.remote.model.response.WalletTransactionResponse
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionDirection
 import com.ahmetkaragunlu.guidemate.wallet.domain.model.WalletTransactionType
 import java.time.Instant
@@ -75,9 +75,9 @@ class WalletRepositoryImplTest {
         var requestedPage: Int? = null
         var requestedSize: Int? = null
 
-        override suspend fun getWallet(): Response<WalletResponseDto> =
+        override suspend fun getWallet(): Response<WalletResponse> =
             Response.success(
-                WalletResponseDto(
+                WalletResponse(
                     balanceMinor = 125_000,
                     availableBalanceMinor = 110_000,
                     currencyCode = "USD",
@@ -87,14 +87,14 @@ class WalletRepositoryImplTest {
         override suspend fun getTransactions(
             page: Int,
             size: Int,
-        ): Response<ApiPageResponse<WalletTransactionResponseDto>> {
+        ): Response<ApiPageResponse<WalletTransactionResponse>> {
             requestedPage = page
             requestedSize = size
             return Response.success(
                 ApiPageResponse(
                     content =
                         listOf(
-                            WalletTransactionResponseDto(
+                            WalletTransactionResponse(
                                 transactionId = "transaction-1",
                                 direction = "CREDIT",
                                 type = "GUIDE_EARNING",
