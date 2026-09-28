@@ -16,6 +16,31 @@ class HostedPaymentUrlTest {
     }
 
     @Test
+    fun `allows secure provider and bank navigation`() {
+        assertFalse(
+            shouldBlockHostedPaymentNavigation("https://sandbox.iyzipay.com/checkout"),
+        )
+        assertFalse(
+            shouldBlockHostedPaymentNavigation("https://secure.bank.example/3ds/verify"),
+        )
+        assertFalse(
+            shouldBlockHostedPaymentNavigation(
+                "https://callback.example/api/v1/payments/iyzico/callback?token=abc",
+            ),
+        )
+    }
+
+    @Test
+    fun `blocks insecure or local payment navigation`() {
+        assertTrue(shouldBlockHostedPaymentNavigation(null))
+        assertTrue(shouldBlockHostedPaymentNavigation("http://sandbox.iyzipay.com/checkout"))
+        assertTrue(shouldBlockHostedPaymentNavigation("file:///tmp/payment.html"))
+        assertTrue(shouldBlockHostedPaymentNavigation("content://payment/result"))
+        assertTrue(shouldBlockHostedPaymentNavigation("javascript:alert('payment')"))
+        assertTrue(shouldBlockHostedPaymentNavigation("intent://payment#Intent;end"))
+    }
+
+    @Test
     fun `recognizes only the payment callback path`() {
         assertTrue(
             "https://local.example/api/v1/payments/iyzico/callback?token=abc"

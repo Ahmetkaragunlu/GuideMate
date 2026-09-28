@@ -204,6 +204,20 @@ private fun HostedPaymentContent(
                                 onPageFinished(url)
                             }
 
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView?,
+                                request: WebResourceRequest?,
+                            ): Boolean {
+                                val shouldBlock =
+                                    shouldBlockHostedPaymentNavigation(
+                                        request?.url?.toString(),
+                                    )
+                                if (shouldBlock && request?.isForMainFrame != false) {
+                                    onPageError(context.getString(R.string.payment_invalid_url_error))
+                                }
+                                return shouldBlock
+                            }
+
                             override fun onReceivedError(
                                 view: WebView?,
                                 request: WebResourceRequest?,
@@ -267,3 +281,6 @@ private fun HostedPaymentContent(
         }
     }
 }
+
+internal fun shouldBlockHostedPaymentNavigation(url: String?): Boolean =
+    url == null || !url.isSecureHostedPaymentUrl()
